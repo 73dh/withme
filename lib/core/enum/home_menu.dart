@@ -8,45 +8,22 @@ import '../router/router_path.dart';
 import '../ui/icon/const.dart';
 
 enum HomeMenu {
-  pool(
-    name: 'Pool',
-    iconPath: IconsPath.poolPerson,
-    body: PoolPage(),
-    // routePath: RoutePath.pool,
-
-  ),
-  customer(
-    name: 'Customer',
-    iconPath: IconsPath.customerPerson,
-    body: CustomerPage(),
-    // routePath: RoutePath.customer,
-  ),
-  search(
-    name: 'Pool',
-    iconPath: IconsPath.searchPerson,
-    body: SearchPage(),
-    // routePath: RoutePath.search,
-  ),
-  dashBoard(
-    name: 'Pool',
-    iconPath: IconsPath.dashBoard,
-    body: DashBoardPage(),
-    // routePath: RoutePath.dashBoard,
-  );
+  pool(name: 'Pool', iconPath: IconsPath.poolPerson),
+  customer(name: 'Customer', iconPath: IconsPath.customerPerson),
+  search(name: 'Pool', iconPath: IconsPath.searchPerson),
+  dashBoard(name: 'Pool', iconPath: IconsPath.dashBoard);
 
   final String name;
   final String iconPath;
-  final Widget body;
-  // final String routePath;
 
-  const HomeMenu({
-    required this.name,
-    required this.iconPath,
-    required this.body,
-    // required this.routePath,
-  });
+  const HomeMenu({required this.name, required this.iconPath});
 
-
+  Widget get toWidget => switch (this) {
+    HomeMenu.pool => PoolPage(),
+    HomeMenu.customer => CustomerPage(),
+    HomeMenu.search => SearchPage(),
+    HomeMenu.dashBoard => DashBoardPage(),
+  };
 }
 
 //1단계: 유치 단계 (Acquisition)

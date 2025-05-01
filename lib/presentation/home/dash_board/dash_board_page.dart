@@ -6,7 +6,7 @@ class DashBoardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('${GoRouterState.of(context).path}'),);
+    return Center(child: Text('${GoRouterState.of(context).uri.path}'),);
     
   }
 }

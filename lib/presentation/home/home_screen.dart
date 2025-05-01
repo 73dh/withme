@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       currentIndex = index;
       _pageController.animateToPage(
-        currentIndex,
+        index,
         duration: Duration(milliseconds: 100),
         curve: Curves.easeIn,
       );
@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: _pageController,
         onPageChanged: _onPageChanged,
         itemBuilder: (context, index) {
-          return HomeMenu.values.firstWhere((e) => e.index == index).body;
+          return HomeMenu.values.firstWhere((e) => e.index == index).toWidget;
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
