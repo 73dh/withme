@@ -10,8 +10,8 @@ import '../ui/icon/const.dart';
 enum HomeMenu {
   pool(name: 'Pool', iconPath: IconsPath.poolPerson),
   customer(name: 'Customer', iconPath: IconsPath.customerPerson),
-  search(name: 'Pool', iconPath: IconsPath.searchPerson),
-  dashBoard(name: 'Pool', iconPath: IconsPath.dashBoard);
+  search(name: 'Search', iconPath: IconsPath.searchPerson),
+  dashBoard(name: 'DashBoard', iconPath: IconsPath.dashBoard);
 
   final String name;
   final String iconPath;

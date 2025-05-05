@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "58346949612",
+    "project_id": "withme-b3e85",
+    "storage_bucket": "withme-b3e85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58346949612:android:c8a3a900bae9f9eb34cec9",
+        "android_client_info": {
+          "package_name": "com.example.dh.withme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIoSEurOQJizo35PIgULn8nhtracqwmmY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

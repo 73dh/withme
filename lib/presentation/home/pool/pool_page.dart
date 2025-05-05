@@ -1,7 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/utils/extension/date_time.dart';
+import 'package:withme/core/widget/circle_item.dart';
 import 'package:withme/core/widget/width_height.dart';
+import 'package:withme/data/mock/mock_customer.dart';
+import 'package:withme/domain/use_case/get_pool_use_case.dart';
 import 'package:withme/presentation/home/pool/components/pool_card.dart';
+import 'package:withme/presentation/home/pool/pool_view_model.dart';
+
+import '../../../core/ui/text_style/text_styles.dart';
+import '../../../domain/model/customer.dart';
 
 class PoolPage extends StatelessWidget {
   const PoolPage({super.key});
@@ -9,27 +19,33 @@ class PoolPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '등록월: 2021/01',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              Column(children: [...List.generate(5, (index) => PoolCard())]),
-              height20,
-              Text(
-                '등록월: 2021/02',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              Column(children: [...List.generate(10, (index) => PoolCard())]),
-            ],
+      child: Scaffold(
+        appBar: AppBar(title: Text('Pool [${10}]')),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListView.builder(
+                  primary: false,
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    final customers =
+                        mockCustomers.map((e) => Customer.fromJson(e)).toList();
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: PoolCard(customer: customers[0]),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+          ),
     );
   }
 }

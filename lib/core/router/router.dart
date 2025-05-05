@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/presentation/home/home_screen.dart';
+import 'package:withme/presentation/registration/registration_screen.dart';
 import 'package:withme/presentation/splash/splash_screen.dart';
 
 final router = GoRouter(
@@ -8,5 +9,9 @@ final router = GoRouter(
   routes: [
     GoRoute(builder: (_, __) => SplashScreen(), path: RoutePath.splash),
     GoRoute(builder: (_, __) => HomeScreen(), path: RoutePath.home),
+    GoRoute(
+      builder: (_, __) => RegistrationScreen(),
+      path: RoutePath.registration,
+    ),
   ],
 );
