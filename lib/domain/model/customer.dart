@@ -72,16 +72,16 @@ class Customer {
         documentReference: snapshot.reference,
       );
 
-  static Map<String, dynamic> toMapForCreateCustomer({ required String name}) {
+  static Map<String, dynamic> toMapForCreateCustomer({ required String name,String? recommender,required String history}) {
     final map = <String, dynamic>{};
     map[keyUserKey] = 'user1';
     map[keyCustomerKey] = generateCustomerKey('user1');
     map[keyCustomerName] = name;
     map[keyCustomerBirth] = '';
-    map[keyCustomerHistory] = [];
+    map[keyCustomerHistory] = [history];
     map[keyIsPolicy] = '';
     map[keyRegisteredDate] = DateTime.now().toUtc();
-    map[keyRecommendByWho] = '';
+    map[keyRecommendByWho] = recommender??'';
 
     return map;
   }

@@ -6,7 +6,7 @@ import 'package:withme/domain/use_case/get_pool_use_case.dart';
 
 final getIt = GetIt.instance;
 
-void setup() {
+void diSetup() {
   // data
   getIt.registerSingleton<FBase>(FBase());
   // repository
