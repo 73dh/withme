@@ -11,7 +11,7 @@ import 'package:withme/presentation/home/pool/pool_page.dart';
 import 'package:withme/presentation/home/search/search_page.dart';
 
 import '../../core/ui/text_style/text_styles.dart';
-import '../../domain/model/customer.dart';
+import '../../domain/model/customer_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

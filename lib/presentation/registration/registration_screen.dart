@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/utils/calculate_age.dart';
+import 'package:withme/core/utils/calculate_insurance_age.dart';
+import 'package:withme/core/utils/days_until_insurance_age.dart';
+import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/generate_customer_key.dart';
 import 'package:withme/core/widget/custom_text_form_field.dart';
+import 'package:withme/core/widget/render_filled_button.dart';
+import 'package:withme/core/widget/render_snack_bar.dart';
+import 'package:withme/core/widget/select_birth.dart';
 import 'package:withme/core/widget/width_height.dart';
 import 'package:withme/data/data_source/remote/fbase.dart';
 import 'package:withme/data/repository/customer_repository_impl.dart';
-import 'package:withme/domain/model/customer.dart';
+import 'package:withme/domain/model/customer_model.dart';
+import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
 import 'package:withme/presentation/registration/enum/history_content.dart';
 
@@ -26,9 +34,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _historyController = TextEditingController(
     text: HistoryContent.title.toString(),
   );
+  final TextEditingController _birthController = TextEditingController();
   final MenuController _menuController = MenuController();
 
   bool isRecommended = false;
+  DateTime? _birth;
 
   @override
   void dispose() {
@@ -53,6 +63,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 _title(),
                 height(39),
                 _inputName(),
+                height(10),
+                _inputBirth(),
                 height(5),
                 _recommendedSwitch(),
                 if (isRecommended) _recommendedInputName(),
@@ -73,7 +85,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Text _title() {
     return const Text(
-      'Registration Customer in Pool',
+      'Registration in Pool',
       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
@@ -97,6 +109,60 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       onSaved: (String text) {
         _nameController.text = text.trim();
       },
+    );
+  }
+
+  _inputBirth() {
+    return Container(
+      padding: const EdgeInsets.only(left: 20),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('생년월일'),
+              const Spacer(),
+              if (_birth != null)
+                FilledButton.tonal(
+                  onPressed: () async {
+                    setState(() {
+                      _birth = null;
+                      _birthController.clear();
+                    });
+                  },
+                  child: const Text('초기화'),
+                ),
+              FilledButton.tonal(
+                onPressed: () async {
+                  DateTime? selectedBirth = await selectBirth(context);
+                  if (selectedBirth != null) {
+                    setState(() {
+                      _birth = selectedBirth;
+                      _birthController.text = selectedBirth.toString();
+                    });
+                  }
+                },
+                child: Text(_birth != null ? _birth!.formattedDate : 'Birth'),
+              ),
+            ],
+          ),
+
+          if (_birth != null)
+            Column(
+              children: [
+                height(5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${calculateAge(_birth!)}세 (보험나이 : ${calculateInsuranceAge(_birth!)}세), 상령일까지 ${daysUntilInsuranceAgeChange(_birth!)}일',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 
@@ -196,7 +262,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       validator: (String text) {
         if (text.isEmpty) {
-          return '내용을 입력 하세요';
+          return '내용을 입력하세요';
         }
         return null;
       },
@@ -206,40 +272,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  FilledButton _registrationButton(BuildContext context) {
-    return FilledButton(
-      onPressed: () {
-        final result = _tryValidation();
-        if (result) {
-          final customerMap = Customer.toMapForCreateCustomer(
-            name: _nameController.text,
-            recommender: _recommendedController.text,
-            history: _historyController.text,
+  Widget _registrationButton(BuildContext context) {
+    return RenderFilledButton(onPressed: () {
+      final result = _tryValidation();
+      if (result) {
+        showDialog(context: context, builder: (context){
+          return Center(
+            child: Container(height: 200,
+              child:
+              Column(children: [Text('data'),Text('data'),Text('data')]),
+            ),
           );
-          getIt<CustomerRepository>().registerCustomer(
-            userKey: 'user1',
-            customerData: customerMap,
-          );
-          context.pop();
-        }
-      },
-      style: FilledButton.styleFrom(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2)),
-        ),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16.0),
-        child: SizedBox(
-          width: double.infinity,
-          child: Text('등록', textAlign: TextAlign.center),
-        ),
-      ),
+        });
+        // final customerMap = CustomerModel.toMapForCreateCustomer(
+        //   name: _nameController.text,
+        //   recommender: _recommendedController.text,
+        //   birth: _birth,
+        // );
+        // final historyMap = HistoryModel.toMapForHistory(
+        //   content: _historyController.text,
+        // );
+        // getIt<CustomerRepository>().registerCustomer(
+        //   userKey: 'user1',
+        //   customerData: customerMap,
+        //   historyData: historyMap,
+        // );
+        // context.pop();
+      }
+    }, text: '등록',
     );
   }
 
   bool _tryValidation() {
     final isValid = _formKey.currentState?.validate();
+    if (_historyController.text == HistoryContent.title.toString()) {
+      renderSnackBar(context, text: '상담 이력을 선택 하세요');
+      return false;
+    }
     if (isValid == true) {
       _formKey.currentState!.save();
       return true;

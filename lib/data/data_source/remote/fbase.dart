@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/fire_base/firestore_keys.dart';
 
-import '../../mock/mock_customer.dart';
 
 class FBase {
   // Customer
@@ -9,16 +8,44 @@ class FBase {
   Future registerCustomer({
     required String userKey,
     required Map<String, dynamic> customerData,
+    required Map<String, dynamic> historyData,
   }) async {
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerData[keyCustomerKey]);
-    customerRef.set(customerData);
+    DocumentReference policyRef =
+        customerRef.collection(collectionPolicies).doc();
+    DocumentReference historyRef =
+        customerRef.collection(collectionHistories).doc();
+
+    FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+      tx.set(customerRef, customerData);
+      tx.set(policyRef, {'test': 'test'});
+      tx.set(historyRef, historyData);
+    });
   }
 
-  Future<List<Map<String, dynamic>>> getCustomers() async {
-    return mockCustomers;
+
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getPools() {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({
+    required String customerKey,
+  }) {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionHistories)
+        .snapshots();
   }
 }
