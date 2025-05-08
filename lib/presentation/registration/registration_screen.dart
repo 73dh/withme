@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
 import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
-import 'package:withme/core/utils/generate_customer_key.dart';
 import 'package:withme/core/widget/custom_text_form_field.dart';
 import 'package:withme/core/widget/render_filled_button.dart';
 import 'package:withme/core/widget/render_snack_bar.dart';
 import 'package:withme/core/widget/select_birth.dart';
 import 'package:withme/core/widget/width_height.dart';
-import 'package:withme/data/data_source/remote/fbase.dart';
-import 'package:withme/data/repository/customer_repository_impl.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/domain/repository/customer_repository.dart';
 import 'package:withme/domain/use_case/customer/register_customer_use_case.dart';
 import 'package:withme/domain/use_case/customer_use_case.dart';
 import 'package:withme/presentation/registration/enum/history_content.dart';
@@ -79,6 +74,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   _historyMenu(context),
 
                   _historyButton(),
+                  // _historySection(context),
                   height(10),
                   if (_historyController.text.isEmpty) _etcHistoryInput(),
                 ],
@@ -86,7 +82,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
           ),
         ),
-        bottomSheet: _registrationButton(context),
+        // bottomSheet: _registrationButton(context),
       ),
     );
   }
@@ -241,32 +237,55 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  MenuAnchor _historyMenu(BuildContext context) {
+  Widget _historySection(BuildContext context) {
     return MenuAnchor(
       controller: _menuController,
-      menuChildren:
-          HistoryContent.values.map((content) {
-            return MenuItemButton(
-              child: Text(content.toString()),
-              onPressed: () {
-                hideKeyboard(context);
-                setState(() {
-                  if (content == HistoryContent.etc) {
-                    _historyController.clear();
-                  } else {
-                    _historyController.text = content.toString().trim();
-                  }
-                  _menuController.close();
-                });
-              },
-            );
-          }).toList(),
+      menuChildren: HistoryContent.values.map((content) {
+        return MenuItemButton(
+          child: Text(content.toString()),
+          onPressed: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+            setState(() {
+              if (content == HistoryContent.etc) {
+                _historyController.clear();
+              } else {
+                _historyController.text = content.toString().trim();
+              }
+              _menuController.close();
+            });
+          },
+        );
+      }).toList(),
+      child: _historyButton(), // 여기가 중요!
     );
   }
 
-  void hideKeyboard(BuildContext context) {
-    FocusScope.of(context).requestFocus(FocusNode());
+  MenuAnchor _historyMenu(BuildContext context) {
+    return MenuAnchor(
+          controller: _menuController,
+          menuChildren:
+              HistoryContent.values.map((content) {
+                return MenuItemButton(
+                  child: Text(content.toString()),
+                  onPressed: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    setState(() {
+                      if (content == HistoryContent.etc) {
+                        _historyController.clear();
+                      } else {
+                        _historyController.text = content.toString().trim();
+                      }
+                      _menuController.close();
+                    });
+                  },
+                );
+              }).toList(),
+        );
+
+
   }
+
+
 
   FilledButton _historyButton() {
     return FilledButton(

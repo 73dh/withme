@@ -3,8 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/history_model.dart';
 
-Future<HistoryModel> showHistories(BuildContext context, List<HistoryModel> histories) async {
+Future<HistoryModel?> showHistories(BuildContext context, List<HistoryModel> histories) async {
  return await showDialog(
+   barrierDismissible: true,
     context: context,
     builder: (context) {
       return Dialog(

@@ -46,7 +46,7 @@ class PoolPage extends StatelessWidget {
                               customer: pools[index],
                               onTap: (List<HistoryModel> histories) async{
                                HistoryModel? historyResult=await showHistories(context, histories);
-                              if(historyResult.contactDate.toString()!=''){
+                              if(historyResult!=null){
 
                                print(historyResult);
                               }
