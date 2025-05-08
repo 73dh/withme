@@ -9,8 +9,8 @@ enum HistoryContent {
 
   @override
   String toString() => switch (this) {
-    HistoryContent.title => '(상담) 이력을 선택 하세요.',
-    HistoryContent.generation => '고객 발굴(등록)',
+    HistoryContent.title => '(상담) 이력을 선택 하세요. (필수)',
+    HistoryContent.generation => '최초 발굴 (신규 등록)',
     HistoryContent.initContact => '초기 면담 또는 통화',
     HistoryContent.needsAssessment => '고객 니즈 평가, 분석',
     HistoryContent.presentation => '상품 등 설명',

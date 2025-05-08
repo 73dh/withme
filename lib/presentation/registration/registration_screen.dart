@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
 import 'package:withme/core/utils/days_until_insurance_age.dart';
@@ -15,6 +16,8 @@ import 'package:withme/data/repository/customer_repository_impl.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
+import 'package:withme/domain/use_case/customer/register_customer_use_case.dart';
+import 'package:withme/domain/use_case/customer_use_case.dart';
 import 'package:withme/presentation/registration/enum/history_content.dart';
 
 import '../../core/di/setup.dart';
@@ -39,6 +42,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   bool isRecommended = false;
   DateTime? _birth;
+  String? _sex;
 
   @override
   void dispose() {
@@ -57,24 +61,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           key: _formKey,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                height(50),
-                _title(),
-                height(39),
-                _inputName(),
-                height(10),
-                _inputBirth(),
-                height(5),
-                _recommendedSwitch(),
-                if (isRecommended) _recommendedInputName(),
-                height(20),
-                _historyMenu(),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  height(50),
+                  _title(),
+                  height(39),
+                  _inputName(),
+                  height(10),
+                  _inputSex(),
+                  height(10),
+                  _inputBirth(),
+                  height(5),
+                  _recommendedSwitch(),
+                  if (isRecommended) _recommendedInputName(),
+                  height(20),
+                  _historyMenu(context),
 
-                _historyButton(),
-                height(10),
-                if (_historyController.text.isEmpty) _etcHistoryInput(),
-              ],
+                  _historyButton(),
+                  height(10),
+                  if (_historyController.text.isEmpty) _etcHistoryInput(),
+                ],
+              ),
             ),
           ),
         ),
@@ -93,11 +101,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   CustomTextFormField _inputName() {
     return CustomTextFormField(
       controller: _nameController,
-      hintText: '신규등록 이름',
+      hintText: '신규 고객 이름 (필수)',
       autoFocus: true,
-      onChanged: (text) {
+      onChanged: (text) async {
         setState(() {
-          _nameController.text = text.trim();
+          _nameController.text = text;
         });
       },
       validator: (String text) {
@@ -112,6 +120,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
+  Widget _inputSex() {
+    return Container(
+      padding: const EdgeInsets.only(left: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text('성별 (필수)'),
+          Spacer(),
+          RadioMenuButton<String>(
+            value: 'man',
+            groupValue: _sex,
+            onChanged:
+                (value) => setState(() {
+                  _sex = value;
+                }),
+
+            child: const Text('남성'),
+          ),
+          RadioMenuButton<String>(
+            value: 'woman',
+            groupValue: _sex,
+            onChanged:
+                (value) => setState(() {
+                  _sex = value;
+                }),
+
+            child: const Text('여성'),
+          ),
+        ],
+      ),
+    );
+  }
+
   _inputBirth() {
     return Container(
       padding: const EdgeInsets.only(left: 20),
@@ -120,7 +161,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('생년월일'),
+              const Text('생년월일 (선택)'),
               const Spacer(),
               if (_birth != null)
                 FilledButton.tonal(
@@ -174,7 +215,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           isRecommended = value;
         });
       },
-      title: const Text('소개자 여부'),
+      title: const Text('소개자 여부 (선택)'),
       contentPadding: const EdgeInsets.only(left: 20),
     );
   }
@@ -200,7 +241,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  MenuAnchor _historyMenu() {
+  MenuAnchor _historyMenu(BuildContext context) {
     return MenuAnchor(
       controller: _menuController,
       menuChildren:
@@ -208,21 +249,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             return MenuItemButton(
               child: Text(content.toString()),
               onPressed: () {
-                if (content.toString() == HistoryContent.etc.toString()) {
-                  setState(() {
+                hideKeyboard(context);
+                setState(() {
+                  if (content == HistoryContent.etc) {
                     _historyController.clear();
-                    _menuController.close();
-                  });
-                } else {
-                  setState(() {
+                  } else {
                     _historyController.text = content.toString().trim();
-                    _menuController.close();
-                  });
-                }
+                  }
+                  _menuController.close();
+                });
               },
             );
           }).toList(),
     );
+  }
+
+  void hideKeyboard(BuildContext context) {
+    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   FilledButton _historyButton() {
@@ -273,39 +316,112 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Widget _registrationButton(BuildContext context) {
-    return RenderFilledButton(onPressed: () {
-      final result = _tryValidation();
-      if (result) {
-        showDialog(context: context, builder: (context){
-          return Center(
-            child: Container(height: 200,
-              child:
-              Column(children: [Text('data'),Text('data'),Text('data')]),
-            ),
+    return RenderFilledButton(
+      onPressed: () async {
+        final result = _tryValidation();
+        if (result) {
+          final result = await showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return SizedBox(
+                height: 320,
+                width: double.infinity,
+                child: _confirmBox(context),
+              );
+            },
           );
-        });
-        // final customerMap = CustomerModel.toMapForCreateCustomer(
-        //   name: _nameController.text,
-        //   recommender: _recommendedController.text,
-        //   birth: _birth,
-        // );
-        // final historyMap = HistoryModel.toMapForHistory(
-        //   content: _historyController.text,
-        // );
-        // getIt<CustomerRepository>().registerCustomer(
-        //   userKey: 'user1',
-        //   customerData: customerMap,
-        //   historyData: historyMap,
-        // );
-        // context.pop();
-      }
-    }, text: '등록',
+          if (result == true) {
+            context.pop();
+          }
+        }
+      },
+      text: '등록',
+    );
+  }
+
+  Column _confirmBox(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        height(20),
+        _renderText(text: '신규등록 확인', size: 25),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _renderText(
+                text: '등록자: ',
+                text2: ' ${_nameController.text} ($_sex)',
+              ),
+              _renderText(
+                text: '생년월일: ',
+                text2:
+                    ' ${_birthController.text.isEmpty ? "추후입력" : DateTime.parse(_birthController.text).formattedDate}',
+              ),
+              _renderText(
+                text: '소개자: ',
+                text2:
+                    '${_recommendedController.text.isEmpty ? "없음" : _recommendedController.text}',
+              ),
+              _renderText(text2: _historyController.text),
+            ],
+          ),
+        ),
+        height(5),
+        RenderFilledButton(
+          onPressed: () {
+            final customerMap = CustomerModel.toMapForCreateCustomer(
+              name: _nameController.text,
+              sex: _sex!,
+              recommender: _recommendedController.text,
+              birth: _birth,
+            );
+            final historyMap = HistoryModel.toMapForHistory(
+              content: _historyController.text,
+            );
+            getIt<CustomerUseCase>().execute(
+              usecase: RegisterCustomerUseCase(
+                userKey: 'user1',
+                customerData: customerMap,
+                historyData: historyMap,
+              ),
+            );
+            // getIt<RegisterCustomerUseCase>().call(
+            //   repository: getIt<CustomerRepository>(),
+            //   userKey: 'user1',
+            //   customerData: customerMap,
+            //   historyData: historyMap,
+            // );
+            context.pop(true);
+          },
+          text: '등록',
+        ),
+      ],
+    );
+  }
+
+  Widget _renderText({String? text, String? text2, double size = 20}) {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(fontSize: size), // 기본 스타일
+        children: [
+          TextSpan(text: text, style: TextStyle(color: Colors.black)),
+          TextSpan(text: text2, style: TextStyle(color: Colors.blue)),
+        ],
+      ),
     );
   }
 
   bool _tryValidation() {
     final isValid = _formKey.currentState?.validate();
-    if (_historyController.text == HistoryContent.title.toString()) {
+
+    if (_nameController.text.isNotEmpty && _sex == null) {
+      renderSnackBar(context, text: '성별을 선택 하세요');
+      return false;
+    }
+    if (_nameController.text.isNotEmpty &&
+        _historyController.text == HistoryContent.title.toString()) {
       renderSnackBar(context, text: '상담 이력을 선택 하세요');
       return false;
     }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../text_style/text_styles.dart';
 
-final theme=ThemeData(
+final theme = ThemeData(
   scaffoldBackgroundColor: Colors.white,
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.white,
@@ -12,8 +12,12 @@ final theme=ThemeData(
     ),
   ),
   bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey.shade100),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor:  Colors.grey.shade200,shape:CircleBorder() ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.amber.shade200,
+    shape: CircleBorder(),
+  ),
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-    backgroundColor: Colors.transparent,elevation: 0
+    backgroundColor: Colors.transparent,
+    elevation: 0,
   ),
 );

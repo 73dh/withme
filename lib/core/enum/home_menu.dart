@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/customer/customer_page.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_page.dart';
-import 'package:withme/presentation/home/pool/pool_page.dart';
+import 'package:withme/presentation/home/pool/screen/pool_page.dart';
 
 import '../../presentation/home/search/search_page.dart';
-import '../router/router_path.dart';
 import '../ui/icon/const.dart';
 
 enum HomeMenu {

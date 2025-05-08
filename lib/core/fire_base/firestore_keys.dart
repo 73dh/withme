@@ -7,6 +7,7 @@ const String collectionHistories = 'Histories';
 const String keyUserKey = 'user_key';
 const String keyCustomerKey = 'customer_key';
 const String keyCustomerName = 'customer_name';
+const String keyCustomerSex='Customer_sex';
 const String keyCustomerBirth = 'customer_birth';
 const String keyIsPolicy = 'is_policy';
 const String keyRecommendByWho = 'recommendByWho';

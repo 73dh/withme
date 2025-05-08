@@ -31,7 +31,15 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   }
 
   @override
-  Stream<List<HistoryModel>> histories({required String customerKey}) {
-    return fBase.getHistories(customerKey: customerKey).transform(toHistories);
+  Stream<List<HistoryModel>> fetchHistories({required String customerKey}) {
+    return fBase.fetchHistories(customerKey: customerKey).transform(toHistories);
   }
+
+  @override
+  Future<void> addHistory(HistoryModel history) {
+    // TODO: implement addHistory
+    throw UnimplementedError();
+  }
+
+
 }

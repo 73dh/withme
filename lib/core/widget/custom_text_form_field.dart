@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../ui/text_style/text_styles.dart';
+
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
@@ -33,13 +35,13 @@ class CustomTextFormField extends StatelessWidget {
       cursorColor: Colors.black87,
       obscureText: obscureText,
       autofocus: autoFocus,
-      onChanged: onChanged,
+      onChanged: (text) => onChanged,
       onEditingComplete: onCompleted,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.all(20),
         hintText: hintText,
-        hintStyle: const TextStyle(color: Colors.blueGrey, fontSize: 14.0),
-        errorStyle: const TextStyle(fontSize: 13, color: Colors.black87),
+        hintStyle: TextStyles.hintStyle,
+        errorStyle: TextStyles.errorStyle,
         errorBorder: baseBorder,
         fillColor: Colors.white,
         filled: true,

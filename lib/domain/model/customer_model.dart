@@ -8,6 +8,7 @@ class CustomerModel {
   final String userKey;
   final String customerKey;
   final String name;
+  final String sex;
   final DateTime? birth;
   // final List<dynamic> policies;
   final String recommended;
@@ -19,6 +20,7 @@ class CustomerModel {
     required this.userKey,
     required this.customerKey,
     required this.name,
+    required this.sex,
     required this.birth,
     // required this.policies,
     required this.recommended,
@@ -50,6 +52,7 @@ class CustomerModel {
     this.documentReference,
   }) : customerKey = map[keyCustomerKey] ?? '',
        name = map[keyCustomerName] ?? '',
+  sex=map[keyCustomerSex]??'',
        birth =
            map[keyCustomerBirth] != ''
                ? (map[keyCustomerBirth] as Timestamp).toDate()
@@ -74,6 +77,7 @@ class CustomerModel {
 
   static Map<String, dynamic> toMapForCreateCustomer({
     required String name,
+    required String sex,
     String? recommender,
     // required String history,
     DateTime? birth,
@@ -82,6 +86,7 @@ class CustomerModel {
     map[keyUserKey] = 'user1';
     map[keyCustomerKey] = generateCustomerKey('user1');
     map[keyCustomerName] = name;
+    map[keyCustomerSex]=sex;
     map[keyCustomerBirth] = birth ?? '';
     // map[keyCustomerHistory] = [history];
     // map[keyIsPolicy] = [];

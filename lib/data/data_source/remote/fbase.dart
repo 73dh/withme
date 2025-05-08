@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/fire_base/firestore_keys.dart';
 
+import '../../../domain/model/history_model.dart';
 
 class FBase {
+
   // Customer
 
   Future registerCustomer({
@@ -27,8 +29,6 @@ class FBase {
     });
   }
 
-
-
   Stream<QuerySnapshot<Map<String, dynamic>>> getPools() {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
@@ -37,7 +37,7 @@ class FBase {
         .snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchHistories({
     required String customerKey,
   }) {
     return FirebaseFirestore.instance
@@ -47,5 +47,9 @@ class FBase {
         .doc(customerKey)
         .collection(collectionHistories)
         .snapshots();
+  }
+
+  Future<void> addHistory(HistoryModel history)async{
+    
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/router/router.dart';
 
-import 'core/ui/text_style/text_styles.dart';
 import 'core/ui/theme/theme.dart';
 
 class App extends StatelessWidget {

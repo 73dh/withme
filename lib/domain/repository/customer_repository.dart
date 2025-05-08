@@ -1,8 +1,10 @@
 
+import 'package:withme/domain/repository/repository.dart';
+
 import '../model/customer_model.dart';
 import '../model/history_model.dart';
 
-abstract interface class CustomerRepository {
+abstract interface class CustomerRepository implements Repository{
   Future<void> registerCustomer({
     required String userKey,
     required Map<String, dynamic> customerData,
@@ -11,5 +13,7 @@ abstract interface class CustomerRepository {
 
   Stream<List<CustomerModel>> getPools();
 
-  Stream<List<HistoryModel>> histories({required String customerKey});
+  Stream<List<HistoryModel>> fetchHistories({required String customerKey});
+
+  Future<void> addHistory(HistoryModel history);
 }
