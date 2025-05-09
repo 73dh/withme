@@ -71,10 +71,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   _recommendedSwitch(),
                   if (isRecommended) _recommendedInputName(),
                   height(20),
-                  _historyMenu(context),
+                  _historyMenu(),
 
-                  _historyButton(),
-                  // _historySection(context),
+                  _historyButton(context),
                   height(10),
                   if (_historyController.text.isEmpty) _etcHistoryInput(),
                 ],
@@ -82,7 +81,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
           ),
         ),
-        // bottomSheet: _registrationButton(context),
+        bottomSheet: _registrationButton(context),
       ),
     );
   }
@@ -237,30 +236,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _historySection(BuildContext context) {
-    return MenuAnchor(
-      controller: _menuController,
-      menuChildren: HistoryContent.values.map((content) {
-        return MenuItemButton(
-          child: Text(content.toString()),
-          onPressed: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-            setState(() {
-              if (content == HistoryContent.etc) {
-                _historyController.clear();
-              } else {
-                _historyController.text = content.toString().trim();
-              }
-              _menuController.close();
-            });
-          },
-        );
-      }).toList(),
-      child: _historyButton(), // 여기가 중요!
-    );
-  }
 
-  MenuAnchor _historyMenu(BuildContext context) {
+
+  MenuAnchor _historyMenu() {
     return MenuAnchor(
           controller: _menuController,
           menuChildren:
@@ -268,7 +246,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 return MenuItemButton(
                   child: Text(content.toString()),
                   onPressed: () {
-                    FocusScope.of(context).requestFocus(FocusNode());
+
                     setState(() {
                       if (content == HistoryContent.etc) {
                         _historyController.clear();
@@ -287,27 +265,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
 
 
-  FilledButton _historyButton() {
-    return FilledButton(
-      onPressed: () {
-        if (_menuController.isOpen) {
-          _menuController.close();
-        } else {
-          _menuController.open();
-        }
-      },
-      style: FilledButton.styleFrom(
-        backgroundColor: Colors.grey,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2)),
-        ),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 21.5),
-          child: Text(_historyController.text),
-        ),
-      ),
+  Builder _historyButton(BuildContext context) {
+    return Builder(
+      builder: (context) {
+        return FilledButton(
+          onPressed: () {
+            if (_menuController.isOpen) {
+              _menuController.close();
+            } else {
+              FocusScope.of(context).requestFocus(FocusNode());
+              _menuController.open();
+            }
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: Colors.grey,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(2)),
+            ),
+          ),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 21.5),
+              child: Text(_historyController.text),
+            ),
+          ),
+        );
+      }
     );
   }
 
