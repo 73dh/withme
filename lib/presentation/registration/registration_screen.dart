@@ -236,61 +236,50 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-
-
   MenuAnchor _historyMenu() {
     return MenuAnchor(
-          controller: _menuController,
-          menuChildren:
-              HistoryContent.values.map((content) {
-                return MenuItemButton(
-                  child: Text(content.toString()),
-                  onPressed: () {
-
-                    setState(() {
-                      if (content == HistoryContent.etc) {
-                        _historyController.clear();
-                      } else {
-                        _historyController.text = content.toString().trim();
-                      }
-                      _menuController.close();
-                    });
-                  },
-                );
-              }).toList(),
-        );
-
-
+      controller: _menuController,
+      menuChildren:
+          HistoryContent.values.map((content) {
+            return MenuItemButton(
+              child: Text(content.toString()),
+              onPressed: () {
+                setState(() {
+                  if (content == HistoryContent.etc) {
+                    _historyController.clear();
+                  } else {
+                    _historyController.text = content.toString().trim();
+                  }
+                  _menuController.close();
+                });
+              },
+            );
+          }).toList(),
+    );
   }
 
-
-
-  Builder _historyButton(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        return FilledButton(
-          onPressed: () {
-            if (_menuController.isOpen) {
-              _menuController.close();
-            } else {
-              FocusScope.of(context).requestFocus(FocusNode());
-              _menuController.open();
-            }
-          },
-          style: FilledButton.styleFrom(
-            backgroundColor: Colors.grey,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(2)),
-            ),
-          ),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 21.5),
-              child: Text(_historyController.text),
-            ),
-          ),
-        );
-      }
+  FilledButton _historyButton(BuildContext context) {
+    return FilledButton(
+      onPressed: () {
+        if (_menuController.isOpen) {
+          _menuController.close();
+        } else {
+          FocusScope.of(context).requestFocus(FocusNode());
+          _menuController.open();
+        }
+      },
+      style: FilledButton.styleFrom(
+        backgroundColor: Colors.grey,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(2)),
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 21.5),
+          child: Text(_historyController.text),
+        ),
+      ),
     );
   }
 
