@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../ui/text_style/text_styles.dart';
+import '../../ui/text_style/text_styles.dart';
+
 
 class CircleItem extends StatelessWidget {
   final int number;

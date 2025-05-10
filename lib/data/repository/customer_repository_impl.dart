@@ -24,6 +24,16 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
       historyData: historyData,
     );
   }
+  @override
+  Future<void> updateCustomer({
+    required String userKey,
+    required Map<String, dynamic> customerData,
+  }) async {
+    await fBase.updateCustomer(
+      userKey: userKey,
+      customerData: customerData,
+    );
+  }
 
   @override
   Stream<List<CustomerModel>> getPools() {
@@ -32,14 +42,21 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
 
   @override
   Stream<List<HistoryModel>> fetchHistories({required String customerKey}) {
-    return fBase.fetchHistories(customerKey: customerKey).transform(toHistories);
+    return fBase
+        .fetchHistories(customerKey: customerKey)
+        .transform(toHistories);
   }
 
   @override
-  Future<void> addHistory(HistoryModel history) {
-    // TODO: implement addHistory
-    throw UnimplementedError();
+  Future<void> addHistory({
+    required String userKey,
+    required String customerKey,
+    required Map<String, dynamic> historyData,
+  }) async {
+    return await fBase.addHistory(
+      userKey: userKey,
+      customerKey: customerKey,
+      historyData: historyData,
+    );
   }
-
-
 }

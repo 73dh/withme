@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../presentation/registration/enum/history_content.dart';
+import '../../domain/enum/history_content.dart';
 
 class SelectHistoryMenu extends StatefulWidget {
   final MenuController menuController;
-  final TextEditingController textEditingController;
+  final TextEditingController textController;
+  final void Function(TextEditingController controller) onTap;
 
   const SelectHistoryMenu({
     super.key,
     required this.menuController,
-    required this.textEditingController,
+    required this.textController,
+    required this.onTap,
   });
 
   @override
@@ -25,13 +27,16 @@ class _SelectHistoryMenuState extends State<SelectHistoryMenu> {
           HistoryContent.values.map((content) {
             return MenuItemButton(
               child: Text(content.toString()),
-              onPressed: () {
+              onPressed:
+              // ()=>widget.onTap(widget.textEditingController)
+              () {
                 setState(() {
                   if (content == HistoryContent.etc) {
-                    widget.textEditingController.clear();
+                    widget.textController.clear();
                   } else {
-                    widget.textEditingController.text = content.toString().trim();
+                    widget.textController.text = content.toString().trim();
                   }
+                  widget.onTap(widget.textController);
                   widget.menuController.close();
                 });
               },

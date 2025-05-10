@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../ui/text_style/text_styles.dart';
+import '../../ui/text_style/text_styles.dart';
+
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
@@ -11,6 +12,7 @@ class CustomTextFormField extends StatelessWidget {
   final VoidCallback? onCompleted;
   final Function(String)? validator;
   final Function(String)? onSaved;
+  final FocusNode? focusNode;
 
   const CustomTextFormField({
     super.key,
@@ -20,8 +22,9 @@ class CustomTextFormField extends StatelessWidget {
     this.autoFocus = false,
     this.onChanged,
     this.onCompleted,
-    required this.validator,
+     this.validator,
     this.onSaved,
+    this.focusNode,
   });
 
   @override
@@ -35,10 +38,11 @@ class CustomTextFormField extends StatelessWidget {
       cursorColor: Colors.black87,
       obscureText: obscureText,
       autofocus: autoFocus,
+      focusNode: focusNode,
       onChanged: (text) => onChanged,
       onEditingComplete: onCompleted,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.all(20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         hintText: hintText,
         hintStyle: TextStyles.hintStyle,
         errorStyle: TextStyles.errorStyle,

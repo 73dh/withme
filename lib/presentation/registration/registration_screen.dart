@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/data/fire_base/firestore_keys.dart';
+import 'package:withme/core/presentation/widget/history_button.dart';
+import 'package:withme/core/presentation/widget/select_history_menu.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
 import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
-import 'package:withme/core/widget/custom_text_form_field.dart';
-import 'package:withme/core/widget/render_filled_button.dart';
-import 'package:withme/core/widget/render_snack_bar.dart';
-import 'package:withme/core/widget/select_birth.dart';
-import 'package:withme/core/widget/width_height.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/customer/register_customer_use_case.dart';
+import 'package:withme/domain/use_case/customer/update_customer_use_case.dart';
 import 'package:withme/domain/use_case/customer_use_case.dart';
-import 'package:withme/presentation/registration/enum/history_content.dart';
+import 'package:withme/core/domain/enum/history_content.dart';
 
 import '../../core/di/setup.dart';
+import '../../core/presentation/widget/custom_text_form_field.dart';
+import '../../core/presentation/widget/render_filled_button.dart';
+import '../../core/presentation/widget/render_snack_bar.dart';
+import '../../core/presentation/widget/select_birth.dart';
+import '../../core/presentation/widget/width_height.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+  final CustomerModel? customerModel;
+
+  const RegistrationScreen({super.key, this.customerModel});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -29,7 +35,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _recommendedController = TextEditingController();
-  final TextEditingController _historyController = TextEditingController(
+  TextEditingController _historyController = TextEditingController(
     text: HistoryContent.title.toString(),
   );
   final TextEditingController _birthController = TextEditingController();
@@ -38,6 +44,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool isRecommended = false;
   DateTime? _birth;
   String? _sex;
+
+  @override
+  void initState() {
+    if (widget.customerModel != null) {
+      print('전달받은 customerKey: ${widget.customerModel?.customerKey}');
+      final customer = widget.customerModel!;
+      _nameController.text = customer.name;
+      _sex = customer.sex;
+      _birth = customer.birth;
+      if(customer.birth.toString()!=''){
+
+      _birthController.text = customer.birth.toString();
+      }
+      if (customer.recommended.isNotEmpty) {
+        isRecommended = true;
+        _recommendedController.text = customer.recommended;
+      }
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -71,9 +97,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   _recommendedSwitch(),
                   if (isRecommended) _recommendedInputName(),
                   height(20),
-                  _historyMenu(),
-
-                  _historyButton(context),
+                  // _historyMenu(),
+                  SelectHistoryMenu(
+                    menuController: _menuController,
+                    textController: _historyController,
+                    onTap: (textController) {
+                      setState(() {
+                        _historyController = textController;
+                      });
+                    },
+                  ),
+                  if (_historyController.text.isNotEmpty &&
+                      widget.customerModel == null)
+                    SizedBox(
+                      width: double.infinity,
+                      child: HistoryButton(
+                        menuController: _menuController,
+                        textController: _historyController,
+                    onPressed:  () {
+                      print('test');
+                      setState(() {
+                      Focus.of(context).requestFocus();
+                    });
+                    },
+                      ),
+                    ),
+                  // _historyButton(context),
                   height(10),
                   if (_historyController.text.isEmpty) _etcHistoryInput(),
                 ],
@@ -121,10 +170,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text('성별 (필수)'),
-          Spacer(),
+          const Text('성별 (필수)'),
+          const Spacer(),
           RadioMenuButton<String>(
-            value: 'man',
+            value: '남',
             groupValue: _sex,
             onChanged:
                 (value) => setState(() {
@@ -134,7 +183,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: const Text('남성'),
           ),
           RadioMenuButton<String>(
-            value: 'woman',
+            value: '여',
             groupValue: _sex,
             onChanged:
                 (value) => setState(() {
@@ -236,53 +285,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  MenuAnchor _historyMenu() {
-    return MenuAnchor(
-      controller: _menuController,
-      menuChildren:
-          HistoryContent.values.map((content) {
-            return MenuItemButton(
-              child: Text(content.toString()),
-              onPressed: () {
-                setState(() {
-                  if (content == HistoryContent.etc) {
-                    _historyController.clear();
-                  } else {
-                    _historyController.text = content.toString().trim();
-                  }
-                  _menuController.close();
-                });
-              },
-            );
-          }).toList(),
-    );
-  }
-
-  FilledButton _historyButton(BuildContext context) {
-    return FilledButton(
-      onPressed: () {
-        if (_menuController.isOpen) {
-          _menuController.close();
-        } else {
-          FocusScope.of(context).requestFocus(FocusNode());
-          _menuController.open();
-        }
-      },
-      style: FilledButton.styleFrom(
-        backgroundColor: Colors.grey,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2)),
-        ),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 21.5),
-          child: Text(_historyController.text),
-        ),
-      ),
-    );
-  }
-
   CustomTextFormField _etcHistoryInput() {
     return CustomTextFormField(
       controller: _historyController,
@@ -311,22 +313,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       onPressed: () async {
         final result = _tryValidation();
         if (result) {
-          final result = await showModalBottomSheet(
+         await showModalBottomSheet(
             context: context,
             builder: (context) {
               return SizedBox(
-                height: 320,
+                height: 250,
                 width: double.infinity,
                 child: _confirmBox(context),
               );
             },
           );
-          if (result == true) {
-            context.pop();
-          }
+
         }
       },
-      text: '등록',
+      text: widget.customerModel == null ? '등록' : '수정',
     );
   }
 
@@ -334,8 +334,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        height(20),
-        _renderText(text: '신규등록 확인', size: 25),
+        height(15),
+        _renderText(
+          text: widget.customerModel == null ? '신규등록 확인' : '수정내용 확인',
+          size: 20,
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
@@ -348,14 +351,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               _renderText(
                 text: '생년월일: ',
                 text2:
-                    ' ${_birthController.text.isEmpty ? "추후입력" : DateTime.parse(_birthController.text).formattedDate}',
+                    ' ${_birthController.text.isEmpty ? "추후입력" : _birth?.formattedDate}',
               ),
               _renderText(
                 text: '소개자: ',
                 text2:
-                    '${_recommendedController.text.isEmpty ? "없음" : _recommendedController.text}',
+                    _recommendedController.text.isEmpty
+                        ? "없음"
+                        : _recommendedController.text,
               ),
-              _renderText(text2: _historyController.text),
+              if (widget.customerModel == null)
+                _renderText(text2: _historyController.text),
             ],
           ),
         ),
@@ -371,34 +377,69 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             final historyMap = HistoryModel.toMapForHistory(
               content: _historyController.text,
             );
-            getIt<CustomerUseCase>().execute(
-              usecase: RegisterCustomerUseCase(
-                userKey: 'user1',
-                customerData: customerMap,
-                historyData: historyMap,
-              ),
-            );
-            // getIt<RegisterCustomerUseCase>().call(
-            //   repository: getIt<CustomerRepository>(),
-            //   userKey: 'user1',
-            //   customerData: customerMap,
-            //   historyData: historyMap,
+            widget.customerModel == null
+                ? _onRegistrationPressed(
+                  customerMap: customerMap,
+                  historyMap: historyMap,
+                )
+                : _onUpdatePressed(
+                  customerMap: customerMap,
+                );
+            // getIt<CustomerUseCase>().execute(
+            //   usecase: RegisterCustomerUseCase(
+            //     userKey: 'user1',
+            //     customerData: customerMap,
+            //     historyData: historyMap,
+            //   ),
             // );
             context.pop(true);
           },
-          text: '등록',
+          text: widget.customerModel == null ? '등록' : '수정',
         ),
       ],
     );
   }
 
-  Widget _renderText({String? text, String? text2, double size = 20}) {
+  void _onRegistrationPressed({
+    required Map<String, dynamic> customerMap,
+    required Map<String, dynamic> historyMap,
+  }) {
+    getIt<CustomerUseCase>().execute(
+      usecase: RegisterCustomerUseCase(
+        userKey: 'user1',
+        customerData: customerMap,
+        historyData: historyMap,
+      ),
+    );
+    context.pop(true);
+  }
+
+  void _onUpdatePressed({
+    required Map<String, dynamic> customerMap,
+  }) {
+    getIt<CustomerUseCase>().execute(
+      usecase: UpdateCustomerUseCase(
+        userKey: 'user1',
+        customerData: customerMap,
+      ),
+    );
+    print(customerMap[keyCustomerKey]);
+    context.pop(true);
+  }
+
+  Widget _renderText({String? text, String? text2, double size = 16}) {
     return RichText(
       text: TextSpan(
         style: TextStyle(fontSize: size), // 기본 스타일
         children: [
-          TextSpan(text: text, style: TextStyle(color: Colors.black)),
-          TextSpan(text: text2, style: TextStyle(color: Colors.blue)),
+          TextSpan(text: text, style: const TextStyle(color: Colors.black87)),
+          TextSpan(
+            text: text2,
+            style: const TextStyle(
+              color: Colors.blueAccent,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -412,7 +453,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       return false;
     }
     if (_nameController.text.isNotEmpty &&
-        _historyController.text == HistoryContent.title.toString()) {
+        _historyController.text == HistoryContent.title.toString() &&
+        widget.customerModel == null) {
       renderSnackBar(context, text: '상담 이력을 선택 하세요');
       return false;
     }

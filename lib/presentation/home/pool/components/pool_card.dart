@@ -3,15 +3,15 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:withme/core/ui/icon/const.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
-import 'package:withme/core/widget/circle_item.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/presentation/home/pool/pool_event.dart';
 import 'package:withme/presentation/home/pool/pool_view_model.dart';
 
 import '../../../../core/di/setup.dart';
+import '../../../../core/presentation/widget/circle_item.dart';
+import '../../../../core/presentation/widget/sex_widget.dart';
+import '../../../../core/presentation/widget/width_height.dart';
 import '../../../../core/ui/text_style/text_styles.dart';
-import '../../../../core/widget/sex_widget.dart';
-import '../../../../core/widget/width_height.dart';
 import '../../../../domain/model/customer_model.dart';
 
 class PoolCard extends StatelessWidget {
@@ -31,6 +31,7 @@ class PoolCard extends StatelessWidget {
           }
           if (snapshot.hasData) {
             List<HistoryModel> histories = snapshot.data;
+            histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
             return Container(
               height: 90,
               width: double.infinity,
@@ -102,10 +103,10 @@ class PoolCard extends StatelessWidget {
   Widget _historyPart(List<HistoryModel> histories) {
     if (histories.isNotEmpty) {
       return GestureDetector(
-        onTap:()=>onTap(histories),
-            // () => onEvent(
-            //   PoolEvent.getHistories(customerKey: customer.customerKey),
-            // ),
+        onTap: () => onTap(histories),
+        // () => onEvent(
+        //   PoolEvent.getHistories(customerKey: customer.customerKey),
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.center,

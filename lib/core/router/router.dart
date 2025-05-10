@@ -4,13 +4,17 @@ import 'package:withme/presentation/home/home_screen.dart';
 import 'package:withme/presentation/registration/registration_screen.dart';
 import 'package:withme/presentation/splash/splash_screen.dart';
 
+import '../../domain/model/customer_model.dart';
+
 final router = GoRouter(
   initialLocation: RoutePath.splash,
   routes: [
     GoRoute(builder: (_, __) => SplashScreen(), path: RoutePath.splash),
     GoRoute(builder: (_, __) => HomeScreen(), path: RoutePath.home),
     GoRoute(
-      builder: (_, __) => RegistrationScreen(),
+      builder:
+          (_, state) =>
+              RegistrationScreen(customerModel: state.extra as CustomerModel?),
       path: RoutePath.registration,
     ),
   ],

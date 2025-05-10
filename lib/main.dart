@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/di/setup.dart';
 
 import 'app.dart';
-import 'core/fire_base/firebase_options.dart';
+import 'core/data/fire_base/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

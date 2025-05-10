@@ -3,6 +3,7 @@ import 'package:withme/core/router/router_path.dart';
 import 'package:withme/data/data_source/remote/fbase.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
+import 'package:withme/domain/use_case/customer/add_history_use_case.dart';
 import 'package:withme/domain/use_case/customer_use_case.dart';
 import 'package:withme/presentation/home/pool/pool_event.dart';
 
@@ -22,14 +23,25 @@ class PoolViewModel with ChangeNotifier {
   }
 
   onEvent(PoolEvent event) {
-switch(event){
-
-  case AddHistory():
-   _addHistory(event.history);
-}
+    switch (event) {
+      case AddHistory():
+        _addHistory(
+          customerKey: event.customerKey,
+          historyData: event.historyData,
+        );
+    }
   }
 
-Future _addHistory(HistoryModel history)async{
-
-}
+  Future _addHistory({
+    required String customerKey,
+    required Map<String, dynamic> historyData,
+  }) async {
+    return getIt<CustomerUseCase>().execute(
+      usecase: AddHistoryUseCase(
+        userKey: 'user1',
+        customerKey: customerKey,
+        historyData: historyData,
+      ),
+    );
+  }
 }

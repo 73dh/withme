@@ -1,14 +1,17 @@
 import '../../../domain/model/history_model.dart';
 
 sealed class PoolEvent {
-factory PoolEvent.addHistory(HistoryModel history)=AddHistory;
+factory PoolEvent.addHistory({required String customerKey,required Map<String,dynamic> historyData})=AddHistory;
 
 
 }
 
 class AddHistory implements PoolEvent{
-  final HistoryModel history;
+  final String customerKey;
+  final  Map<String,dynamic> historyData;
 
-  AddHistory(this.history);
+  AddHistory({required this.customerKey, required this.historyData});
+
+
 
 }

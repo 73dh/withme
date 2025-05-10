@@ -1,15 +1,18 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:withme/core/widget/my_circular_indicator.dart';
+import 'package:go_router/go_router.dart';
+import 'package:withme/core/domain/enum/history_content.dart';
+import 'package:withme/core/router/router_path.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/presentation/home/pool/components/pool_card.dart';
 import 'package:withme/presentation/home/pool/pool_event.dart';
 import 'package:withme/presentation/home/pool/pool_view_model.dart';
 
 import '../../../../core/di/setup.dart';
+import '../../../../core/presentation/widget/my_circular_indicator.dart';
 import '../../../../domain/model/history_model.dart';
-import '../components/show_histories.dart';
+import '../../../../core/presentation/widget/show_histories.dart';
 
 class PoolPage extends StatelessWidget {
   const PoolPage({super.key});
@@ -17,6 +20,10 @@ class PoolPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<PoolViewModel>();
+    final MenuController menuController = MenuController();
+    final TextEditingController textController = TextEditingController(
+      text: HistoryContent.title.toString(),
+    );
     return SafeArea(
       child: StreamBuilder(
         stream: viewModel.getPools(),
@@ -42,15 +49,32 @@ class PoolPage extends StatelessWidget {
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: PoolCard(
-                              customer: pools[index],
-                              onTap: (List<HistoryModel> histories) async{
-                               HistoryModel? historyResult=await showHistories(context, histories);
-                              if(historyResult!=null){
-
-                               print(historyResult);
-                              }
+                            child: GestureDetector(
+                              onTap: (){
+                                print('customer: ${pools[index].toString()}');
+                                context.push(RoutePath.registration,extra: pools[index]);
                               },
+                              child: PoolCard(
+                                customer: pools[index],
+                                onTap: (List<HistoryModel> histories) async {
+                                  String? content = await CommonDialog(
+                                    menuController: menuController,
+                                    textController: textController,
+                                  ).showHistories(context, histories);
+                                  if (content != null) {
+                                    Map<String, dynamic> historyData =
+                                        HistoryModel.toMapForHistory(
+                                          content: content,
+                                        );
+                                    viewModel.onEvent(
+                                      PoolEvent.addHistory(
+                                        customerKey: pools[index].customerKey,
+                                        historyData: historyData,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ),
                           );
                         },
@@ -67,6 +91,4 @@ class PoolPage extends StatelessWidget {
       ),
     );
   }
-
-
 }

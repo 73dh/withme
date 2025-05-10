@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:withme/core/fire_base/firestore_keys.dart';
 
+import '../../../core/data/fire_base/firestore_keys.dart';
 import '../../../domain/model/history_model.dart';
 
 class FBase {
-
   // Customer
 
   Future registerCustomer({
@@ -29,6 +28,24 @@ class FBase {
     });
   }
 
+  Future updateCustomer({
+    required String userKey,
+    required Map<String, dynamic> customerData,
+  }) async {
+    DocumentReference customerRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(userKey)
+        .collection(collectionCustomer)
+        .doc(customerData[keyCustomerKey]);
+    // DocumentReference policyRef =
+    // customerRef.collection(collectionPolicies).doc();
+
+   await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+      tx.update(customerRef, customerData);
+      // tx.update(policyRef, {'test': 'test'});
+    });
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getPools() {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
@@ -37,6 +54,7 @@ class FBase {
         .snapshots();
   }
 
+  // History
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchHistories({
     required String customerKey,
   }) {
@@ -49,7 +67,24 @@ class FBase {
         .snapshots();
   }
 
-  Future<void> addHistory(HistoryModel history)async{
-    
+  Future<void> addHistory({
+    required String userKey,
+    required String customerKey,
+    required Map<String, dynamic> historyData,
+  }) async {
+    DocumentReference historyRef =
+        FirebaseFirestore.instance
+            .collection(collectionUsers)
+            .doc(userKey)
+            .collection(collectionCustomer)
+            .doc(customerKey)
+            .collection(collectionHistories)
+            .doc();
+    FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+      tx.set(historyRef, historyData);
+    });
+    print(userKey);
+    print(customerKey);
+    print(historyData);
   }
 }

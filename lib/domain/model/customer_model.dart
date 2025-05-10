@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/utils/generate_customer_key.dart';
 
-import '../../core/fire_base/firestore_keys.dart';
+import '../../core/data/fire_base/firestore_keys.dart';
 import 'history_model.dart';
 
 class CustomerModel {
@@ -10,6 +10,7 @@ class CustomerModel {
   final String name;
   final String sex;
   final DateTime? birth;
+
   // final List<dynamic> policies;
   final String recommended;
   final DateTime registeredDate;
@@ -29,30 +30,13 @@ class CustomerModel {
     required this.documentReference,
   });
 
-  // factory Customer.fromJson(Map<String, dynamic> json) {
-  //   return Customer(
-  //     userKey: json['userKey'] as String,
-  //     customerKey: json['customerKey'] as String,
-  //     name: json['name'] as String,
-  //     birth: json['birth'] != null ? DateTime.parse(json['birth']) : null,
-  //     // policies: List<dynamic>.from(json['isPolicies'] ?? []),
-  //     recommended: json['recommended'] as String,
-  //     registeredDate: DateTime.parse(json['registeredDate']),
-  //     // histories:
-  //     //     (json['histories'] as List<dynamic>? ?? [])
-  //     //         .map((e) => CustomerHistory.fromJson(e as Map<String, dynamic>))
-  //     //         .toList(),
-  //     documentReference: json['documentReference'] as DocumentReference?,
-  //   );
-  // }
-
   CustomerModel.fromMap(
     Map<String, dynamic> map,
     this.userKey, {
     this.documentReference,
   }) : customerKey = map[keyCustomerKey] ?? '',
        name = map[keyCustomerName] ?? '',
-  sex=map[keyCustomerSex]??'',
+       sex = map[keyCustomerSex] ?? '',
        birth =
            map[keyCustomerBirth] != ''
                ? (map[keyCustomerBirth] as Timestamp).toDate()
@@ -86,7 +70,7 @@ class CustomerModel {
     map[keyUserKey] = 'user1';
     map[keyCustomerKey] = generateCustomerKey('user1');
     map[keyCustomerName] = name;
-    map[keyCustomerSex]=sex;
+    map[keyCustomerSex] = sex;
     map[keyCustomerBirth] = birth ?? '';
     // map[keyCustomerHistory] = [history];
     // map[keyIsPolicy] = [];
@@ -94,5 +78,10 @@ class CustomerModel {
     map[keyRecommendByWho] = recommender ?? '';
 
     return map;
+  }
+
+  @override
+  String toString() {
+    return 'CustomerModel{customerKey: $customerKey}';
   }
 }

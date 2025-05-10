@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:withme/core/enum/home_menu.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/icon/const.dart';
+
+import '../../core/domain/enum/home_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

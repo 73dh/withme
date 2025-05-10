@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:withme/core/fire_base/firestore_keys.dart';
+
+import '../../core/data/fire_base/firestore_keys.dart';
 
 class PolicyModel {
   final DateTime policyDate;
