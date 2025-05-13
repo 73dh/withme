@@ -60,21 +60,29 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
 
       bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        height: 65,
         notchMargin: 10,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ...HomeMenu.values.map((menu) {
-              return Image.asset(
-                menu.iconPath,
-                color:
-                    menu.index == currentIndex ? Colors.black87 : Colors.grey,
-              );
-            }),
-            const SizedBox(width: 70),
-          ],
+        height: 65,
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          color: Colors.transparent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ...HomeMenu.values.map((menu) {
+                return GestureDetector(
+                  onTap: (){
+                    _onPageChanged(menu.index);
+                  },
+                  child: Image.asset(
+                    menu.iconPath,
+                    color:
+                        menu.index == currentIndex ? Colors.black87 : Colors.grey,
+                  ),
+                );
+              }),
+              const SizedBox(width: 70),
+            ],
+          ),
         ),
       ),
       // BottomN

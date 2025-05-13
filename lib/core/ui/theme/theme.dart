@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/ui/color/color_style.dart';
 
 import '../text_style/text_styles.dart';
 
@@ -11,13 +12,13 @@ final theme = ThemeData(
       color: Colors.black38,
     ),
   ),
-  bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey.shade100),
+  bottomAppBarTheme: BottomAppBarTheme(color:ColorStyles.bottomNavColor,elevation: 0,shape: CircularNotchedRectangle()),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: Colors.amber.shade200,
     shape: CircleBorder(),
   ),
-  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-  ),
+  // bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+  //   backgroundColor: Colors.deepPurple,
+  //   elevation: 0,
+  // ),
 );

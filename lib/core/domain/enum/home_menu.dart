@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/customer/customer_page.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_page.dart';
-import 'package:withme/presentation/home/pool/screen/pool_page.dart';
 
+import '../../../presentation/home/prospect/screen/prospect_page.dart';
 import '../../../presentation/home/search/search_page.dart';
 import '../../ui/icon/const.dart';
 
 
 enum HomeMenu {
-  pool(name: 'Pool', iconPath: IconsPath.poolPerson),
+  prospect(name: 'Prospect', iconPath: IconsPath.prospectPerson),
   customer(name: 'Customer', iconPath: IconsPath.customerPerson),
   search(name: 'Search', iconPath: IconsPath.searchPerson),
   dashBoard(name: 'DashBoard', iconPath: IconsPath.dashBoard);
@@ -19,7 +19,7 @@ enum HomeMenu {
   const HomeMenu({required this.name, required this.iconPath});
 
   Widget get toWidget => switch (this) {
-    HomeMenu.pool => PoolPage(),
+    HomeMenu.prospect => ProspectPage(),
     HomeMenu.customer => CustomerPage(),
     HomeMenu.search => SearchPage(),
     HomeMenu.dashBoard => DashBoardPage(),

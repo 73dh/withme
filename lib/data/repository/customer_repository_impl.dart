@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:withme/core/utils/transformers.dart';
 import 'package:withme/data/data_source/remote/fbase.dart';
 import 'package:withme/domain/model/customer_model.dart';
+import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
 
 import '../../domain/model/history_model.dart';
@@ -24,27 +25,23 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
       historyData: historyData,
     );
   }
+
   @override
   Future<void> updateCustomer({
     required String userKey,
     required Map<String, dynamic> customerData,
   }) async {
-    await fBase.updateCustomer(
-      userKey: userKey,
-      customerData: customerData,
-    );
+    await fBase.updateCustomer(userKey: userKey, customerData: customerData);
   }
 
   @override
-  Stream<List<CustomerModel>> getPools() {
-    return fBase.getPools().transform(toPools);
+  Stream<List<CustomerModel>> getAll() {
+    return fBase.getAll().transform(toPools);
   }
 
   @override
-  Stream<List<HistoryModel>> fetchHistories({required String customerKey}) {
-    return fBase
-        .fetchHistories(customerKey: customerKey)
-        .transform(toHistories);
+  Stream<List<HistoryModel>> getHistories({required String customerKey}) {
+    return fBase.getHistories(customerKey: customerKey).transform(toHistories);
   }
 
   @override
@@ -58,5 +55,23 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
       customerKey: customerKey,
       historyData: historyData,
     );
+  }
+
+  @override
+  Stream<List<PolicyModel>> fetchPolicies({required String customerKey}) {
+    return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
+  }
+
+  @override
+  Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
+
+    return (await fBase.getPolicies(
+      customerKey: customerKey,
+    )).docs.map((e) => PolicyModel.fromSnapshot(e)).toList();
+  }
+
+  @override
+  Future<void> deleteCustomer({required String customerKey}) async{
+return await fBase.deleteCustomer(customerKey: customerKey);
   }
 }

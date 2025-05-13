@@ -2,10 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:withme/core/ui/icon/const.dart';
+import 'package:withme/core/utils/calculate_age.dart';
+import 'package:withme/core/utils/calculate_insurance_age.dart';
+import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/presentation/home/pool/pool_event.dart';
-import 'package:withme/presentation/home/pool/pool_view_model.dart';
+import 'package:withme/presentation/home/prospect/prospect_view_model.dart';
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/widget/circle_item.dart';
@@ -14,17 +16,17 @@ import '../../../../core/presentation/widget/width_height.dart';
 import '../../../../core/ui/text_style/text_styles.dart';
 import '../../../../domain/model/customer_model.dart';
 
-class PoolCard extends StatelessWidget {
+class ProspectCard extends StatelessWidget {
   final CustomerModel customer;
   final void Function(List<HistoryModel> histories) onTap;
 
-  const PoolCard({super.key, required this.customer, required this.onTap});
+  const ProspectCard({super.key, required this.customer, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: StreamBuilder(
-        stream: getIt<PoolViewModel>().fetchHistories(customer.customerKey),
+        stream: getIt<ProspectViewModel>().fetchHistories(customer.customerKey),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             log(snapshot.error.toString());
@@ -36,7 +38,7 @@ class PoolCard extends StatelessWidget {
               height: 90,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: Colors.brown.shade50,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
@@ -69,14 +71,14 @@ class PoolCard extends StatelessWidget {
                     ),
                     width(20),
                     _namePart(),
-                    Spacer(),
+                    const Spacer(),
                     Expanded(child: _historyPart(histories)),
                   ],
                 ),
               ),
             );
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         },
       ),
@@ -84,6 +86,13 @@ class PoolCard extends StatelessWidget {
   }
 
   Widget _namePart() {
+    DateTime? isDate = customer.birth?.toLocal();
+    int difference =
+        customer.birth != null
+            ? getInsuranceAgeChangeDate(
+              customer.birth!,
+            ).difference(DateTime.now()).inDays
+            : 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -93,8 +102,23 @@ class PoolCard extends StatelessWidget {
             Text(customer.name, style: TextStyles.bold14),
             width(5),
             sexIcon(customer.sex),
+            width(5),
+            (isDate != null)
+                ? Text(
+                  '${calculateAge(customer.birth!)}세 [Insure: ${calculateInsuranceAge(customer.birth!)}]',
+                )
+                : const SizedBox.shrink(),
           ],
         ),
+        (customer.birth?.toLocal() != null)
+            ? Text(
+              '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}',
+              style: TextStyle(
+                color: difference <= 90 ? Colors.red : Colors.black87,
+              ),
+            )
+            : const SizedBox.shrink(),
+
         Text(customer.recommended != '' ? customer.recommended : '소개자 없음'),
       ],
     );

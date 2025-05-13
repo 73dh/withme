@@ -4,29 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/domain/enum/history_content.dart';
 import 'package:withme/core/router/router_path.dart';
+import 'package:withme/data/repository/customer_repository_impl.dart';
 import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/presentation/home/pool/components/pool_card.dart';
-import 'package:withme/presentation/home/pool/pool_event.dart';
-import 'package:withme/presentation/home/pool/pool_view_model.dart';
+import 'package:withme/domain/repository/customer_repository.dart';
+import 'package:withme/domain/use_case/customer/get_prospect_use_case.dart';
+import 'package:withme/presentation/home/prospect/components/prospect_card.dart';
+import 'package:withme/presentation/home/prospect/prospect_event.dart';
+import 'package:withme/presentation/home/prospect/prospect_view_model.dart';
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/widget/my_circular_indicator.dart';
 import '../../../../domain/model/history_model.dart';
 import '../../../../core/presentation/widget/show_histories.dart';
 
-class PoolPage extends StatelessWidget {
-  const PoolPage({super.key});
+class ProspectPage extends StatelessWidget {
+  const ProspectPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = getIt<PoolViewModel>();
+    final viewModel = getIt<ProspectViewModel>();
     final MenuController menuController = MenuController();
     final TextEditingController textController = TextEditingController(
       text: HistoryContent.title.toString(),
     );
     return SafeArea(
       child: StreamBuilder(
-        stream: viewModel.getPools(),
+        stream: viewModel.getProspects(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             log(snapshot.error.toString());
@@ -34,7 +37,7 @@ class PoolPage extends StatelessWidget {
           if (snapshot.hasData) {
             List<CustomerModel> pools = snapshot.data;
             return Scaffold(
-              appBar: AppBar(title: Text('Pool [${pools.length}]')),
+              appBar: AppBar(title: Text('Prospect ${pools.length}명')),
               body: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -51,10 +54,9 @@ class PoolPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: GestureDetector(
                               onTap: (){
-                                print('customer: ${pools[index].toString()}');
                                 context.push(RoutePath.registration,extra: pools[index]);
                               },
-                              child: PoolCard(
+                              child: ProspectCard(
                                 customer: pools[index],
                                 onTap: (List<HistoryModel> histories) async {
                                   String? content = await CommonDialog(
@@ -67,7 +69,7 @@ class PoolPage extends StatelessWidget {
                                           content: content,
                                         );
                                     viewModel.onEvent(
-                                      PoolEvent.addHistory(
+                                      ProspectEvent.addHistory(
                                         customerKey: pools[index].customerKey,
                                         historyData: historyData,
                                       ),

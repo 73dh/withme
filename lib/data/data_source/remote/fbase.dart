@@ -16,14 +16,14 @@ class FBase {
         .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerData[keyCustomerKey]);
-    DocumentReference policyRef =
-        customerRef.collection(collectionPolicies).doc();
+    // DocumentReference policyRef =
+    //     customerRef.collection(collectionPolicies).doc();
     DocumentReference historyRef =
         customerRef.collection(collectionHistories).doc();
 
     FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(customerRef, customerData);
-      tx.set(policyRef, {'test': 'test'});
+      // tx.set(policyRef, {'test': 'test'});
       tx.set(historyRef, historyData);
     });
   }
@@ -37,16 +37,20 @@ class FBase {
         .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerData[keyCustomerKey]);
-    // DocumentReference policyRef =
-    // customerRef.collection(collectionPolicies).doc();
 
-   await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
-      tx.update(customerRef, customerData);
-      // tx.update(policyRef, {'test': 'test'});
-    });
+    await customerRef.update(customerData);
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getPools() {
+  Future<void> deleteCustomer({required String customerKey})async{
+    DocumentReference customerRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey);
+    await customerRef.delete();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAll() {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc('user1')
@@ -55,7 +59,7 @@ class FBase {
   }
 
   // History
-  Stream<QuerySnapshot<Map<String, dynamic>>> fetchHistories({
+  Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({
     required String customerKey,
   }) {
     return FirebaseFirestore.instance
@@ -83,8 +87,30 @@ class FBase {
     FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(historyRef, historyData);
     });
-    print(userKey);
-    print(customerKey);
-    print(historyData);
   }
+
+  // Policy
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
+    required String customerKey,
+  }) {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionPolicies)
+        .snapshots();
+  }
+  Future<QuerySnapshot<Map<String, dynamic>>> getPolicies({
+    required String customerKey,
+  }) {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionPolicies)
+        .get();
+  }
+
 }

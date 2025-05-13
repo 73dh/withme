@@ -6,12 +6,11 @@ class HistoryButton extends StatelessWidget {
   final TextEditingController textController;
   final void Function()? onPressed;
 
-
   const HistoryButton({
     super.key,
     required this.menuController,
-    required this.textController,  this.onPressed,
-
+    required this.textController,
+    this.onPressed,
   });
 
   @override
@@ -22,7 +21,7 @@ class HistoryButton extends StatelessWidget {
         if (menuController.isOpen) {
           menuController.close();
         } else {
-           onPressed;
+          onPressed;
           menuController.open();
         }
       },
@@ -36,8 +35,9 @@ class HistoryButton extends StatelessWidget {
       ),
       child: SizedBox(
         width: 180,
-        child: Text(shortenedText(textController.text,)
-        ,textAlign: TextAlign.center,
+        child: Text(
+          shortenedText(textController.text),
+          textAlign: TextAlign.center,
         ),
       ),
     );

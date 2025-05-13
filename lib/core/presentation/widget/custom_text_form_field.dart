@@ -6,8 +6,11 @@ import '../../ui/text_style/text_styles.dart';
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
+  final String? labelText;
   final bool obscureText;
+
   final bool autoFocus;
+  final bool readOnly;
   final Function(String)? onChanged;
   final VoidCallback? onCompleted;
   final Function(String)? validator;
@@ -18,8 +21,10 @@ class CustomTextFormField extends StatelessWidget {
     super.key,
     this.controller,
     this.hintText,
+    this.labelText,
     this.obscureText = false,
     this.autoFocus = false,
+    this.readOnly=false,
     this.onChanged,
     this.onCompleted,
      this.validator,
@@ -29,12 +34,17 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseBorder = const OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
-    );
+
+    final baseBorder =
+        InputBorder.none;
+
+    // readOnly?InputBorder.none: OutlineInputBorder(
+    //   borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
+    // );
 
     return TextFormField(
       controller: controller,
+      readOnly: readOnly,
       cursorColor: Colors.black87,
       obscureText: obscureText,
       autofocus: autoFocus,
@@ -45,6 +55,8 @@ class CustomTextFormField extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         hintText: hintText,
         hintStyle: TextStyles.hintStyle,
+        labelText: labelText,
+        labelStyle: TextStyles.labelStyle,
         errorStyle: TextStyles.errorStyle,
         errorBorder: baseBorder,
         fillColor: Colors.white,

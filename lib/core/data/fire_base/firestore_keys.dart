@@ -15,8 +15,24 @@ const String keyRegisteredDate = 'registeredDate';
 const String keyCustomerHistory = 'histories';
 
 // Policy
-const String keyPolicyDate='policy_date';
-const String keyProductName='product_name';
+const String keyPolicyHolder='policyHolder';
+const String keyPolicyHolderBirth='policyHolderBirth';
+const String keyPolicyHolderSex='policyHolderSex';
+const String keyInsured='insured';
+const String keyInsuredBirth='insuredBirth';
+const String keyInsuredSex='insuredSex';
+const String keyProductCategory='productCategory';
+const String keyProductName='productName';
+const String keyStartDate='startDate';
+const String keyEndDate='endDate';
+const String keyPaymentMethod='paymentMethod';
+const String keyPayPeriod='payPeriod';
+const String keyPrice='price';
+const String keyPolicyState='policyState';
+
+
+// const String keyPolicyDate='policy_date';
+// const String keyProductName='product_name';
 
 // History
 const String keyContactDate='contact_date';
