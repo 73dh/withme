@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../ui/text_style/text_styles.dart';
-
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
   final String? labelText;
   final bool obscureText;
-
+  final TextAlign? textAlign;
+  final TextInputType? inputType;
+  final TextStyle? textStyle;
   final bool autoFocus;
   final bool readOnly;
+  final List<TextInputFormatter>? inputFormatters;
   final Function(String)? onChanged;
   final VoidCallback? onCompleted;
   final Function(String)? validator;
@@ -24,23 +27,23 @@ class CustomTextFormField extends StatelessWidget {
     this.labelText,
     this.obscureText = false,
     this.autoFocus = false,
-    this.readOnly=false,
+    this.textStyle,
+    this.textAlign = TextAlign.start,
+    this.inputType,
+    this.inputFormatters,
+    this.readOnly = false,
     this.onChanged,
     this.onCompleted,
-     this.validator,
+    this.validator,
     this.onSaved,
     this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
-
-    final baseBorder =
-        InputBorder.none;
-
-    // readOnly?InputBorder.none: OutlineInputBorder(
-    //   borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
-    // );
+    final baseBorder = const OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
+    );
 
     return TextFormField(
       controller: controller,
@@ -49,6 +52,9 @@ class CustomTextFormField extends StatelessWidget {
       obscureText: obscureText,
       autofocus: autoFocus,
       focusNode: focusNode,
+      textAlign: textAlign!,
+      style: textStyle,
+      keyboardType: inputType,
       onChanged: (text) => onChanged,
       onEditingComplete: onCompleted,
       decoration: InputDecoration(

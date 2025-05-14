@@ -39,36 +39,25 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
     return fBase.getAll().transform(toPools);
   }
 
-  @override
-  Stream<List<HistoryModel>> getHistories({required String customerKey}) {
-    return fBase.getHistories(customerKey: customerKey).transform(toHistories);
-  }
+  // @override
+  // Stream<List<HistoryModel>> getHistories({required String customerKey}) {
+  //   return fBase.getHistories(customerKey: customerKey).transform(toHistories);
+  // }
+  //
+  // @override
+  // Future<void> addHistory({
+  //   required String userKey,
+  //   required String customerKey,
+  //   required Map<String, dynamic> historyData,
+  // }) async {
+  //   return await fBase.addHistory(
+  //     userKey: userKey,
+  //     customerKey: customerKey,
+  //     historyData: historyData,
+  //   );
+  // }
 
-  @override
-  Future<void> addHistory({
-    required String userKey,
-    required String customerKey,
-    required Map<String, dynamic> historyData,
-  }) async {
-    return await fBase.addHistory(
-      userKey: userKey,
-      customerKey: customerKey,
-      historyData: historyData,
-    );
-  }
 
-  @override
-  Stream<List<PolicyModel>> fetchPolicies({required String customerKey}) {
-    return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
-  }
-
-  @override
-  Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
-
-    return (await fBase.getPolicies(
-      customerKey: customerKey,
-    )).docs.map((e) => PolicyModel.fromSnapshot(e)).toList();
-  }
 
   @override
   Future<void> deleteCustomer({required String customerKey}) async{

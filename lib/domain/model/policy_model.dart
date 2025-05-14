@@ -10,12 +10,12 @@ class PolicyModel {
   final DateTime? insuredBirth;
   final String insuredSex;
   final String productCategory;
+  final String insuranceCompany;
   final String productName;
+  final String paymentMethod;
+  final int premium;
   final DateTime? startDate;
   final DateTime? endDate;
-  final String paymentMethod;
-  final int payPeriod;
-  final int price;
   final String policyState;
   final DocumentReference? documentReference;
 
@@ -27,12 +27,12 @@ class PolicyModel {
     required this.insuredBirth,
     required this.insuredSex,
     required this.productCategory,
+    required this.insuranceCompany,
     required this.productName,
+    required this.paymentMethod,
+    required this.premium,
     required this.startDate,
     required this.endDate,
-    required this.paymentMethod,
-    required this.payPeriod,
-    required this.price,
     required this.policyState,
     this.documentReference,
   });
@@ -55,7 +55,10 @@ class PolicyModel {
               : DateTime.now().toUtc(),
       insuredSex: map[keyInsuredSex] ?? '',
       productCategory: map[keyProductCategory] ?? '',
+      insuranceCompany: map[keyInsuranceCompany] ?? '',
       productName: map[keyProductName] ?? '',
+      paymentMethod: map[keyPaymentMethod] ?? '',
+      premium: map[keyPremium] ?? 0,
       startDate:
           map[keyStartDate] is Timestamp
               ? (map[keyStartDate] as Timestamp).toDate()
@@ -64,11 +67,7 @@ class PolicyModel {
           map[keyEndDate] is Timestamp
               ? (map[keyEndDate] as Timestamp).toDate()
               : DateTime.now().toUtc(),
-      paymentMethod: map[keyPaymentMethod] ?? '',
-      payPeriod: map[keyPayPeriod] ?? 0,
-      price: map[keyPrice] ?? 0,
-      policyState: map[keyPolicyState] ?? 'active',
-      // 기본값 지정 가능
+      policyState: map[keyPolicyState] ?? '유지',
       documentReference: reference,
     );
   }
@@ -84,60 +83,39 @@ class PolicyModel {
     );
   }
 
- static Map<String, dynamic> toMapForCreatePolicy({
+  static Map<String, dynamic> toMapForCreatePolicy({
     required String policyHolder,
     required DateTime policyHolderBirth,
     required String policyHolderSex,
     required String insured,
     required DateTime insuredBirth,
     required String insuredSex,
+    required String productCategory,
+    required String insuranceCompany,
+    required String productName,
+    required String paymentMethod,
+    required String premium,
+
     required DateTime startDate,
     required DateTime endDate,
-
-
-}) {
-   final map= <String, dynamic> {};
+  }) {
+    final map = <String, dynamic>{};
 
     map[keyPolicyHolder] = policyHolder;
     map[keyPolicyHolderBirth] = policyHolderBirth;
     map[keyPolicyHolderSex] = policyHolderSex;
     map[keyInsured] = insured;
-    map[keyInsuredBirth] =insuredBirth;
+    map[keyInsuredBirth] = insuredBirth;
     map[keyInsuredSex] = insuredSex;
-    map[keyProductCategory] = '보험상품 카테고리';
-    map[keyProductName] = '상품명';
-    map[keyStartDate] =startDate;
+    map[keyProductCategory] = productCategory;
+    map[keyInsuranceCompany] = insuranceCompany;
+    map[keyProductName] = productName;
+    map[keyPaymentMethod] = paymentMethod;
+    map[keyPremium] = premium;
+    map[keyStartDate] = startDate;
     map[keyEndDate] = endDate;
-    map[keyPaymentMethod] = '월납';
-    map[keyPayPeriod] = 10;
-    map[keyPrice] = 20000;
     map[keyPolicyState] = '유지';
 
     return map;
   }
 }
-
-// PolicyModel({
-//    this.policyDate,
-//    this.productName,
-//   required this.documentReference,
-// });
-//
-// PolicyModel.fromMap(Map<String, dynamic> map, {this.documentReference})
-//   : policyDate = (map[keyPolicyDate] is Timestamp)
-//     ? (map[keyPolicyDate] as Timestamp).toDate()
-//     : null,
-//     productName = map[keyProductName]??'';
-//
-// PolicyModel.fromSnapshot(DocumentSnapshot snapshot)
-//   : this.fromMap(
-//       snapshot.data() as Map<String, dynamic>,
-//       documentReference: snapshot.reference,
-//     );
-//
-// static Map<String, dynamic> toMapForCreatePolicy() {
-//   final map = <String, dynamic>{};
-//   map[keyPolicyDate] = 'policy date';
-//   map[keyProductName] = '상품명';
-//   return map;
-// }

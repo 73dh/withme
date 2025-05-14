@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:withme/core/data/fire_base/firestore_keys.dart';
+import 'package:withme/core/domain/enum/insurance_category.dart';
+import 'package:withme/core/domain/enum/insurance_company.dart';
+import 'package:withme/core/presentation/widget/confirm_box_text.dart';
 import 'package:withme/core/presentation/widget/custom_text_form_field.dart';
 import 'package:withme/core/presentation/widget/render_filled_button.dart';
 import 'package:withme/core/presentation/widget/render_snack_bar.dart';
 import 'package:withme/core/presentation/widget/select_date.dart';
+import 'package:withme/core/presentation/widget/show_confirm_dialog.dart';
 import 'package:withme/core/presentation/widget/title_widget.dart';
 import 'package:withme/core/presentation/widget/width_height.dart';
 import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/policy_model.dart';
+import 'package:withme/presentation/policy/components/part_box.dart';
+import 'package:withme/presentation/policy/components/part_title.dart';
+import 'package:withme/presentation/policy/components/policy_confirm_box.dart';
+import 'package:withme/presentation/policy/policy_view_model.dart';
 
+import '../../core/di/setup.dart';
+import '../../core/ui/text_style/text_styles.dart';
 import '../../domain/model/customer_model.dart';
 
 class PolicyScreen extends StatefulWidget {
@@ -23,14 +37,21 @@ class PolicyScreen extends StatefulWidget {
 class _PolicyScreenState extends State<PolicyScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _insuredNameController = TextEditingController();
+  final TextEditingController _productNameController = TextEditingController();
+  final TextEditingController _premiumController = TextEditingController();
+  final NumberFormat _formatter = NumberFormat.decimalPattern();
+
   String _policyHolderName = '';
   String _policyHolderSex = '';
   DateTime? _policyHolderBirth;
-  String _insuredName = '';
+
   String _insuredSex = '';
   DateTime? _insuredBirth;
-  String _productName = '';
-  double _premium = 0;
+  String _productCategory = '상품 종류';
+  String _insuranceCompany = '보험사';
+
+  String _paymentMethod = '';
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -40,12 +61,32 @@ class _PolicyScreenState extends State<PolicyScreen> {
   void initState() {
     if (widget.customer.name.isNotEmpty) {
       _policyHolderName = widget.customer.name;
-      // _policyHolderNameController.text = widget.customer.name;
       _policyHolderSex = widget.customer.sex;
       _policyHolderBirth = widget.customer.birth;
     }
+    _premiumController.addListener(() {
+      final text = _premiumController.text.replaceAll(',', '');
+      if (text.isEmpty) return;
+
+      final newText = _formatter.format(int.parse(text));
+      if (newText != _premiumController.text) {
+        _premiumController.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: newText.length),
+        );
+      }
+    });
+
     setState(() {});
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _insuredNameController.dispose();
+    _productNameController.dispose();
+    _premiumController.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,43 +98,75 @@ class _PolicyScreenState extends State<PolicyScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
-            child: Column(
-              children: [
-                TitleWidget(title: 'Policy Info'),
-                height(20),
-                _policyHolderPart(),
-                height(5),
-                _insuredPart(),
-
-                TextFormField(
-                  decoration: const InputDecoration(labelText: '보험 상품명'),
-                  validator: (value) => value!.isEmpty ? '상품명을 확인하세요' : null,
-                  onSaved: (value) => _productName = value!,
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: '보험료 (₩)'),
-                  keyboardType: TextInputType.number,
-                  validator:
-                      (value) =>
-                          value == null || double.tryParse(value) == null
-                              ? '숫자를 입력하세요'
-                              : null,
-                  onSaved: (value) => _premium = double.parse(value!),
-                ),
-                const SizedBox(height: 16),
-                _periodPart(context),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const TitleWidget(title: 'Policy Info'),
+                  height(40),
+                  const PartTitle(text: '계약관계자 정보'),
+                  _customerPart(),
+                  height(20),
+                  const PartTitle(text: '보험계약 정보'),
+                  _policyPart(),
+                  height(20),
+                  const PartTitle(text: '계약일, 만기일'),
+                  PartBox(child: _periodPart(context)),
+                ],
+              ),
             ),
           ),
         ),
-        bottomSheet: RenderFilledButton(
-          onPressed: _submitForm,
-          text: '등록',
-          backgroundColor:
-              _isCompleted ? ColorStyles.bottomNavColor : Colors.grey,
-        ),
+        bottomSheet: _submitButton(context),
       ),
     );
+  }
+
+  PartBox _customerPart() {
+    return PartBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [_policyHolderPart(), height(5), _insuredPart()],
+      ),
+    );
+  }
+
+  PartBox _policyPart() {
+    return PartBox(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                children: [
+                  _renderFittedBox(_productCategory),
+                  _selectProductCategory(),
+                ],
+              ),
+              Row(
+                children: [
+                  _renderFittedBox(_insuranceCompany),
+                  _selectInsuranceCompany(),
+                ],
+              ),
+            ],
+          ),
+          _inputProductName(),
+          height(5),
+          Row(
+            children: [
+              _selectPaymentMethod(),
+              const Icon(Icons.more_vert),
+              _inputPremium(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  FittedBox _renderFittedBox(String text) {
+    return FittedBox(child: Text(text, textAlign: TextAlign.center));
   }
 
   LayoutBuilder _policyHolderPart() {
@@ -119,7 +192,6 @@ class _PolicyScreenState extends State<PolicyScreen> {
                 RadioMenuButton<String>(
                   value: '여',
                   groupValue: _policyHolderSex,
-
                   onChanged: null,
                   child: const Text('여'),
                 ),
@@ -128,7 +200,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
             SizedBox(
               width: 130,
               child: RenderFilledButton(
-                borderRadius: 30,
+                borderRadius: 10,
                 backgroundColor:
                     _policyHolderBirth == null
                         ? ColorStyles.activeButtonColor
@@ -162,9 +234,15 @@ class _PolicyScreenState extends State<PolicyScreen> {
             SizedBox(
               width: constraints.maxWidth * 0.25,
               child: CustomTextFormField(
+                controller: _insuredNameController,
                 hintText: '피보험자',
+                autoFocus: true,
+                textAlign: TextAlign.center,
                 validator: (value) => value.isEmpty ? '이름 입력' : null,
-                onSaved: (value) => _insuredName = value,
+                onChanged: (value) {
+                  setState(() => _insuredNameController.text = value);
+                },
+                onSaved: (value) => _insuredNameController.text = value,
               ),
             ),
             Row(
@@ -173,21 +251,13 @@ class _PolicyScreenState extends State<PolicyScreen> {
                 RadioMenuButton<String>(
                   value: '남',
                   groupValue: _insuredSex,
-                  onChanged:
-                      (value) => setState(() {
-                        _insuredSex = value!;
-                      }),
-
+                  onChanged: (value) => setState(() => _insuredSex = value!),
                   child: const Text('남'),
                 ),
                 RadioMenuButton<String>(
                   value: '여',
                   groupValue: _insuredSex,
-                  onChanged:
-                      (value) => setState(() {
-                        _insuredSex = value!;
-                      }),
-
+                  onChanged: (value) => setState(() => _insuredSex = value!),
                   child: const Text('여'),
                 ),
               ],
@@ -195,7 +265,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
             SizedBox(
               width: 130,
               child: RenderFilledButton(
-                borderRadius: 30,
+                borderRadius: 10,
                 backgroundColor: ColorStyles.activeButtonColor,
                 foregroundColor: Colors.black87,
                 onPressed: () async {
@@ -213,13 +283,120 @@ class _PolicyScreenState extends State<PolicyScreen> {
     );
   }
 
+  PopupMenuButton<dynamic> _selectProductCategory() {
+    return PopupMenuButton(
+      icon: const Icon(Icons.drag_indicator),
+      itemBuilder: (context) {
+        return InsuranceCategory.values
+            .map(
+              (e) => PopupMenuItem(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _productCategory = e.toString();
+                      context.pop();
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Icon(e.getCategoryIcon()),
+                      width(10),
+                      Text(e.toString()),
+                    ],
+                  ),
+                ),
+              ),
+            )
+            .toList();
+      },
+    );
+  }
+
+  PopupMenuButton<dynamic> _selectInsuranceCompany() {
+    return PopupMenuButton(
+      icon: const Icon(Icons.drag_indicator),
+      itemBuilder: (context) {
+        return InsuranceCompany.values
+            .map(
+              (e) => PopupMenuItem(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _insuranceCompany = e.toString();
+                      context.pop();
+                    });
+                  },
+                  child: Text(e.toString()),
+                ),
+              ),
+            )
+            .toList();
+      },
+    );
+  }
+
+  CustomTextFormField _inputProductName() {
+    return CustomTextFormField(
+      controller: _productNameController,
+      hintText: '보험 상품명',
+      textAlign: TextAlign.center,
+      onChanged: (value) {
+        setState(() => _productNameController.text = value);
+      },
+      validator: (value) => value.isEmpty ? '상품명을 입력하세요' : null,
+      onSaved: (value) => _productNameController.text = value,
+    );
+  }
+
+  Row _selectPaymentMethod() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RadioMenuButton<String>(
+          value: '월납',
+          groupValue: _paymentMethod,
+          onChanged: (value) {
+            setState(() => _paymentMethod = value!);
+          },
+          child: const Text('월납'),
+        ),
+        RadioMenuButton<String>(
+          value: '일시납',
+          groupValue: _paymentMethod,
+
+          onChanged: (value) {
+            setState(() => _paymentMethod = value!);
+          },
+          child: const Text('일시납'),
+        ),
+      ],
+    );
+  }
+
+  Expanded _inputPremium() {
+    return Expanded(
+      child: CustomTextFormField(
+        controller: _premiumController,
+        hintText: '보험료 (예) 100,000',
+        inputType: TextInputType.number,
+        textAlign: TextAlign.center,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        onChanged: (value) {
+          setState(() => _premiumController.text = value);
+        },
+        validator: (value) => value.isEmpty ? '보험료를 입력하세요' : null,
+        onSaved: (value) => _premiumController.text = value,
+      ),
+    );
+  }
+
   Row _periodPart(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Expanded(
           child: RenderFilledButton(
-            borderRadius: 30,
+            borderRadius: 10,
             backgroundColor: ColorStyles.activeButtonColor,
             foregroundColor: Colors.black87,
             onPressed: () async {
@@ -237,7 +414,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
         width(10),
         Expanded(
           child: RenderFilledButton(
-            borderRadius: 30,
+            borderRadius: 10,
             backgroundColor: ColorStyles.activeButtonColor,
             foregroundColor: Colors.black87,
             onPressed: () async {
@@ -256,7 +433,18 @@ class _PolicyScreenState extends State<PolicyScreen> {
     );
   }
 
-  void _submitForm() {
+  Widget _submitButton(BuildContext context) {
+    return RenderFilledButton(
+      backgroundColor: ColorStyles.activeButtonColor,
+      foregroundColor: Colors.black87,
+      onPressed: () async {
+        _tryValidation();
+      },
+      text: '확인',
+    );
+  }
+
+  void _tryValidation() {
     if (_formKey.currentState!.validate()) {
       if (_policyHolderBirth == null) {
         renderSnackBar(context, text: '계약자 생일을 확인하세요');
@@ -270,30 +458,86 @@ class _PolicyScreenState extends State<PolicyScreen> {
         renderSnackBar(context, text: '피보험자 생일을 확인하세요');
         return;
       }
+      if (_productCategory.isEmpty || _insuranceCompany.isEmpty) {
+        renderSnackBar(context, text: '상품종류와 보험사를 선택하세요.');
+        return;
+      }
+      if (_paymentMethod.isEmpty) {
+        renderSnackBar(context, text: '납입방법을 선택하세요.');
+        return;
+      }
+
       if (_startDate == null) {
         renderSnackBar(context, text: '계약일을 확인하세요');
         return;
       }
       if (_endDate == null) {
         renderSnackBar(context, text: '보장 종료일을 확인하세요');
-        setState(() => _isCompleted = true);
+
         return;
       }
-
+      if (_startDate != null &&
+          _endDate != null &&
+          _startDate!.isAfter(_endDate!)) {
+        renderSnackBar(context, text: '시작일이 종료일보다 늦습니다.');
+        return;
+      }
+      setState(() => _isCompleted = true);
       _formKey.currentState!.save();
-      final policyMap = PolicyModel.toMapForCreatePolicy(
-        policyHolder: _policyHolderName,
-        policyHolderBirth: _policyHolderBirth!,
-        policyHolderSex: _policyHolderSex,
-        insured: _insuredName,
-        insuredBirth: _insuredBirth!,
-        insuredSex: _insuredSex,
-        startDate: _startDate!,
-        endDate: _endDate!,
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SizedBox(
+            height: 300,
+            width: double.infinity,
+            child: _confirmBox(context),
+          );
+        },
       );
-
-      print('--- 보험 계약 정보 --- $policyMap');
-      // 여기에서 Firebase 등에 저장 가능
+      return;
     }
+  }
+
+  _confirmBox(context) {
+    final policyMap = PolicyModel.toMapForCreatePolicy(
+      policyHolder: _policyHolderName,
+      policyHolderBirth: _policyHolderBirth!,
+      policyHolderSex: _policyHolderSex,
+      insured: _insuredNameController.text,
+      insuredBirth: _insuredBirth!,
+      insuredSex: _insuredSex,
+      productCategory: _productCategory,
+      insuranceCompany: _insuranceCompany,
+      productName: _productNameController.text,
+      paymentMethod: _paymentMethod,
+      premium: _premiumController.text,
+      startDate: _startDate!,
+      endDate: _endDate!,
+    );
+
+    final policyMapSample = PolicyModel.toMapForCreatePolicy(
+      policyHolder: '_policyHolderName',
+      policyHolderBirth: DateTime.now(),
+      policyHolderSex: '여',
+      insured: '_insuredNameController',
+      insuredBirth: DateTime.now(),
+      insuredSex: '남',
+      productCategory: '_productCategory',
+      insuranceCompany: '_insuranceCompany',
+      productName: '_productNameController',
+      paymentMethod: '_paymentMethod',
+      premium: '100000',
+      startDate: DateTime.now(),
+      endDate: DateTime.now(),
+    );
+
+    return PolicyConfirmBox(
+      policyMap: policyMap,
+      onChecked: (bool result) {
+        if (result == true) {
+          getIt<PolicyViewModel>().addPolicy(policyMap: policyMapSample);
+        }
+      },
+    );
   }
 }

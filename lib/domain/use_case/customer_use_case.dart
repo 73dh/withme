@@ -3,7 +3,7 @@ import 'package:withme/domain/use_case/base/base_stream_use_case.dart';
 
 import 'base/base_use_case.dart';
 
-class CustomerUseCase  {
+ class CustomerUseCase  {
   final CustomerRepository _customerRepository;
 
   CustomerUseCase({required CustomerRepository customerRepository})

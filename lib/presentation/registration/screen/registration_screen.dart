@@ -38,7 +38,8 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> with SingleTickerProviderStateMixin{
+class _RegistrationScreenState extends State<RegistrationScreen>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   final TextEditingController _nameController = TextEditingController();
@@ -48,8 +49,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
   );
   final TextEditingController _birthController = TextEditingController();
 
-  late AnimationController _animationController;
-  late Animation<double> _opacityAnimation;
+   AnimationController? _animationController;
+  late Animation<Color?> _colorAnimation;
 
   bool _isReadOnly = false;
   bool _isRecommended = false;
@@ -73,9 +74,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
         _isRecommended = true;
         _recommendedController.text = customer.recommended;
       }
-      
-      _animationController=AnimationController(vsync: this,duration: Duration(milliseconds: 800))..repeat(reverse: true);
-      _opacityAnimation=Tween(begin: 1.0,end: 0.0).animate(_animationController);
+
+      _animationController = AnimationController(
+        vsync: this,
+        duration: Duration(seconds: 3),
+      )..repeat(reverse: true);
+      _colorAnimation = ColorTween(
+        begin: Colors.red,
+        end: Colors.blue,
+      ).animate(_animationController!);
     }
     super.initState();
   }
@@ -85,7 +92,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
     _nameController.dispose();
     _recommendedController.dispose();
     _historyController.dispose();
-    _animationController.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 
@@ -100,7 +107,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
             child: Column(
               children: [
                 height(20),
-                TitleWidget(title: 'Registration in Prospect'),
+                const TitleWidget(title: 'Registration in Prospect'),
                 height(39),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -116,18 +123,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
                       _recommendedSwitch(),
                       if (_isRecommended) _recommendedInputName(),
                       height(30),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              print('동그란 버튼 클릭!');
-                            },
-                            child: FadeTransition(opacity: _opacityAnimation,
-                              child: Container(
+                      if(_isReadOnly)
+                      _addPolicy(context),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        bottomSheet: _registrationButton(context),
+      ),
+    );
+  }
+
+  Row _addPolicy(BuildContext context) {
+    return Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            context.push(
+                              RoutePath.policy,
+                              extra: widget.customerModel,
+                            );
+                          },
+                          child: AnimatedBuilder(
+                            animation: _colorAnimation,
+                            builder: (context, child) {
+                              return Container(
                                 width: 50,
                                 height: 50,
                                 decoration: BoxDecoration(
-                                  color: Colors.red,
+                                  color: _colorAnimation.value,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
@@ -137,34 +165,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
                                     ),
                                   ],
                                 ),
-                                child: Center(child: Text('계약',style: TextStyle(color: Colors.white),)),
-                              ),
-                            ),
+                                child: Center(
+                                  child: Text(
+                                    '계약',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        floatingActionButton:  FadeTransition(opacity: _opacityAnimation,child: FloatingActionButton(onPressed: (){},),),
-        bottomSheet: _registrationButton(context),
-      ),
-    );
+                        ),
+                      ],
+                    );
   }
 
   AppBar _appBar() {
-    return AppBar(
-      actions: [
-        if (_isReadOnly) _addPolicyIcon(),
-
-        _editIcon(),
-        if (_isReadOnly) _deleteIcon(),
-      ],
-    );
+    return AppBar( actions: [_editIcon(), if (_isReadOnly) _deleteIcon()]);
   }
 
   IconButton _deleteIcon() {
@@ -204,21 +220,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           _isReadOnly ? Icons.edit : Icons.check,
           key: ValueKey<bool>(_isReadOnly),
         ),
-      ),
-    );
-  }
-
-  IconButton _addPolicyIcon() {
-    return IconButton(
-      onPressed: () {
-        context.push(RoutePath.policy, extra: widget.customerModel);
-      },
-      icon: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(IconsPath.addPolicy, width: 25),
-          Text('신계약', style: TextStyles.iconTextStyle),
-        ],
       ),
     );
   }
@@ -397,7 +398,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           },
         );
   }
-
 
   Widget _registrationButton(BuildContext context) {
     return RenderFilledButton(

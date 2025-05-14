@@ -20,14 +20,13 @@ abstract interface class CustomerRepository implements Repository {
 
   Stream<List<CustomerModel>> getAll();
 
-  Stream<List<HistoryModel>> getHistories({required String customerKey});
+  // Stream<List<HistoryModel>> getHistories({required String customerKey});
+  //
+  // Future<void> addHistory({
+  //   required String userKey,
+  //   required String customerKey,
+  //   required Map<String, dynamic> historyData,
+  // });
 
-  Future<void> addHistory({
-    required String userKey,
-    required String customerKey,
-    required Map<String, dynamic> historyData,
-  });
 
-  Stream<List<PolicyModel>> fetchPolicies({required String customerKey});
-  Future<List<PolicyModel>> getPolicies({required String customerKey});
 }

@@ -16,14 +16,11 @@ class FBase {
         .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerData[keyCustomerKey]);
-    // DocumentReference policyRef =
-    //     customerRef.collection(collectionPolicies).doc();
     DocumentReference historyRef =
         customerRef.collection(collectionHistories).doc();
 
     FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(customerRef, customerData);
-      // tx.set(policyRef, {'test': 'test'});
       tx.set(historyRef, historyData);
     });
   }
@@ -41,7 +38,7 @@ class FBase {
     await customerRef.update(customerData);
   }
 
-  Future<void> deleteCustomer({required String customerKey})async{
+  Future<void> deleteCustomer({required String customerKey}) async {
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc('user1')
@@ -90,17 +87,19 @@ class FBase {
   }
 
   // Policy
-  Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
-    required String customerKey,
-  }) {
-    return FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc('user1')
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .snapshots();
-  }
+
+  // Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
+  //   required String customerKey,
+  // }) {
+  //   return FirebaseFirestore.instance
+  //       .collection(collectionUsers)
+  //       .doc('user1')
+  //       .collection(collectionCustomer)
+  //       .doc(customerKey)
+  //       .collection(collectionPolicies)
+  //       .snapshots();
+  // }
+
   Future<QuerySnapshot<Map<String, dynamic>>> getPolicies({
     required String customerKey,
   }) {
@@ -113,4 +112,20 @@ class FBase {
         .get();
   }
 
+  Future<void> addPolicy({
+    required String userKey,
+    required String customerKey,
+    required Map<String, dynamic> policyData,
+  }) async {
+    DocumentReference policyRef =
+        FirebaseFirestore.instance
+            .collection(collectionUsers)
+            .doc('user1')
+            .collection(collectionCustomer)
+            .doc(customerKey)
+            .collection(collectionPolicies)
+            .doc();
+
+    await policyRef.set(policyData);
+  }
 }

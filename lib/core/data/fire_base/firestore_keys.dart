@@ -21,13 +21,15 @@ const String keyPolicyHolderSex='policyHolderSex';
 const String keyInsured='insured';
 const String keyInsuredBirth='insuredBirth';
 const String keyInsuredSex='insuredSex';
-const String keyProductCategory='productCategory';
-const String keyProductName='productName';
 const String keyStartDate='startDate';
 const String keyEndDate='endDate';
+
+const String keyProductCategory='productCategory';
+const String keyInsuranceCompany='insuranceCompany';
+const String keyProductName='productName';
+const String keyPremium='premium';
 const String keyPaymentMethod='paymentMethod';
 const String keyPayPeriod='payPeriod';
-const String keyPrice='price';
 const String keyPolicyState='policyState';
 
 
