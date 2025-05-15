@@ -9,7 +9,7 @@ import '../customer_use_case.dart';
 
 class GetCustomersUseCase extends BaseStreamUseCase<CustomerRepository> {
   @override
-  Stream call(CustomerRepository repository) async* {
+  Stream<List<CustomerModel>> call(CustomerRepository repository) async* {
     Stream<List<CustomerModel>> getAll =
         getIt<CustomerUseCase>().call(usecase: GetAllUseCase())
             as Stream<List<CustomerModel>>;

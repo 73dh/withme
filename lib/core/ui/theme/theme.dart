@@ -12,13 +12,13 @@ final theme = ThemeData(
       color: Colors.black38,
     ),
   ),
-  bottomAppBarTheme: BottomAppBarTheme(color:ColorStyles.bottomNavColor,elevation: 0,shape: CircularNotchedRectangle()),
+  bottomAppBarTheme: BottomAppBarTheme(
+    color: ColorStyles.bottomNavColor,
+    elevation: 0,
+    shape: const CircularNotchedRectangle(),
+  ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: Colors.amber.shade200,
-    shape: CircleBorder(),
+    shape: const CircleBorder(),
   ),
-  // bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-  //   backgroundColor: Colors.deepPurple,
-  //   elevation: 0,
-  // ),
 );

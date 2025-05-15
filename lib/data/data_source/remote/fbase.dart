@@ -88,17 +88,17 @@ class FBase {
 
   // Policy
 
-  // Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
-  //   required String customerKey,
-  // }) {
-  //   return FirebaseFirestore.instance
-  //       .collection(collectionUsers)
-  //       .doc('user1')
-  //       .collection(collectionCustomer)
-  //       .doc(customerKey)
-  //       .collection(collectionPolicies)
-  //       .snapshots();
-  // }
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
+    required String customerKey,
+  }) {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionPolicies)
+        .snapshots();
+  }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getPolicies({
     required String customerKey,
@@ -117,6 +117,12 @@ class FBase {
     required String customerKey,
     required Map<String, dynamic> policyData,
   }) async {
+    DocumentReference customerRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey);
+
     DocumentReference policyRef =
         FirebaseFirestore.instance
             .collection(collectionUsers)
@@ -125,6 +131,13 @@ class FBase {
             .doc(customerKey)
             .collection(collectionPolicies)
             .doc();
+
+    FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+      tx.update(customerRef, {
+        keyCustomerBirth: policyData[keyPolicyHolderBirth],
+      });
+      tx.set(policyRef, policyData);
+    });
 
     await policyRef.set(policyData);
   }

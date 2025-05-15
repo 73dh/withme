@@ -11,7 +11,7 @@ class CustomerModel {
   final String sex;
   final DateTime? birth;
 
-  // final List<dynamic> policies;
+  final List<dynamic> policies;
   final String recommended;
   final DateTime registeredDate;
   final List<HistoryModel> histories;
@@ -23,7 +23,7 @@ class CustomerModel {
     required this.name,
     required this.sex,
     required this.birth,
-    // required this.policies,
+    required this.policies,
     required this.recommended,
     required this.registeredDate,
     required this.histories,
@@ -41,7 +41,7 @@ class CustomerModel {
            map[keyCustomerBirth] != ''
                ? (map[keyCustomerBirth] as Timestamp).toDate()
                : null,
-       // policies = List.from(map[keyIsPolicy] ?? []),
+       policies = List.from(map[keyIsPolicy] ?? []),
        recommended = map[keyRecommendByWho] ?? '',
        registeredDate =
            map[keyRegisteredDate] == null

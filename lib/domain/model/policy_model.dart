@@ -13,7 +13,7 @@ class PolicyModel {
   final String insuranceCompany;
   final String productName;
   final String paymentMethod;
-  final int premium;
+  final String premium;
   final DateTime? startDate;
   final DateTime? endDate;
   final String policyState;
@@ -58,7 +58,7 @@ class PolicyModel {
       insuranceCompany: map[keyInsuranceCompany] ?? '',
       productName: map[keyProductName] ?? '',
       paymentMethod: map[keyPaymentMethod] ?? '',
-      premium: map[keyPremium] ?? 0,
+      premium: map[keyPremium] ?? '',
       startDate:
           map[keyStartDate] is Timestamp
               ? (map[keyStartDate] as Timestamp).toDate()

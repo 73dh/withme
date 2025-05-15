@@ -9,10 +9,10 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
 
   PolicyRepositoryImpl({required this.fBase});
 
-  // @override
-  // Stream<List<PolicyModel>> fetchPolicies({required String customerKey}) {
-  //   return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
-  // }
+  @override
+  Stream<List<PolicyModel>> fetchPolicies({required String customerKey}) {
+    return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
+  }
 
   @override
   Future<List<PolicyModel>> getPolicies({required String customerKey}) async {

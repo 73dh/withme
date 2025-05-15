@@ -205,7 +205,8 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     _policyHolderBirth == null
                         ? ColorStyles.activeButtonColor
                         : ColorStyles.unActiveButtonColor,
-                foregroundColor: Colors.black87,
+                foregroundColor:
+                    _policyHolderBirth != null ? Colors.black87 : Colors.white,
                 onPressed:
                     _policyHolderBirth == null
                         ? () async {
@@ -266,8 +267,12 @@ class _PolicyScreenState extends State<PolicyScreen> {
               width: 130,
               child: RenderFilledButton(
                 borderRadius: 10,
-                backgroundColor:_insuredBirth!=null?ColorStyles.unActiveButtonColor: ColorStyles.activeButtonColor,
-                foregroundColor:_insuredBirth!=null? Colors.black87:Colors.white,
+                backgroundColor:
+                    _insuredBirth != null
+                        ? ColorStyles.unActiveButtonColor
+                        : ColorStyles.activeButtonColor,
+                foregroundColor:
+                    _insuredBirth != null ? Colors.black87 : Colors.white,
                 onPressed: () async {
                   DateTime? birth = await selectDate(context);
                   if (birth != null) {
@@ -390,46 +395,56 @@ class _PolicyScreenState extends State<PolicyScreen> {
     );
   }
 
-  Row _periodPart(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Expanded(
-          child: RenderFilledButton(
-            borderRadius: 10,
-            backgroundColor:_startDate!=null?ColorStyles.unActiveButtonColor: ColorStyles.activeButtonColor,
-            foregroundColor:_startDate!=null? Colors.black87:Colors.white,
-            onPressed: () async {
-              DateTime? selectedDate = await selectDate(context);
-              if (selectedDate != null) {
-                setState(() => _startDate = selectedDate);
-              }
-            },
-            text:
-                _startDate == null
-                    ? '계약일 선택'
-                    : '보장개시일: ${_startDate!.toLocal().toString().split(' ')[0]}',
+  Padding _periodPart(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Expanded(
+            child: RenderFilledButton(
+              borderRadius: 10,
+              backgroundColor:
+                  _startDate != null
+                      ? ColorStyles.unActiveButtonColor
+                      : ColorStyles.activeButtonColor,
+              foregroundColor:
+                  _startDate != null ? Colors.black87 : Colors.white,
+              onPressed: () async {
+                DateTime? selectedDate = await selectDate(context);
+                if (selectedDate != null) {
+                  setState(() => _startDate = selectedDate);
+                }
+              },
+              text:
+                  _startDate == null
+                      ? '계약일 선택'
+                      : '보장개시일: ${_startDate!.toLocal().toString().split(' ')[0]}',
+            ),
           ),
-        ),
-        width(10),
-        Expanded(
-          child: RenderFilledButton(
-            borderRadius: 10,
-            backgroundColor:_endDate!=null?ColorStyles.unActiveButtonColor: ColorStyles.activeButtonColor,
-            foregroundColor:_endDate!=null? Colors.black87:Colors.white,
-            onPressed: () async {
-              DateTime? selectedDate = await selectDate(context);
-              if (selectedDate != null) {
-                setState(() => _endDate = selectedDate);
-              }
-            },
-            text:
-                _endDate == null
-                    ? '만기일 선택'
-                    : '보장종료일: ${_endDate!.toLocal().toString().split(' ')[0]}',
+          width(10),
+          Expanded(
+            child: RenderFilledButton(
+              borderRadius: 10,
+              backgroundColor:
+                  _endDate != null
+                      ? ColorStyles.unActiveButtonColor
+                      : ColorStyles.activeButtonColor,
+              foregroundColor: _endDate != null ? Colors.black87 : Colors.white,
+              onPressed: () async {
+                DateTime? selectedDate = await selectDate(context);
+                if (selectedDate != null) {
+                  setState(() => _endDate = selectedDate);
+                }
+              },
+              text:
+                  _endDate == null
+                      ? '만기일 선택'
+                      : '보장종료일: ${_endDate!.toLocal().toString().split(' ')[0]}',
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -535,7 +550,11 @@ class _PolicyScreenState extends State<PolicyScreen> {
       policyMap: policyMap,
       onChecked: (bool result) {
         if (result == true) {
-          getIt<PolicyViewModel>().addPolicy(policyMap: policyMapSample);
+          getIt<PolicyViewModel>().addPolicy(
+            userKey: 'user1',
+            customerKey: widget.customer.customerKey,
+            policyData: policyMapSample,
+          );
         }
       },
     );

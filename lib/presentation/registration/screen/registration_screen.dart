@@ -243,7 +243,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
         : Expanded(
           child: CustomTextFormField(
             controller: _nameController,
-            hintText: '신규 고객 이름 (필수)',
+            hintText: '이름(필수)',
             autoFocus: true,
             readOnly: _isReadOnly,
             onChanged: (text) async {
