@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 class PartBox extends StatelessWidget {
   final Widget child;
+
   const PartBox({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return                 Container(
+    return Container(
       padding: EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,

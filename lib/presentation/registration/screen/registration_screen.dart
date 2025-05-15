@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/domain/enum/history_content.dart';
 import 'package:withme/core/presentation/widget/confirm_box_text.dart';
+import 'package:withme/core/presentation/widget/dashed_divider.dart';
 import 'package:withme/core/presentation/widget/history_button.dart';
 import 'package:withme/core/presentation/widget/select_history_menu.dart';
 import 'package:withme/core/presentation/widget/show_confirm_dialog.dart';
@@ -18,6 +19,7 @@ import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/core/presentation/widget/title_widget.dart';
+import 'package:withme/presentation/policy/components/part_box.dart';
 import 'package:withme/presentation/registration/registration_event.dart';
 import 'package:withme/presentation/registration/registration_view_model.dart';
 
@@ -49,7 +51,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
   );
   final TextEditingController _birthController = TextEditingController();
 
-   AnimationController? _animationController;
+  AnimationController? _animationController;
   late Animation<Color?> _colorAnimation;
 
   bool _isReadOnly = false;
@@ -77,7 +79,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
 
       _animationController = AnimationController(
         vsync: this,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       )..repeat(reverse: true);
       _colorAnimation = ColorTween(
         begin: Colors.red,
@@ -104,31 +106,48 @@ class _RegistrationScreenState extends State<RegistrationScreen>
         body: Form(
           key: _formKey,
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                height(20),
-                const TitleWidget(title: 'Registration in Prospect'),
-                height(39),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _inputName(),
-                      height(10),
-                      _inputSex(),
-                      height(10),
-                      _inputBirth(),
-                      height(5),
-                      _recommendedSwitch(),
-                      if (_isRecommended) _recommendedInputName(),
-                      height(30),
-                      if(_isReadOnly)
-                      _addPolicy(context),
-                    ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  height(20),
+                  const TitleWidget(title: 'Registered Prospect'),
+                  height(39),
+                  PartBox(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20,
+                        left: 20,
+                        right: 10,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              _inputName(),
+                          Spacer(),
+                          _inputSex(),
+                            ],
+                          ),
+                          height(10),
+                          height(10),
+                          _inputBirth(),
+                          height(20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: DashedDivider(height: 1),
+                          ),
+                          _recommendedSwitch(),
+                          if (_isRecommended) _recommendedInputName(),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  height(15),
+                  if (_isReadOnly) _addPolicy(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -139,48 +158,42 @@ class _RegistrationScreenState extends State<RegistrationScreen>
 
   Row _addPolicy(BuildContext context) {
     return Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.push(
-                              RoutePath.policy,
-                              extra: widget.customerModel,
-                            );
-                          },
-                          child: AnimatedBuilder(
-                            animation: _colorAnimation,
-                            builder: (context, child) {
-                              return Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: _colorAnimation.value,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '계약',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    );
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        GestureDetector(
+          onTap: () {
+            context.push(RoutePath.policy, extra: widget.customerModel);
+          },
+          child: AnimatedBuilder(
+            animation: _colorAnimation,
+            builder: (context, child) {
+              return Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: _colorAnimation.value,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    const BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Text('계약', style: TextStyle(color: Colors.white)),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   AppBar _appBar() {
-    return AppBar( actions: [_editIcon(), if (_isReadOnly) _deleteIcon()]);
+    return AppBar(actions: [_editIcon(), if (_isReadOnly) _deleteIcon()]);
   }
 
   IconButton _deleteIcon() {
@@ -226,40 +239,38 @@ class _RegistrationScreenState extends State<RegistrationScreen>
 
   Widget _inputName() {
     return _isReadOnly
-        ? Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Text('고객명: ${_nameController.text}'),
-        )
-        : CustomTextFormField(
-          controller: _nameController,
-          hintText: '신규 고객 이름 (필수)',
-          autoFocus: true,
-          readOnly: _isReadOnly,
-          onChanged: (text) async {
-            setState(() {
-              _nameController.text = text;
-            });
-          },
-          validator: (String text) {
-            if (text.isEmpty) {
-              return '이름을 입력하세요';
-            }
-            return null;
-          },
-          onSaved: (String text) {
-            _nameController.text = text.trim();
-          },
+        ? Text('고객명: ${_nameController.text}')
+        : Expanded(
+          child: CustomTextFormField(
+            controller: _nameController,
+            hintText: '신규 고객 이름 (필수)',
+            autoFocus: true,
+            readOnly: _isReadOnly,
+            onChanged: (text) async {
+              setState(() {
+                _nameController.text = text;
+              });
+            },
+            validator: (String text) {
+              if (text.isEmpty) {
+                return '이름을 입력하세요';
+              }
+              return null;
+            },
+            onSaved: (String text) {
+              _nameController.text = text.trim();
+            },
+          ),
         );
   }
 
   Widget _inputSex() {
     return Container(
-      padding: const EdgeInsets.only(left: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        // mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text('성별 ' + (!_isReadOnly ? ' (필수)' : '')),
-          const Spacer(),
+        //   Text('성별 ' + (!_isReadOnly ? ' (필수)' : '')),
+        //   const Spacer(),
           RadioMenuButton<String>(
             value: '남',
             groupValue: _sex,
@@ -291,7 +302,6 @@ class _RegistrationScreenState extends State<RegistrationScreen>
 
   _inputBirth() {
     return Container(
-      padding: const EdgeInsets.only(left: 20),
       child: Column(
         children: [
           Row(
@@ -350,7 +360,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
 
   ListTile _recommendedSwitch() {
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 20),
+      contentPadding: EdgeInsets.zero,
       title: Text(
         '소개자 여부 ${!_isReadOnly ? '(선택)' : ''}',
         style: TextStyles.normal13,

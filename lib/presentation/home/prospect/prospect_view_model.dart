@@ -38,7 +38,7 @@ class ProspectViewModel with ChangeNotifier {
     required String customerKey,
     required Map<String, dynamic> historyData,
   }) async {
-    return getIt<CustomerUseCase>().execute(
+    return getIt<HistoryUseCase>().execute(
       usecase: AddHistoryUseCase(
         userKey: 'user1',
         customerKey: customerKey,

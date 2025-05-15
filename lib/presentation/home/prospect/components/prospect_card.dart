@@ -6,6 +6,7 @@ import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
 import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
+import 'package:withme/core/utils/shortened_text.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/presentation/home/prospect/prospect_view_model.dart';
 
@@ -99,27 +100,26 @@ class ProspectCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(customer.name, style: TextStyles.bold14),
+            Text(shortNameText(customer.name), style: TextStyles.bold14),
             width(5),
             sexIcon(customer.sex),
             width(5),
             (isDate != null)
                 ? Text(
-                  '${calculateAge(customer.birth!)}세 [Insure: ${calculateInsuranceAge(customer.birth!)}]',
+                  '${calculateAge(customer.birth!)}세/보험: ${calculateInsuranceAge(customer.birth!)}세',
                 )
                 : const SizedBox.shrink(),
           ],
         ),
-        (customer.birth?.toLocal() != null)
-            ? Text(
-              '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}',
-              style: TextStyle(
-                color: difference <= 90 ? Colors.red : Colors.black87,
-              ),
-            )
-            : const SizedBox.shrink(),
-
-        Text(customer.recommended != '' ? customer.recommended : '소개자 없음'),
+        Text(
+          customer.birth?.toLocal() != null
+              ? '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}'
+              : '',
+          style: TextStyle(
+            color: difference <= 90 ? Colors.red : Colors.black87,
+          ),
+        ),
+        Text(customer.recommended != '' ? customer.recommended : ''),
       ],
     );
   }
@@ -128,9 +128,6 @@ class ProspectCard extends StatelessWidget {
     if (histories.isNotEmpty) {
       return GestureDetector(
         onTap: () => onTap(histories),
-        // () => onEvent(
-        //   PoolEvent.getHistories(customerKey: customer.customerKey),
-        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.center,

@@ -266,8 +266,8 @@ class _PolicyScreenState extends State<PolicyScreen> {
               width: 130,
               child: RenderFilledButton(
                 borderRadius: 10,
-                backgroundColor: ColorStyles.activeButtonColor,
-                foregroundColor: Colors.black87,
+                backgroundColor:_insuredBirth!=null?ColorStyles.unActiveButtonColor: ColorStyles.activeButtonColor,
+                foregroundColor:_insuredBirth!=null? Colors.black87:Colors.white,
                 onPressed: () async {
                   DateTime? birth = await selectDate(context);
                   if (birth != null) {
@@ -397,8 +397,8 @@ class _PolicyScreenState extends State<PolicyScreen> {
         Expanded(
           child: RenderFilledButton(
             borderRadius: 10,
-            backgroundColor: ColorStyles.activeButtonColor,
-            foregroundColor: Colors.black87,
+            backgroundColor:_startDate!=null?ColorStyles.unActiveButtonColor: ColorStyles.activeButtonColor,
+            foregroundColor:_startDate!=null? Colors.black87:Colors.white,
             onPressed: () async {
               DateTime? selectedDate = await selectDate(context);
               if (selectedDate != null) {
@@ -415,8 +415,8 @@ class _PolicyScreenState extends State<PolicyScreen> {
         Expanded(
           child: RenderFilledButton(
             borderRadius: 10,
-            backgroundColor: ColorStyles.activeButtonColor,
-            foregroundColor: Colors.black87,
+            backgroundColor:_endDate!=null?ColorStyles.unActiveButtonColor: ColorStyles.activeButtonColor,
+            foregroundColor:_endDate!=null? Colors.black87:Colors.white,
             onPressed: () async {
               DateTime? selectedDate = await selectDate(context);
               if (selectedDate != null) {
@@ -436,7 +436,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
   Widget _submitButton(BuildContext context) {
     return RenderFilledButton(
       backgroundColor: ColorStyles.activeButtonColor,
-      foregroundColor: Colors.black87,
+      foregroundColor: Colors.white,
       onPressed: () async {
         _tryValidation();
       },
