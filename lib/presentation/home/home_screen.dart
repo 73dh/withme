@@ -17,25 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final _pageController = PageController();
 
   void _onPageChanged(int index) {
-    if (index > 3) {
-      final updatedIndex = index % 4;
-      setState(() {
-        currentIndex = updatedIndex;
-        _pageController.animateToPage(
-          updatedIndex,
-          duration: const Duration(milliseconds: 100),
-          curve: Curves.easeIn,
-        );
-      });
-      return;
-    }
     setState(() {
-      currentIndex = index;
-      _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeIn,
-      );
+      currentIndex = index % 4;
     });
   }
 
@@ -46,15 +29,21 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: _pageController,
         padEnds: true,
         onPageChanged: _onPageChanged,
-
+        itemCount: HomeMenu.values.length,
         itemBuilder: (context, index) {
-          final int = index % 4;
-          return HomeMenu.values.firstWhere((e) => e.index == int).toWidget;
+          final pageIndex = index % 4;
+          return HomeMenu.values
+              .firstWhere((e) => e.index == pageIndex)
+              .toWidget;
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(RoutePath.registration),
-        child: Image.asset(IconsPath.personAdd),
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: Image.asset(IconsPath.personAdd),
+        ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
@@ -70,13 +59,20 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               ...HomeMenu.values.map((menu) {
                 return GestureDetector(
-                  onTap: (){
-                    _onPageChanged(menu.index);
+                  onTap: () {
+                    _pageController.animateToPage(
+                      menu.index,
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeIn,
+                    );
+                    // _onPageChanged(menu.index);
                   },
                   child: Image.asset(
                     menu.iconPath,
                     color:
-                        menu.index == currentIndex ? Colors.black87 : Colors.grey,
+                        menu.index == currentIndex
+                            ? Colors.black87
+                            : Colors.grey,
                   ),
                 );
               }),
@@ -85,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      // BottomN
     );
   }
 }

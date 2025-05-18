@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/color/color_style.dart';
 
-import '../../../core/ui/text_style/text_styles.dart';
+import '../../ui/text_style/text_styles.dart';
 
 class PartTitle extends StatelessWidget {
   final String text;
@@ -20,7 +19,7 @@ class PartTitle extends StatelessWidget {
             style: TextStyles.bold14.copyWith(fontStyle: FontStyle.italic),
           ),
         ),
-        Spacer(),
+        const Spacer(),
       ],
     );
   }

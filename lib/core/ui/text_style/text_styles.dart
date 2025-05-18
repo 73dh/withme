@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 abstract interface class TextStyles {
   static const normal12 = TextStyle(fontSize: 12);
   static const normal13 = TextStyle(fontSize: 13);
+  static const normal14 = TextStyle(fontSize: 14);
   static const bold12 = TextStyle(fontWeight: FontWeight.bold, fontSize: 12);
   static const bold14 = TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
   static const bold16 = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
@@ -16,4 +16,10 @@ abstract interface class TextStyles {
   static const hintStyle = TextStyle(color: Colors.blueGrey, fontSize: 14.0);
   static const labelStyle = TextStyle(color: Colors.black87, fontSize: 14.0);
   static const iconTextStyle = TextStyle(color: Colors.black87, fontSize: 8.0,fontStyle: FontStyle.italic);
+
+ static TextStyle? get cancelStyle => const TextStyle(
+    decoration: TextDecoration.lineThrough,
+    decorationColor: Colors.red,
+    decorationThickness: 2,
+  );
 }

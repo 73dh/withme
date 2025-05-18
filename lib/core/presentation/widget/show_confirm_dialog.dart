@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:withme/core/presentation/widget/width_height.dart';
+import 'package:withme/core/presentation/components/width_height.dart';
 
 Future<bool?> showConfirmDialog(BuildContext context,{required String text}) {
  return showDialog(

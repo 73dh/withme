@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:withme/core/utils/transformers.dart';
 import 'package:withme/data/data_source/remote/fbase.dart';
 import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
 
-import '../../domain/model/history_model.dart';
+import '../../core/utils/transformers.dart';
 
 class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   final FBase fBase;
@@ -57,10 +55,8 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   //   );
   // }
 
-
-
   @override
-  Future<void> deleteCustomer({required String customerKey}) async{
-return await fBase.deleteCustomer(customerKey: customerKey);
+  Future<void> deleteCustomer({required String customerKey}) async {
+    return await fBase.deleteCustomer(customerKey: customerKey);
   }
 }

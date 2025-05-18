@@ -1,13 +1,11 @@
-import '../../../domain/model/history_model.dart';
-
-sealed class ProspectEvent {
-  factory ProspectEvent.addHistory({
+sealed class ProspectListEvent {
+  factory ProspectListEvent.addHistory({
     required String customerKey,
     required Map<String, dynamic> historyData,
   }) = AddHistory;
 }
 
-class AddHistory implements ProspectEvent {
+class AddHistory implements ProspectListEvent {
   final String customerKey;
   final Map<String, dynamic> historyData;
 

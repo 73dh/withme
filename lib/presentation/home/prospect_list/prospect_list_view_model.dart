@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/router/router_path.dart';
-import 'package:withme/data/data_source/remote/fbase.dart';
-import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/domain/repository/customer_repository.dart';
-import 'package:withme/domain/use_case/history/add_history_use_case.dart';
 import 'package:withme/domain/use_case/customer_use_case.dart';
+import 'package:withme/domain/use_case/history/add_history_use_case.dart';
 import 'package:withme/domain/use_case/history_use_case.dart';
-import 'package:withme/presentation/home/prospect/prospect_event.dart';
+import 'package:withme/presentation/home/prospect_list/prospect_list_event.dart';
 
 import '../../../core/di/setup.dart';
-import '../../../domain/use_case/history/get_histories_use_case.dart';
 import '../../../domain/use_case/customer/get_prospect_use_case.dart';
+import '../../../domain/use_case/history/get_histories_use_case.dart';
 
-class ProspectViewModel with ChangeNotifier {
-
+class ProspectListViewModel with ChangeNotifier {
   Stream getProspects() {
     return getIt<CustomerUseCase>().call(usecase: GetProspectUseCase());
   }
@@ -24,7 +19,7 @@ class ProspectViewModel with ChangeNotifier {
     );
   }
 
-  onEvent(ProspectEvent event) {
+  onEvent(ProspectListEvent event) {
     switch (event) {
       case AddHistory():
         _addHistory(

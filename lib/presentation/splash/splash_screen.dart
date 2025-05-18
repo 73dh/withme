@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void initScreen() async {
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
     if (mounted) {
       context.go(RoutePath.home);
     }
@@ -25,6 +25,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(child: Center(child: Text('withMe')));
+    return const Material(child: Center(child: Text('withMe')));
   }
 }

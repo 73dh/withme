@@ -1,5 +1,4 @@
 import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
 import 'package:withme/domain/repository/policy_repository.dart';
 import 'package:withme/domain/use_case/base/base_stream_use_case.dart';
@@ -11,7 +10,9 @@ import '../../../core/di/setup.dart';
 class GetProspectUseCase extends BaseStreamUseCase<CustomerRepository> {
   @override
   Stream call(CustomerRepository repository) async* {
-    Stream<List<CustomerModel>> getAll = getIt<CustomerUseCase>().call(usecase: GetAllUseCase()) as Stream<List<CustomerModel>>;
+    Stream<List<CustomerModel>> getAll =
+        getIt<CustomerUseCase>().call(usecase: GetAllUseCase())
+            as Stream<List<CustomerModel>>;
     await for (final customers in getAll) {
       List<CustomerModel> prospectCustomers = [];
       for (var i = 0; i < customers.length; i++) {

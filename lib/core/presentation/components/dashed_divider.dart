@@ -16,13 +16,16 @@ class DashedDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: CustomPaint(
-        painter: _DashedLinePainter(
-          color: color,
-          dashWidth: dashWidth,
-          dashSpacing: dashSpacing,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: SizedBox(
+        height: height,
+        child: CustomPaint(
+          painter: _DashedLinePainter(
+            color: color,
+            dashWidth: dashWidth,
+            dashSpacing: dashSpacing,
+          ),
         ),
       ),
     );

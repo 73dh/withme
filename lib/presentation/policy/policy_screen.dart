@@ -2,27 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/domain/enum/insurance_category.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
-import 'package:withme/core/presentation/widget/confirm_box_text.dart';
-import 'package:withme/core/presentation/widget/custom_text_form_field.dart';
-import 'package:withme/core/presentation/widget/render_filled_button.dart';
+import 'package:withme/core/presentation/components/custom_text_form_field.dart';
+import 'package:withme/core/presentation/components/part_box.dart';
+import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/widget/render_snack_bar.dart';
 import 'package:withme/core/presentation/widget/select_date.dart';
-import 'package:withme/core/presentation/widget/show_confirm_dialog.dart';
-import 'package:withme/core/presentation/widget/title_widget.dart';
-import 'package:withme/core/presentation/widget/width_height.dart';
+import 'package:withme/core/presentation/components/title_widget.dart';
+import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/policy_model.dart';
-import 'package:withme/presentation/policy/components/part_box.dart';
-import 'package:withme/presentation/policy/components/part_title.dart';
 import 'package:withme/presentation/policy/components/policy_confirm_box.dart';
 import 'package:withme/presentation/policy/policy_view_model.dart';
 
 import '../../core/di/setup.dart';
-import '../../core/ui/text_style/text_styles.dart';
+import '../../core/presentation/components/part_title.dart';
 import '../../domain/model/customer_model.dart';
 
 class PolicyScreen extends StatefulWidget {
@@ -95,13 +91,13 @@ class _PolicyScreenState extends State<PolicyScreen> {
       child: Scaffold(
         appBar: AppBar(),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const TitleWidget(title: 'Policy Info'),
+                  const TitleWidget(title: 'Registration Policy Info'),
                   height(40),
                   const PartTitle(text: '계약관계자 정보'),
                   _customerPart(),
@@ -460,94 +456,120 @@ class _PolicyScreenState extends State<PolicyScreen> {
   }
 
   void _tryValidation() {
-    if (_formKey.currentState!.validate()) {
-      if (_policyHolderBirth == null) {
-        renderSnackBar(context, text: '계약자 생일을 확인하세요');
-        return;
-      }
-      if (_insuredSex == '') {
-        renderSnackBar(context, text: '피보험자 성별을 확인하세요');
-        return;
-      }
-      if (_insuredBirth == null) {
-        renderSnackBar(context, text: '피보험자 생일을 확인하세요');
-        return;
-      }
-      if (_productCategory.isEmpty || _insuranceCompany.isEmpty) {
-        renderSnackBar(context, text: '상품종류와 보험사를 선택하세요.');
-        return;
-      }
-      if (_paymentMethod.isEmpty) {
-        renderSnackBar(context, text: '납입방법을 선택하세요.');
-        return;
-      }
-
-      if (_startDate == null) {
-        renderSnackBar(context, text: '계약일을 확인하세요');
-        return;
-      }
-      if (_endDate == null) {
-        renderSnackBar(context, text: '보장 종료일을 확인하세요');
-
-        return;
-      }
-      if (_startDate != null &&
-          _endDate != null &&
-          _startDate!.isAfter(_endDate!)) {
-        renderSnackBar(context, text: '시작일이 종료일보다 늦습니다.');
-        return;
-      }
-      setState(() => _isCompleted = true);
-      _formKey.currentState!.save();
-      showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SizedBox(
-            height: 300,
-            width: double.infinity,
-            child: _confirmBox(context),
-          );
-        },
-      );
-      return;
-    }
+    // if (_formKey.currentState!.validate()) {
+    //   if (_policyHolderBirth == null) {
+    //     renderSnackBar(context, text: '계약자 생일을 확인하세요');
+    //     return;
+    //   }
+    //   if (_insuredSex == '') {
+    //     renderSnackBar(context, text: '피보험자 성별을 확인하세요');
+    //     return;
+    //   }
+    //   if (_insuredBirth == null) {
+    //     renderSnackBar(context, text: '피보험자 생일을 확인하세요');
+    //     return;
+    //   }
+    //   if (_productCategory.isEmpty || _insuranceCompany.isEmpty) {
+    //     renderSnackBar(context, text: '상품종류와 보험사를 선택하세요.');
+    //     return;
+    //   }
+    //   if (_paymentMethod.isEmpty) {
+    //     renderSnackBar(context, text: '납입방법을 선택하세요.');
+    //     return;
+    //   }
+    //
+    //   if (_startDate == null) {
+    //     renderSnackBar(context, text: '계약일을 확인하세요');
+    //     return;
+    //   }
+    //   if (_endDate == null) {
+    //     renderSnackBar(context, text: '보장 종료일을 확인하세요');
+    //
+    //     return;
+    //   }
+    //   if (_startDate != null &&
+    //       _endDate != null &&
+    //       _startDate!.isAfter(_endDate!)) {
+    //     renderSnackBar(context, text: '시작일이 종료일보다 늦습니다.');
+    //     return;
+    //   }
+    //   setState(() => _isCompleted = true);
+    //   _formKey.currentState!.save();
+    //   showModalBottomSheet(
+    //     context: context,
+    //     builder: (context) {
+    //       return SizedBox(
+    //         height: 300,
+    //         width: double.infinity,
+    //         child: _confirmBox(context),
+    //       );
+    //     },
+    //   );
+    //
+    //   return;
+    // }
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SizedBox(
+          height: 300,
+          width: double.infinity,
+          child: _confirmBox(context),
+        );
+      },
+    );
   }
 
   _confirmBox(context) {
-    final policyMap = PolicyModel.toMapForCreatePolicy(
-      policyHolder: _policyHolderName,
-      policyHolderBirth: _policyHolderBirth!,
-      policyHolderSex: _policyHolderSex,
-      insured: _insuredNameController.text,
-      insuredBirth: _insuredBirth!,
-      insuredSex: _insuredSex,
-      productCategory: _productCategory,
-      insuranceCompany: _insuranceCompany,
-      productName: _productNameController.text,
-      paymentMethod: _paymentMethod,
-      premium: _premiumController.text,
-      startDate: _startDate!,
-      endDate: _endDate!,
-    );
+    // final policyMap = PolicyModel.toMapForCreatePolicy(
+    //   policyHolder: _policyHolderName,
+    //   policyHolderBirth: _policyHolderBirth!,
+    //   policyHolderSex: _policyHolderSex,
+    //   insured: _insuredNameController.text,
+    //   insuredBirth: _insuredBirth!,
+    //   insuredSex: _insuredSex,
+    //   productCategory: _productCategory,
+    //   insuranceCompany: _insuranceCompany,
+    //   productName: _productNameController.text,
+    //   paymentMethod: _paymentMethod,
+    //   premium: _premiumController.text,
+    //   startDate: _startDate!,
+    //   endDate: _endDate!,
+    // );
 
     final policyMapSample = PolicyModel.toMapForCreatePolicy(
-      policyHolder: '_policyHolderName',
+      policyHolder: '홍길동',
       policyHolderBirth: DateTime.now(),
       policyHolderSex: '여',
-      insured: '_insuredNameController',
+      insured: '김신한',
       insuredBirth: DateTime.now(),
       insuredSex: '남',
-      productCategory: '_productCategory',
-      insuranceCompany: '_insuranceCompany',
-      productName: '_productNameController',
-      paymentMethod: '_paymentMethod',
+      productCategory: '저축보험',
+      insuranceCompany: '삼성생명',
+      productName: '(무)삼성저축보험',
+      paymentMethod: '월납',
       premium: '100000',
       startDate: DateTime.now(),
       endDate: DateTime.now(),
     );
 
+    // original
+    // return PolicyConfirmBox(
+    //   policyMap: policyMap,
+    //   onChecked: (bool result) {
+    //     if (result == true) {
+    //       getIt<PolicyViewModel>().addPolicy(
+    //         userKey: 'user1',
+    //         customerKey: widget.customer.customerKey,
+    //         policyData: policyMap,
+    //       );
+    //     }
+    //   },
+    // );
+
+    // sample
     return PolicyConfirmBox(
-      policyMap: policyMap,
+      policyMap: policyMapSample,
       onChecked: (bool result) {
         if (result == true) {
           getIt<PolicyViewModel>().addPolicy(

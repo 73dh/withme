@@ -7,4 +7,5 @@ abstract class IconsPath{
   static const String manIcon ='assets/icons/man.png';
   static const String womanIcon ='assets/icons/woman.png';
   static const String deleteIcon ='assets/icons/delete.png';
+  static const String signature ='assets/icons/signature.png';
 }

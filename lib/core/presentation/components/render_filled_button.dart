@@ -28,7 +28,7 @@ class RenderFilledButton extends StatelessWidget {
         ),
       ),
       child:  Padding(
-        padding: EdgeInsets.symmetric(vertical: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: SizedBox(
           width: double.infinity,
           child: Text(text, textAlign: TextAlign.center),

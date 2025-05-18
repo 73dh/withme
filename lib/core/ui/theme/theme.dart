@@ -6,6 +6,8 @@ import '../text_style/text_styles.dart';
 final theme = ThemeData(
   scaffoldBackgroundColor: Colors.white,
   appBarTheme: AppBarTheme(
+    elevation: 0,
+    surfaceTintColor: Colors.transparent,
     backgroundColor: Colors.white,
     titleTextStyle: TextStyles.bold20.copyWith(
       fontStyle: FontStyle.italic,

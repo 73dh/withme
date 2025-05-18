@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:withme/core/utils/generate_customer_key.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
 import 'history_model.dart';
@@ -29,7 +28,24 @@ class CustomerModel {
     required this.histories,
     required this.documentReference,
   });
-
+  factory CustomerModel.fromJson(Map<String, dynamic> json) {
+    return CustomerModel(
+      userKey: json[keyUserKey] as String,
+      customerKey: json[keyCustomerKey] as String,
+      name: json[keyCustomerName] as String,
+      sex: json[keyCustomerSex] as String,
+      birth: json[keyCustomerBirth] != null
+          ? (json[keyCustomerBirth] as Timestamp).toDate()
+          : null,
+      policies: json[keyIsPolicy] ?? [],
+      recommended: json[keyRecommendByWho] as String? ?? '',
+      registeredDate: (json[keyRegisteredDate] as Timestamp).toDate(),
+      histories: (json[keyCustomerHistory] as List<dynamic>? ?? [])
+          .map((e) => HistoryModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      documentReference: json[keyDocumentRef] as DocumentReference?,
+    );
+  }
   CustomerModel.fromMap(
     Map<String, dynamic> map,
     this.userKey, {
@@ -64,8 +80,6 @@ class CustomerModel {
     required String name,
     required String sex,
     String? recommender,
-
-    // required String history,
     DateTime? birth,
   }) {
     final map = <String, dynamic>{};
@@ -74,16 +88,13 @@ class CustomerModel {
     map[keyCustomerName] = name;
     map[keyCustomerSex] = sex;
     map[keyCustomerBirth] = birth ?? '';
-    // map[keyCustomerHistory] = [history];
-    // map[keyIsPolicy] = [];
     map[keyRegisteredDate] = DateTime.now().toUtc();
     map[keyRecommendByWho] = recommender ?? '';
-
     return map;
   }
 
   @override
   String toString() {
-    return 'CustomerModel{customerKey: $customerKey}';
+    return 'CustomerModel{userKey: $userKey, customerKey: $customerKey, name: $name, sex: $sex, birth: $birth, policies: $policies, recommended: $recommended, registeredDate: $registeredDate, histories: $histories, documentReference: $documentReference}';
   }
 }

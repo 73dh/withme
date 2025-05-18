@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
-import '../../../domain/model/history_model.dart';
 
 class FBase {
   // Customer

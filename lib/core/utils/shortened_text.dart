@@ -3,7 +3,7 @@ String shortenedText(String originalText) =>
         ? '${originalText.substring(0, 16)}...'
         : originalText;
 
-String shortNameText(String originalText) =>
-    originalText.length > 3
-        ? '${originalText.substring(0, 3)}..'
+String shortenedNameText(String originalText, {int length=3}) =>
+    originalText.length > length
+        ? '${originalText.substring(0, length)}..'
         : originalText;

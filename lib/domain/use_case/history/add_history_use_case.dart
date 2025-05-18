@@ -1,8 +1,5 @@
-import 'package:withme/domain/repository/customer_repository.dart';
 import 'package:withme/domain/repository/history_repository.dart';
 import 'package:withme/domain/use_case/base/base_use_case.dart';
-
-import '../../../core/di/setup.dart';
 
 class AddHistoryUseCase extends BaseUseCase<HistoryRepository> {
   final String userKey;

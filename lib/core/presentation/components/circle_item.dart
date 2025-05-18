@@ -17,7 +17,7 @@ class CircleItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(size),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5), // 그림자 색상
+            color: Colors.grey..withOpacity(0.5), // 그림자 색상
             offset: const Offset(4, 4), // x, y 방향으로 이동 (오른쪽 아래)
             blurRadius: 6, // 흐림 정도
             spreadRadius: 1, // 퍼짐 정도

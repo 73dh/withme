@@ -1,33 +1,35 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/icon/const.dart';
+import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
 import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/shortened_text.dart';
 import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/presentation/home/prospect/prospect_view_model.dart';
 
 import '../../../../core/di/setup.dart';
-import '../../../../core/presentation/widget/circle_item.dart';
-import '../../../../core/presentation/widget/sex_widget.dart';
-import '../../../../core/presentation/widget/width_height.dart';
+import '../../../../core/presentation/components/circle_item.dart';
+import '../../../../core/presentation/components/sex_widget.dart';
+import '../../../../core/presentation/components/width_height.dart';
 import '../../../../core/ui/text_style/text_styles.dart';
 import '../../../../domain/model/customer_model.dart';
+import '../prospect_list_view_model.dart';
 
-class ProspectCard extends StatelessWidget {
+class ProspectItem extends StatelessWidget {
   final CustomerModel customer;
   final void Function(List<HistoryModel> histories) onTap;
 
-  const ProspectCard({super.key, required this.customer, required this.onTap});
+  const ProspectItem({super.key, required this.customer, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: StreamBuilder(
-        stream: getIt<ProspectViewModel>().fetchHistories(customer.customerKey),
+        stream: getIt<ProspectListViewModel>().fetchHistories(
+          customer.customerKey,
+        ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             log(snapshot.error.toString());
@@ -73,8 +75,10 @@ class ProspectCard extends StatelessWidget {
                     width(20),
                     _namePart(),
                     const Spacer(),
-                    Expanded(child: _historyPart(histories)),
-                  ],
+                    Expanded(child:
+                    HistoryPartWidget(histories: histories, onTap:(histories)=> onTap(histories)),
+                    // _historyPart(histories)),
+                    )],
                 ),
               ),
             );
@@ -100,7 +104,7 @@ class ProspectCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(shortNameText(customer.name), style: TextStyles.bold14),
+            Text(shortenedNameText(customer.name), style: TextStyles.bold14),
             width(5),
             sexIcon(customer.sex),
             width(5),
@@ -124,46 +128,46 @@ class ProspectCard extends StatelessWidget {
     );
   }
 
-  Widget _historyPart(List<HistoryModel> histories) {
-    if (histories.isNotEmpty) {
-      return GestureDetector(
-        onTap: () => onTap(histories),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (histories.length >= 2)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    histories[histories.length - 2].contactDate.formattedDate,
-                    style: TextStyles.normal12,
-                  ),
-                  Text(
-                    histories[histories.length - 2].content,
-                    style: TextStyles.bold12,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            height(3),
-            Text(
-              histories[histories.length - 1].contactDate.formattedDate,
-              style: TextStyles.normal12,
-            ),
-            Text(
-              histories[histories.length - 1].content,
-              style: TextStyles.bold12,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
+  // Widget _historyPart(List<HistoryModel> histories) {
+  //   if (histories.isNotEmpty) {
+  //     return GestureDetector(
+  //       onTap: () => onTap(histories),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.end,
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           if (histories.length >= 2)
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.end,
+  //               children: [
+  //                 Text(
+  //                   histories[histories.length - 2].contactDate.formattedDate,
+  //                   style: TextStyles.normal12,
+  //                 ),
+  //                 Text(
+  //                   histories[histories.length - 2].content,
+  //                   style: TextStyles.bold12,
+  //                   maxLines: 1,
+  //                   overflow: TextOverflow.ellipsis,
+  //                 ),
+  //               ],
+  //             ),
+  //           height(3),
+  //           Text(
+  //             histories[histories.length - 1].contactDate.formattedDate,
+  //             style: TextStyles.normal12,
+  //           ),
+  //           Text(
+  //             histories[histories.length - 1].content,
+  //             style: TextStyles.bold12,
+  //             maxLines: 1,
+  //             overflow: TextOverflow.ellipsis,
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   } else {
+  //     return const SizedBox.shrink();
+  //   }
+  // }
 }

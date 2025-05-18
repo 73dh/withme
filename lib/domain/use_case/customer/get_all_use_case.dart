@@ -3,7 +3,6 @@ import 'package:withme/domain/use_case/base/base_stream_use_case.dart';
 
 import '../../../core/di/setup.dart';
 import '../../model/customer_model.dart';
-import '../base/base_use_case.dart';
 
 class GetAllUseCase extends BaseStreamUseCase<CustomerRepository> {
   @override

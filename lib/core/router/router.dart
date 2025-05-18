@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/router/router_path.dart';
+import 'package:withme/presentation/customer/customer_screen.dart';
 import 'package:withme/presentation/home/home_screen.dart';
 import 'package:withme/presentation/registration/screen/registration_screen.dart';
 import 'package:withme/presentation/splash/splash_screen.dart';
@@ -10,8 +11,8 @@ import '../../presentation/policy/policy_screen.dart';
 final router = GoRouter(
   initialLocation: RoutePath.splash,
   routes: [
-    GoRoute(builder: (_, __) => SplashScreen(), path: RoutePath.splash),
-    GoRoute(builder: (_, __) => HomeScreen(), path: RoutePath.home),
+    GoRoute(builder: (_, __) => const SplashScreen(), path: RoutePath.splash),
+    GoRoute(builder: (_, __) => const HomeScreen(), path: RoutePath.home),
     GoRoute(
       builder:
           (_, state) =>
@@ -20,9 +21,12 @@ final router = GoRouter(
     ),
     GoRoute(
       builder:
-          (_, state) =>
-          PolicyScreen(customer: state.extra as CustomerModel,),
+          (_, state) => PolicyScreen(customer: state.extra as CustomerModel),
       path: RoutePath.policy,
+    ),
+    GoRoute(
+      builder: (_, state) =>  CustomerScreen(customer: state.extra as CustomerModel,),
+      path: RoutePath.customer,
     ),
   ],
 );
