@@ -5,6 +5,8 @@ import '../model/history_model.dart';
 abstract interface class HistoryRepository implements Repository{
   Stream<List<HistoryModel>> getHistories({required String customerKey});
 
+  Future<List<HistoryModel>> getCustomerHistories({required String customerKey});
+
   Future<void> addHistory({
     required String userKey,
     required String customerKey,

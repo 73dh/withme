@@ -67,6 +67,18 @@ class FBase {
         .snapshots();
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> getCustomerHistories({
+    required String customerKey,
+  }) {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc('user1')
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionHistories)
+        .get();
+  }
+
   Future<void> addHistory({
     required String userKey,
     required String customerKey,
