@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
+import 'package:withme/core/router/router_path.dart';
+import 'package:withme/core/ui/icon/const.dart';
+import 'package:withme/presentation/home/customer_list/components/customer_item.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
 import '../../../../core/di/setup.dart';
+import '../../../../core/ui/color/color_style.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -17,10 +22,20 @@ class _NextScreenState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Next Screen')),
+      appBar: AppBar(title: const Text('검색 결과')),
       body: Stack(
         children: [
-          const Center(child: Text('Main Content')),
+          ListenableBuilder(
+            listenable: viewModel,
+            builder: (BuildContext context, Widget? child) {
+              return ListView.builder(
+                itemCount: viewModel.state.searchedCustomers.length,
+                itemBuilder: (context, index) {
+                  return Text(viewModel.state.searchedCustomers[index].name);
+                },
+              );
+            },
+          ),
           NotificationListener<DraggableScrollableNotification>(
             onNotification: (notification) {
               if (notification.extent == 0.5) {
@@ -48,29 +63,7 @@ class _NextScreenState extends State<SearchPage> {
                   child: ListenableBuilder(
                     listenable: viewModel,
                     builder: (context, widget) {
-                      return ListView(
-                        controller: scrollController,
-                        children: [
-                          _dragUpBar(),
-                          height(16),
-                          ElevatedButton(
-                            onPressed: () {
-                              final searchedCustomers =
-                                  viewModel.state.customers
-                                      .where((e) => e.sex == '남')
-                                      .toList();
-                              print(searchedCustomers);
-                              final searchedHistories =
-                                  viewModel.state.histories
-                                      .where((e) => e.content.contains('신'))
-                                      .toList();
-                              print(searchedHistories);
-                            },
-                            child: const Text('남자'),
-                          ),
-                          // 여기에 검색 옵션 등을 추가 가능
-                        ],
-                      );
+                      return _searchConditionBox(scrollController);
                     },
                   ),
                 );
@@ -79,6 +72,42 @@ class _NextScreenState extends State<SearchPage> {
           ),
         ],
       ),
+    );
+  }
+
+  ListView _searchConditionBox(ScrollController scrollController) {
+    return ListView(
+      controller: scrollController,
+      children: [
+        _dragUpBar(),
+        height(16),
+        RenderFilledButton(
+          onPressed: () {
+            viewModel.isThisMonthBirth();
+          },
+          text: '이달 생일 (오늘 포함 도래예정)',
+          backgroundColor: ColorStyles.searchButtonColor,
+          borderRadius: 10,
+        ),
+        height(5),
+        RenderFilledButton(
+          onPressed: () {
+            viewModel.filterCustomersByUpcomingInsuranceAgeIncrease;
+          },
+          text: '상령일 30일~60일 사이',
+          backgroundColor: ColorStyles.searchButtonColor,
+          borderRadius: 10,
+        ),
+        height(5),
+        RenderFilledButton(
+          onPressed: () {
+            viewModel.isThisMonthBirth();
+          },
+          text: '직전 3개월 이내 관리이력 없음',
+          backgroundColor: ColorStyles.searchButtonColor,
+          borderRadius: 10,
+        ),
+      ],
     );
   }
 

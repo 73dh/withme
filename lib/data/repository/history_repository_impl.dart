@@ -26,9 +26,6 @@ class HistoryRepositoryImpl with Transformers implements HistoryRepository {
     );
   }
 
-  @override
-  Future<List<HistoryModel>> getCustomerHistories({required String customerKey}) async{
-   return (await fBase.getCustomerHistories(customerKey: customerKey)).docs.map((e)=>HistoryModel.fromSnapshot(e)).toList();
-  }
+
 
 }
