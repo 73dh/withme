@@ -22,7 +22,7 @@ class HistoryPartWidget extends StatelessWidget {
         onTap: () => onTap(histories),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             if (histories.length >= 2)
               Column(

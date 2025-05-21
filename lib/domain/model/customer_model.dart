@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:withme/domain/model/policy_model.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
 import 'history_model.dart';
@@ -97,4 +98,21 @@ class CustomerModel {
   String toString() {
     return 'CustomerModel{userKey: $userKey, customerKey: $customerKey, name: $name, sex: $sex, birth: $birth, policies: $policies, recommended: $recommended, registeredDate: $registeredDate, histories: $histories, documentReference: $documentReference}';
   }
-}
+
+  CustomerModel copyWith({
+    List<PolicyModel>? policies,
+    List<HistoryModel>? histories,
+  }) {
+    return CustomerModel(
+      userKey: userKey,
+      customerKey: customerKey,
+      name: name,
+      sex: sex,
+      birth: birth,
+      policies: policies ?? this.policies,
+      recommended: recommended,
+      registeredDate: registeredDate,
+      histories: histories ?? this.histories,
+      documentReference: documentReference,
+    );
+}}

@@ -78,7 +78,7 @@ class CustomerItem extends StatelessWidget {
   Widget _namePart() {
     int difference =
         getInsuranceAgeChangeDate(
-          customer.birth!,
+          customer.birth ?? DateTime.now(),
         ).difference(DateTime.now()).inDays;
     return Row(
       children: [
@@ -87,11 +87,11 @@ class CustomerItem extends StatelessWidget {
         sexIcon(customer.sex),
         width(5),
         Text(
-          '${calculateAge(customer.birth!)}세/보험: ${calculateInsuranceAge(customer.birth!)}세',
+          '${calculateAge(customer.birth ?? DateTime.now())}세/보험: ${calculateInsuranceAge(customer.birth ?? DateTime.now())}세',
         ),
         width(3),
         Text(
-          '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}',
+          '상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
           style: TextStyle(
             color: difference <= 90 ? Colors.red : Colors.black87,
           ),

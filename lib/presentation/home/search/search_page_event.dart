@@ -1,0 +1,9 @@
+sealed class SearchPageEvent{
+  factory SearchPageEvent.filterCustomersByComingBirth()=FilterCustomersByComingBirth;
+  factory SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease()=FilterCustomersByUpcomingInsuranceAgeIncrease;
+  factory SearchPageEvent.filterNoRecentHistoryCustomers()=FilterNoRecentHistoryCustomers;
+}
+
+class FilterCustomersByComingBirth implements SearchPageEvent{}
+class FilterCustomersByUpcomingInsuranceAgeIncrease implements SearchPageEvent{}
+class FilterNoRecentHistoryCustomers implements SearchPageEvent{}

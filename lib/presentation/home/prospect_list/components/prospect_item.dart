@@ -75,10 +75,13 @@ class ProspectItem extends StatelessWidget {
                     width(20),
                     _namePart(),
                     const Spacer(),
-                    Expanded(child:
-                    HistoryPartWidget(histories: histories, onTap:(histories)=> onTap(histories)),
-                    // _historyPart(histories)),
-                    )],
+                    Expanded(
+                      child: HistoryPartWidget(
+                        histories: histories,
+                        onTap: (histories) => onTap(histories),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -127,47 +130,4 @@ class ProspectItem extends StatelessWidget {
       ],
     );
   }
-
-  // Widget _historyPart(List<HistoryModel> histories) {
-  //   if (histories.isNotEmpty) {
-  //     return GestureDetector(
-  //       onTap: () => onTap(histories),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.end,
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           if (histories.length >= 2)
-  //             Column(
-  //               crossAxisAlignment: CrossAxisAlignment.end,
-  //               children: [
-  //                 Text(
-  //                   histories[histories.length - 2].contactDate.formattedDate,
-  //                   style: TextStyles.normal12,
-  //                 ),
-  //                 Text(
-  //                   histories[histories.length - 2].content,
-  //                   style: TextStyles.bold12,
-  //                   maxLines: 1,
-  //                   overflow: TextOverflow.ellipsis,
-  //                 ),
-  //               ],
-  //             ),
-  //           height(3),
-  //           Text(
-  //             histories[histories.length - 1].contactDate.formattedDate,
-  //             style: TextStyles.normal12,
-  //           ),
-  //           Text(
-  //             histories[histories.length - 1].content,
-  //             style: TextStyles.bold12,
-  //             maxLines: 1,
-  //             overflow: TextOverflow.ellipsis,
-  //           ),
-  //         ],
-  //       ),
-  //     );
-  //   } else {
-  //     return const SizedBox.shrink();
-  //   }
-  // }
 }

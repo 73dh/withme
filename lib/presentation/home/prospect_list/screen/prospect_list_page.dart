@@ -90,7 +90,7 @@ class _ProspectListPageState extends State<ProspectListPage> {
                               child: ProspectItem(
                                 customer: prospects[index],
                                 onTap: (histories) {
-                                  _onHistoryTap(histories, prospects[index]);
+                                  _popupHistory(histories, prospects[index]);
                                 },
                               ),
                             ),
@@ -110,24 +110,24 @@ class _ProspectListPageState extends State<ProspectListPage> {
     );
   }
 
-  void _onHistoryTap(
-    List<HistoryModel> histories,
-    CustomerModel prospect,
-  ) async {
-    String? content = await CommonDialog(
-      menuController: menuController,
-      textController: textController,
-    ).showHistories(context, histories);
-    if (content != null) {
-      Map<String, dynamic> historyData = HistoryModel.toMapForHistory(
-        content: content,
-      );
-      viewModel.onEvent(
-        ProspectListEvent.addHistory(
-          customerKey: prospect.customerKey,
-          historyData: historyData,
-        ),
-      );
-    }
-  }
+  // void _popupHistory(
+  //   List<HistoryModel> histories,
+  //   CustomerModel prospect,
+  // ) async {
+  //   String? content = await CommonDialog(
+  //     menuController: menuController,
+  //     textController: textController,
+  //   ).showHistories(context, histories);
+  //   if (content != null) {
+  //     Map<String, dynamic> historyData = HistoryModel.toMapForHistory(
+  //       content: content,
+  //     );
+  //     viewModel.onEvent(
+  //       ProspectListEvent.addHistory(
+  //         customerKey: prospect.customerKey,
+  //         historyData: historyData,
+  //       ),
+  //     );
+  //   }
+  // }
 }

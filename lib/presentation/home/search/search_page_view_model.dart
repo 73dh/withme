@@ -7,6 +7,10 @@ import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/domain/use_case/customer/get_all_use_case.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_this_birth_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case.dart';
+import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_state.dart';
 
 import '../../../core/di/setup.dart';
@@ -19,25 +23,45 @@ class SearchPageViewModel with ChangeNotifier {
 
   SearchPageState get state => _state;
 
+onEvent(SearchPageEvent event){
+  switch(event){
+
+    case FilterCustomersByComingBirth():
+      _filterCustomersByComingBirth();
+    case FilterCustomersByUpcomingInsuranceAgeIncrease():
+      _filterCustomersByUpcomingInsuranceAgeIncrease();
+    case FilterNoRecentHistoryCustomers():
+      _filterNoRecentHistoryCustomers();
+  }
+}
+
   void getAllData() {
     final historyFutures = <Future<List<HistoryModel>>>[];
     final policyFutures = <Future<List<PolicyModel>>>[];
 
+    if (state.customers.isNotEmpty) return;
+
     getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).listen((
-        customerData ,
-        ) async {
+      originalCustomers,
+    ) async {
+      for (var customer in originalCustomers as List<CustomerModel>) {
+        final historyFuture =
+            getIt<HistoryUseCase>()
+                .call(
+                  usecase: GetHistoriesUseCase(
+                    customerKey: customer.customerKey,
+                  ),
+                )
+                .first;
 
-      _state = state.copyWith(customers: customerData);
-      notifyListeners();
-
-      for (var customer in customerData as List<CustomerModel>) {
-        final historyFuture = getIt<HistoryUseCase>().call(
-          usecase: GetHistoriesUseCase(customerKey: customer.customerKey),
-        ).first;
-
-        final policyFuture = getIt<PolicyUseCase>().call(
-          usecase: GetPoliciesUseCase(customerKey: customer.customerKey),
-        ).first;
+        final policyFuture =
+            getIt<PolicyUseCase>()
+                .call(
+                  usecase: GetPoliciesUseCase(
+                    customerKey: customer.customerKey,
+                  ),
+                )
+                .first;
 
         // Future 객체 자체를 리스트에 추가
         historyFutures.add(historyFuture as Future<List<HistoryModel>>);
@@ -48,11 +72,21 @@ class SearchPageViewModel with ChangeNotifier {
       final historiesList = await Future.wait(historyFutures);
       final policiesList = await Future.wait(policyFutures);
 
-      // 결과들을 평탄화
-      final allHistories = historiesList.expand((h) => h).toList();
-      final allPolicies = policiesList.expand((p) => p).toList();
+      // 각 customer에 해당하는 history, policy 붙이기
+      final updatedCustomers = List.generate(originalCustomers.length, (i) {
+        final updated = originalCustomers[i].copyWith(
+          histories: historiesList[i],
+          policies: policiesList[i],
+        );
+        return updated;
+      });
 
-      _state = state.copyWith(histories: allHistories, policies: allPolicies);
+      // 결과들을 평탄화 하여 저장
+      _state = state.copyWith(
+        customers: updatedCustomers,
+        histories: historiesList.expand((e) => e).toList(),
+        policies: policiesList.expand((e) => e).toList(),
+      );
       notifyListeners();
 
       log('customer length: ${state.customers.length}');
@@ -61,63 +95,23 @@ class SearchPageViewModel with ChangeNotifier {
     });
   }
 
-  void isThisMonthBirth() {
-    final now = DateTime.now();
-    final searchedCustomers = state.customers.where((e) {
-      if (e.birth == null) return false;
-
-      final birth = e.birth!;
-      // 생일의 연도를 현재로 바꾸어서 비교
-      final thisYearsBirthday = DateTime(now.year, birth.month, birth.day);
-
-      return thisYearsBirthday.month == now.month &&
-          !thisYearsBirthday.isBefore(now);
-    }).toList();
-
-    print(searchedCustomers);
-    _state = state.copyWith(searchedCustomers: searchedCustomers);
-    notifyListeners();
-  }
-
-  void filterCustomersByUpcomingInsuranceAgeIncrease() {
-    final now = DateTime.now();
-    final in10Days = now.add(Duration(days: 10));
-    final in30Days = now.add(Duration(days: 30));
-
-    final filtered = state.customers.where((customer) {
-      final birth = customer.birth;
-      if (birth == null) return false;
-
-      // 보험 상령일 = 생일 + 6개월
-      final insuranceAgeIncreaseDate = DateTime(
-        birth.year,
-        birth.month + 6,
-        birth.day,
-      );
-
-      // 올해 또는 내년의 보험 상령일 구하기
-      DateTime thisYearIncrease = DateTime(
-        now.year,
-        insuranceAgeIncreaseDate.month,
-        insuranceAgeIncreaseDate.day,
-      );
-
-      if (thisYearIncrease.isBefore(now)) {
-        // 이미 지난 경우는 내년 상령일 사용
-        thisYearIncrease = DateTime(
-          now.year + 1,
-          insuranceAgeIncreaseDate.month,
-          insuranceAgeIncreaseDate.day,
-        );
-      }
-
-      // 상령일이 10일 이상, 30일 이내인지 확인
-      return thisYearIncrease.isAfter(in10Days) &&
-          !thisYearIncrease.isAfter(in30Days);
-    }).toList();
+  Future<void> _filterCustomersByComingBirth() async {
+    final filtered = await FilterThisBirthUseCase.call(state.customers);
 
     _state = state.copyWith(searchedCustomers: filtered);
     notifyListeners();
   }
 
+  Future<void> _filterCustomersByUpcomingInsuranceAgeIncrease() async {
+    final filtered = await FilterUpcomingInsuranceUseCase.call(state.customers);
+    _state = state.copyWith(searchedCustomers: filtered);
+    notifyListeners();
+  }
+
+  Future<void> _filterNoRecentHistoryCustomers() async {
+    final filtered = await FilterNoRecentHistoryUseCase.call(state.customers);
+
+    _state = state.copyWith(searchedCustomers: filtered);
+    notifyListeners();
+  }
 }
