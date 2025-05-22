@@ -17,8 +17,13 @@ import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
+import 'enum/search_option.dart';
 
 class SearchPageViewModel with ChangeNotifier {
+  SearchPageViewModel(){
+    getAllData();
+
+  }
   SearchPageState _state = SearchPageState();
 
   SearchPageState get state => _state;
@@ -34,13 +39,11 @@ class SearchPageViewModel with ChangeNotifier {
     }
   }
 
-  void getAllData({bool isReload = false}) {
+  Future<void> getAllData() async {
     final historyFutures = <Future<List<HistoryModel>>>[];
     final policyFutures = <Future<List<PolicyModel>>>[];
 
-    if (state.customers.isNotEmpty && isReload == false) return;
-    if (isReload == true||state.customers.isEmpty) {
-      print('reload');
+
       getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).listen((
         originalCustomers,
       ) async {
@@ -66,6 +69,7 @@ class SearchPageViewModel with ChangeNotifier {
           // Future 객체 자체를 리스트에 추가
           historyFutures.add(historyFuture as Future<List<HistoryModel>>);
           policyFutures.add(policyFuture as Future<List<PolicyModel>>);
+          notifyListeners();
         }
 
         // 모든 Future 결과를 기다림
@@ -84,35 +88,44 @@ class SearchPageViewModel with ChangeNotifier {
         // 결과들을 평탄화 하여 저장
         _state = state.copyWith(
           customers: updatedCustomers,
+          searchedCustomers: updatedCustomers,
           histories: historiesList.expand((e) => e).toList(),
           policies: policiesList.expand((e) => e).toList(),
         );
         notifyListeners();
 
-        log('customer length: ${state.customers.length}');
-        log('history length: ${state.histories.length}');
-        log('policies length: ${state.policies.length}');
+        // log('customer length: ${state.customers.length}');
+        // log('history length: ${state.histories.length}');
+        // log('policies length: ${state.policies.length}');
       });
-    }
+
+  }
+
+  Future<void> _filterNoRecentHistoryCustomers() async {
+    final filtered = await FilterNoRecentHistoryUseCase.call(state.customers);
+    _state = state.copyWith(
+      searchedCustomers: filtered,
+      currentSearchOption: SearchOption.noRecentHistory,isInitScreen: false
+    );
+    notifyListeners();
   }
 
   Future<void> _filterCustomersByComingBirth() async {
     final filtered = await FilterThisBirthUseCase.call(state.customers);
 
-    _state = state.copyWith(searchedCustomers: filtered,currentSearchOption: 1);
+    _state = state.copyWith(
+      searchedCustomers: filtered,
+      currentSearchOption: SearchOption.comingBirth,isInitScreen: false
+    );
     notifyListeners();
   }
 
   Future<void> _filterCustomersByUpcomingInsuranceAgeIncrease() async {
     final filtered = await FilterUpcomingInsuranceUseCase.call(state.customers);
-    _state = state.copyWith(searchedCustomers: filtered,currentSearchOption: 2);
-    notifyListeners();
-  }
-
-  Future<void> _filterNoRecentHistoryCustomers() async {
-    final filtered = await FilterNoRecentHistoryUseCase.call(state.customers);
-
-    _state = state.copyWith(searchedCustomers: filtered,currentSearchOption: 3);
+    _state = state.copyWith(
+      searchedCustomers: filtered,
+      currentSearchOption: SearchOption.upcomingInsuranceAge,isInitScreen: false
+    );
     notifyListeners();
   }
 }

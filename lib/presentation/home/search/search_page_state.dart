@@ -2,13 +2,15 @@ import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
 
 import '../../../domain/model/history_model.dart';
+import 'enum/search_option.dart';
 
 class SearchPageState {
   final List<CustomerModel> customers;
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
   final List<CustomerModel> searchedCustomers;
-  final int? currentSearchOption;
+  final SearchOption? currentSearchOption;
+  final bool isInitScreen;
 
   SearchPageState({
     this.customers = const [],
@@ -16,6 +18,7 @@ class SearchPageState {
     this.policies = const [],
     this.searchedCustomers = const [],
     this.currentSearchOption,
+    this.isInitScreen = true,
   });
 
   SearchPageState copyWith({
@@ -23,14 +26,16 @@ class SearchPageState {
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
     List<CustomerModel>? searchedCustomers,
-    int? currentSearchOption,
+    SearchOption? currentSearchOption,
+    bool? isInitScreen,
   }) {
     return SearchPageState(
       customers: customers ?? this.customers,
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
-      searchedCustomers: searchedCustomers?? this.searchedCustomers,
-      currentSearchOption: currentSearchOption?? this.currentSearchOption,
+      searchedCustomers: searchedCustomers ?? this.searchedCustomers,
+      currentSearchOption: currentSearchOption ?? this.currentSearchOption,
+      isInitScreen: isInitScreen ?? this.isInitScreen,
     );
   }
 }

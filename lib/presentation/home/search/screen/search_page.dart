@@ -4,6 +4,7 @@ import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/widget/pop_up_history.dart';
 import 'package:withme/presentation/home/search/components/searched_customer_item.dart';
+import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
@@ -27,40 +28,37 @@ class _NextScreenState extends State<SearchPage> {
       builder: (BuildContext context, Widget? child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('검색 결과  ${viewModel.state.searchedCustomers.length}명'),
+            title:
+                (viewModel.state.isInitScreen == false)
+                    ? Text(
+                      '${viewModel.state.currentSearchOption!.name}  ${viewModel.state.searchedCustomers.length}명',
+                    )
+                    : null,
           ),
           body: Stack(
             children: [
-              ListView.builder(
-                itemCount: viewModel.state.searchedCustomers.length,
-                itemBuilder: (context, index) {
-                  final customer = viewModel.state.searchedCustomers[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SearchedCustomerItem(
-                      customer: customer,
-                      onTap: (histories)async {
-                      await  popupAddHistory(
-                          context,
-                          histories,
-                          customer,
-                          HistoryContent.title.toString(),
-                        );
-                        viewModel.getAllData(isReload: true);
-                        switch(viewModel.state.currentSearchOption){
-                          case 1:viewModel.onEvent(SearchPageEvent.filterCustomersByComingBirth());
-                          case 2:viewModel.onEvent(SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease());
-                          case 3:viewModel.onEvent(SearchPageEvent.filterNoRecentHistoryCustomers());
-                        }
-                      },
-                    ),
-                  );
-                },
-              ),
+              if (viewModel.state.isInitScreen == false)
+                ListView.builder(
+                  itemCount: viewModel.state.searchedCustomers.length,
+                  itemBuilder: (context, index) {
+                    final customer = viewModel.state.searchedCustomers[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SearchedCustomerItem(
+                        customer: customer,
+                        onTap: (histories) async {
+                          await onPopupAddHistory(histories, customer);
+                        },
+                      ),
+                    );
+                  },
+                ),
               NotificationListener<DraggableScrollableNotification>(
                 onNotification: (notification) {
                   if (notification.extent == 0.5) {
-                    viewModel.getAllData();
+                    viewModel.onEvent(
+                      SearchPageEvent.filterNoRecentHistoryCustomers(),
+                    );
                     return true;
                   }
                   return false;
@@ -98,6 +96,32 @@ class _NextScreenState extends State<SearchPage> {
     );
   }
 
+  Future<void> onPopupAddHistory(histories, customer) async {
+    await popupAddHistory(
+      context,
+      histories,
+      customer,
+      HistoryContent.title.toString(),
+    );
+    switch (viewModel.state.currentSearchOption) {
+      case SearchOption.noRecentHistory:
+        viewModel.onEvent(SearchPageEvent.filterNoRecentHistoryCustomers());
+        break;
+      case SearchOption.comingBirth:
+        viewModel.onEvent(SearchPageEvent.filterCustomersByComingBirth());
+        break;
+      case SearchOption.upcomingInsuranceAge:
+        viewModel.onEvent(
+          SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease(),
+        );
+        break;
+
+      case null:
+        break;
+    }
+    await viewModel.getAllData();
+  }
+
   ListView _searchConditionBox(ScrollController scrollController) {
     return ListView(
       controller: scrollController,
@@ -107,10 +131,24 @@ class _NextScreenState extends State<SearchPage> {
         RenderFilledButton(
           onPressed:
               () => viewModel.onEvent(
+                SearchPageEvent.filterNoRecentHistoryCustomers(),
+              ),
+          text: '3개월 이내 미관리',
+          backgroundColor:
+              viewModel.state.currentSearchOption ==
+                      SearchOption.noRecentHistory
+                  ? ColorStyles.activeSearchButtonColor
+                  : ColorStyles.unActiveSearchButtonColor,
+          borderRadius: 10,
+        ),
+        height(5),
+        RenderFilledButton(
+          onPressed:
+              () => viewModel.onEvent(
                 SearchPageEvent.filterCustomersByComingBirth(),
               ),
           text: '생일 (30일 이내)',
-          backgroundColor: ColorStyles.searchButtonColor,
+          backgroundColor: ColorStyles.unActiveSearchButtonColor,
           borderRadius: 10,
         ),
         height(5),
@@ -120,17 +158,7 @@ class _NextScreenState extends State<SearchPage> {
                 SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease(),
               ),
           text: '상령일 잔여일 (10일~30일)',
-          backgroundColor: ColorStyles.searchButtonColor,
-          borderRadius: 10,
-        ),
-        height(5),
-        RenderFilledButton(
-          onPressed:
-              () => viewModel.onEvent(
-                SearchPageEvent.filterNoRecentHistoryCustomers(),
-              ),
-          text: '3개월 이내 미관리',
-          backgroundColor: ColorStyles.searchButtonColor,
+          backgroundColor: ColorStyles.unActiveSearchButtonColor,
           borderRadius: 10,
         ),
       ],
