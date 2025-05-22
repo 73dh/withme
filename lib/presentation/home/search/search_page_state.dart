@@ -8,12 +8,14 @@ class SearchPageState {
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
   final List<CustomerModel> searchedCustomers;
+  final int? currentSearchOption;
 
   SearchPageState({
     this.customers = const [],
     this.histories = const [],
     this.policies = const [],
     this.searchedCustomers = const [],
+    this.currentSearchOption,
   });
 
   SearchPageState copyWith({
@@ -21,12 +23,14 @@ class SearchPageState {
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
     List<CustomerModel>? searchedCustomers,
+    int? currentSearchOption,
   }) {
     return SearchPageState(
       customers: customers ?? this.customers,
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
       searchedCustomers: searchedCustomers?? this.searchedCustomers,
+      currentSearchOption: currentSearchOption?? this.currentSearchOption,
     );
   }
 }

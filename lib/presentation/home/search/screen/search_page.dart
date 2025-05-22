@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/domain/enum/history_content.dart';
 import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
+import 'package:withme/core/presentation/widget/pop_up_history.dart';
 import 'package:withme/presentation/home/search/components/searched_customer_item.dart';
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
@@ -37,8 +39,19 @@ class _NextScreenState extends State<SearchPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: SearchedCustomerItem(
                       customer: customer,
-                      onTap: (text) {
-                        print('tap');
+                      onTap: (histories)async {
+                      await  popupAddHistory(
+                          context,
+                          histories,
+                          customer,
+                          HistoryContent.title.toString(),
+                        );
+                        viewModel.getAllData(isReload: true);
+                        switch(viewModel.state.currentSearchOption){
+                          case 1:viewModel.onEvent(SearchPageEvent.filterCustomersByComingBirth());
+                          case 2:viewModel.onEvent(SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease());
+                          case 3:viewModel.onEvent(SearchPageEvent.filterNoRecentHistoryCustomers());
+                        }
                       },
                     ),
                   );

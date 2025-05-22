@@ -23,95 +23,96 @@ class SearchPageViewModel with ChangeNotifier {
 
   SearchPageState get state => _state;
 
-onEvent(SearchPageEvent event){
-  switch(event){
-
-    case FilterCustomersByComingBirth():
-      _filterCustomersByComingBirth();
-    case FilterCustomersByUpcomingInsuranceAgeIncrease():
-      _filterCustomersByUpcomingInsuranceAgeIncrease();
-    case FilterNoRecentHistoryCustomers():
-      _filterNoRecentHistoryCustomers();
+  onEvent(SearchPageEvent event) {
+    switch (event) {
+      case FilterCustomersByComingBirth():
+        _filterCustomersByComingBirth();
+      case FilterCustomersByUpcomingInsuranceAgeIncrease():
+        _filterCustomersByUpcomingInsuranceAgeIncrease();
+      case FilterNoRecentHistoryCustomers():
+        _filterNoRecentHistoryCustomers();
+    }
   }
-}
 
-  void getAllData() {
+  void getAllData({bool isReload = false}) {
     final historyFutures = <Future<List<HistoryModel>>>[];
     final policyFutures = <Future<List<PolicyModel>>>[];
 
-    if (state.customers.isNotEmpty) return;
+    if (state.customers.isNotEmpty && isReload == false) return;
+    if (isReload == true||state.customers.isEmpty) {
+      print('reload');
+      getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).listen((
+        originalCustomers,
+      ) async {
+        for (var customer in originalCustomers as List<CustomerModel>) {
+          final historyFuture =
+              getIt<HistoryUseCase>()
+                  .call(
+                    usecase: GetHistoriesUseCase(
+                      customerKey: customer.customerKey,
+                    ),
+                  )
+                  .first;
 
-    getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).listen((
-      originalCustomers,
-    ) async {
-      for (var customer in originalCustomers as List<CustomerModel>) {
-        final historyFuture =
-            getIt<HistoryUseCase>()
-                .call(
-                  usecase: GetHistoriesUseCase(
-                    customerKey: customer.customerKey,
-                  ),
-                )
-                .first;
+          final policyFuture =
+              getIt<PolicyUseCase>()
+                  .call(
+                    usecase: GetPoliciesUseCase(
+                      customerKey: customer.customerKey,
+                    ),
+                  )
+                  .first;
 
-        final policyFuture =
-            getIt<PolicyUseCase>()
-                .call(
-                  usecase: GetPoliciesUseCase(
-                    customerKey: customer.customerKey,
-                  ),
-                )
-                .first;
+          // Future 객체 자체를 리스트에 추가
+          historyFutures.add(historyFuture as Future<List<HistoryModel>>);
+          policyFutures.add(policyFuture as Future<List<PolicyModel>>);
+        }
 
-        // Future 객체 자체를 리스트에 추가
-        historyFutures.add(historyFuture as Future<List<HistoryModel>>);
-        policyFutures.add(policyFuture as Future<List<PolicyModel>>);
-      }
+        // 모든 Future 결과를 기다림
+        final historiesList = await Future.wait(historyFutures);
+        final policiesList = await Future.wait(policyFutures);
 
-      // 모든 Future 결과를 기다림
-      final historiesList = await Future.wait(historyFutures);
-      final policiesList = await Future.wait(policyFutures);
+        // 각 customer에 해당하는 history, policy 붙이기
+        final updatedCustomers = List.generate(originalCustomers.length, (i) {
+          final updated = originalCustomers[i].copyWith(
+            histories: historiesList[i],
+            policies: policiesList[i],
+          );
+          return updated;
+        });
 
-      // 각 customer에 해당하는 history, policy 붙이기
-      final updatedCustomers = List.generate(originalCustomers.length, (i) {
-        final updated = originalCustomers[i].copyWith(
-          histories: historiesList[i],
-          policies: policiesList[i],
+        // 결과들을 평탄화 하여 저장
+        _state = state.copyWith(
+          customers: updatedCustomers,
+          histories: historiesList.expand((e) => e).toList(),
+          policies: policiesList.expand((e) => e).toList(),
         );
-        return updated;
+        notifyListeners();
+
+        log('customer length: ${state.customers.length}');
+        log('history length: ${state.histories.length}');
+        log('policies length: ${state.policies.length}');
       });
-
-      // 결과들을 평탄화 하여 저장
-      _state = state.copyWith(
-        customers: updatedCustomers,
-        histories: historiesList.expand((e) => e).toList(),
-        policies: policiesList.expand((e) => e).toList(),
-      );
-      notifyListeners();
-
-      log('customer length: ${state.customers.length}');
-      log('history length: ${state.histories.length}');
-      log('policies length: ${state.policies.length}');
-    });
+    }
   }
 
   Future<void> _filterCustomersByComingBirth() async {
     final filtered = await FilterThisBirthUseCase.call(state.customers);
 
-    _state = state.copyWith(searchedCustomers: filtered);
+    _state = state.copyWith(searchedCustomers: filtered,currentSearchOption: 1);
     notifyListeners();
   }
 
   Future<void> _filterCustomersByUpcomingInsuranceAgeIncrease() async {
     final filtered = await FilterUpcomingInsuranceUseCase.call(state.customers);
-    _state = state.copyWith(searchedCustomers: filtered);
+    _state = state.copyWith(searchedCustomers: filtered,currentSearchOption: 2);
     notifyListeners();
   }
 
   Future<void> _filterNoRecentHistoryCustomers() async {
     final filtered = await FilterNoRecentHistoryUseCase.call(state.customers);
 
-    _state = state.copyWith(searchedCustomers: filtered);
+    _state = state.copyWith(searchedCustomers: filtered,currentSearchOption: 3);
     notifyListeners();
   }
 }

@@ -2,10 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/domain/enum/history_content.dart';
 import 'package:withme/core/presentation/widget/app_bar_search_widget.dart';
+import 'package:withme/core/presentation/widget/pop_up_history.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/domain/model/customer_model.dart';
+import 'package:withme/domain/use_case/history/add_history_use_case.dart';
 import 'package:withme/presentation/home/prospect_list/components/prospect_item.dart';
 
 import '../../../../core/di/setup.dart';
@@ -26,15 +29,15 @@ class _ProspectListPageState extends State<ProspectListPage> {
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
 
-  final MenuController menuController = MenuController();
-  final TextEditingController textController = TextEditingController(
-    text: HistoryContent.title.toString(),
-  );
+  // final MenuController menuController = MenuController();
+  // final TextEditingController textController = TextEditingController(
+  //   text: HistoryContent.title.toString(),
+  // );
 
   @override
   void dispose() {
-    menuController.close();
-    textController.dispose();
+    // menuController.close();
+    // textController.dispose();
     super.dispose();
   }
 
@@ -57,7 +60,6 @@ class _ProspectListPageState extends State<ProspectListPage> {
               appBar: AppBar(
                 title: Text('Prospect ${prospects.length}명'),
                 actions: [
-                  // _searchPart()
                   AppBarSearchWidget(
                     onSubmitted: (text) {
                       setState(() {
@@ -82,16 +84,18 @@ class _ProspectListPageState extends State<ProspectListPage> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: GestureDetector(
-                              onTap:
-                                  () => context.push(
-                                    RoutePath.registration,
-                                    extra: prospects[index],
-                                  ),
+                              onTap: () {
+                                context.push(
+                                  RoutePath.registration,
+                                  extra: prospects[index],
+                                );
+                              },
                               child: ProspectItem(
                                 customer: prospects[index],
-                                onTap: (histories) {
-                                  _popupHistory(histories, prospects[index]);
-                                },
+                                onTap:
+                                    (histories) {
+                                    popupAddHistory(context, histories, prospects[index], HistoryContent.title.toString());
+                                    },
                               ),
                             ),
                           );
@@ -110,24 +114,4 @@ class _ProspectListPageState extends State<ProspectListPage> {
     );
   }
 
-  // void _popupHistory(
-  //   List<HistoryModel> histories,
-  //   CustomerModel prospect,
-  // ) async {
-  //   String? content = await CommonDialog(
-  //     menuController: menuController,
-  //     textController: textController,
-  //   ).showHistories(context, histories);
-  //   if (content != null) {
-  //     Map<String, dynamic> historyData = HistoryModel.toMapForHistory(
-  //       content: content,
-  //     );
-  //     viewModel.onEvent(
-  //       ProspectListEvent.addHistory(
-  //         customerKey: prospect.customerKey,
-  //         historyData: historyData,
-  //       ),
-  //     );
-  //   }
-  // }
 }
