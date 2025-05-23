@@ -103,7 +103,7 @@ class SearchedCustomerItem extends StatelessWidget {
             width(5),
             (isDate != null)
                 ? Text(
-                  '${calculateAge(customer.birth!)}세/보험: ${calculateInsuranceAge(customer.birth!)}세',
+                  '${ customer.birth!.formattedBirth} (${calculateAge(customer.birth!)}세)',
                 )
                 : const SizedBox.shrink(),
           ],

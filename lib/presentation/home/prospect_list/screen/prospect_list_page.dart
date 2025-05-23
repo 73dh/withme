@@ -29,18 +29,6 @@ class _ProspectListPageState extends State<ProspectListPage> {
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
 
-  // final MenuController menuController = MenuController();
-  // final TextEditingController textController = TextEditingController(
-  //   text: HistoryContent.title.toString(),
-  // );
-
-  @override
-  void dispose() {
-    // menuController.close();
-    // textController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -92,10 +80,14 @@ class _ProspectListPageState extends State<ProspectListPage> {
                               },
                               child: ProspectItem(
                                 customer: prospects[index],
-                                onTap:
-                                    (histories) {
-                                    popupAddHistory(context, histories, prospects[index], HistoryContent.title.toString());
-                                    },
+                                onTap: (histories) {
+                                  popupAddHistory(
+                                    context,
+                                    histories,
+                                    prospects[index],
+                                    HistoryContent.title.toString(),
+                                  );
+                                },
                               ),
                             ),
                           );
@@ -113,5 +105,4 @@ class _ProspectListPageState extends State<ProspectListPage> {
       ),
     );
   }
-
 }

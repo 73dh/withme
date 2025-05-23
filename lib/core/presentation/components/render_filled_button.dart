@@ -13,7 +13,7 @@ class RenderFilledButton extends StatelessWidget {
     required this.text,
     this.borderRadius=2,
     this.backgroundColor,
-    this.foregroundColor,
+    this.foregroundColor=Colors.black87,
   });
 
   @override

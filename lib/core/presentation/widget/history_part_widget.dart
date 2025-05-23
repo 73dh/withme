@@ -22,11 +22,10 @@ class HistoryPartWidget extends StatelessWidget {
         onTap: () => onTap(histories),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             if (histories.length >= 2)
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     histories[histories.length - 2].contactDate.formattedDate,

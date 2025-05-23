@@ -31,7 +31,7 @@ class _NextScreenState extends State<SearchPage> {
             title:
                 (viewModel.state.isInitScreen == false)
                     ? Text(
-                      '${viewModel.state.currentSearchOption!.name}  ${viewModel.state.searchedCustomers.length}명',
+                      '${viewModel.state.currentSearchOption!.toString()}  ${viewModel.state.searchedCustomers.length}명',
                     )
                     : null,
           ),
@@ -119,7 +119,7 @@ class _NextScreenState extends State<SearchPage> {
       case null:
         break;
     }
-    await viewModel.getAllData();
+    // await viewModel.getAllData();
   }
 
   ListView _searchConditionBox(ScrollController scrollController) {
@@ -128,40 +128,54 @@ class _NextScreenState extends State<SearchPage> {
       children: [
         _dragUpBar(),
         height(16),
-        RenderFilledButton(
+        _buildFilterButton(
           onPressed:
               () => viewModel.onEvent(
                 SearchPageEvent.filterNoRecentHistoryCustomers(),
               ),
           text: '3개월 이내 미관리',
-          backgroundColor:
+          isActive:
               viewModel.state.currentSearchOption ==
-                      SearchOption.noRecentHistory
-                  ? ColorStyles.activeSearchButtonColor
-                  : ColorStyles.unActiveSearchButtonColor,
-          borderRadius: 10,
+              SearchOption.noRecentHistory,
         ),
         height(5),
-        RenderFilledButton(
+        _buildFilterButton(
           onPressed:
               () => viewModel.onEvent(
                 SearchPageEvent.filterCustomersByComingBirth(),
               ),
           text: '생일 (30일 이내)',
-          backgroundColor: ColorStyles.unActiveSearchButtonColor,
-          borderRadius: 10,
+          isActive:
+              viewModel.state.currentSearchOption == SearchOption.comingBirth,
         ),
         height(5),
-        RenderFilledButton(
+        _buildFilterButton(
           onPressed:
               () => viewModel.onEvent(
                 SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease(),
               ),
           text: '상령일 잔여일 (10일~30일)',
-          backgroundColor: ColorStyles.unActiveSearchButtonColor,
-          borderRadius: 10,
+          isActive:
+              viewModel.state.currentSearchOption ==
+              SearchOption.upcomingInsuranceAge,
         ),
       ],
+    );
+  }
+
+  Widget _buildFilterButton({
+    required VoidCallback onPressed,
+    required String text,
+    required bool isActive,
+  }) {
+    return RenderFilledButton(
+      onPressed: onPressed,
+      text: text,
+      backgroundColor:
+          isActive
+              ? ColorStyles.activeSearchButtonColor
+              : ColorStyles.unActiveSearchButtonColor,
+      borderRadius: 10,
     );
   }
 

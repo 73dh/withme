@@ -12,7 +12,9 @@ import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
 
 import '../../core/di/setup.dart';
+import '../../core/domain/enum/history_content.dart';
 import '../../core/presentation/core_presentation_import.dart';
+import '../../core/presentation/widget/pop_up_history.dart';
 import '../../core/utils/extension/number_format.dart';
 import '../../domain/model/customer_model.dart';
 import '../../domain/model/history_model.dart';
@@ -101,6 +103,7 @@ class CustomerScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +134,14 @@ class CustomerScreen extends StatelessWidget {
                     List<HistoryModel> histories = snapshot.data!;
                     return HistoryPartWidget(
                       histories: histories,
-                      onTap: (histories) {},
+                      onTap: (histories) {
+                        popupAddHistory(
+                          context,
+                          histories,
+                          customer,
+                          HistoryContent.title.toString(),
+                        );
+                      },
                     );
                   } else {
                     return MyCircularIndicator();

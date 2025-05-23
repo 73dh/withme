@@ -126,7 +126,7 @@ class ProspectItem extends StatelessWidget {
             color: difference <= 90 ? Colors.red : Colors.black87,
           ),
         ),
-        Text(customer.recommended != '' ? customer.recommended : ''),
+        Text(customer.recommended != '' ? '소개자: ${customer.recommended}' : ''),
       ],
     );
   }

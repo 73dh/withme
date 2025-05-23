@@ -16,6 +16,7 @@ import '../../../core/presentation/components/render_filled_button.dart';
 import '../../../core/presentation/widget/render_snack_bar.dart';
 import '../../../core/presentation/widget/select_date.dart';
 import '../../../core/presentation/components/width_height.dart';
+import '../../../core/ui/color/color_style.dart';
 import '../../../core/ui/text_style/text_styles.dart';
 import '../../../core/utils/calculate_age.dart';
 import '../../../core/utils/calculate_insurance_age.dart';
@@ -31,10 +32,7 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _RegistrationScreenState
-    extends
-        State<RegistrationScreen> // with SingleTickerProviderStateMixin {
-        {
+class _RegistrationScreenState extends State<RegistrationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   final TextEditingController _nameController = TextEditingController();
@@ -43,9 +41,6 @@ class _RegistrationScreenState
     text: '신규등록',
   );
   final TextEditingController _birthController = TextEditingController();
-
-  // AnimationController? _animationController;
-  // late Animation<Color?> _colorAnimation;
 
   bool _isReadOnly = false;
   bool _isRecommended = false;
@@ -382,6 +377,7 @@ class _RegistrationScreenState
           );
         }
       },
+      foregroundColor: ColorStyles.activeButtonColor,
       text: widget.customerModel == null ? '등록' : '수정',
     );
   }
