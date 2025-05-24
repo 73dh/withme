@@ -28,7 +28,6 @@ class _SelectHistoryMenuState extends State<SelectHistoryMenu> {
             return MenuItemButton(
               child: Text(content.toString()),
               onPressed:
-              // ()=>widget.onTap(widget.textEditingController)
               () {
                 setState(() {
                   if (content == HistoryContent.etc) {

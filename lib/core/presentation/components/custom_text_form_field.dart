@@ -41,9 +41,10 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseBorder = const OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
-    );
+    final baseBorder =OutlineInputBorder(borderSide: BorderSide.none);
+    // const OutlineInputBorder(
+    //   borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
+    // );
 
     return TextFormField(
       controller: controller,
@@ -58,7 +59,7 @@ class CustomTextFormField extends StatelessWidget {
       onChanged: (text) => onChanged,
       onEditingComplete: onCompleted,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         hintText: hintText,
         hintStyle: TextStyles.hintStyle,
         labelText: labelText,

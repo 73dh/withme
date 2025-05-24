@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 
-import '../../../../core/di/setup.dart';
+import '../../di/setup.dart';
 
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/text_style/text_styles.dart';
-import '../../../../core/utils/calculate_age.dart';
-import '../../../../core/utils/calculate_insurance_age.dart';
-import '../../../../core/utils/days_until_insurance_age.dart';
-import '../../../../core/utils/shortened_text.dart';
-import '../../../../domain/model/customer_model.dart';
-import '../../../../domain/model/policy_model.dart';
-import '../customer_list_view_model.dart';
+import '../core_presentation_import.dart';
+import '../../ui/text_style/text_styles.dart';
+import '../../utils/calculate_age.dart';
+import '../../utils/calculate_insurance_age.dart';
+import '../../utils/days_until_insurance_age.dart';
+import '../../utils/shortened_text.dart';
+import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/policy_model.dart';
+import '../../../presentation/home/customer_list/customer_list_view_model.dart';
 
 class CustomerItem extends StatelessWidget {
   final CustomerModel customer;
@@ -63,6 +63,7 @@ class CustomerItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [_namePart(), _policyPart(policies)],
                     ),
+
                   ],
                 ),
               ),

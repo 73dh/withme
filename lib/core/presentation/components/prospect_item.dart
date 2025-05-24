@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
@@ -8,14 +9,15 @@ import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/shortened_text.dart';
 import 'package:withme/domain/model/history_model.dart';
+import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
-import '../../../../core/di/setup.dart';
-import '../../../../core/presentation/components/circle_item.dart';
-import '../../../../core/presentation/components/sex_widget.dart';
-import '../../../../core/presentation/components/width_height.dart';
-import '../../../../core/ui/text_style/text_styles.dart';
-import '../../../../domain/model/customer_model.dart';
-import '../prospect_list_view_model.dart';
+import '../../di/setup.dart';
+import 'circle_item.dart';
+import 'sex_widget.dart';
+import 'width_height.dart';
+import '../../ui/text_style/text_styles.dart';
+import '../../../domain/model/customer_model.dart';
+import '../../../presentation/home/prospect_list/prospect_list_view_model.dart';
 
 class ProspectItem extends StatelessWidget {
   final CustomerModel customer;
@@ -27,9 +29,10 @@ class ProspectItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: StreamBuilder(
-        stream: getIt<ProspectListViewModel>().fetchHistories(
-          customer.customerKey,
-        ),
+        stream:getIt<HistoryUseCase>().call(usecase: GetHistoriesUseCase(customerKey: customer.customerKey)),
+        // getIt<ProspectListViewModel>().fetchHistories(
+        //   customer.customerKey,
+        // ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             log(snapshot.error.toString());

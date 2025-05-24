@@ -10,7 +10,6 @@ class SearchPageState {
   final List<PolicyModel> policies;
   final List<CustomerModel> searchedCustomers;
   final SearchOption? currentSearchOption;
-  final bool isInitScreen;
 
   SearchPageState({
     this.customers = const [],
@@ -18,7 +17,6 @@ class SearchPageState {
     this.policies = const [],
     this.searchedCustomers = const [],
     this.currentSearchOption,
-    this.isInitScreen = true,
   });
 
   SearchPageState copyWith({
@@ -27,7 +25,6 @@ class SearchPageState {
     List<PolicyModel>? policies,
     List<CustomerModel>? searchedCustomers,
     SearchOption? currentSearchOption,
-    bool? isInitScreen,
   }) {
     return SearchPageState(
       customers: customers ?? this.customers,
@@ -35,7 +32,6 @@ class SearchPageState {
       policies: policies ?? this.policies,
       searchedCustomers: searchedCustomers ?? this.searchedCustomers,
       currentSearchOption: currentSearchOption ?? this.currentSearchOption,
-      isInitScreen: isInitScreen ?? this.isInitScreen,
     );
   }
 }

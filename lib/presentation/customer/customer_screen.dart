@@ -54,7 +54,9 @@ class CustomerScreen extends StatelessWidget {
                     if (snapshot.hasError) {
                       log(snapshot.error.toString());
                     }
-                    if (snapshot.hasData) {
+                    if(!snapshot.hasData){
+                      return const MyCircularIndicator();
+                    }
                       List<PolicyModel> policies = snapshot.data!;
                       return ListView.builder(
                         shrinkWrap: true,
@@ -66,9 +68,6 @@ class CustomerScreen extends StatelessWidget {
                         },
                         itemCount: policies.length,
                       );
-                    } else {
-                      return const MyCircularIndicator();
-                    }
                   },
                 ),
               ),
@@ -130,7 +129,9 @@ class CustomerScreen extends StatelessWidget {
                   customer.customerKey,
                 ),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
+                  if(!snapshot.hasData){
+                    return const MyCircularIndicator();
+                  }
                     List<HistoryModel> histories = snapshot.data!;
                     return HistoryPartWidget(
                       histories: histories,
@@ -143,9 +144,7 @@ class CustomerScreen extends StatelessWidget {
                         );
                       },
                     );
-                  } else {
-                    return MyCircularIndicator();
-                  }
+
                 },
               ),
             ],

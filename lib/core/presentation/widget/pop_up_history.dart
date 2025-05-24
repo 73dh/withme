@@ -27,7 +27,7 @@ Future<void> popupAddHistory(
       Map<String, dynamic> historyData = HistoryModel.toMapForHistory(
         content: content,
       );
-      if(historyData.isNotEmpty){
+      if (historyData.isNotEmpty) {
         getIt<HistoryUseCase>().execute(
           usecase: AddHistoryUseCase(
             userKey: 'user1',
@@ -35,11 +35,10 @@ Future<void> popupAddHistory(
             historyData: historyData,
           ),
         );
-      }else{
+      } else {
         null;
       }
     }
   } finally {
-    // textController.dispose();
   }
 }

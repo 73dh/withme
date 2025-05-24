@@ -30,14 +30,17 @@ class HistoryButton extends StatelessWidget {
 
         padding: EdgeInsets.zero,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2)),
+          borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
       ),
       child: SizedBox(
-        width: 180,
-        child: Text(
-          shortenedText(textController.text),
-          textAlign: TextAlign.center,
+        width: MediaQuery.of(context).size.width * 0.7,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            shortenedText(textController.text),
+            textAlign: TextAlign.left,
+          ),
         ),
       ),
     );
