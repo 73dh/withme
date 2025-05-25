@@ -6,26 +6,26 @@ import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
+import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/history_model.dart';
-import '../../../presentation/home/prospect_list/prospect_list_view_model.dart';
+import '../../../domain/model/policy_model.dart';
 import '../../di/setup.dart';
-
-import '../core_presentation_import.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../../utils/calculate_age.dart';
-import '../../utils/calculate_insurance_age.dart';
 import '../../utils/days_until_insurance_age.dart';
 import '../../utils/shortened_text.dart';
-import '../../../domain/model/customer_model.dart';
-import '../../../domain/model/policy_model.dart';
-import '../../../presentation/home/customer_list/customer_list_view_model.dart';
+import '../core_presentation_import.dart';
 import '../widget/history_part_widget.dart';
 
 class SearchCustomerItem extends StatelessWidget {
   final CustomerModel customer;
   final void Function(List<HistoryModel> histories) onTap;
 
-  const SearchCustomerItem({super.key, required this.customer, required this.onTap});
+  const SearchCustomerItem({
+    super.key,
+    required this.customer,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,26 +69,28 @@ class SearchCustomerItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [_namePart(), _policyPart(policies)],
                   ),
-                  Flexible(
-                    fit: FlexFit.loose,
+                  Expanded(
+                    // fit: FlexFit.loose,
                     child: StreamBuilder(
-                      stream: getIt<HistoryUseCase>().call(usecase: GetHistoriesUseCase(customerKey: customer.customerKey)),
+                      stream: getIt<HistoryUseCase>().call(
+                        usecase: GetHistoriesUseCase(
+                          customerKey: customer.customerKey,
+                        ),
+                      ),
                       //     .fetchHistories(
                       //   customer.customerKey,
                       // ),
                       builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          log(snapshot.error.toString());
-                        }
-                        if(!snapshot.hasData){
+                        if (!snapshot.hasData) {
                           return const MyCircularIndicator();
                         }
-                          List<HistoryModel> histories=snapshot.data;
+
+                        List<HistoryModel> histories = snapshot.data;
                         return HistoryPartWidget(
                           histories: histories,
                           onTap: (histories) => onTap(histories),
                         );
-                      }
+                      },
                     ),
                   ),
                 ],
@@ -120,7 +122,6 @@ class SearchCustomerItem extends StatelessWidget {
               '${customer.birth?.formattedBirth} ${calculateAge(customer.birth ?? DateTime.now())}세/',
             ),
             width(3),
-
           ],
         ),
         Text(
@@ -129,8 +130,7 @@ class SearchCustomerItem extends StatelessWidget {
             color: difference <= 90 ? Colors.red : Colors.black87,
           ),
         ),
-        if(customer.recommended!='')
-        Text(customer.recommended),
+        if (customer.recommended != '') Text(customer.recommended),
       ],
     );
   }

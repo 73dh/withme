@@ -1,12 +1,21 @@
+import '../../../presentation/home/search/enum/upcoming_insurance_age.dart';
 import '../../domain_import.dart';
 
 abstract class FilterUpcomingInsuranceUseCase{
-  static Future<List<CustomerModel>> call(List<CustomerModel> customers)async{
+  static Future<Map<UpcomingInsuranceAge, List<CustomerModel>>> call(List<CustomerModel> customers) async {
     final now = DateTime.now();
 
-  return customers.where((customer) {
+    // 초기 맵 생성
+    final Map<UpcomingInsuranceAge, List<CustomerModel>> result = {
+      UpcomingInsuranceAge.today: [],
+      UpcomingInsuranceAge.tomorrow: [],
+      UpcomingInsuranceAge.inSevenAfter: [],
+      UpcomingInsuranceAge.inMonthLater: [],
+    };
+
+    for (final customer in customers) {
       final birth = customer.birth;
-      if (birth == null) return false;
+      if (birth == null) continue;
 
       // 보험 상령일 = 생일 + 6개월
       final insuranceAgeIncreaseDate = DateTime(
@@ -32,9 +41,19 @@ abstract class FilterUpcomingInsuranceUseCase{
 
       final remainingDays = thisYearIncrease.difference(now).inDays;
 
-      // 잔여일이 10일 이상 30일 이내인지 확인
-      return remainingDays >= 10 && remainingDays <= 30;
-    }).toList();
+      if (remainingDays == 0) {
+        result[UpcomingInsuranceAge.today]!.add(customer);
+      } else if (remainingDays == 1) {
+        result[UpcomingInsuranceAge.tomorrow]!.add(customer);
+      } else if (remainingDays > 1 && remainingDays <= 7) {
+        result[UpcomingInsuranceAge.inSevenAfter]!.add(customer);
+      } else if (remainingDays > 7 && remainingDays <= 30) {
+        result[UpcomingInsuranceAge.inMonthLater]!.add(customer);
+      }
+    }
 
+    return result;
   }
+
+
 }

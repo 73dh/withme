@@ -9,7 +9,7 @@ import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_this_birth_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case.dart';
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_state.dart';
@@ -18,7 +18,10 @@ import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
+import 'enum/coming_birth.dart';
 import 'enum/search_option.dart';
+import 'enum/no_contact_month.dart';
+import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
   SearchPageState _state = SearchPageState();
@@ -27,12 +30,12 @@ class SearchPageViewModel with ChangeNotifier {
 
   onEvent(SearchPageEvent event) {
     switch (event) {
-      case FilterCustomersByComingBirth():
-        _filterCustomersByComingBirth();
-      case FilterCustomersByUpcomingInsuranceAgeIncrease():
-        _filterCustomersByUpcomingInsuranceAgeIncrease();
+      case FilterComingBirth():
+        _filterComingBirth(birthOption: event.birthDay);
+      case FilterUpcomingInsuranceAge():
+        _filterUpcomingInsuranceAge(insuranceAge: event.insuranceAge);
       case FilterNoRecentHistoryCustomers():
-        _filterNoRecentHistoryCustomers(month: event.month);
+        _filterNoRecentHistoryCustomers(monthOption: event.month);
       case FilterNoBirthCustomers():
         _filterNoBirthCustomers();
     }
@@ -93,36 +96,50 @@ class SearchPageViewModel with ChangeNotifier {
     });
   }
 
-  Future<void> _filterNoRecentHistoryCustomers({required int month}) async {
-    final filtered = await FilterNoRecentHistoryUseCase.call(customers:  state.customers,month: month);
+  Future<void> _filterNoRecentHistoryCustomers({
+    required NoContactMonth monthOption,
+  }) async {
+    final filtered = await FilterNoRecentHistoryUseCase.call(
+      customers: state.customers,
+      month: monthOption,
+    );
     _state = state.copyWith(
       searchedCustomers: List.from(filtered),
       currentSearchOption: SearchOption.noRecentHistory,
+      noContactMonth: monthOption,
     );
     notifyListeners();
   }
 
-  Future<void> _filterCustomersByComingBirth() async {
-    final filtered = await FilterThisBirthUseCase.call(state.customers);
+  Future<void> _filterComingBirth({required ComingBirth birthOption}) async {
+    final result = await FilterComingBirthUseCase.call(state.customers);
+
+    final filtered = result[birthOption] ?? [];
 
     _state = state.copyWith(
       searchedCustomers: List.from(filtered),
       currentSearchOption: SearchOption.comingBirth,
+      comingBirth: birthOption,
     );
     notifyListeners();
   }
 
-  Future<void> _filterCustomersByUpcomingInsuranceAgeIncrease() async {
-    final filtered = await FilterUpcomingInsuranceUseCase.call(state.customers);
+  Future<void> _filterUpcomingInsuranceAge({
+    required UpcomingInsuranceAge insuranceAge,
+  }) async {
+    final result = await FilterUpcomingInsuranceUseCase.call(state.customers);
+    final filtered = result[insuranceAge] ?? [];
+
     _state = state.copyWith(
       searchedCustomers: List.from(filtered),
       currentSearchOption: SearchOption.upcomingInsuranceAge,
+      upcomingInsuranceAge: insuranceAge
     );
     notifyListeners();
   }
 
-  Future<void> _filterNoBirthCustomers()async{
-    final filtered=await FilterNoBirthUseCase.call(state.customers);
+  Future<void> _filterNoBirthCustomers() async {
+    final filtered = await FilterNoBirthUseCase.call(state.customers);
     _state = state.copyWith(
       searchedCustomers: List.from(filtered),
       currentSearchOption: SearchOption.noBirth,

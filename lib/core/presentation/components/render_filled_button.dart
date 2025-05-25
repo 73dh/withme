@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/search/enum/selected_menu_no_contact.dart';
+import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 
 class RenderFilledButton extends StatelessWidget {
   final void Function() onPressed;
@@ -7,8 +7,8 @@ class RenderFilledButton extends StatelessWidget {
   final double borderRadius;
   final Color? backgroundColor;
   final Color? foregroundColor;
-  final List<PopupMenuEntry<SelectedMenuNoContact>>? menuItems;
-  final void Function(SelectedMenuNoContact)? onMenuSelected;
+  final List<PopupMenuEntry<dynamic>>? menuItems;
+  final void Function(dynamic)? onMenuSelected;
   final String? selectedMenu;
 
   const RenderFilledButton({
@@ -34,29 +34,26 @@ class RenderFilledButton extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: SizedBox(
-          width: double.infinity,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment:  MainAxisAlignment.center,
-            children: [
-              if (menuItems != null)
-                PopupMenuButton<SelectedMenuNoContact>(
-                  itemBuilder: (context) => menuItems!,
-                  onSelected: onMenuSelected,
-                  icon: const Icon(Icons.more_vert, size: 20),
-                  padding: EdgeInsets.zero,
-                  splashRadius: 20,
-                ),
-              Text(
-              menuItems!=null? (selectedMenu??text):  text,
-                textAlign:menuItems!=null?TextAlign.left: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
+      child: SizedBox(
+        width: double.infinity,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment:  MainAxisAlignment.center,
+          children: [
+            if (menuItems != null)
+              PopupMenuButton<dynamic>(
+                itemBuilder: (context) => menuItems!,
+                onSelected: onMenuSelected as dynamic,
+                icon: const Icon(Icons.arrow_drop_down, size: 20),
+                padding: EdgeInsets.zero,
+                splashRadius: 20,
               ),
-            ],
-          ),
+            Text(
+            menuItems!=null? (selectedMenu??text):  text,
+              textAlign:menuItems!=null?TextAlign.left: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

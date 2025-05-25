@@ -7,23 +7,18 @@ import 'package:withme/core/presentation/components/search_customer_item.dart';
 import 'package:withme/core/presentation/components/prospect_item.dart';
 import 'package:withme/core/di/setup.dart';
 import 'package:withme/core/ui/color/color_style.dart';
+import 'package:withme/presentation/home/search/components/coming_birth_filter_button.dart';
+import 'package:withme/presentation/home/search/components/no_contact_filter_button.dart';
+import 'package:withme/presentation/home/search/components/upcoming_insurance_age_filter_button.dart';
 import 'package:withme/presentation/home/search/enum/search_option.dart';
-import 'package:withme/presentation/home/search/enum/selected_menu_no_contact.dart';
+import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
-class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+class SearchPage extends StatelessWidget {
+  SearchPage({super.key});
 
-  @override
-  State<SearchPage> createState() => _SearchPageState();
-}
-
-class _SearchPageState extends State<SearchPage> {
   final viewModel = getIt<SearchPageViewModel>();
-
-  SelectedMenuNoContact _selectedMenuNoContact =
-      SelectedMenuNoContact.threeMonth;
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +39,19 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   AppBar _buildAppBar() {
-    final option = viewModel.state.currentSearchOption;
+    final state = viewModel.state;
+    final currentOption = state.currentSearchOption;
+
+    final option = switch (currentOption) {
+      SearchOption.noRecentHistory => state.noContactMonth,
+      SearchOption.comingBirth => state.comingBirth,
+      SearchOption.upcomingInsuranceAge => state.upcomingInsuranceAge,
+      SearchOption.noBirth => '생년월일 정보없음',
+      _ => '',
+    };
     final count = viewModel.state.searchedCustomers.length;
     return AppBar(
-      title: option != null ? Text('$option $count명') : const Text(''),
+      title: option != '' ? Text('$option $count명') : const Text(''),
     );
   }
 
@@ -57,7 +61,7 @@ class _SearchPageState extends State<SearchPage> {
       itemCount: customers.length,
       itemBuilder: (context, index) {
         final customer = customers[index];
-        final item =
+        final itemWidget =
             customer.policies.isEmpty
                 ? ProspectItem(
                   customer: customer,
@@ -72,7 +76,7 @@ class _SearchPageState extends State<SearchPage> {
                           _handleAddHistory(context, histories, customer),
                 );
 
-        return Padding(padding: const EdgeInsets.all(8.0), child: item);
+        return Padding(padding: const EdgeInsets.all(8.0), child: itemWidget);
       },
     );
   }
@@ -114,36 +118,12 @@ class _SearchPageState extends State<SearchPage> {
       children: [
         _buildDragHandle(),
         height(16),
-        _buildFilterButton(
-          text: '${_selectedMenuNoContact.toString()} 미관리',
-          option: SearchOption.noRecentHistory,
-          menuItems:
-              SelectedMenuNoContact.values
-                  .map(
-                    (menu) => PopupMenuItem<SelectedMenuNoContact>(
-                      value: menu,
-                      child: Text(menu.toString()),
-                    ),
-                  )
-                  .toList(),
+        NoContactFilterButton(viewModel: viewModel),
 
-          event: SearchPageEvent.filterNoRecentHistoryCustomers(
-            month: _selectedMenuNoContact.toInt,
-          ),
-        ),
         height(5),
-        _buildFilterButton(
-          text: '생일 (30일 이내)',
-          option: SearchOption.comingBirth,
-          event: SearchPageEvent.filterCustomersByComingBirth(),
-        ),
+        ComingBirthFilterButton(viewModel: viewModel),
         height(5),
-        _buildFilterButton(
-          text: '상령일 잔여일 (10일~30일)',
-          option: SearchOption.upcomingInsuranceAge,
-          event:
-              SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease(),
-        ),
+        UpcomingInsuranceAgeFilterButton(viewModel: viewModel),
         height(5),
         _buildFilterButton(
           text: '생년월일 정보 없음',
@@ -158,20 +138,10 @@ class _SearchPageState extends State<SearchPage> {
     required String text,
     required SearchOption option,
     required SearchPageEvent event,
-    List<PopupMenuEntry<SelectedMenuNoContact>>? menuItems,
   }) {
     final isActive = viewModel.state.currentSearchOption == option;
     return RenderFilledButton(
       onPressed: () => viewModel.onEvent(event),
-
-      menuItems: menuItems,
-      onMenuSelected: (selectedOption) {
-        setState(() {
-          _selectedMenuNoContact = selectedOption;
-
-          viewModel.onEvent(event);
-        });
-      },
       text: text,
       backgroundColor:
           isActive
@@ -207,28 +177,27 @@ class _SearchPageState extends State<SearchPage> {
     );
     await viewModel.getAllData();
 
-    final option = viewModel.state.currentSearchOption;
-    switch (option) {
-      case SearchOption.noRecentHistory:
-        await viewModel.onEvent(
-          SearchPageEvent.filterNoRecentHistoryCustomers(
-            month: _selectedMenuNoContact.toInt,
-          ),
-        );
-        break;
-      case SearchOption.comingBirth:
-        await viewModel.onEvent(SearchPageEvent.filterCustomersByComingBirth());
-        break;
-      case SearchOption.upcomingInsuranceAge:
-        await viewModel.onEvent(
-          SearchPageEvent.filterCustomersByUpcomingInsuranceAgeIncrease(),
-        );
-        break;
-      case SearchOption.noBirth:
-        await viewModel.onEvent(SearchPageEvent.filterNoBirthCustomers());
-        break;
-      case null:
-        break;
+    final state = viewModel.state;
+    final currentOption = state.currentSearchOption;
+
+    final event = switch (currentOption) {
+      SearchOption.noRecentHistory =>
+        SearchPageEvent.filterNoRecentHistoryCustomers(
+          month: state.noContactMonth,
+        ),
+      SearchOption.comingBirth => SearchPageEvent.filterComingBirth(
+        birthDay: state.comingBirth,
+      ),
+      SearchOption.upcomingInsuranceAge =>
+        SearchPageEvent.filterUpcomingInsuranceAge(
+          insuranceAge: state.upcomingInsuranceAge,
+        ),
+      SearchOption.noBirth => SearchPageEvent.filterNoBirthCustomers(),
+      _ => null,
+    };
+
+    if (event != null) {
+      await viewModel.onEvent(event);
     }
   }
 }

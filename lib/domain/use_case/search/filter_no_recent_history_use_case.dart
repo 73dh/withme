@@ -1,12 +1,13 @@
+import '../../../presentation/home/search/enum/no_contact_month.dart';
 import '../../domain_import.dart';
 
 abstract class FilterNoRecentHistoryUseCase {
   static Future<List<CustomerModel>> call({
     required List<CustomerModel> customers,
-    required int month,
+    required NoContactMonth month,
   }) async {
     final now = DateTime.now();
-    final threeMonthsAgo = now.subtract(Duration(days: month * 30));
+    final threeMonthsAgo = now.subtract(Duration(days: month.toInt * 30));
 
     List<CustomerModel> filtered = [];
 

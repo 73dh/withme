@@ -33,7 +33,7 @@ class HistoryPartWidget extends StatelessWidget {
                   ),
                   Text(
                     histories[histories.length - 2].content,
-                    style: TextStyles.bold12,
+                    style: TextStyles.normal12,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -46,7 +46,7 @@ class HistoryPartWidget extends StatelessWidget {
             ),
             Text(
               histories[histories.length - 1].content,
-              style: TextStyles.bold12,
+              style: TextStyles.normal12,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
