@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
@@ -12,6 +13,7 @@ import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../di/setup.dart';
+import '../../ui/color/color_style.dart';
 import 'circle_item.dart';
 import 'sex_widget.dart';
 import 'width_height.dart';
@@ -29,65 +31,66 @@ class ProspectItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: StreamBuilder(
-        stream:getIt<HistoryUseCase>().call(usecase: GetHistoriesUseCase(customerKey: customer.customerKey)),
+        stream: getIt<HistoryUseCase>().call(
+          usecase: GetHistoriesUseCase(customerKey: customer.customerKey),
+        ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             log(snapshot.error.toString());
           }
-          if (snapshot.hasData) {
-            List<HistoryModel> histories = snapshot.data;
-            histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
-            return Container(
-              height: 90,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.brown.shade50,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5), // 그림자 색상
-                    offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
-                    blurRadius: 6, // 흐림 정도
-                    spreadRadius: 1, // 퍼짐 정도
+          if (!snapshot.hasData) {
+            return SizedBox.shrink();
+          }
+          List<HistoryModel> histories = snapshot.data;
+          histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
+          return Container(
+            height: 90,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: ColorStyles.customerItemColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5), // 그림자 색상
+                  offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
+                  blurRadius: 6, // 흐림 정도
+                  spreadRadius: 1, // 퍼짐 정도
+                ),
+              ],
+            ),
+
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        customer.registeredDate.formattedMonth,
+                        style: TextStyles.normal12,
+                      ),
+                      height(5),
+                      CircleItem(
+                        number: histories.length,
+                        color: Colors.grey[300],
+                      ),
+                    ],
+                  ),
+                  width(20),
+                  _namePart(),
+                  const Spacer(),
+                  Expanded(
+                    child: HistoryPartWidget(
+                      histories: histories,
+                      onTap: (histories) => onTap(histories),
+                    ),
                   ),
                 ],
               ),
-
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          customer.registeredDate.formattedMonth,
-                          style: TextStyles.normal12,
-                        ),
-                        height(5),
-                        CircleItem(
-                          number: histories.length,
-                          color: Colors.grey[300],
-                        ),
-                      ],
-                    ),
-                    width(20),
-                    _namePart(),
-                    const Spacer(),
-                    Expanded(
-                      child: HistoryPartWidget(
-                        histories: histories,
-                        onTap: (histories) => onTap(histories),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
+            ),
+          );
         },
       ),
     );

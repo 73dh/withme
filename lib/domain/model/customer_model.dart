@@ -11,7 +11,7 @@ class CustomerModel {
   final String sex;
   final DateTime? birth;
 
-  final List<dynamic> policies;
+  final List<PolicyModel> policies;
   final String recommended;
   final DateTime registeredDate;
   final List<HistoryModel> histories;

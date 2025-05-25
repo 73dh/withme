@@ -6,6 +6,7 @@ import 'package:withme/core/utils/extension/number_format.dart';
 
 import '../../di/setup.dart';
 
+import '../../ui/color/color_style.dart';
 import '../core_presentation_import.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../../utils/calculate_age.dart';
@@ -30,13 +31,15 @@ class CustomerItem extends StatelessWidget {
         if (snapshot.hasError) {
           log(snapshot.error.toString());
         }
-        if (snapshot.hasData) {
+        if (!snapshot.hasData) {
+          return SizedBox.shrink();}
+
           List<PolicyModel> policies = snapshot.data;
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 5.0),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: ColorStyles.customerItemColor,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -69,9 +72,6 @@ class CustomerItem extends StatelessWidget {
               ),
             ),
           );
-        } else {
-          return const SizedBox.shrink();
-        }
       },
     );
   }

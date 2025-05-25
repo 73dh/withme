@@ -1,4 +1,5 @@
 import 'package:withme/presentation/customer/customer_view_model.dart';
+import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
 import 'di_setup_import.dart';
@@ -38,4 +39,5 @@ void diSetup() {
   getIt.registerFactory<PolicyViewModel>(() => PolicyViewModel());
   getIt.registerFactory<CustomerViewModel>(() => CustomerViewModel());
   getIt.registerFactory<SearchPageViewModel>(() => SearchPageViewModel());
+  getIt.registerFactory<DashBoardViewModel>(() => DashBoardViewModel());
 }
