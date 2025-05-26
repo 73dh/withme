@@ -1,3 +1,5 @@
+import 'package:withme/core/domain/enum/insurance_category.dart';
+import 'package:withme/core/domain/enum/insurance_company.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/presentation/home/search/enum/coming_birth.dart';
@@ -16,6 +18,8 @@ class SearchPageState {
   final NoContactMonth noContactMonth;
   final ComingBirth comingBirth;
   final UpcomingInsuranceAge upcomingInsuranceAge;
+  final InsuranceCompany? insuranceCompany;
+  final InsuranceCategory? insuranceCategory;
 
   SearchPageState({
     this.customers = const [],
@@ -26,6 +30,8 @@ class SearchPageState {
     this.noContactMonth = NoContactMonth.threeMonth,
     this.comingBirth = ComingBirth.today,
     this.upcomingInsuranceAge = UpcomingInsuranceAge.today,
+    this.insuranceCompany,
+    this.insuranceCategory,
   });
 
   SearchPageState copyWith({
@@ -37,6 +43,8 @@ class SearchPageState {
     NoContactMonth? noContactMonth,
     ComingBirth? comingBirth,
     UpcomingInsuranceAge? upcomingInsuranceAge,
+    InsuranceCompany? insuranceCompany,
+    InsuranceCategory? insuranceCategory,
   }) {
     return SearchPageState(
       customers: customers ?? this.customers,
@@ -47,6 +55,8 @@ class SearchPageState {
       noContactMonth: noContactMonth ?? this.noContactMonth,
       comingBirth: comingBirth ?? this.comingBirth,
       upcomingInsuranceAge: upcomingInsuranceAge ?? this.upcomingInsuranceAge,
+      insuranceCompany: insuranceCompany ?? this.insuranceCompany,
+      insuranceCategory: insuranceCategory ?? this.insuranceCategory,
     );
   }
 }

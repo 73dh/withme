@@ -152,6 +152,7 @@ class SearchPageViewModel with ChangeNotifier {
       searchedCustomers: List.from(filtered),
       currentSearchOption: SearchOption.noBirth,
     );
+    print('test');
     notifyListeners();
   }
 }

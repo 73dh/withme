@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:withme/core/domain/enum/history_content.dart';
+import 'package:withme/core/domain/enum/insurance_category.dart';
 import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/widget/pop_up_history.dart';
 import 'package:withme/core/presentation/components/search_customer_item.dart';
 import 'package:withme/core/presentation/components/prospect_item.dart';
 import 'package:withme/core/di/setup.dart';
+import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/presentation/home/search/components/coming_birth_filter_button.dart';
+import 'package:withme/presentation/home/search/components/no_birth_filter_button.dart';
 import 'package:withme/presentation/home/search/components/no_contact_filter_button.dart';
 import 'package:withme/presentation/home/search/components/upcoming_insurance_age_filter_button.dart';
 import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
+
+import '../../../../core/presentation/components/part_title.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({super.key});
@@ -63,11 +69,18 @@ class SearchPage extends StatelessWidget {
         final customer = customers[index];
         final itemWidget =
             customer.policies.isEmpty
-                ? ProspectItem(
-                  customer: customer,
-                  onTap:
-                      (histories) =>
-                          _handleAddHistory(context, histories, customer),
+                ? GestureDetector(
+                  onTap: () async {
+                    await context.push(RoutePath.registration, extra: customer);
+                    await viewModel.getAllData();
+                    await _updateSearchedCustomers();
+                  },
+                  child: ProspectItem(
+                    customer: customer,
+                    onTap:
+                        (histories) =>
+                            _handleAddHistory(context, histories, customer),
+                  ),
                 )
                 : SearchCustomerItem(
                   customer: customer,
@@ -119,35 +132,18 @@ class SearchPage extends StatelessWidget {
         _buildDragHandle(),
         height(16),
         NoContactFilterButton(viewModel: viewModel),
-
         height(5),
         ComingBirthFilterButton(viewModel: viewModel),
         height(5),
         UpcomingInsuranceAgeFilterButton(viewModel: viewModel),
         height(5),
-        _buildFilterButton(
-          text: '생년월일 정보 없음',
-          option: SearchOption.noBirth,
-          event: SearchPageEvent.filterNoBirthCustomers(),
-        ),
+        NoBirthFilterButton(viewModel: viewModel),
+        height(5),
+        PartTitle(text: '계약조회'),
+        PopupMenuButton(itemBuilder: (context){
+          return InsuranceCategory.values.map((e)=>PopupMenuItem(child: Text(e.toString()))).toList();
+        })
       ],
-    );
-  }
-
-  Widget _buildFilterButton({
-    required String text,
-    required SearchOption option,
-    required SearchPageEvent event,
-  }) {
-    final isActive = viewModel.state.currentSearchOption == option;
-    return RenderFilledButton(
-      onPressed: () => viewModel.onEvent(event),
-      text: text,
-      backgroundColor:
-          isActive
-              ? ColorStyles.activeSearchButtonColor
-              : ColorStyles.unActiveSearchButtonColor,
-      borderRadius: 10,
     );
   }
 
@@ -176,7 +172,10 @@ class SearchPage extends StatelessWidget {
       HistoryContent.title.toString(),
     );
     await viewModel.getAllData();
+    await _updateSearchedCustomers();
+  }
 
+  Future<void> _updateSearchedCustomers() async {
     final state = viewModel.state;
     final currentOption = state.currentSearchOption;
 

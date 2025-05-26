@@ -17,9 +17,9 @@ class DashBoardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<DashBoardViewModel>();
-    final monthlyStats = viewModel.generateMonthlyStats(
-      viewModel.state.customers,
-    );
+    // final monthlyStats = viewModel.generateMonthlyStats(
+    //   viewModel.state.customers,
+    // );
     print('monthlyStats: ${viewModel.state.customers}');
 
     return Scaffold(
@@ -115,9 +115,9 @@ class DashBoardPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        buildMonthlyTable(monthlyStats),
+                        // buildMonthlyTable(monthlyStats),
                         const SizedBox(height: 24),
-                        buildBarChart(monthlyStats),
+                        // buildBarChart(monthlyStats),
                       ],
                     ),
                   ],

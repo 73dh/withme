@@ -25,7 +25,7 @@ class HistoryPartWidget extends StatelessWidget {
           children: [
             if (histories.length >= 2)
               Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     histories[histories.length - 2].contactDate.formattedDate,
