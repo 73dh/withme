@@ -10,3 +10,6 @@ export 'components/my_circular_indicator.dart';
 export 'package:withme/core/presentation/widget/app_bar_search_widget.dart';
 export '../../../../core/presentation/components/circle_item.dart';
 export 'components/sex_widget.dart';
+export 'package:withme/core/presentation/components/prospect_item.dart';
+export 'package:withme/core/presentation/components/search_customer_item.dart';
+export 'package:withme/core/presentation/widget/pop_up_history.dart';

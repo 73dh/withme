@@ -1,4 +1,4 @@
-import 'package:withme/core/domain/enum/insurance_category.dart';
+import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
@@ -10,53 +10,61 @@ import '../../../domain/model/history_model.dart';
 import 'enum/search_option.dart';
 
 class SearchPageState {
+  final bool isLoadingAllData;
   final List<CustomerModel> customers;
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
-  final List<CustomerModel> searchedCustomers;
+  final List<CustomerModel> filteredCustomers;
+  final List<PolicyModel> filteredPolicies;
   final SearchOption? currentSearchOption;
   final NoContactMonth noContactMonth;
   final ComingBirth comingBirth;
   final UpcomingInsuranceAge upcomingInsuranceAge;
-  final InsuranceCompany? insuranceCompany;
-  final InsuranceCategory? insuranceCategory;
+  final String? insuranceCompany;
+  final String? productCategory;
 
   SearchPageState({
+    this.isLoadingAllData=false,
     this.customers = const [],
     this.histories = const [],
     this.policies = const [],
-    this.searchedCustomers = const [],
+    this.filteredCustomers = const [],
+    this.filteredPolicies=const [],
     this.currentSearchOption,
     this.noContactMonth = NoContactMonth.threeMonth,
     this.comingBirth = ComingBirth.today,
     this.upcomingInsuranceAge = UpcomingInsuranceAge.today,
     this.insuranceCompany,
-    this.insuranceCategory,
+    this.productCategory,
   });
 
   SearchPageState copyWith({
+    bool? isLoadingAllData,
     List<CustomerModel>? customers,
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
-    List<CustomerModel>? searchedCustomers,
+    List<CustomerModel>? filteredCustomers,
+    List<PolicyModel>? filteredPolicies,
     SearchOption? currentSearchOption,
     NoContactMonth? noContactMonth,
     ComingBirth? comingBirth,
     UpcomingInsuranceAge? upcomingInsuranceAge,
-    InsuranceCompany? insuranceCompany,
-    InsuranceCategory? insuranceCategory,
+    String? insuranceCompany,
+    String? productCategory,
   }) {
     return SearchPageState(
+      isLoadingAllData: isLoadingAllData?? this.isLoadingAllData,
       customers: customers ?? this.customers,
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
-      searchedCustomers: searchedCustomers ?? this.searchedCustomers,
+      filteredCustomers: filteredCustomers ?? this.filteredCustomers,
+      filteredPolicies: filteredPolicies?? this.filteredPolicies,
       currentSearchOption: currentSearchOption ?? this.currentSearchOption,
       noContactMonth: noContactMonth ?? this.noContactMonth,
       comingBirth: comingBirth ?? this.comingBirth,
       upcomingInsuranceAge: upcomingInsuranceAge ?? this.upcomingInsuranceAge,
       insuranceCompany: insuranceCompany ?? this.insuranceCompany,
-      insuranceCategory: insuranceCategory ?? this.insuranceCategory,
+      productCategory: productCategory ?? this.productCategory,
     );
   }
 }

@@ -14,7 +14,6 @@ import 'package:withme/presentation/customer/customer_view_model.dart';
 import '../../core/di/setup.dart';
 import '../../core/domain/enum/history_content.dart';
 import '../../core/presentation/core_presentation_import.dart';
-import '../../core/presentation/widget/pop_up_history.dart';
 import '../../core/utils/extension/number_format.dart';
 import '../../domain/model/customer_model.dart';
 import '../../domain/model/history_model.dart';

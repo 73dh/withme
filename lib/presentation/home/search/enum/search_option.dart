@@ -1,7 +1,7 @@
 enum SearchOption {
   noRecentHistory,
   comingBirth,
-  upcomingInsuranceAge,noBirth;
+  upcomingInsuranceAge,noBirth,filterPolicy;
 
 
 }

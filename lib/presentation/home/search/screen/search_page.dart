@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:withme/core/domain/enum/history_content.dart';
-import 'package:withme/core/domain/enum/insurance_category.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
-import 'package:withme/core/presentation/widget/pop_up_history.dart';
-import 'package:withme/core/presentation/components/search_customer_item.dart';
-import 'package:withme/core/presentation/components/prospect_item.dart';
 import 'package:withme/core/di/setup.dart';
+import 'package:withme/core/presentation/components/policy_item.dart';
 import 'package:withme/core/router/router_path.dart';
-import 'package:withme/core/ui/color/color_style.dart';
+import 'package:withme/domain/use_case/customer/update_searched_customers_use_case.dart';
 import 'package:withme/presentation/home/search/components/coming_birth_filter_button.dart';
 import 'package:withme/presentation/home/search/components/no_birth_filter_button.dart';
 import 'package:withme/presentation/home/search/components/no_contact_filter_button.dart';
+import 'package:withme/presentation/home/search/components/policy_filter_button.dart';
 import 'package:withme/presentation/home/search/components/upcoming_insurance_age_filter_button.dart';
 import 'package:withme/presentation/home/search/enum/search_option.dart';
-import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
-import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
-
-import '../../../../core/presentation/components/part_title.dart';
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({super.key});
@@ -55,42 +48,82 @@ class SearchPage extends StatelessWidget {
       SearchOption.noBirth => '생년월일 정보없음',
       _ => '',
     };
-    final count = viewModel.state.searchedCustomers.length;
+    final count = viewModel.state.filteredCustomers.length;
     return AppBar(
       title: option != '' ? Text('$option $count명') : const Text(''),
     );
   }
 
   Widget _buildCustomerList(BuildContext context) {
-    final customers = viewModel.state.searchedCustomers;
+    final customers = viewModel.state.filteredCustomers;
+    final policies = viewModel.state.filteredPolicies;
+
+    if (viewModel.state.currentSearchOption == SearchOption.filterPolicy) {
+      return ListView.builder(
+        itemCount: policies.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: PolicyItem(policy: policies[index]),
+          );
+        },
+      );
+    }
     return ListView.builder(
       itemCount: customers.length,
       itemBuilder: (context, index) {
         final customer = customers[index];
-        final itemWidget =
+        final item =
             customer.policies.isEmpty
-                ? GestureDetector(
-                  onTap: () async {
-                    await context.push(RoutePath.registration, extra: customer);
-                    await viewModel.getAllData();
-                    await _updateSearchedCustomers();
-                  },
-                  child: ProspectItem(
-                    customer: customer,
-                    onTap:
-                        (histories) =>
-                            _handleAddHistory(context, histories, customer),
-                  ),
-                )
-                : SearchCustomerItem(
-                  customer: customer,
-                  onTap:
-                      (histories) =>
-                          _handleAddHistory(context, histories, customer),
-                );
+                ? _buildProspectItem(context, customer)
+                : _buildCustomerItem(context, customer);
 
-        return Padding(padding: const EdgeInsets.all(8.0), child: itemWidget);
+        return Padding(padding: const EdgeInsets.all(8.0), child: item);
       },
+    );
+  }
+
+  Widget _buildProspectItem(BuildContext context, dynamic customer) {
+    return GestureDetector(
+      onTap: () async {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+
+        await Future.delayed(const Duration(milliseconds: 100));
+        await context.push(RoutePath.registration, extra: customer);
+        Navigator.of(context).pop();
+
+        await viewModel.getAllData();
+        await UpdateSearchedCustomersUseCase.call(viewModel);
+      },
+      child: ProspectItem(
+        customer: customer,
+        onTap: (histories) => _handleAddHistory(context, histories, customer),
+      ),
+    );
+  }
+
+  // Widget _buildProspectItem(BuildContext context, dynamic customer) {
+  //   return GestureDetector(
+  //     onTap: () async {
+  //       await context.push(RoutePath.registration, extra: customer);
+  //       await viewModel.getAllData();
+  //       await UpdateSearchedCustomersUseCase.call(viewModel);
+  //     },
+  //     child: ProspectItem(
+  //       customer: customer,
+  //       onTap: (histories) => _handleAddHistory(context, histories, customer),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildCustomerItem(BuildContext context, dynamic customer) {
+    return SearchCustomerItem(
+      customer: customer,
+      onTap: (histories) => _handleAddHistory(context, histories, customer),
     );
   }
 
@@ -108,17 +141,28 @@ class SearchPage extends StatelessWidget {
         minChildSize: 0.1,
         maxChildSize: 0.5,
         builder: (context, scrollController) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
-            ),
-            child: ListenableBuilder(
-              listenable: viewModel,
-              builder: (context, _) => _buildFilterOptions(scrollController),
-            ),
+          return Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
+                ),
+                child: ListenableBuilder(
+                  listenable: viewModel,
+                  builder:
+                      (context, _) => _buildFilterOptions(scrollController),
+                ),
+              ),
+              if (viewModel.state.isLoadingAllData)
+                const Positioned(
+                  top: 10,
+                  right: 10,
+                  child: MyCircularIndicator(),
+                ),
+            ],
           );
         },
       ),
@@ -139,10 +183,8 @@ class SearchPage extends StatelessWidget {
         height(5),
         NoBirthFilterButton(viewModel: viewModel),
         height(5),
-        PartTitle(text: '계약조회'),
-        PopupMenuButton(itemBuilder: (context){
-          return InsuranceCategory.values.map((e)=>PopupMenuItem(child: Text(e.toString()))).toList();
-        })
+        const PartTitle(text: '계약조회'),
+        PolicyFilterButton(viewModel: viewModel),
       ],
     );
   }
@@ -171,32 +213,6 @@ class SearchPage extends StatelessWidget {
       customer,
       HistoryContent.title.toString(),
     );
-    await viewModel.getAllData();
-    await _updateSearchedCustomers();
-  }
-
-  Future<void> _updateSearchedCustomers() async {
-    final state = viewModel.state;
-    final currentOption = state.currentSearchOption;
-
-    final event = switch (currentOption) {
-      SearchOption.noRecentHistory =>
-        SearchPageEvent.filterNoRecentHistoryCustomers(
-          month: state.noContactMonth,
-        ),
-      SearchOption.comingBirth => SearchPageEvent.filterComingBirth(
-        birthDay: state.comingBirth,
-      ),
-      SearchOption.upcomingInsuranceAge =>
-        SearchPageEvent.filterUpcomingInsuranceAge(
-          insuranceAge: state.upcomingInsuranceAge,
-        ),
-      SearchOption.noBirth => SearchPageEvent.filterNoBirthCustomers(),
-      _ => null,
-    };
-
-    if (event != null) {
-      await viewModel.onEvent(event);
-    }
+    await UpdateSearchedCustomersUseCase.call(viewModel);
   }
 }

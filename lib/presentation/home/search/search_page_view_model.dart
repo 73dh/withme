@@ -1,27 +1,20 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/firestore_keys.dart';
-import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/domain/use_case/customer/get_all_data_use_case.dart';
-import 'package:withme/domain/use_case/customer/get_all_use_case.dart';
-import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
-import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_policy_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case.dart';
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_state.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
-import '../../../domain/model/history_model.dart';
-import '../../../domain/model/policy_model.dart';
 import 'enum/coming_birth.dart';
-import 'enum/search_option.dart';
 import 'enum/no_contact_month.dart';
+import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
@@ -39,67 +32,29 @@ class SearchPageViewModel with ChangeNotifier {
         _filterNoRecentHistoryCustomers(monthOption: event.month);
       case FilterNoBirthCustomers():
         _filterNoBirthCustomers();
+      case SelectProductCategory():
+        _selectProductCategory(productCategory: event.productCategory);
+      case SelectInsuranceCompany():
+        _selectInsuranceCompany(insuranceCompany: event.insuranceCompany);
+      case FilterPolicy():
+        _filterPolicy(
+          productCategory: event.productCategory,
+          insuranceCompany: event.insuranceCompany,
+        );
     }
   }
 
   Future<void> getAllData() async {
-    List<CustomerModel> customersAllData=await getIt<CustomerUseCase>().execute(usecase: GetAllDataUseCase());
-    // final historyFutures = <Future<List<HistoryModel>>>[];
-    // final policyFutures = <Future<List<PolicyModel>>>[];
-    //
-    // getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).listen((
-    //   originalCustomers,
-    // ) async {
-    //   for (var customer in originalCustomers as List<CustomerModel>) {
-    //     final historyFuture =
-    //         getIt<HistoryUseCase>()
-    //             .call(
-    //               usecase: GetHistoriesUseCase(
-    //                 customerKey: customer.customerKey,
-    //               ),
-    //             )
-    //             .first;
-    //
-    //     final policyFuture =
-    //         getIt<PolicyUseCase>()
-    //             .call(
-    //               usecase: GetPoliciesUseCase(
-    //                 customerKey: customer.customerKey,
-    //               ),
-    //             )
-    //             .first;
-    //
-    //     // Future 객체 자체를 리스트에 추가
-    //     historyFutures.add(historyFuture as Future<List<HistoryModel>>);
-    //     policyFutures.add(policyFuture as Future<List<PolicyModel>>);
-    //     notifyListeners();
-    //   }
-    //
-    //   // 모든 Future 결과를 기다림
-    //   final historiesList = await Future.wait(historyFutures);
-    //   final policiesList = await Future.wait(policyFutures);
-    //
-    //   // 각 customer에 해당하는 history, policy 붙이기
-    //   final updatedCustomers = List.generate(originalCustomers.length, (i) {
-    //     final updated = originalCustomers[i].copyWith(
-    //       histories: historiesList[i],
-    //       policies: policiesList[i],
-    //     );
-    //     return updated;
-    //   });
+    _state = state.copyWith(isLoadingAllData: true);
+    notifyListeners();
 
-      // 결과들을 평탄화 하여 저장
-    //   _state = state.copyWith(
-    //     customers: updatedCustomers,
-    //     histories: historiesList.expand((e) => e).toList(),
-    //     policies: policiesList.expand((e) => e).toList(),
-    //   );
-    //   notifyListeners();
-    // });
+    List<CustomerModel> customersAllData = await getIt<CustomerUseCase>()
+        .execute(usecase: GetAllDataUseCase());
     _state = state.copyWith(
       customers: customersAllData,
-      histories: customersAllData.expand((e)=>e.histories).toList(),
+      histories: customersAllData.expand((e) => e.histories).toList(),
       policies: customersAllData.expand((e) => e.policies).toList(),
+      isLoadingAllData: false,
     );
     notifyListeners();
   }
@@ -112,7 +67,7 @@ class SearchPageViewModel with ChangeNotifier {
       month: monthOption,
     );
     _state = state.copyWith(
-      searchedCustomers: List.from(filtered),
+      filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.noRecentHistory,
       noContactMonth: monthOption,
     );
@@ -125,7 +80,7 @@ class SearchPageViewModel with ChangeNotifier {
     final filtered = result[birthOption] ?? [];
 
     _state = state.copyWith(
-      searchedCustomers: List.from(filtered),
+      filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.comingBirth,
       comingBirth: birthOption,
     );
@@ -139,9 +94,9 @@ class SearchPageViewModel with ChangeNotifier {
     final filtered = result[insuranceAge] ?? [];
 
     _state = state.copyWith(
-      searchedCustomers: List.from(filtered),
+      filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.upcomingInsuranceAge,
-      upcomingInsuranceAge: insuranceAge
+      upcomingInsuranceAge: insuranceAge,
     );
     notifyListeners();
   }
@@ -149,10 +104,35 @@ class SearchPageViewModel with ChangeNotifier {
   Future<void> _filterNoBirthCustomers() async {
     final filtered = await FilterNoBirthUseCase.call(state.customers);
     _state = state.copyWith(
-      searchedCustomers: List.from(filtered),
+      filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.noBirth,
     );
-    print('test');
+    notifyListeners();
+  }
+
+  void _selectProductCategory({required String productCategory}) {
+    _state = state.copyWith(productCategory: productCategory);
+    notifyListeners();
+  }
+
+  void _selectInsuranceCompany({required String insuranceCompany}) {
+    _state = state.copyWith(insuranceCompany: insuranceCompany);
+    notifyListeners();
+  }
+
+  void _filterPolicy({
+    String? productCategory,
+    String? insuranceCompany,
+  }) async {
+    final filtered = await FilterPolicyUseCase.call(
+      policies: state.policies,
+      productCategory: productCategory,
+      insuranceCompany: insuranceCompany,
+    );
+    _state = state.copyWith(
+      filteredPolicies: filtered,
+      currentSearchOption: SearchOption.filterPolicy,
+    );
     notifyListeners();
   }
 }

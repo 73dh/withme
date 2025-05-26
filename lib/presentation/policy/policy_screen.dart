@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:withme/core/domain/enum/insurance_category.dart';
+import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
 import 'package:withme/core/presentation/components/custom_text_form_field.dart';
 import 'package:withme/core/presentation/components/part_box.dart';
@@ -288,7 +288,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
     return PopupMenuButton(
       icon: const Icon(Icons.drag_indicator),
       itemBuilder: (context) {
-        return InsuranceCategory.values
+        return ProductCategory.values
             .map(
               (e) => PopupMenuItem(
                 child: GestureDetector(

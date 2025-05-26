@@ -25,20 +25,20 @@ class RenderFilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+          ),
         ),
-      ),
-      child: SizedBox(
-        width: double.infinity,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment:  MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (menuItems != null)
               PopupMenuButton<dynamic>(
@@ -49,8 +49,8 @@ class RenderFilledButton extends StatelessWidget {
                 splashRadius: 20,
               ),
             Text(
-            menuItems!=null? (selectedMenu??text):  text,
-              textAlign:menuItems!=null?TextAlign.left: TextAlign.center,
+              menuItems != null ? (selectedMenu ?? text) : text,
+              textAlign: menuItems != null ? TextAlign.left : TextAlign.center,
               overflow: TextOverflow.ellipsis,
             ),
           ],
