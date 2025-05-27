@@ -1,3 +1,5 @@
+import 'package:withme/core/domain/enum/insurance_company.dart';
+import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 
 import 'enum/coming_birth.dart';
@@ -18,14 +20,14 @@ sealed class SearchPageEvent {
   factory SearchPageEvent.filterNoBirthCustomers() = FilterNoBirthCustomers;
 
   factory SearchPageEvent.selectProductCategory({
-    required String productCategory,
+    required ProductCategory productCategory,
   }) = SelectProductCategory;
 
   factory SearchPageEvent.selectInsuranceCompany({
-    required String insuranceCompany,
+    required InsuranceCompany insuranceCompany,
   }) = SelectInsuranceCompany;
 
-  factory SearchPageEvent.filterPolicy({String? productCategory,String? insuranceCompany})=FilterPolicy;
+  factory SearchPageEvent.filterPolicy({required ProductCategory productCategory,required InsuranceCompany insuranceCompany})=FilterPolicy;
 }
 
 class FilterNoRecentHistoryCustomers implements SearchPageEvent {
@@ -49,20 +51,20 @@ class FilterUpcomingInsuranceAge implements SearchPageEvent {
 class FilterNoBirthCustomers implements SearchPageEvent {}
 
 class SelectProductCategory implements SearchPageEvent {
-  final String productCategory;
+  final ProductCategory productCategory;
 
   SelectProductCategory({required this.productCategory});
 }
 
 class SelectInsuranceCompany implements SearchPageEvent {
-  final String insuranceCompany;
+  final InsuranceCompany insuranceCompany;
 
   SelectInsuranceCompany({required this.insuranceCompany});
 }
 
 class FilterPolicy implements SearchPageEvent{
-  final String? productCategory;
-  final String? insuranceCompany;
+  final ProductCategory productCategory;
+  final InsuranceCompany insuranceCompany;
 
-  FilterPolicy({ this.productCategory,  this.insuranceCompany});
+  FilterPolicy({required this.productCategory,required  this.insuranceCompany});
 }

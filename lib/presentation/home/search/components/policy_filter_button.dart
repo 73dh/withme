@@ -22,20 +22,22 @@ class PolicyFilterButton extends StatelessWidget {
     return Row(
       children: [
         RenderPopUpMenu(
-          label: viewModel.state.productCategory ?? '상품종류',
+          label: viewModel.state.productCategory.toString() ,
           items: ProductCategory.values,
           onSelect:
-              (e) => viewModel.onEvent(
-                SelectProductCategory(productCategory: e.toString()),
-              ),
+              (e ) {
+                viewModel.onEvent(
+                SelectProductCategory(productCategory: e),
+              );
+              },
         ),
 
         RenderPopUpMenu(
-          label: viewModel.state.insuranceCompany ?? '보험회사',
+          label: viewModel.state.insuranceCompany.toString(),
           items: InsuranceCompany.values,
           onSelect:
               (e) => viewModel.onEvent(
-                SelectInsuranceCompany(insuranceCompany: e.toString()),
+                SelectInsuranceCompany(insuranceCompany: e),
               ),
         ),
         Expanded(

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:withme/core/domain/enum/insurance_company.dart';
+import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/domain/use_case/customer/get_all_data_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_birth_use_case.dart';
@@ -110,19 +112,19 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void _selectProductCategory({required String productCategory}) {
+  void _selectProductCategory({required ProductCategory productCategory}) {
     _state = state.copyWith(productCategory: productCategory);
     notifyListeners();
   }
 
-  void _selectInsuranceCompany({required String insuranceCompany}) {
+  void _selectInsuranceCompany({required InsuranceCompany insuranceCompany}) {
     _state = state.copyWith(insuranceCompany: insuranceCompany);
     notifyListeners();
   }
 
   void _filterPolicy({
-    String? productCategory,
-    String? insuranceCompany,
+   required ProductCategory productCategory,
+  required  InsuranceCompany insuranceCompany,
   }) async {
     final filtered = await FilterPolicyUseCase.call(
       policies: state.policies,

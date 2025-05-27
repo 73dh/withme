@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 enum ProductCategory {
+  all,
   wholeLife,
   termLife,
   variableWholeLife,
@@ -18,6 +19,7 @@ enum ProductCategory {
 
   @override
   String toString() => switch (this) {
+    ProductCategory.all=>'전체상품',
     ProductCategory.wholeLife => '종신보험',
     ProductCategory.termLife => '정기보험',
     ProductCategory.variableWholeLife => '변액종신보험',
@@ -36,6 +38,7 @@ enum ProductCategory {
 
   IconData getCategoryIcon() {
     return switch (this) {
+      ProductCategory.all=>Icons.info,
       ProductCategory.wholeLife => Icons.favorite,
       ProductCategory.termLife => Icons.access_time,
       ProductCategory.variableWholeLife => Icons.swap_vert,

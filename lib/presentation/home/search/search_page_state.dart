@@ -20,8 +20,8 @@ class SearchPageState {
   final NoContactMonth noContactMonth;
   final ComingBirth comingBirth;
   final UpcomingInsuranceAge upcomingInsuranceAge;
-  final String? insuranceCompany;
-  final String? productCategory;
+  final InsuranceCompany insuranceCompany;
+  final ProductCategory productCategory;
 
   SearchPageState({
     this.isLoadingAllData=false,
@@ -34,8 +34,8 @@ class SearchPageState {
     this.noContactMonth = NoContactMonth.threeMonth,
     this.comingBirth = ComingBirth.today,
     this.upcomingInsuranceAge = UpcomingInsuranceAge.today,
-    this.insuranceCompany,
-    this.productCategory,
+    this.insuranceCompany=InsuranceCompany.all,
+    this.productCategory=ProductCategory.all,
   });
 
   SearchPageState copyWith({
@@ -49,8 +49,8 @@ class SearchPageState {
     NoContactMonth? noContactMonth,
     ComingBirth? comingBirth,
     UpcomingInsuranceAge? upcomingInsuranceAge,
-    String? insuranceCompany,
-    String? productCategory,
+    InsuranceCompany? insuranceCompany,
+    ProductCategory? productCategory,
   }) {
     return SearchPageState(
       isLoadingAllData: isLoadingAllData?? this.isLoadingAllData,

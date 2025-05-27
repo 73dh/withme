@@ -1,26 +1,25 @@
-import '../../model/customer_model.dart';
+
+
+import '../../../core/domain/core_domain_import.dart';
 import '../../model/policy_model.dart';
 
 class FilterPolicyUseCase {
   static Future<List<PolicyModel>> call({
-    String? productCategory,
-    String? insuranceCompany,
+    required ProductCategory productCategory,
+    required InsuranceCompany insuranceCompany,
     required List<PolicyModel> policies,
   }) async {
     final filtered =
         policies.where((policy) {
-          final matchesProduct =
-              productCategory == null ||
-              policy.productCategory == productCategory;
-          final matchesCompany =
-              insuranceCompany == null ||
-              policy.insuranceCompany == insuranceCompany;
-          return matchesProduct && matchesCompany;
-        }).toList();
+          final matchProduct =
+              policy.productCategory == productCategory.toString() ||
+              productCategory == ProductCategory.all;
 
-    print(
-      'Filtered policies with productCategory:$productCategory, insuranceCompany:$insuranceCompany → ${filtered.length} results',
-    );
+          final matchCompany =
+              policy.insuranceCompany == insuranceCompany.toString() ||
+              insuranceCompany == InsuranceCompany.all;
+          return matchProduct && matchCompany;
+        }).toList();
 
     return filtered;
   }
