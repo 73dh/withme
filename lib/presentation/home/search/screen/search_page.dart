@@ -93,8 +93,12 @@ class SearchPage extends StatelessWidget {
         );
 
         await Future.delayed(const Duration(milliseconds: 100));
-        await context.push(RoutePath.registration, extra: customer);
-        Navigator.of(context).pop();
+        if (context.mounted) {
+          await context.push(RoutePath.registration, extra: customer);
+        }
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
 
         await viewModel.getAllData();
         await UpdateSearchedCustomersUseCase.call(viewModel);
@@ -106,20 +110,6 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  // Widget _buildProspectItem(BuildContext context, dynamic customer) {
-  //   return GestureDetector(
-  //     onTap: () async {
-  //       await context.push(RoutePath.registration, extra: customer);
-  //       await viewModel.getAllData();
-  //       await UpdateSearchedCustomersUseCase.call(viewModel);
-  //     },
-  //     child: ProspectItem(
-  //       customer: customer,
-  //       onTap: (histories) => _handleAddHistory(context, histories, customer),
-  //     ),
-  //   );
-  // }
-
   Widget _buildCustomerItem(BuildContext context, dynamic customer) {
     return SearchCustomerItem(
       customer: customer,
@@ -130,7 +120,7 @@ class SearchPage extends StatelessWidget {
   Widget _buildDraggableFilterSheet() {
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
-        if (notification.extent == 0.5) {
+        if (notification.extent == 0.51) {
           viewModel.getAllData();
           return true;
         }
@@ -139,7 +129,7 @@ class SearchPage extends StatelessWidget {
       child: DraggableScrollableSheet(
         initialChildSize: 0.1,
         minChildSize: 0.1,
-        maxChildSize: 0.5,
+        maxChildSize: 0.51,
         builder: (context, scrollController) {
           return Stack(
             children: [
@@ -158,9 +148,9 @@ class SearchPage extends StatelessWidget {
               ),
               if (viewModel.state.isLoadingAllData)
                 const Positioned(
-                  top: 10,
-                  right: 10,
-                  child: MyCircularIndicator(),
+                  top: 15,
+                  left: 20,
+                  child: MyCircularIndicator(size: 10),
                 ),
             ],
           );
@@ -183,8 +173,8 @@ class SearchPage extends StatelessWidget {
         height(5),
         NoBirthFilterButton(viewModel: viewModel),
         height(5),
-        const PartTitle(text: '계약조회'),
-        PolicyFilterButton(viewModel: viewModel),
+         const PartTitle(text: '계약조회'),
+        PartBox(child: PolicyFilterButton(viewModel: viewModel)),
       ],
     );
   }
