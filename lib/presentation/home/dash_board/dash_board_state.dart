@@ -7,22 +7,26 @@ class DashBoardState {
   final List<CustomerModel> customers;
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
+ final Map<String, List<CustomerModel>> monthlyCustomers;
 
   DashBoardState({
     this.customers = const [],
     this.histories = const [],
     this.policies = const [],
+    this.monthlyCustomers=const {},
   });
 
   DashBoardState copyWith({
     List<CustomerModel>? customers,
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
+    Map<String, List<CustomerModel>>? monthlyCustomers,
   }) {
     return DashBoardState(
       customers: customers ?? this.customers,
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
+      monthlyCustomers: monthlyCustomers??this.monthlyCustomers,
     );
   }
 }

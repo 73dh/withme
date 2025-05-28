@@ -10,7 +10,6 @@ class CustomerModel {
   final String name;
   final String sex;
   final DateTime? birth;
-
   final List<PolicyModel> policies;
   final String recommended;
   final DateTime registeredDate;
@@ -29,24 +28,28 @@ class CustomerModel {
     required this.histories,
     required this.documentReference,
   });
+
   factory CustomerModel.fromJson(Map<String, dynamic> json) {
     return CustomerModel(
       userKey: json[keyUserKey] as String,
       customerKey: json[keyCustomerKey] as String,
       name: json[keyCustomerName] as String,
       sex: json[keyCustomerSex] as String,
-      birth: json[keyCustomerBirth] != null
-          ? (json[keyCustomerBirth] as Timestamp).toDate()
-          : null,
+      birth:
+          json[keyCustomerBirth] != null
+              ? (json[keyCustomerBirth] as Timestamp).toDate()
+              : null,
       policies: json[keyIsPolicy] ?? [],
       recommended: json[keyRecommendByWho] as String? ?? '',
       registeredDate: (json[keyRegisteredDate] as Timestamp).toDate(),
-      histories: (json[keyCustomerHistory] as List<dynamic>? ?? [])
-          .map((e) => HistoryModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      histories:
+          (json[keyCustomerHistory] as List<dynamic>? ?? [])
+              .map((e) => HistoryModel.fromJson(e as Map<String, dynamic>))
+              .toList(),
       documentReference: json[keyDocumentRef] as DocumentReference?,
     );
   }
+
   CustomerModel.fromMap(
     Map<String, dynamic> map,
     this.userKey, {
@@ -61,7 +64,7 @@ class CustomerModel {
        policies = List.from(map[keyIsPolicy] ?? []),
        recommended = map[keyRecommendByWho] ?? '',
        registeredDate =
-           map[keyRegisteredDate] == null
+           map[keyRegisteredDate] != null
                ? (map[keyRegisteredDate] as Timestamp).toDate()
                : DateTime.now().toUtc(),
        histories =
@@ -115,4 +118,5 @@ class CustomerModel {
       histories: histories ?? this.histories,
       documentReference: documentReference,
     );
-}}
+  }
+}

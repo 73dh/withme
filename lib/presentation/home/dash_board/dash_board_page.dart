@@ -17,10 +17,6 @@ class DashBoardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<DashBoardViewModel>();
-    // final monthlyStats = viewModel.generateMonthlyStats(
-    //   viewModel.state.customers,
-    // );
-    print('monthlyStats: ${viewModel.state.customers}');
 
     return Scaffold(
       appBar: AppBar(title: const Text('대시보드')),
@@ -42,7 +38,6 @@ class DashBoardPage extends StatelessWidget {
               builder: (context, constraints) {
                 final tableWidth = constraints.maxWidth;
                 final cellWidth = tableWidth / 4;
-
                 return Column(
                   children: [
                     Container(
@@ -107,6 +102,7 @@ class DashBoardPage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 32),
                         const Text(
                           '월별 고객 현황',
                           style: TextStyle(
@@ -115,9 +111,12 @@ class DashBoardPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        // buildMonthlyTable(monthlyStats),
+                        buildMonthlyTable(viewModel.state.monthlyCustomers),
+
                         const SizedBox(height: 24),
-                        // buildBarChart(monthlyStats),
+                        buildBarChart(
+                          convertToStats(viewModel.state.monthlyCustomers),
+                        ),
                       ],
                     ),
                   ],
@@ -156,49 +155,60 @@ class _TableCellText extends StatelessWidget {
   }
 }
 
-Widget buildMonthlyTable(Map<String, Map<String, int>> stats) {
-  final sortedKeys = stats.keys.toList()..sort();
+Widget buildMonthlyTable(Map<String, List<CustomerModel>> monthlyData) {
+  final sortedKeys = monthlyData .keys.toList()..sort();
 
   return Table(
-    border: TableBorder.all(color: Colors.grey.shade300),
-    columnWidths: {
-      0: const FixedColumnWidth(120),
+    border: TableBorder.all(),
+    columnWidths: const {
+      0: FlexColumnWidth(2),
+      1: FlexColumnWidth(1.5),
+      2: FlexColumnWidth(1.5),
     },
     children: [
-      // 첫 번째 행 (월 표시)
-      TableRow(
-        decoration: BoxDecoration(color: Colors.blue.shade50),
+      // 헤더
+      const TableRow(
+        decoration: BoxDecoration(color: Color(0xFFE0E0E0)),
         children: [
-          const _TableCellText('구분', isHeader: true),
-          ...sortedKeys.map((key) => _TableCellText(key, isHeader: true)).toList(),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text('월', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              '가망고객 수',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text('계약자 수', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
-      // 두 번째 행 (가망고객 수)
-      TableRow(
-        decoration: BoxDecoration(color: Colors.grey.shade100),
-        children: [
-          const _TableCellText('가망고객 수'),
-          ...sortedKeys.map((key) {
-            final count = stats[key]?['prospect'] ?? 0;
-            return _TableCellText('$count명');
-          }).toList(),
-        ],
-      ),
-      // 세 번째 행 (계약고객 수)
-      TableRow(
-        decoration: BoxDecoration(color: Colors.grey.shade100),
-        children: [
-          const _TableCellText('계약고객 수'),
-          ...sortedKeys.map((key) {
-            final count = stats[key]?['customer'] ?? 0;
-            return _TableCellText('$count명');
-          }).toList(),
-        ],
-      ),
+      // 각 월에 대한 데이터 행
+      for (var monthKey in sortedKeys)
+        TableRow(
+          children: [
+            Padding(padding: const EdgeInsets.all(8.0), child: Text(monthKey)),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isEmpty).length}',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isNotEmpty).length}',
+              ),
+            ),
+          ],
+        ),
     ],
   );
 }
-
 
 BarChartGroupData generateBarGroup(
   String month,
@@ -241,4 +251,24 @@ Widget buildBarChart(Map<String, Map<String, int>> stats) {
       ),
     ),
   );
+}
+
+Map<String, Map<String, int>> convertToStats(
+  Map<String, List<CustomerModel>> monthlyData,
+) {
+  final Map<String, Map<String, int>> stats = {};
+
+  for (final entry in monthlyData.entries) {
+    final monthKey = entry.key;
+    final customers = entry.value;
+
+    final prospectCount =
+        customers.where((c) => (c.policies ?? []).isEmpty).length;
+    final customerCount =
+        customers.where((c) => (c.policies ?? []).isNotEmpty).length;
+
+    stats[monthKey] = {'prospect': prospectCount, 'customer': customerCount};
+  }
+
+  return stats;
 }
