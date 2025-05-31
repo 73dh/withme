@@ -62,6 +62,8 @@ class DashBoardPage extends StatelessWidget {
                                 '계약자 (Customer)',
                                 isHeader: true,
                               ),
+
+
                               RenderTableCellText('총 계약건수', isHeader: true),
                               // 새 헤더
                             ],
@@ -76,7 +78,7 @@ class DashBoardPage extends StatelessWidget {
                               RenderTableCellText('${prospect.length}명'),
                               RenderTableCellText('${customer.length}명'),
                               RenderTableCellText(
-                                '${total.map((c) => c.policies?.length ?? 0).fold(0, (a, b) => a + b)}건',
+                                '${total.map((c) => c.policies.length ).fold(0, (a, b) => a + b)}건',
                               ), // 총 계약건수
                             ],
                           ),
@@ -105,45 +107,119 @@ class DashBoardPage extends StatelessWidget {
   }
 }
 
+// Widget _buildMonthlyTable(Map<String, List<CustomerModel>> monthlyData) {
+//   final sortedKeys = monthlyData.keys.toList()..sort();
+//
+//   return RenderTable(
+//     columnWidths: const {
+//       0: FlexColumnWidth(2), // 월
+//       1: FlexColumnWidth(1.5), // 가망고객
+//       2: FlexColumnWidth(1.5), // 총 계약 건수
+//     },
+//     tableRows: [
+//       // 헤더
+//       TableRow(
+//         decoration: BoxDecoration(color: Colors.blue.shade50),
+//         children: const [
+//           RenderTableCellText('월', isHeader: true),
+//           RenderTableCellText('가망고객', isHeader: true),
+//           RenderTableCellText('총 계약건수', isHeader: true),
+//         ],
+//       ),
+//
+//       // 각 월 데이터 행
+//       for (var monthKey in sortedKeys)
+//         TableRow(
+//           children: [
+//             RenderTableCellText(monthKey),
+//             RenderTableCellText(
+//               '${monthlyData[monthKey]!.where((c) => (c.policies ).isEmpty).length}',
+//             ),
+//
+//             RenderTableCellText(
+//               '${monthlyData[monthKey]!.map((c) => c.policies.length ).fold(0, (a, b) => a + b)}',
+//             ),
+//           ],
+//         ),
+//     ],
+//   );
+// }
+
 Widget _buildMonthlyTable(Map<String, List<CustomerModel>> monthlyData) {
   final sortedKeys = monthlyData.keys.toList()..sort();
 
-  return RenderTable(
-    columnWidths: const {
-      0: FlexColumnWidth(2), // 월
-      1: FlexColumnWidth(1.5), // 가망고객
-      2: FlexColumnWidth(1.5), // 고객
-      3: FlexColumnWidth(1.5), // 총 계약 건수
-    },
-    tableRows: [
-      // 헤더
-      TableRow(
-        decoration: BoxDecoration(color: Colors.blue.shade50),
-        children: const [
-          RenderTableCellText('월', isHeader: true),
-          RenderTableCellText('가망고객', isHeader: true),
-          RenderTableCellText('고객', isHeader: true),
-          RenderTableCellText('총 계약건수', isHeader: true),
-        ],
-      ),
+  // 첫 번째 열 텍스트
+  final fixedColumn = [
+    const RenderTableCellText('구분', isHeader: true),
+    const RenderTableCellText('가망고객', isHeader: true),
+    const RenderTableCellText('총 계약건수', isHeader: true),
+  ];
 
-      // 각 월 데이터 행
-      for (var monthKey in sortedKeys)
-        TableRow(
-          children: [
-            RenderTableCellText(monthKey),
-            RenderTableCellText(
-              '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isEmpty).length}',
-            ),
-            RenderTableCellText(
-              '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isNotEmpty).length}',
-            ),
-            RenderTableCellText(
-              '${monthlyData[monthKey]!.map((c) => c.policies?.length ?? 0).fold(0, (a, b) => a + b)}',
-            ),
-          ],
+  // 가로 스크롤 가능한 행들
+  final monthHeaderRow = sortedKeys
+      .map((key) => RenderTableCellText(key, isHeader: true))
+      .toList();
+
+  final prospectRow = sortedKeys
+      .map((key) => RenderTableCellText(
+    '${monthlyData[key]!.where((c) => c.policies.isEmpty).length}',
+  ))
+      .toList();
+
+  final contractRow = sortedKeys
+      .map((key) => RenderTableCellText(
+    '${monthlyData[key]!
+        .map((c) => c.policies.length)
+        .fold(0, (a, b) => a + b)}',
+  ))
+      .toList();
+
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // 고정 열
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: fixedColumn
+            .map(
+              (cell) => Container(
+            width: 100,
+            height: 48,
+            alignment: Alignment.centerLeft,
+            color: Colors.blue.shade50,
+            child: cell,
+          ),
+        )
+            .toList(),
+      ),
+      // 스크롤 가능한 영역
+      Expanded(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: monthHeaderRow.map((e) => _wrapCell(e)).toList()),
+              Row(children: prospectRow.map((e) => _wrapCell(e)).toList()),
+              Row(children: contractRow.map((e) => _wrapCell(e)).toList()),
+            ],
+          ),
         ),
+      ),
     ],
+  );
+}
+
+Widget _wrapCell(Widget cell) {
+  return Container(
+    width: 100,
+    height: 48,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.grey.shade300),
+      color: Colors.grey.shade100,
+    ),
+    child: cell,
   );
 }
 
@@ -191,20 +267,21 @@ Widget _buildBarChart(Map<String, Map<String, int>> stats) {
 }
 
 Map<String, Map<String, int>> convertToStats(
-  Map<String, List<CustomerModel>> monthlyData,
-) {
+    Map<String, List<CustomerModel>> monthlyData,
+    ) {
   final Map<String, Map<String, int>> stats = {};
 
   for (final entry in monthlyData.entries) {
     final monthKey = entry.key;
     final customers = entry.value;
 
-    final prospectCount =
-        customers.where((c) => (c.policies ?? []).isEmpty).length;
-    final customerCount =
-        customers.where((c) => (c.policies ?? []).isNotEmpty).length;
+    final prospectCount = customers.where((c) => c.policies.isEmpty).length;
+    final customerCount = customers.where((c) => c.policies.isNotEmpty).length;
 
-    stats[monthKey] = {'prospect': prospectCount, 'customer': customerCount};
+    stats[monthKey] = {
+      'prospect': prospectCount,
+      'customer': customerCount,
+    };
   }
 
   return stats;

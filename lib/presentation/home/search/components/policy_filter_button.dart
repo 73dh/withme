@@ -22,6 +22,13 @@ class PolicyFilterButton extends StatelessWidget {
     return Row(
       children: [
         RenderPopUpMenu(
+          label: viewModel.state.selectedContractMonth ?? '계약월 선택',
+          items: viewModel.state.contractMonths,
+          onSelect: (month) => viewModel.onEvent(
+            SelectContractMonth(selectedContractMonth: month),
+          ),
+        ),
+        RenderPopUpMenu(
           label: viewModel.state.productCategory.toString() ,
           items: ProductCategory.values,
           onSelect:
@@ -47,6 +54,8 @@ class PolicyFilterButton extends StatelessWidget {
                 SearchPageEvent.filterPolicy(
                   productCategory: viewModel.state.productCategory,
                   insuranceCompany: viewModel.state.insuranceCompany,
+                  selectedContractMonth: viewModel.state.selectedContractMonth??''
+
                 ),
               );
             },

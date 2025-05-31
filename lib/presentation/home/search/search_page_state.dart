@@ -22,20 +22,24 @@ class SearchPageState {
   final UpcomingInsuranceAge upcomingInsuranceAge;
   final InsuranceCompany insuranceCompany;
   final ProductCategory productCategory;
+  final List<String> contractMonths;
+  final String? selectedContractMonth;
 
   SearchPageState({
-    this.isLoadingAllData=false,
+    this.isLoadingAllData = false,
     this.customers = const [],
     this.histories = const [],
     this.policies = const [],
     this.filteredCustomers = const [],
-    this.filteredPolicies=const [],
+    this.filteredPolicies = const [],
     this.currentSearchOption,
     this.noContactMonth = NoContactMonth.threeMonth,
     this.comingBirth = ComingBirth.today,
     this.upcomingInsuranceAge = UpcomingInsuranceAge.today,
-    this.insuranceCompany=InsuranceCompany.all,
-    this.productCategory=ProductCategory.all,
+    this.insuranceCompany = InsuranceCompany.all,
+    this.productCategory = ProductCategory.all,
+    this.contractMonths = const [],
+    this.selectedContractMonth,
   });
 
   SearchPageState copyWith({
@@ -51,20 +55,25 @@ class SearchPageState {
     UpcomingInsuranceAge? upcomingInsuranceAge,
     InsuranceCompany? insuranceCompany,
     ProductCategory? productCategory,
+    List<String>? contractMonths,
+    String? selectedContractMonth,
   }) {
     return SearchPageState(
-      isLoadingAllData: isLoadingAllData?? this.isLoadingAllData,
+      isLoadingAllData: isLoadingAllData ?? this.isLoadingAllData,
       customers: customers ?? this.customers,
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
       filteredCustomers: filteredCustomers ?? this.filteredCustomers,
-      filteredPolicies: filteredPolicies?? this.filteredPolicies,
+      filteredPolicies: filteredPolicies ?? this.filteredPolicies,
       currentSearchOption: currentSearchOption ?? this.currentSearchOption,
       noContactMonth: noContactMonth ?? this.noContactMonth,
       comingBirth: comingBirth ?? this.comingBirth,
       upcomingInsuranceAge: upcomingInsuranceAge ?? this.upcomingInsuranceAge,
       insuranceCompany: insuranceCompany ?? this.insuranceCompany,
       productCategory: productCategory ?? this.productCategory,
+      contractMonths: contractMonths ?? this.contractMonths,
+      selectedContractMonth:
+          selectedContractMonth ?? this.selectedContractMonth,
     );
   }
 }

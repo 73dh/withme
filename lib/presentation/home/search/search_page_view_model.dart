@@ -42,6 +42,8 @@ class SearchPageViewModel with ChangeNotifier {
           productCategory: event.productCategory,
           insuranceCompany: event.insuranceCompany,
         );
+      case SelectContractMonth():
+        _selectContractMonth(selectedContractMonth: event.selectedContractMonth);
     }
   }
 
@@ -108,6 +110,11 @@ class SearchPageViewModel with ChangeNotifier {
       filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.noBirth,
     );
+    notifyListeners();
+  }
+
+  void _selectContractMonth({required String selectedContractMonth}){
+    _state = state.copyWith(selectedContractMonth: selectedContractMonth);
     notifyListeners();
   }
 

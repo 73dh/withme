@@ -19,6 +19,10 @@ sealed class SearchPageEvent {
 
   factory SearchPageEvent.filterNoBirthCustomers() = FilterNoBirthCustomers;
 
+  factory SearchPageEvent.selectContractMonth({
+    required String selectedContractMonth,
+  }) = SelectContractMonth;
+
   factory SearchPageEvent.selectProductCategory({
     required ProductCategory productCategory,
   }) = SelectProductCategory;
@@ -27,7 +31,11 @@ sealed class SearchPageEvent {
     required InsuranceCompany insuranceCompany,
   }) = SelectInsuranceCompany;
 
-  factory SearchPageEvent.filterPolicy({required ProductCategory productCategory,required InsuranceCompany insuranceCompany})=FilterPolicy;
+  factory SearchPageEvent.filterPolicy({
+    required ProductCategory productCategory,
+    required InsuranceCompany insuranceCompany,
+    required String selectedContractMonth,
+  }) = FilterPolicy;
 }
 
 class FilterNoRecentHistoryCustomers implements SearchPageEvent {
@@ -50,6 +58,12 @@ class FilterUpcomingInsuranceAge implements SearchPageEvent {
 
 class FilterNoBirthCustomers implements SearchPageEvent {}
 
+class SelectContractMonth implements SearchPageEvent {
+  final String selectedContractMonth;
+
+  SelectContractMonth({required this.selectedContractMonth});
+}
+
 class SelectProductCategory implements SearchPageEvent {
   final ProductCategory productCategory;
 
@@ -62,9 +76,14 @@ class SelectInsuranceCompany implements SearchPageEvent {
   SelectInsuranceCompany({required this.insuranceCompany});
 }
 
-class FilterPolicy implements SearchPageEvent{
+class FilterPolicy implements SearchPageEvent {
   final ProductCategory productCategory;
   final InsuranceCompany insuranceCompany;
+  final String selectedContractMonth;
 
-  FilterPolicy({required this.productCategory,required  this.insuranceCompany});
+  FilterPolicy({
+    required this.productCategory,
+    required this.insuranceCompany,
+    required this.selectedContractMonth,
+  });
 }
