@@ -64,9 +64,8 @@ class CustomerModel {
        policies = List.from(map[keyIsPolicy] ?? []),
        recommended = map[keyRecommendByWho] ?? '',
        registeredDate =
-           map[keyRegisteredDate] != null
-               ? (map[keyRegisteredDate] as Timestamp).toDate()
-               : DateTime.now().toUtc(),
+           (map[keyRegisteredDate] as Timestamp).toDate()
+             ,
        histories =
            (map[keyCustomerHistory] as List<dynamic>? ?? [])
                .map((e) => HistoryModel.fromMap(e as Map<String, dynamic>))
@@ -83,6 +82,7 @@ class CustomerModel {
     required String customerKey,
     required String name,
     required String sex,
+    required DateTime registeredDate,
     String? recommender,
     DateTime? birth,
   }) {
@@ -92,7 +92,7 @@ class CustomerModel {
     map[keyCustomerName] = name;
     map[keyCustomerSex] = sex;
     map[keyCustomerBirth] = birth ?? '';
-    map[keyRegisteredDate] = DateTime.now().toUtc();
+    map[keyRegisteredDate] = registeredDate;
     map[keyRecommendByWho] = recommender ?? '';
     return map;
   }

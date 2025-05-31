@@ -17,11 +17,11 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.registration,
       pageBuilder: (context, state) {
-        final customer = state.extra as CustomerModel;
-
         return CustomTransitionPage(
           key: state.pageKey,
-          child: RegistrationScreen(customerModel: state.extra as CustomerModel?),
+          child: RegistrationScreen(
+            customerModel: state.extra as CustomerModel?,
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -29,19 +29,14 @@ final router = GoRouter(
         );
       },
     ),
-    // GoRoute(
-    //   builder:
-    //       (_, state) =>
-    //           RegistrationScreen(customerModel: state.extra as CustomerModel?),
-    //   path: RoutePath.registration,
-    // ),
     GoRoute(
       builder:
           (_, state) => PolicyScreen(customer: state.extra as CustomerModel),
       path: RoutePath.policy,
     ),
     GoRoute(
-      builder: (_, state) =>  CustomerScreen(customer: state.extra as CustomerModel,),
+      builder:
+          (_, state) => CustomerScreen(customer: state.extra as CustomerModel),
       path: RoutePath.customer,
     ),
   ],

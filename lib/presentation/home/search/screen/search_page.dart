@@ -55,11 +55,13 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _buildCustomerList(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
     final customers = viewModel.state.filteredCustomers;
     final policies = viewModel.state.filteredPolicies;
 
     if (viewModel.state.currentSearchOption == SearchOption.filterPolicy) {
       return ListView.builder(
+        padding: EdgeInsets.only(bottom: bottomPadding),
         itemCount: policies.length,
         itemBuilder: (context, index) {
           return Padding(
@@ -70,6 +72,7 @@ class SearchPage extends StatelessWidget {
       );
     }
     return ListView.builder(
+      padding: EdgeInsets.only(bottom: bottomPadding),
       itemCount: customers.length,
       itemBuilder: (context, index) {
         final customer = customers[index];

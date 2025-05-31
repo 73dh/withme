@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
 import 'package:withme/core/domain/enum/product_category.dart';
-import 'package:withme/domain/use_case/customer/get_all_data_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';

@@ -1,14 +1,11 @@
-import 'dart:typed_data';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
-import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/render_table.dart';
+import 'package:withme/presentation/home/dash_board/components/render_table_cell_text.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
-import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
 import '../../../core/di/setup.dart';
+import '../../../core/presentation/core_presentation_import.dart';
 import '../../../domain/model/customer_model.dart';
 
 class DashBoardPage extends StatelessWidget {
@@ -37,89 +34,67 @@ class DashBoardPage extends StatelessWidget {
             return LayoutBuilder(
               builder: (context, constraints) {
                 final tableWidth = constraints.maxWidth;
-                final cellWidth = tableWidth / 4;
-                return Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          const BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
+                final cellWidth = tableWidth / 5;
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      RenderTable(
+                        columnWidths: {
+                          0: FixedColumnWidth(cellWidth),
+                          1: FixedColumnWidth(cellWidth),
+                          2: FixedColumnWidth(cellWidth),
+                          3: FixedColumnWidth(cellWidth),
+                          4: FixedColumnWidth(cellWidth),
+                        },
+                        tableRows: [
+                          TableRow(
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                            ),
+                            children: const [
+                              RenderTableCellText('구분', isHeader: true),
+                              RenderTableCellText('전체 (Total)', isHeader: true),
+                              RenderTableCellText(
+                                '가망 고객 (Prospect)',
+                                isHeader: true,
+                              ),
+                              RenderTableCellText(
+                                '계약자 (Customer)',
+                                isHeader: true,
+                              ),
+                              RenderTableCellText('총 계약건수', isHeader: true),
+                              // 새 헤더
+                            ],
+                          ),
+                          TableRow(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                            ),
+                            children: [
+                              RenderTableCellText('인원 수'),
+                              RenderTableCellText('${total.length}명'),
+                              RenderTableCellText('${prospect.length}명'),
+                              RenderTableCellText('${customer.length}명'),
+                              RenderTableCellText(
+                                '${total.map((c) => c.policies?.length ?? 0).fold(0, (a, b) => a + b)}건',
+                              ), // 총 계약건수
+                            ],
                           ),
                         ],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Table(
-                          border: TableBorder.all(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                          columnWidths: {
-                            0: FixedColumnWidth(cellWidth),
-                            1: FixedColumnWidth(cellWidth),
-                            2: FixedColumnWidth(cellWidth),
-                            3: FixedColumnWidth(cellWidth),
-                          },
-                          children: [
-                            TableRow(
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                              ),
-                              children: const [
-                                _TableCellText('구분', isHeader: true),
-                                _TableCellText('전체 (Total)', isHeader: true),
-                                _TableCellText(
-                                  '가망 고객 (Prospect)',
-                                  isHeader: true,
-                                ),
-                                _TableCellText(
-                                  '계약자 (Customer)',
-                                  isHeader: true,
-                                ),
-                              ],
-                            ),
-                            TableRow(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                              ),
-                              children: [
-                                _TableCellText('인원 수'),
-                                _TableCellText('${total.length}명'),
-                                _TableCellText('${prospect.length}명'),
-                                _TableCellText('${customer.length}명'),
-                              ],
-                            ),
-                          ],
-                        ),
+
+                      height(20),
+                      PartTitle(text: '월별 고객 현황'),
+
+                      height(5),
+                      _buildMonthlyTable(viewModel.state.monthlyCustomers),
+
+                      const SizedBox(height: 24),
+                      _buildBarChart(
+                        convertToStats(viewModel.state.monthlyCustomers),
                       ),
-                    ),
-
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 32),
-                        const Text(
-                          '월별 고객 현황',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        buildMonthlyTable(viewModel.state.monthlyCustomers),
-
-                        const SizedBox(height: 24),
-                        buildBarChart(
-                          convertToStats(viewModel.state.monthlyCustomers),
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             );
@@ -130,79 +105,41 @@ class DashBoardPage extends StatelessWidget {
   }
 }
 
-class _TableCellText extends StatelessWidget {
-  final String text;
-  final bool isHeader;
+Widget _buildMonthlyTable(Map<String, List<CustomerModel>> monthlyData) {
+  final sortedKeys = monthlyData.keys.toList()..sort();
 
-  const _TableCellText(this.text, {this.isHeader = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-      alignment: Alignment.center,
-      color: isHeader ? Colors.transparent : null,
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 14,
-          color: Colors.black87,
-        ),
-      ),
-    );
-  }
-}
-
-Widget buildMonthlyTable(Map<String, List<CustomerModel>> monthlyData) {
-  final sortedKeys = monthlyData .keys.toList()..sort();
-
-  return Table(
-    border: TableBorder.all(),
+  return RenderTable(
     columnWidths: const {
-      0: FlexColumnWidth(2),
-      1: FlexColumnWidth(1.5),
-      2: FlexColumnWidth(1.5),
+      0: FlexColumnWidth(2), // 월
+      1: FlexColumnWidth(1.5), // 가망고객
+      2: FlexColumnWidth(1.5), // 고객
+      3: FlexColumnWidth(1.5), // 총 계약 건수
     },
-    children: [
+    tableRows: [
       // 헤더
-      const TableRow(
-        decoration: BoxDecoration(color: Color(0xFFE0E0E0)),
-        children: [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('월', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              '가망고객 수',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('계약자 수', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
+      TableRow(
+        decoration: BoxDecoration(color: Colors.blue.shade50),
+        children: const [
+          RenderTableCellText('월', isHeader: true),
+          RenderTableCellText('가망고객', isHeader: true),
+          RenderTableCellText('고객', isHeader: true),
+          RenderTableCellText('총 계약건수', isHeader: true),
         ],
       ),
-      // 각 월에 대한 데이터 행
+
+      // 각 월 데이터 행
       for (var monthKey in sortedKeys)
         TableRow(
           children: [
-            Padding(padding: const EdgeInsets.all(8.0), child: Text(monthKey)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isEmpty).length}',
-              ),
+            RenderTableCellText(monthKey),
+            RenderTableCellText(
+              '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isEmpty).length}',
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isNotEmpty).length}',
-              ),
+            RenderTableCellText(
+              '${monthlyData[monthKey]!.where((c) => (c.policies ?? []).isNotEmpty).length}',
+            ),
+            RenderTableCellText(
+              '${monthlyData[monthKey]!.map((c) => c.policies?.length ?? 0).fold(0, (a, b) => a + b)}',
             ),
           ],
         ),
@@ -225,7 +162,7 @@ BarChartGroupData generateBarGroup(
   );
 }
 
-Widget buildBarChart(Map<String, Map<String, int>> stats) {
+Widget _buildBarChart(Map<String, Map<String, int>> stats) {
   final keys = stats.keys.toList()..sort();
 
   return SizedBox(

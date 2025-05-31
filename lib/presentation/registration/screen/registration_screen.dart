@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:withme/core/domain/enum/history_content.dart';
-import 'package:withme/core/router/router_path.dart';
-import 'package:withme/core/ui/icon/const.dart';
-import 'package:withme/core/utils/extension/date_time.dart';
+import 'package:intl/intl.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/presentation/registration/registration_event.dart';
 import 'package:withme/presentation/registration/registration_view_model.dart';
 
 import '../../../core/di/setup.dart';
+import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/presentation/components/custom_text_form_field.dart';
-import '../../../core/presentation/components/render_filled_button.dart';
-import '../../../core/presentation/widget/render_snack_bar.dart';
-import '../../../core/presentation/widget/select_date.dart';
-import '../../../core/ui/color/color_style.dart';
-import '../../../core/ui/text_style/text_styles.dart';
-import '../../../core/utils/calculate_age.dart';
-import '../../../core/utils/calculate_insurance_age.dart';
-import '../../../core/utils/days_until_insurance_age.dart';
-import '../../../core/utils/generate_customer_key.dart';
+import '../../../core/router/router_path.dart';
+import '../../../core/ui/core_ui_import.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final CustomerModel? customerModel;
@@ -32,14 +23,12 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey();
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _recommendedController = TextEditingController();
-  final TextEditingController _historyController = TextEditingController(
-    text: '신규등록',
-  );
-  final TextEditingController _birthController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _recommendedController = TextEditingController();
+  final _historyController = TextEditingController(text: '신규등록');
+  final _birthController = TextEditingController();
+  final _registeredDateController = TextEditingController();
 
   bool _isReadOnly = false;
   bool _isRecommended = false;
@@ -51,13 +40,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeCustomer();
+  }
+
+  void _initializeCustomer() {
     final customer = widget.customerModel;
+    _registeredDateController.text = DateTime.now().formattedDate;
+    print('_registeredDate: ${_registeredDateController.text}');
     if (customer != null) {
       _isReadOnly = true;
       _nameController.text = customer.name;
       _sex = customer.sex;
       _birth = customer.birth;
       _birthController.text = customer.birth.toString();
+      _registeredDateController.text = customer.registeredDate.toString();
       if (customer.recommended.isNotEmpty) {
         _isRecommended = true;
         _recommendedController.text = customer.recommended;
@@ -79,26 +75,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(),
-        body: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                const TitleWidget(title: 'Registered Prospect'),
-                height(20),
-                const PartTitle(text: '가망고객'),
-                _buildCustomerInfoPart(),
-                height(15),
-                const PartTitle(text: '소개자'),
-                _buildRecommenderPart(),
-                height(20),
-                if (_isReadOnly) _buildAddPolicyButton(),
-              ],
-            ),
-          ),
-        ),
-        bottomSheet: !_isReadOnly ? _buildSubmitButton(context) : null,
+        body: _buildForm(),
+        bottomSheet: !_isReadOnly ? _buildSubmitButton() : null,
       ),
     );
   }
@@ -110,10 +88,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
+  Widget _buildForm() {
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const TitleWidget(title: 'Registered Prospect'),
+            height(20),
+            const PartTitle(text: '가망고객'),
+            _buildCustomerInfoPart(),
+            height(15),
+            const PartTitle(text: '소개자'),
+            _buildRecommenderPart(),
+            height(20),
+            if (_isReadOnly) _buildAddPolicyButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCustomerInfoPart() {
     return PartBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -124,8 +124,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 _buildSexSelector(),
               ],
             ),
-            height(20),
+            height(10),
             _buildBirthSelector(),
+            height(10),
+            _buildRegisteredDateSelector(),
           ],
         ),
       ),
@@ -148,9 +150,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Widget _buildAddPolicyButton() {
     return AddPolicyWidget(
-      onTap: () {
-        context.push(RoutePath.policy, extra: widget.customerModel);
-      },
+      onTap: () => context.push(RoutePath.policy, extra: widget.customerModel),
     );
   }
 
@@ -158,7 +158,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return IconButton(
       icon: Image.asset(IconsPath.deleteIcon, width: 25),
       onPressed: () async {
-        bool? confirm = await showConfirmDialog(
+        final confirm = await showConfirmDialog(
           context,
           text: '가망고객을 삭제하시겠습니까?',
         );
@@ -236,20 +236,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         }),
                 child: const Text('초기화'),
               ),
-            FilledButton.tonal(
-              onPressed:
-                  _isReadOnly
-                      ? null
-                      : () async {
-                        final date = await selectDate(context);
-                        if (date != null) {
-                          setState(() {
-                            _birth = date;
-                            _birthController.text = date.toString();
-                          });
-                        }
-                      },
-              child: Text(_birth != null ? _birth!.formattedDate : 'Birth'),
+            SizedBox(
+              width: 120,
+              child: FilledButton.tonal(
+                onPressed:
+                    _isReadOnly
+                        ? null
+                        : () async {
+                          final date = await selectDate(context);
+                          if (date != null) {
+                            setState(() {
+                              _birth = date;
+                              _birthController.text = date.toString();
+                            });
+                          }
+                        },
+                child: Text(_birth != null ? _birth!.formattedDate : 'Birth'),
+              ),
             ),
           ],
         ),
@@ -258,11 +261,42 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: Text(
-              '${calculateAge(_birth!)}세 (보험나이: ${calculateInsuranceAge(_birth!)}세), '
-              '상령일까지 ${daysUntilInsuranceAgeChange(_birth!)}일',
+              '${calculateAge(_birth!)}세 (보험나이: ${calculateInsuranceAge(_birth!)}세), 상령일까지 ${daysUntilInsuranceAgeChange(_birth!)}일',
             ),
           ),
         ],
+      ],
+    );
+  }
+
+  Widget _buildRegisteredDateSelector() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text('등록일 ${_isReadOnly ? '' : '(선택)'}'),
+            const Spacer(),
+
+            SizedBox(
+              width: 120,
+              child: FilledButton.tonal(
+                onPressed:
+                    _isReadOnly
+                        ? null
+                        : () async {
+                          final date = await selectDate(context);
+                          if (date != null) {
+                            setState(() {
+                              _registeredDateController.text =
+                                  date.formattedDate;
+                            });
+                          }
+                        },
+                child: Text(_registeredDateController.text),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -301,7 +335,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         );
   }
 
-  Widget _buildSubmitButton(BuildContext context) {
+  Widget _buildSubmitButton() {
     return RenderFilledButton(
       text: widget.customerModel == null ? '등록' : '수정',
       foregroundColor: ColorStyles.activeButtonColor,
@@ -309,14 +343,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         if (_tryValidation()) {
           showModalBottomSheet(
             context: context,
-            builder: (_) => _buildConfirmationBox(context),
+            builder: (_) => _buildConfirmationBox(),
           );
         }
       },
     );
   }
 
-  Widget _buildConfirmationBox(BuildContext context) {
+  Widget _buildConfirmationBox() {
     return SizedBox(
       height: 250,
       child: Column(
@@ -350,6 +384,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ? "없음"
                           : _recommendedController.text,
                 ),
+                ConfirmBoxText(
+                  text: '등록일: ',
+                  text2: _registeredDateController.text,
+                ),
                 if (widget.customerModel == null)
                   ConfirmBoxText(text2: _historyController.text),
               ],
@@ -358,6 +396,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           RenderFilledButton(
             text: widget.customerModel == null ? '등록' : '수정',
             onPressed: _submitForm,
+            foregroundColor: Colors.white,
           ),
         ],
       ),
@@ -375,7 +414,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       renderSnackBar(context, text: '상담 이력을 선택 하세요');
       return false;
     }
-
     if (isValid) {
       _formKey.currentState!.save();
       return true;
@@ -391,6 +429,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       sex: _sex!,
       recommender: _recommendedController.text,
       birth: _birth,
+      registeredDate: DateFormat(
+        'yy/MM/dd',
+      ).parseStrict(_registeredDateController.text),
     );
 
     if (widget.customerModel == null) {
