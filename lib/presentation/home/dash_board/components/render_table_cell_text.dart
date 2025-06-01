@@ -9,7 +9,7 @@ class RenderTableCellText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 8),
       alignment: Alignment.center,
       color: isHeader ? Colors.transparent : null,
       child: Text(

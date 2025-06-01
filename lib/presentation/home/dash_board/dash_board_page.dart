@@ -1,7 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/custom_bar_chart.dart';
-import 'package:withme/presentation/home/dash_board/components/custom_monthly_table.dart';
+import 'package:withme/presentation/home/dash_board/part/custom_bar_chart.dart';
+import 'package:withme/presentation/home/dash_board/part/custom_monthly_table.dart';
+import 'package:withme/presentation/home/dash_board/part/custom_summery_table.dart';
 import 'package:withme/presentation/home/dash_board/components/render_table.dart';
 import 'package:withme/presentation/home/dash_board/components/render_table_cell_text.dart';
 import 'package:withme/presentation/home/dash_board/components/render_table_row.dart';
@@ -52,12 +53,20 @@ class DashBoardPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSummaryTable(cellWidth, total, prospect, contract),
-                      const SizedBox(height: 20),
+                      const PartTitle(text: 'Summery'),
+                      CustomSummeryTable(
+                        cellWidth: cellWidth,
+                        total: total,
+                        prospect: prospect,
+                        contract: contract,
+                      ),
+                      height(20),
                       const PartTitle(text: 'Monthly'),
-                      const SizedBox(height: 5),
-                    CustomMonthlyTable(monthlyData:  flattenedMonthly),
-                      const SizedBox(height: 24),
+                      height(5),
+                      CustomMonthlyTable(monthlyData: flattenedMonthly),
+                      height(24),
+                      const PartTitle(text: 'Monthly Chart'),
+                    height(10),
                       CustomBarChart(monthlyData: flattenedMonthly),
                     ],
                   ),
@@ -69,43 +78,4 @@ class DashBoardPage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildSummaryTable(
-    double cellWidth,
-    List<CustomerModel> total,
-    List<CustomerModel> prospect,
-    List<CustomerModel> contract,
-  ) {
-    return RenderTable(
-      columnWidths: {
-        for (int i = 0; i < 5; i++) i: FixedColumnWidth(cellWidth),
-      },
-      tableRows: [
-        TableRow(
-          decoration: BoxDecoration(color: Colors.blue.shade50),
-          children: const [
-            RenderTableCellText('구분', isHeader: true),
-            RenderTableCellText('전체 (Total)', isHeader: true),
-            RenderTableCellText('가망 고객 (Prospect)', isHeader: true),
-            RenderTableCellText('계약자 (Customer)', isHeader: true),
-            RenderTableCellText('총 계약건수', isHeader: true),
-          ],
-        ),
-        TableRow(
-          decoration: BoxDecoration(color: Colors.grey.shade100),
-          children: [
-            const RenderTableCellText('고객/건'),
-            RenderTableCellText('${total.length}명'),
-            RenderTableCellText('${prospect.length}명'),
-            RenderTableCellText('${contract.length}명'),
-            RenderTableCellText(
-              '${total.map((c) => c.policies.length).fold(0, (a, b) => a + b)}건',
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-
 }
