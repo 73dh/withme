@@ -7,7 +7,7 @@ class DashBoardState {
   final List<CustomerModel> customers;
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
- final Map<String, List<CustomerModel>> monthlyCustomers;
+  final Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers;
 
   DashBoardState({
     this.customers = const [],
@@ -20,7 +20,7 @@ class DashBoardState {
     List<CustomerModel>? customers,
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
-    Map<String, List<CustomerModel>>? monthlyCustomers,
+    Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers,
   }) {
     return DashBoardState(
       customers: customers ?? this.customers,

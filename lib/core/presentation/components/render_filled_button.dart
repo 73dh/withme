@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 
+import '../../ui/color/color_style.dart';
+
 class RenderFilledButton extends StatelessWidget {
   final void Function() onPressed;
   final String text;
@@ -44,7 +46,7 @@ class RenderFilledButton extends StatelessWidget {
               PopupMenuButton<dynamic>(
                 itemBuilder: (context) => menuItems!,
                 onSelected: onMenuSelected as dynamic,
-                icon: const Icon(Icons.arrow_drop_down, size: 20),
+                icon:  Icon(Icons.arrow_drop_down, size: 20,color: ColorStyles.menuButtonColor,),
                 padding: EdgeInsets.zero,
                 splashRadius: 20,
               ),

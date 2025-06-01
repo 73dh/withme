@@ -23,7 +23,7 @@ class SearchPageState {
   final InsuranceCompany insuranceCompany;
   final ProductCategory productCategory;
   final List<String> contractMonths;
-  final String? selectedContractMonth;
+  final String selectedContractMonth;
 
   SearchPageState({
     this.isLoadingAllData = false,
@@ -39,7 +39,7 @@ class SearchPageState {
     this.insuranceCompany = InsuranceCompany.all,
     this.productCategory = ProductCategory.all,
     this.contractMonths = const [],
-    this.selectedContractMonth,
+    this.selectedContractMonth='전계약월',
   });
 
   SearchPageState copyWith({

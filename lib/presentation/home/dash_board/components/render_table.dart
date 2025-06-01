@@ -13,7 +13,7 @@ class RenderTable extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
         boxShadow: [
           const BoxShadow(
             color: Colors.black12,
@@ -23,7 +23,7 @@ class RenderTable extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(4),
         child: Table(
           border: TableBorder.all(color: Colors.grey.shade300, width: 1),
           columnWidths: columnWidths,

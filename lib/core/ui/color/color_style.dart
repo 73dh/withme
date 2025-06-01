@@ -7,4 +7,5 @@ abstract interface class ColorStyles{
   static Color unActiveButtonColor=Colors.deepPurple.shade50;
   static Color unActiveSearchButtonColor=Colors.brown.shade50;
   static Color activeSearchButtonColor=Colors.deepOrange.shade200;
+  static Color menuButtonColor=Colors.indigo;
 }

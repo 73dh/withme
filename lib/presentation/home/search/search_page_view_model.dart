@@ -43,7 +43,9 @@ class SearchPageViewModel with ChangeNotifier {
           insuranceCompany: event.insuranceCompany,
         );
       case SelectContractMonth():
-        _selectContractMonth(selectedContractMonth: event.selectedContractMonth);
+        _selectContractMonth(
+          selectedContractMonth: event.selectedContractMonth,
+        );
     }
   }
 
@@ -53,10 +55,20 @@ class SearchPageViewModel with ChangeNotifier {
 
     List<CustomerModel> customersAllData = await getIt<CustomerUseCase>()
         .execute(usecase: GetAllDataUseCase());
+
+    List<String> contractMonths = customersAllData
+        .expand((e) => e.policies)
+        .map((policy) => policy.startDate)
+        .whereType<DateTime>()
+        .map((date) => "${date.year}-${date.month.toString().padLeft(2, '0')}")
+        .toSet()
+        .toList()
+      ..sort();
     _state = state.copyWith(
       customers: customersAllData,
       histories: customersAllData.expand((e) => e.histories).toList(),
       policies: customersAllData.expand((e) => e.policies).toList(),
+      contractMonths:contractMonths,
       isLoadingAllData: false,
     );
     notifyListeners();
@@ -113,7 +125,7 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void _selectContractMonth({required String selectedContractMonth}){
+  void _selectContractMonth({required String selectedContractMonth}) {
     _state = state.copyWith(selectedContractMonth: selectedContractMonth);
     notifyListeners();
   }
@@ -129,10 +141,12 @@ class SearchPageViewModel with ChangeNotifier {
   }
 
   void _filterPolicy({
-   required ProductCategory productCategory,
-  required  InsuranceCompany insuranceCompany,
+    required ProductCategory productCategory,
+    required InsuranceCompany insuranceCompany,
+
   }) async {
     final filtered = await FilterPolicyUseCase.call(
+      contractMonth: state.selectedContractMonth,
       policies: state.policies,
       productCategory: productCategory,
       insuranceCompany: insuranceCompany,

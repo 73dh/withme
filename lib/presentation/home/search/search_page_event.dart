@@ -1,7 +1,7 @@
-import 'package:withme/core/domain/enum/insurance_company.dart';
-import 'package:withme/core/domain/enum/product_category.dart';
+
 import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 
+import '../../../core/domain/core_domain_import.dart';
 import 'enum/coming_birth.dart';
 import 'enum/upcoming_insurance_age.dart';
 

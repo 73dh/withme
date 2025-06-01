@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/search/components/render_pop_up_menu.dart';
 import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
@@ -19,55 +20,69 @@ class PolicyFilterButton extends StatelessWidget {
     final isActive =
         viewModel.state.currentSearchOption == SearchOption.filterPolicy;
 
-    return Row(
-      children: [
-        RenderPopUpMenu(
-          label: viewModel.state.selectedContractMonth ?? '계약월 선택',
-          items: viewModel.state.contractMonths,
-          onSelect: (month) => viewModel.onEvent(
-            SelectContractMonth(selectedContractMonth: month),
-          ),
-        ),
-        RenderPopUpMenu(
-          label: viewModel.state.productCategory.toString() ,
-          items: ProductCategory.values,
-          onSelect:
-              (e ) {
-                viewModel.onEvent(
-                SelectProductCategory(productCategory: e),
-              );
-              },
-        ),
+    return LayoutBuilder(
+      builder: (context,constraint) {
+        final double totalWidth = constraint.maxWidth;
+        final double firstItemWidth = totalWidth * 0.7;
+        return Row(
+          children: [
+            SizedBox(
+              width: firstItemWidth,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  RenderPopUpMenu(
+                    label: viewModel.state.selectedContractMonth ,
+                    items: ['전계약월',...viewModel.state.contractMonths],
+                    onSelect:
+                        (month) => viewModel.onEvent(
+                          SelectContractMonth(selectedContractMonth: month),
+                        ),
+                  ),
+                  RenderPopUpMenu(
+                    label:shortenedNameText( viewModel.state.productCategory.toString(),length: 6),
+                    items: ProductCategory.values,
+                    onSelect: (e) {
+                      viewModel.onEvent(SelectProductCategory(productCategory: e));
+                    },
+                  ),
 
-        RenderPopUpMenu(
-          label: viewModel.state.insuranceCompany.toString(),
-          items: InsuranceCompany.values,
-          onSelect:
-              (e) => viewModel.onEvent(
-                SelectInsuranceCompany(insuranceCompany: e),
+                  RenderPopUpMenu(
+                    label:shortenedNameText( viewModel.state.insuranceCompany.toString(),length: 6),
+                    items: InsuranceCompany.values,
+                    onSelect:
+                        (e) => viewModel.onEvent(
+                          SelectInsuranceCompany(insuranceCompany: e),
+                        ),
+                  ),
+                ],
               ),
-        ),
-        Expanded(
-          child: RenderFilledButton(
-            onPressed: () {
-              viewModel.onEvent(
-                SearchPageEvent.filterPolicy(
-                  productCategory: viewModel.state.productCategory,
-                  insuranceCompany: viewModel.state.insuranceCompany,
-                  selectedContractMonth: viewModel.state.selectedContractMonth??''
+            ),
 
-                ),
-              );
-            },
-            text: '조회',
-            backgroundColor:
-                isActive
-                    ? ColorStyles.activeSearchButtonColor
-                    : ColorStyles.unActiveSearchButtonColor,
-            borderRadius: 10,
-          ),
-        ),
-      ],
+            SizedBox(
+              width:totalWidth- firstItemWidth,
+              child: RenderFilledButton(
+                onPressed: () {
+                  viewModel.onEvent(
+                    SearchPageEvent.filterPolicy(
+                      productCategory: viewModel.state.productCategory,
+                      insuranceCompany: viewModel.state.insuranceCompany,
+                      selectedContractMonth:
+                          viewModel.state.selectedContractMonth ?? '',
+                    ),
+                  );
+                },
+                text: '조회',
+                backgroundColor:
+                    isActive
+                        ? ColorStyles.activeSearchButtonColor
+                        : ColorStyles.unActiveSearchButtonColor,
+                borderRadius: 10,
+              ),
+            ),
+          ],
+        );
+      }
     );
   }
 }

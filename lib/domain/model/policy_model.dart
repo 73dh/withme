@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
+import '../domain_import.dart';
 
 class PolicyModel {
   final String policyHolder;
@@ -68,6 +69,7 @@ class PolicyModel {
               ? (map[keyEndDate] as Timestamp).toDate()
               : DateTime.now().toUtc(),
       policyState: map[keyPolicyState] ?? '유지',
+
       documentReference: reference,
     );
   }
@@ -118,4 +120,6 @@ class PolicyModel {
 
     return map;
   }
+
+
 }

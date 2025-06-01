@@ -4,7 +4,7 @@ class RenderTableCellText extends StatelessWidget {
   final String text;
   final bool isHeader;
 
-  const RenderTableCellText(this.text, {this.isHeader = false});
+  const RenderTableCellText(this.text, {super.key, this.isHeader = false});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class RenderTableCellText extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 14,
+          fontSize: 11,
           color: Colors.black87,
         ),
       ),

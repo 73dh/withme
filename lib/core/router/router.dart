@@ -17,27 +17,45 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.registration,
       pageBuilder: (context, state) {
-        return CustomTransitionPage(
-          key: state.pageKey,
+        return _fadePage(
           child: RegistrationScreen(
             customerModel: state.extra as CustomerModel?,
           ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 300),
+          state: state,
         );
       },
     ),
     GoRoute(
-      builder:
-          (_, state) => PolicyScreen(customer: state.extra as CustomerModel),
       path: RoutePath.policy,
+      pageBuilder: (context, state) {
+        return _fadePage(
+          child: PolicyScreen(customer: state.extra as CustomerModel),
+          state: state,
+        );
+      },
     ),
     GoRoute(
-      builder:
-          (_, state) => CustomerScreen(customer: state.extra as CustomerModel),
       path: RoutePath.customer,
+      pageBuilder: (context, state) {
+        return _fadePage(
+          child: CustomerScreen(customer: state.extra as CustomerModel),
+          state: state,
+        );
+      },
     ),
   ],
 );
+
+CustomTransitionPage _fadePage({
+  required Widget child,
+  required GoRouterState state,
+}) {
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+    transitionDuration: const Duration(milliseconds: 300),
+  );
+}
