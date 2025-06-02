@@ -23,16 +23,31 @@ class CustomMonthlyTable extends StatelessWidget {
 
     final contractData =
         sortedKeys.map((key) {
-          final customers = monthlyData[key] ?? []; // null일 경우 빈 리스트로 대체
+          final customers = monthlyData[key] ?? [];
           final count = customers.fold(0, (sum, c) => sum + c.policies.length);
           return '$count';
         }).toList();
 
     final rows = <TableRow>[
-      renderTableRow(cells: ['구분', ...sortedKeys], isHeader: true),
-      renderTableRow(cells: ['가망고객', ...prospectData]),
-      renderTableRow(cells: ['총 계약건수', ...contractData]),
+      renderTableRow(
+        cells: ['구분', ...sortedKeys],
+        isHeader: true,
+        backgroundColor: Colors.blue.shade50, // ✅ Header 색상 적용
+      ),
+      renderTableRow(
+        cells: ['가망고객', ...prospectData],
+        backgroundColor: Colors.grey.shade100,
+        isBarProspect: true,
+        isHeader: true// ✅ Data row 색상 적용
+      ),
+      renderTableRow(
+        cells: ['총 계약건수', ...contractData],
+        backgroundColor: Colors.grey.shade100,
+        isBarContract: true,
+        isHeader: true// ✅ Data row 색상 적용
+      ),
     ];
+
     return RenderScrollableTable(rows: rows, sortedKeys: sortedKeys);
   }
 }

@@ -28,7 +28,28 @@ class SearchPage extends StatelessWidget {
           appBar: _buildAppBar(),
           body: Stack(
             children: [
-              _buildCustomerList(context),
+              if (viewModel.state.currentSearchOption != null)
+                _buildCustomerList(context),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child:
+                viewModel.state.currentSearchOption == null
+                    ? const Align(
+                  key: ValueKey(
+                    'select_button_text',
+                  ), // key가 꼭 달라야 애니메이션이 동작함
+                  alignment: FractionalOffset(0.5, 0.33),
+                  child: Text(
+                    'Select Button',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                )
+                    : const SizedBox.shrink(
+                  key: ValueKey(
+                    'empty',
+                  ), // 다른 key를 주어야 AnimatedSwitcher가 인식
+                ),
+              ),
               _buildDraggableFilterSheet(),
             ],
           ),
@@ -55,7 +76,10 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _buildCustomerList(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
+    final bottomPadding = MediaQuery
+        .of(context)
+        .padding
+        .bottom + 100;
     final customers = viewModel.state.filteredCustomers;
     final policies = viewModel.state.filteredPolicies;
 
@@ -77,9 +101,9 @@ class SearchPage extends StatelessWidget {
       itemBuilder: (context, index) {
         final customer = customers[index];
         final item =
-            customer.policies.isEmpty
-                ? _buildProspectItem(context, customer)
-                : _buildCustomerItem(context, customer);
+        customer.policies.isEmpty
+            ? _buildProspectItem(context, customer)
+            : _buildCustomerItem(context, customer);
 
         return Padding(padding: const EdgeInsets.all(8.0), child: item);
       },
@@ -176,7 +200,7 @@ class SearchPage extends StatelessWidget {
         height(5),
         NoBirthFilterButton(viewModel: viewModel),
         height(5),
-         const PartTitle(text: '계약조회'),
+        const PartTitle(text: '계약조회'),
         PartBox(child: PolicyFilterButton(viewModel: viewModel)),
       ],
     );
@@ -195,11 +219,9 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  Future<void> _handleAddHistory(
-    BuildContext context,
-    dynamic histories,
-    dynamic customer,
-  ) async {
+  Future<void> _handleAddHistory(BuildContext context,
+      dynamic histories,
+      dynamic customer,) async {
     await popupAddHistory(
       context,
       histories,

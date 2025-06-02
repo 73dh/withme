@@ -64,22 +64,22 @@ class _RenderScrollableTableState extends State<RenderScrollableTable> {
               scrollDirection: Axis.horizontal,
               child: RenderTable(
                 columnWidths: {
-                  0: const FixedColumnWidth(100),
+                  0: const FixedColumnWidth(80),
                   for (int i = 1; i <= widget.sortedKeys.length; i++)
-                    i: const FixedColumnWidth(50),
+                    i: const FixedColumnWidth(60),
                 },
                 tableRows: widget.rows,
               ),
             ),
             if (showRightArrow)
-              Positioned(
+              const Positioned(
                 right: 0,
                 top: 0,
                 bottom: 0,
                 child: ArrowIndicator(isRight: true),
               ),
             if (showLeftArrow)
-              Positioned(
+              const Positioned(
                 left: 0,
                 top: 0,
                 bottom: 0,

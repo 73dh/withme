@@ -46,7 +46,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void _initializeCustomer() {
     final customer = widget.customerModel;
     _registeredDateController.text = DateTime.now().formattedDate;
-    print('_registeredDate: ${_registeredDateController.text}');
     if (customer != null) {
       _isReadOnly = true;
       _nameController.text = customer.name;
@@ -352,14 +351,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Widget _buildConfirmationBox() {
     return SizedBox(
-      height: 250,
+      height: 280,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          height(15),
+          height(5),
           ConfirmBoxText(
             text: widget.customerModel == null ? '신규등록 확인' : '수정내용 확인',
-            size: 20,
+            size: 18,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -451,6 +450,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
 
     context.pop(true);
-    context.pop();
+    context.pop('true');
   }
 }

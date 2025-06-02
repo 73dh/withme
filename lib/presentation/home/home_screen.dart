@@ -38,7 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(RoutePath.registration),
+        onPressed: ()async {
+         String? result=await context.push(RoutePath.registration);
+         print('current path: $result');
+        },
         child: SizedBox(
           width: 24,
           height: 24,
@@ -65,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       duration: const Duration(milliseconds: 100),
                       curve: Curves.easeIn,
                     );
-                    // _onPageChanged(menu.index);
                   },
                   child: Image.asset(
                     menu.iconPath,
