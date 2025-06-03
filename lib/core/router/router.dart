@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/router/router_path.dart';
+import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/presentation/customer/customer_screen.dart';
 import 'package:withme/presentation/home/home_screen.dart';
 import 'package:withme/presentation/registration/screen/registration_screen.dart';
@@ -13,7 +14,9 @@ final router = GoRouter(
   initialLocation: RoutePath.splash,
   routes: [
     GoRoute(builder: (_, __) => const SplashScreen(), path: RoutePath.splash),
-    GoRoute(builder: (_, __) => const HomeScreen(), path: RoutePath.home),
+    GoRoute(path: RoutePath.home,pageBuilder: (context,state){
+      return _fadePage(child: HomeScreen(), state: state);
+    }, ),
     GoRoute(
       path: RoutePath.registration,
       pageBuilder: (context, state) {
@@ -56,6 +59,6 @@ CustomTransitionPage _fadePage({
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return FadeTransition(opacity: animation, child: child);
     },
-    transitionDuration: const Duration(milliseconds: 300),
+    transitionDuration: AppDurations.duration300,
   );
 }

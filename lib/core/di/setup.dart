@@ -6,7 +6,7 @@ import 'di_setup_import.dart';
 
 final getIt = GetIt.instance;
 
-void diSetup() {
+Future<void> diSetup() async {
   // data
   getIt.registerSingleton<FBase>(FBase());
 
@@ -39,5 +39,6 @@ void diSetup() {
   getIt.registerFactory<PolicyViewModel>(() => PolicyViewModel());
   getIt.registerFactory<CustomerViewModel>(() => CustomerViewModel());
   getIt.registerFactory<SearchPageViewModel>(() => SearchPageViewModel());
-  getIt.registerFactory<DashBoardViewModel>(() => DashBoardViewModel());
+ getIt.registerSingleton<DashBoardViewModel>( DashBoardViewModel());
+
 }

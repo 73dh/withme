@@ -8,12 +8,14 @@ class DashBoardState {
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
   final Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers;
+  final bool isLoading;
 
   DashBoardState({
     this.customers = const [],
     this.histories = const [],
     this.policies = const [],
     this.monthlyCustomers=const {},
+    this.isLoading=false,
   });
 
   DashBoardState copyWith({
@@ -21,58 +23,60 @@ class DashBoardState {
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
     Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers,
+    bool? isLoading,
   }) {
     return DashBoardState(
       customers: customers ?? this.customers,
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
       monthlyCustomers: monthlyCustomers??this.monthlyCustomers,
+      isLoading: isLoading?? this.isLoading,
     );
   }
 }
 
 
-class MonthlyCustomerStats {
-  final String month;
-  final int prospectCount;
-  final int customerCount;
-  final List<CustomerModel> customers;
+// class MonthlyCustomerStats {
+//   final String month;
+//   final int prospectCount;
+//   final int customerCount;
+//   final List<CustomerModel> customers;
+//
+//   MonthlyCustomerStats({
+//     required this.month,
+//     required this.prospectCount,
+//     required this.customerCount,
+//     required this.customers,
+//   });
+// }
 
-  MonthlyCustomerStats({
-    required this.month,
-    required this.prospectCount,
-    required this.customerCount,
-    required this.customers,
-  });
-}
-
-List<MonthlyCustomerStats> generateMonthlyStatsList(List<CustomerModel> customers) {
-  final Map<String, List<CustomerModel>> grouped = {};
-
-  for (var customer in customers) {
-    final date = customer.registeredDate;
-    final key = '${date.year}-${date.month.toString().padLeft(2, '0')}';
-    grouped.putIfAbsent(key, () => []);
-    grouped[key]!.add(customer);
-  }
-
-  final statsList = grouped.entries.map((entry) {
-    final month = entry.key;
-    final customerList = entry.value;
-
-    final prospectCount = customerList.where((c) => c.policies.isEmpty).length;
-    final customerCount = customerList.where((c) => c.policies.isNotEmpty).length;
-
-    return MonthlyCustomerStats(
-      month: month,
-      prospectCount: prospectCount,
-      customerCount: customerCount,
-      customers: customerList,
-    );
-  }).toList();
-
-  // 월 기준 정렬
-  statsList.sort((a, b) => a.month.compareTo(b.month));
-
-  return statsList;
-}
+// List<MonthlyCustomerStats> generateMonthlyStatsList(List<CustomerModel> customers) {
+//   final Map<String, List<CustomerModel>> grouped = {};
+//
+//   for (var customer in customers) {
+//     final date = customer.registeredDate;
+//     final key = '${date.year}/${date.month.toString().padLeft(2, '0')}';
+//     grouped.putIfAbsent(key, () => []);
+//     grouped[key]!.add(customer);
+//   }
+//
+//   final statsList = grouped.entries.map((entry) {
+//     final month = entry.key;
+//     final customerList = entry.value;
+//
+//     final prospectCount = customerList.where((c) => c.policies.isEmpty).length;
+//     final customerCount = customerList.where((c) => c.policies.isNotEmpty).length;
+//
+//     return MonthlyCustomerStats(
+//       month: month,
+//       prospectCount: prospectCount,
+//       customerCount: customerCount,
+//       customers: customerList,
+//     );
+//   }).toList();
+//
+//   // 월 기준 정렬
+//   statsList.sort((a, b) => a.month.compareTo(b.month));
+//
+//   return statsList;
+// }

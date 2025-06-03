@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/router/router_path.dart';
+import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/icon/const.dart';
+import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
+import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
+import '../../core/di/di_setup_import.dart';
+import '../../core/di/setup.dart';
 import '../../core/domain/enum/home_menu.dart';
+import '../../domain/domain_import.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,14 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: ()async {
-         String? result=await context.push(RoutePath.registration);
-         print('current path: $result');
-        },
+        onPressed: currentIndex != 3 ? () async {
+          await context.push(RoutePath.registration);
+        } : null,
         child: SizedBox(
           width: 24,
           height: 24,
-          child: Image.asset(IconsPath.personAdd),
+          child: currentIndex != 3 ? Image.asset(IconsPath.personAdd) : Text(
+              '진도율'),
         ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
@@ -65,16 +71,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     _pageController.animateToPage(
                       menu.index,
-                      duration: const Duration(milliseconds: 100),
+                      duration: AppDurations.duration100,
                       curve: Curves.easeIn,
                     );
                   },
                   child: Image.asset(
                     menu.iconPath,
                     color:
-                        menu.index == currentIndex
-                            ? Colors.black87
-                            : Colors.grey,
+                    menu.index == currentIndex
+                        ? Colors.black87
+                        : Colors.grey,
                   ),
                 );
               }),

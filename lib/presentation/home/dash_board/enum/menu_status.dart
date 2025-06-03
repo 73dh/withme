@@ -1,0 +1,1 @@
+enum MenuStatus { isOpened, isClosed }

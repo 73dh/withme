@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/ui/const/duration.dart';
 
 class AppBarSearchWidget extends StatefulWidget {
   final void Function(String) onSubmitted;
@@ -38,7 +39,7 @@ class _AppBarSearchWidgetState extends State<AppBarSearchWidget> {
           ),
 
         AnimatedSwitcher(
-          duration: const Duration(milliseconds: 800),
+          duration: AppDurations.duration500,
           transitionBuilder: (child, animation) {
             return RotationTransition(turns: animation, child: child);
           },

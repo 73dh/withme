@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/icon/const.dart';
 
 class AddPolicyWidget extends StatefulWidget {
@@ -21,7 +22,7 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
   void initState() {
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: AppDurations.durationThreeSec,
     )..repeat(reverse: true);
     _colorAnimation = ColorTween(
       begin: Colors.red,

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/setup.dart';
 import 'package:withme/core/presentation/components/policy_item.dart';
 import 'package:withme/core/router/router_path.dart';
+import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/use_case/customer/update_searched_customers_use_case.dart';
 import 'package:withme/presentation/home/search/components/coming_birth_filter_button.dart';
 import 'package:withme/presentation/home/search/components/no_birth_filter_button.dart';
@@ -31,7 +32,7 @@ class SearchPage extends StatelessWidget {
               if (viewModel.state.currentSearchOption != null)
                 _buildCustomerList(context),
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
+                duration: AppDurations.duration300,
                 child:
                 viewModel.state.currentSearchOption == null
                     ? const Align(
@@ -119,7 +120,7 @@ class SearchPage extends StatelessWidget {
           builder: (_) => const Center(child: CircularProgressIndicator()),
         );
 
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future.delayed(AppDurations.duration100);
         if (context.mounted) {
           await context.push(RoutePath.registration, extra: customer);
         }

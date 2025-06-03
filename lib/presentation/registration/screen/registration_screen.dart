@@ -4,6 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
+import 'package:withme/presentation/registration/components/add_policy_button.dart';
+import 'package:withme/presentation/registration/components/birth_selector.dart';
+import 'package:withme/presentation/registration/components/delete_icon.dart';
+import 'package:withme/presentation/registration/components/edit_toggle_icon.dart';
+import 'package:withme/presentation/registration/components/name_field.dart';
+import 'package:withme/presentation/registration/components/registered_date_selector.dart';
+import 'package:withme/presentation/registration/components/sex_selector.dart';
 import 'package:withme/presentation/registration/registration_event.dart';
 import 'package:withme/presentation/registration/registration_view_model.dart';
 
@@ -16,13 +23,14 @@ import '../../../core/ui/core_ui_import.dart';
 class RegistrationScreen extends StatefulWidget {
   final CustomerModel? customerModel;
 
-  const RegistrationScreen({super.key, this.customerModel});
+  const RegistrationScreen({super.key, this.customerModel,});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _recommendedController = TextEditingController();
@@ -83,7 +91,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   AppBar _buildAppBar() {
     return AppBar(
       elevation: 0,
-      actions: [_buildEditToggleIcon(), if (_isReadOnly) _buildDeleteIcon()],
+      actions: [
+        EditToggleIcon(
+          isReadOnly: _isReadOnly,
+          onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
+        ),
+        if (_isReadOnly)
+          DeleteIcon(
+            viewModel: viewModel,
+            customerModel: widget.customerModel!,
+          ),
+      ],
     );
   }
 
@@ -102,7 +120,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             const PartTitle(text: '소개자'),
             _buildRecommenderPart(),
             height(20),
-            if (_isReadOnly) _buildAddPolicyButton(),
+            if (_isReadOnly)
+              AddPolicyButton(customerModel: widget.customerModel!),
           ],
         ),
       ),
@@ -147,156 +166,59 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildAddPolicyButton() {
-    return AddPolicyWidget(
-      onTap: () => context.push(RoutePath.policy, extra: widget.customerModel),
-    );
-  }
-
-  IconButton _buildDeleteIcon() {
-    return IconButton(
-      icon: Image.asset(IconsPath.deleteIcon, width: 25),
-      onPressed: () async {
-        final confirm = await showConfirmDialog(
-          context,
-          text: '가망고객을 삭제하시겠습니까?',
-        );
-        if (confirm == true && mounted) {
-          viewModel.onEvent(
-            RegistrationEvent.deleteCustomer(
-              customerKey: widget.customerModel!.customerKey,
-            ),
-          );
-          context.pop();
-        }
-      },
-    );
-  }
-
-  IconButton _buildEditToggleIcon() {
-    return IconButton(
-      icon: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
-        child: Icon(
-          _isReadOnly ? Icons.edit : Icons.check,
-          key: ValueKey(_isReadOnly),
-        ),
-        transitionBuilder:
-            (child, anim) => RotationTransition(turns: anim, child: child),
-      ),
-      onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
-    );
-  }
-
   Widget _buildNameField() {
-    return _isReadOnly
-        ? Text('고객명: ${_nameController.text}')
-        : Expanded(
-          child: CustomTextFormField(
-            controller: _nameController,
-            hintText: '이름',
-            autoFocus: true,
-            validator: (text) => text.isEmpty ? '이름을 입력하세요' : null,
-            onSaved: (text) => _nameController.text = text.trim(),
-          ),
-        );
+    return NameField(isReadOnly: _isReadOnly, nameController: _nameController);
   }
 
   Widget _buildSexSelector() {
-    return Row(
-      children:
-          ['남', '여'].map((label) {
-            return RadioMenuButton<String>(
-              value: label,
-              groupValue: _sex,
-              onChanged:
-                  _isReadOnly ? null : (val) => setState(() => _sex = val),
-              child: Text(label == '남' ? '남성' : '여성'),
-            );
-          }).toList(),
+    return SexSelector(
+      sex: _sex,
+      isReadOnly: _isReadOnly,
+      onChanged: _isReadOnly ? null : (value) => setState(() => _sex = value),
     );
   }
 
   Widget _buildBirthSelector() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text('생년월일 ${_isReadOnly ? '' : '(선택)'}'),
-            const Spacer(),
-            if (_birth != null)
-              FilledButton.tonal(
-                onPressed:
-                    _isReadOnly
-                        ? null
-                        : () => setState(() {
-                          _birth = null;
-                          _birthController.clear();
-                        }),
-                child: const Text('초기화'),
-              ),
-            SizedBox(
-              width: 120,
-              child: FilledButton.tonal(
-                onPressed:
-                    _isReadOnly
-                        ? null
-                        : () async {
-                          final date = await selectDate(context);
-                          if (date != null) {
-                            setState(() {
-                              _birth = date;
-                              _birthController.text = date.toString();
-                            });
-                          }
-                        },
-                child: Text(_birth != null ? _birth!.formattedDate : 'Birth'),
-              ),
-            ),
-          ],
-        ),
-        if (_birth != null) ...[
-          height(5),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              '${calculateAge(_birth!)}세 (보험나이: ${calculateInsuranceAge(_birth!)}세), 상령일까지 ${daysUntilInsuranceAgeChange(_birth!)}일',
-            ),
-          ),
-        ],
-      ],
+    return BirthSelector(
+      isReadOnly: _isReadOnly,
+      birth: _birth,
+      onInitPressed:
+          _isReadOnly
+              ? null
+              : () => setState(() {
+                _birth = null;
+                _birthController.clear();
+              }),
+      onSetPressed:
+          _isReadOnly
+              ? null
+              : () async {
+                final date = await selectDate(context);
+                if (date != null) {
+                  setState(() {
+                    _birth = date;
+                    _birthController.text = date.toString();
+                  });
+                }
+              },
     );
   }
 
   Widget _buildRegisteredDateSelector() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text('등록일 ${_isReadOnly ? '' : '(선택)'}'),
-            const Spacer(),
-
-            SizedBox(
-              width: 120,
-              child: FilledButton.tonal(
-                onPressed:
-                    _isReadOnly
-                        ? null
-                        : () async {
-                          final date = await selectDate(context);
-                          if (date != null) {
-                            setState(() {
-                              _registeredDateController.text =
-                                  date.formattedDate;
-                            });
-                          }
-                        },
-                child: Text(_registeredDateController.text),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return RegisteredDateSelector(
+      isReadOnly: _isReadOnly,
+      registeredDate: _registeredDateController.text,
+      onPressed:
+          _isReadOnly
+              ? null
+              : () async {
+                final date = await selectDate(context);
+                if (date != null) {
+                  setState(() {
+                    _registeredDateController.text = date.formattedDate;
+                  });
+                }
+              },
     );
   }
 

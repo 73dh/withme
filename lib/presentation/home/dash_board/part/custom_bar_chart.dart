@@ -48,45 +48,42 @@ class _CustomBarChartState extends State<CustomBarChart> {
     final stats = _convertToStats(widget.monthlyData);
     final keys = stats.keys.toList()..sort();
 
-    // y축 최대값 계산 (차트 스케일 맞춤용)
-    final maxY =
-        stats.values
-            .expand((map) => map.values)
-            .fold<int>(0, (prev, element) => element > prev ? element : prev)
-            .toDouble();
+    final maxY = stats.values
+        .expand((map) => map.values)
+        .fold<int>(0, (prev, element) => element > prev ? element : prev)
+        .toDouble();
 
-    // y축 숫자 리스트 (0부터 maxY까지 정수단위)
-    final yLabels = List.generate(maxY.toInt() + 1, (index) => index);
+    // 간소화된 y축 레이블 (5개로 제한)
+    final step = (maxY / 4).ceil(); // 최대 5개
+    final yLabels = List.generate(5, (i) => step * i).toSet().toList()
+      ..sort((a, b) => b.compareTo(a)); // 높은 수부터 내림차순
 
     return LayoutBuilder(
       builder: (context, constraint) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _updateArrows());
 
         return SizedBox(
-          height: 280,
+          height: 300, // 세로 크기 줄임
           child: Row(
             children: [
-              // 고정 y축 영역
+              // 좁아진 y축
               SizedBox(
-                width: 30,
+                width: 24,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:
-                      yLabels.reversed
-                          .map(
-                            (y) => Text(
-                              y.toString(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                  children: yLabels
+                      .map((y) => Text(
+                    y.toString(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.black54,
+                    ),
+                  ))
+                      .toList(),
                 ),
               ),
 
-              // 차트 + 스크롤 영역
+              // 차트
               Expanded(
                 child: Stack(
                   children: [
@@ -95,11 +92,10 @@ class _CustomBarChartState extends State<CustomBarChart> {
                       controller: _scrollController,
                       child: SizedBox(
                         width: keys.length * 60,
-                        height: 280,
+                        height: 300,
                         child: BarChart(
                           BarChartData(
                             maxY: maxY + 1,
-                            // 약간 여유 줌
                             barGroups: List.generate(keys.length, (i) {
                               final key = keys[i];
                               final data = stats[key]!;
@@ -131,7 +127,8 @@ class _CustomBarChartState extends State<CustomBarChart> {
                                     if (idx >= 0 && idx < keys.length) {
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 8),
-                                        child: Text(keys[idx].substring(5)),
+                                        child: Text(keys[idx].substring(5),
+                                            style: const TextStyle(fontSize: 10)),
                                       );
                                     }
                                     return const SizedBox.shrink();
@@ -142,9 +139,7 @@ class _CustomBarChartState extends State<CustomBarChart> {
                                 sideTitles: SideTitles(showTitles: false),
                               ),
                               leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: false,
-                                ), // y축 직접 구현했으니 숨김
+                                sideTitles: SideTitles(showTitles: false),
                               ),
                               rightTitles: AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
@@ -169,7 +164,6 @@ class _CustomBarChartState extends State<CustomBarChart> {
                         top: 0,
                         bottom: 0,
                         child: ArrowIndicator(isRight: false),
-                        // child: _arrowOverlay(isLeft: true),
                       ),
                     if (showRightArrow)
                       Positioned(
@@ -177,7 +171,6 @@ class _CustomBarChartState extends State<CustomBarChart> {
                         top: 0,
                         bottom: 0,
                         child: ArrowIndicator(isRight: true),
-                        // child: _arrowOverlay(isLeft: false),
                       ),
                   ],
                 ),
@@ -188,6 +181,7 @@ class _CustomBarChartState extends State<CustomBarChart> {
       },
     );
   }
+
 
   Map<String, Map<String, int>> _convertToStats(
     Map<String, List<CustomerModel>> monthlyData,

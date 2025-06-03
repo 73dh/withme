@@ -2,27 +2,45 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:withme/domain/domain_import.dart';
-
 import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
 
 import '../../../core/di/setup.dart';
 
 class DashBoardViewModel with ChangeNotifier {
   DashBoardViewModel() {
-    getIt<CustomerUseCase>()
-        .execute(usecase: GetAllDataUseCase())
-        .then((customersAllData) {
+    _init();
+  }
+
+  DashBoardState _state = DashBoardState();
+
+  DashBoardState get state => _state;
+
+  Future<void> _init() async {
+    await loadData(); // async 함수 별도로 실행
+  }
+
+  Future<void> loadData() async {
+
+    try {
+      _state = state.copyWith(isLoading: true);
+      notifyListeners();
+
+      final customersAllData =
+          await getIt<CustomerUseCase>().execute(usecase: GetAllDataUseCase())
+              as List<CustomerModel>;
+
       // 월별 계약 고객 그룹 (startDate 기준)
       final Map<String, List<CustomerModel>> contractGrouped = {};
 
       // 월별 가망 고객 그룹 (registeredDate 기준, 계약 없는 고객)
       final Map<String, List<CustomerModel>> prospectGrouped = {};
 
-      for (var customer in customersAllData as List<CustomerModel>) {
+      for (var customer in customersAllData) {
         // 가망 고객 (계약 없는 고객)
-        if (customer.policies == null || customer.policies.isEmpty) {
+        if (customer.policies.isEmpty || customer.policies.isEmpty) {
           final regDate = customer.registeredDate;
-          final regMonth = '${regDate.year}-${regDate.month.toString().padLeft(2, '0')}';
+          final regMonth =
+              '${regDate.year}-${regDate.month.toString().padLeft(2, '0')}';
 
           prospectGrouped.putIfAbsent(regMonth, () => []);
           prospectGrouped[regMonth]!.add(customer);
@@ -34,7 +52,8 @@ class DashBoardViewModel with ChangeNotifier {
           final startDate = policy.startDate;
           if (startDate == null) continue;
 
-          final contractMonth = '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}';
+          final contractMonth =
+              '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}';
 
           contractGrouped.putIfAbsent(contractMonth, () => []);
           contractGrouped[contractMonth]!.add(customer);
@@ -46,10 +65,9 @@ class DashBoardViewModel with ChangeNotifier {
 
       final Map<String, Map<String, List<CustomerModel>>> monthlyGrouped = {};
 
-      final allMonths = <String>{
-        ...prospectGrouped.keys,
-        ...contractGrouped.keys,
-      }.toList()..sort();
+      final allMonths =
+          <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()
+            ..sort();
 
       for (var month in allMonths) {
         monthlyGrouped[month] = {
@@ -63,45 +81,12 @@ class DashBoardViewModel with ChangeNotifier {
         customers: customersAllData,
         histories: customersAllData.expand((e) => e.histories).toList(),
         policies: customersAllData.expand((e) => e.policies).toList(),
+        isLoading: false,
       );
 
       notifyListeners();
-    })
-        .catchError((e, stack) {
+    } catch (e, stack) {
       log(e.toString());
-    });
-
-    // getIt<CustomerUseCase>()
-    //     .execute(usecase: GetAllDataUseCase())
-    //     .then((customersAllData) {
-    //       // 월별 고객 분류용 맵 초기화
-    //       final Map<String, List<CustomerModel>> monthlyGrouped = {};
-    //
-    //       for (var customer in customersAllData as List<CustomerModel>) {
-    //         final date = customer.registeredDate;
-    //         final monthKey =
-    //             '${date.year}-${date.month.toString().padLeft(2, '0')}';
-    //
-    //         // 해당 월에 해당하는 리스트에 고객 추가
-    //         monthlyGrouped.putIfAbsent(monthKey, () => []);
-    //         monthlyGrouped[monthKey]!.add(customer);
-    //       }
-    //
-    //       _state = state.copyWith(
-    //         monthlyCustomers: monthlyGrouped,
-    //         customers: customersAllData,
-    //         histories: customersAllData.expand((e) => e.histories).toList(),
-    //         policies: customersAllData.expand((e) => e.policies).toList(),
-    //       );
-    //
-    //       notifyListeners();
-    //     })
-    //     .catchError((e, stack) {
-    //       log(e.toString());
-    //     });
+    }
   }
-
-  DashBoardState _state = DashBoardState();
-
-  DashBoardState get state => _state;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/dash_board_page.dart';
+import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
+import 'package:withme/presentation/home/dash_board/screen/dash_board_root.dart';
 
 import '../../../presentation/home/customer_list/screen/customer_list_page.dart';
 import '../../../presentation/home/prospect_list/screen/prospect_list_page.dart';
@@ -18,9 +19,9 @@ enum HomeMenu {
   const HomeMenu({required this.name, required this.iconPath});
 
   Widget get toWidget => switch (this) {
-    HomeMenu.prospect =>  ProspectListPage(),
+    HomeMenu.prospect =>  const ProspectListPage(),
     HomeMenu.customer => const CustomerListPage(),
     HomeMenu.search =>  SearchPage(),
-    HomeMenu.dashBoard => const DashBoardPage(),
+    HomeMenu.dashBoard => const DashBoardRoot(),
   };
 }
