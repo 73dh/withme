@@ -29,7 +29,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
           if (!snapshot.hasData) {
             return const MyCircularIndicator();
           }
-          List<CustomerModel> originalCustomers = snapshot.data;
+          List<CustomerModel> originalCustomers = snapshot.data!;
           List<CustomerModel> customers =
               originalCustomers
                   .where((e) => e.name.contains(_searchText.trim()))

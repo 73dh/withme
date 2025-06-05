@@ -41,7 +41,7 @@ class ProspectItem extends StatelessWidget {
           if (!snapshot.hasData) {
             return SizedBox.shrink();
           }
-          List<HistoryModel> histories = snapshot.data;
+          List<HistoryModel> histories = snapshot.data!;
           histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
           return Container(
             height: 90,

@@ -11,7 +11,7 @@ class PolicyUseCase{
     return  usecase(_policyRepository);
   }
 
-  Stream call<T>({required BaseStreamUseCase usecase}){
+  Stream<R> call<R>({required BaseStreamUseCase<R,PolicyRepository> usecase}){
     return usecase(_policyRepository);
   }
 }

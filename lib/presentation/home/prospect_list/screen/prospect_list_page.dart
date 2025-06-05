@@ -26,28 +26,41 @@ class _ProspectListPageState extends State<ProspectListPage> {
   String? _searchText = '';
 
   @override
+  void initState() {
+    super.initState();
+    viewModel.fetchOnce(); // 처음 로드할 때 데이터 요청
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: StreamBuilder(
-        stream: viewModel.getProspects(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            log(snapshot.error.toString());
-          }
-          if (!snapshot.hasData) {
-            return MyCircularIndicator();
-          }
-          List<CustomerModel> prospectsOrigin = snapshot.data;
-          final prospects =
-              prospectsOrigin.where((e) {
-                return e.name.contains(_searchText ?? '');
-              }).toList();
-          return Scaffold(
-            appBar: _appBar(prospects),
-            body: _prospectList(prospects),
-          );
-        },
-      ),
+      child: ListenableBuilder(listenable: viewModel, builder: (context,widget){
+        return Scaffold(
+                  appBar: _appBar(viewModel.state.cachedProspects),
+                  body: _prospectList(viewModel.state.cachedProspects),);
+      })
+
+      // FutureBuilder(
+      //   // stream: viewModel.prospectsStream,
+      //   future: viewModel.fetchOnce(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.hasError) {
+      //       log(snapshot.error.toString());
+      //     }
+      //     if (!snapshot.hasData || viewModel.state.isLoading==true) {
+      //       return MyCircularIndicator();
+      //     }
+      //     List<CustomerModel> prospectsOrigin =viewModel.state.cachedProspects;
+      //     final prospects =
+      //         prospectsOrigin.where((e) {
+      //           return e.name.contains(_searchText ?? '');
+      //         }).toList();
+      //     return Scaffold(
+      //       appBar: _appBar(prospects),
+      //       body: _prospectList(prospects),
+      //     );
+      //   },
+      // ),
     );
   }
 

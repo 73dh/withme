@@ -1,5 +1,5 @@
 import 'package:withme/domain/repository/repository.dart';
 
-abstract class BaseStreamUseCase<T extends Repository>{
-  Stream call(T repository);
+abstract class BaseStreamUseCase<R,T extends Repository>{
+  Stream<R> call(T repository);
 }

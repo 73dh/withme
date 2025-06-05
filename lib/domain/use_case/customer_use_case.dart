@@ -1,6 +1,7 @@
 import 'package:withme/domain/repository/customer_repository.dart';
 import 'package:withme/domain/use_case/base/base_stream_use_case.dart';
 
+import '../domain_import.dart';
 import 'base/base_use_case.dart';
 
  class CustomerUseCase  {
@@ -13,7 +14,7 @@ import 'base/base_use_case.dart';
     return  usecase(_customerRepository);
   }
 
-  Stream call<T>({required BaseStreamUseCase usecase}){
-    return usecase(_customerRepository);
+  Stream<R> call<R>({required BaseStreamUseCase<R,CustomerRepository> usecase}){
+    return usecase(_customerRepository) ;
   }
 }

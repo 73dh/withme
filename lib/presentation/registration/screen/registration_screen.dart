@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
@@ -23,14 +24,13 @@ import '../../../core/ui/core_ui_import.dart';
 class RegistrationScreen extends StatefulWidget {
   final CustomerModel? customerModel;
 
-  const RegistrationScreen({super.key, this.customerModel,});
+  const RegistrationScreen({super.key, this.customerModel});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _recommendedController = TextEditingController();
@@ -207,7 +207,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget _buildRegisteredDateSelector() {
     return RegisteredDateSelector(
       isReadOnly: _isReadOnly,
-      registeredDate: _registeredDateController.text,
+      registeredDate: DateTime.parse(_registeredDateController.text),
       onPressed:
           _isReadOnly
               ? null
@@ -278,9 +278,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           height(5),
-          ConfirmBoxText(
-            text: widget.customerModel == null ? '신규등록 확인' : '수정내용 확인',
-            size: 18,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              MyCircularIndicator(),
+              ConfirmBoxText(
+                text: widget.customerModel == null ? '신규등록 확인' : '수정내용 확인',
+                size: 18,
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -307,7 +313,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
                 ConfirmBoxText(
                   text: '등록일: ',
-                  text2: _registeredDateController.text,
+                  text2:
+                      DateTime.parse(
+                        _registeredDateController.text,
+                      ).formattedDate,
                 ),
                 if (widget.customerModel == null)
                   ConfirmBoxText(text2: _historyController.text),
@@ -342,7 +351,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return false;
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     final customerMap = CustomerModel.toMapForCreateCustomer(
       customerKey:
           widget.customerModel?.customerKey ?? generateCustomerKey('user1'),
@@ -350,9 +359,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       sex: _sex!,
       recommender: _recommendedController.text,
       birth: _birth,
-      registeredDate: DateFormat(
-        'yy/MM/dd',
-      ).parseStrict(_registeredDateController.text),
+      registeredDate: DateTime.parse(_registeredDateController.text),
     );
 
     if (widget.customerModel == null) {
@@ -370,8 +377,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         RegistrationEvent.updateCustomer(customerData: customerMap),
       );
     }
-
-    context.pop(true);
-    context.pop('true');
+    await getIt<ProspectListViewModel>().refresh();
+    if (mounted && context.canPop()) {
+      context.pop(true);
+      context.pop('true');
+    }
   }
 }

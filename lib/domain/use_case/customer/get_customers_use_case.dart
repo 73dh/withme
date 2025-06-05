@@ -7,12 +7,12 @@ import '../../../core/di/setup.dart';
 import '../../model/customer_model.dart';
 import '../customer_use_case.dart';
 
-class GetCustomersUseCase extends BaseStreamUseCase<CustomerRepository> {
+class GetCustomersUseCase extends BaseStreamUseCase<List<CustomerModel>, CustomerRepository> {
   @override
   Stream<List<CustomerModel>> call(CustomerRepository repository) async* {
     Stream<List<CustomerModel>> getAll =
         getIt<CustomerUseCase>().call(usecase: GetAllUseCase())
-            as Stream<List<CustomerModel>>;
+          ;
 
     await for (final customers in getAll) {
       List<CustomerModel> policyCustomers = [];

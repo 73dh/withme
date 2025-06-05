@@ -13,7 +13,7 @@ class HistoryUseCase {
     return usecase(_historyRepository);
   }
 
-  Stream call<T>({required BaseStreamUseCase usecase}) {
+  Stream<R> call<R>({required BaseStreamUseCase<R,HistoryRepository> usecase}) {
     return usecase(_historyRepository);
   }
 }

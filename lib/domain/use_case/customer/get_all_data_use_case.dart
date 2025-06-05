@@ -15,7 +15,7 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
   Future<List<CustomerModel>> call(CustomerRepository repository) async {
     final originalCustomers =
         await getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).first
-            as List<CustomerModel>;
+            ;
     final historyFutures = <Future<List<HistoryModel>>>[];
     final policyFutures = <Future<List<PolicyModel>>>[];
 
@@ -35,8 +35,8 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
               .first;
 
       // Future 객체 자체를 리스트에 추가
-      historyFutures.add(historyFuture as Future<List<HistoryModel>>);
-      policyFutures.add(policyFuture as Future<List<PolicyModel>>);
+      historyFutures.add(historyFuture );
+      policyFutures.add(policyFuture );
     }
 
     // 모든 Future 결과를 기다림

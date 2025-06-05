@@ -85,7 +85,7 @@ class SearchCustomerItem extends StatelessWidget {
                         return const MyCircularIndicator();
                       }
 
-                      List<HistoryModel> histories = snapshot.data;
+                      List<HistoryModel> histories = snapshot.data!;
                       return HistoryPartWidget(
                         histories: histories,
                         onTap: (histories) => onTap(histories),
