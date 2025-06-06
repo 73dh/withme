@@ -25,8 +25,8 @@ class RegistrationViewModel with ChangeNotifier {
   void _onRegisterCustomer({
     required Map<String, dynamic> customerMap,
     required Map<String, dynamic> historyMap,
-  }) {
-    getIt<CustomerUseCase>().execute(
+  }) async {
+    await getIt<CustomerUseCase>().execute(
       usecase: RegisterCustomerUseCase(
         userKey: 'user1',
         customerData: customerMap,

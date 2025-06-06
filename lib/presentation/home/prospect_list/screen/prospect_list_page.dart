@@ -1,18 +1,12 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/domain/enum/history_content.dart';
-import 'package:withme/core/presentation/components/prospect_item.dart';
-import 'package:withme/core/presentation/widget/app_bar_search_widget.dart';
-import 'package:withme/core/presentation/widget/pop_up_history.dart';
-import 'package:withme/core/router/router_path.dart';
-import 'package:withme/domain/model/customer_model.dart';
 
 import '../../../../core/di/setup.dart';
-import '../../../../core/presentation/components/my_circular_indicator.dart';
-import '../prospect_list_view_model.dart';
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/router/router_import.dart';
+import '../../../../domain/domain_import.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -34,33 +28,26 @@ class _ProspectListPageState extends State<ProspectListPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: ListenableBuilder(listenable: viewModel, builder: (context,widget){
-        return Scaffold(
-                  appBar: _appBar(viewModel.state.cachedProspects),
-                  body: _prospectList(viewModel.state.cachedProspects),);
-      })
-
-      // FutureBuilder(
-      //   // stream: viewModel.prospectsStream,
-      //   future: viewModel.fetchOnce(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.hasError) {
-      //       log(snapshot.error.toString());
-      //     }
-      //     if (!snapshot.hasData || viewModel.state.isLoading==true) {
-      //       return MyCircularIndicator();
-      //     }
-      //     List<CustomerModel> prospectsOrigin =viewModel.state.cachedProspects;
-      //     final prospects =
-      //         prospectsOrigin.where((e) {
-      //           return e.name.contains(_searchText ?? '');
-      //         }).toList();
-      //     return Scaffold(
-      //       appBar: _appBar(prospects),
-      //       body: _prospectList(prospects),
-      //     );
-      //   },
-      // ),
+      child: StreamBuilder(
+        stream: viewModel.cachedProspects,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            log(snapshot.error.toString());
+          }
+          if (!snapshot.hasData || viewModel.state.isLoading == true) {
+            return const MyCircularIndicator();
+          }
+          List<CustomerModel> prospectsOrigin = snapshot.data!;
+          final prospects =
+              prospectsOrigin.where((e) {
+                return e.name.contains(_searchText ?? '');
+              }).toList();
+          return Scaffold(
+            appBar: _appBar(prospects),
+            body: _prospectList(prospects),
+          );
+        },
+      ),
     );
   }
 

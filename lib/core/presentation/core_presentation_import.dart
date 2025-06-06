@@ -18,3 +18,4 @@ export '../../../core/presentation/widget/render_snack_bar.dart';
 export '../../../core/presentation/widget/select_date.dart';
 export 'components/my_circular_indicator.dart';
 export 'components/sex_widget.dart';
+export 'package:flutter/material.dart';

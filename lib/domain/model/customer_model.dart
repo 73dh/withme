@@ -85,6 +85,7 @@ class CustomerModel {
     required DateTime registeredDate,
     String? recommender,
     DateTime? birth,
+
   }) {
     final map = <String, dynamic>{};
     map[keyUserKey] = 'user1';

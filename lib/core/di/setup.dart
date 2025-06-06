@@ -33,12 +33,13 @@ Future<void> diSetup() async {
   );
 
   // viewModel
-  getIt.registerLazySingleton<ProspectListViewModel>(() => ProspectListViewModel());
-  getIt.registerFactory<CustomerListViewModel>(() => CustomerListViewModel());
+  getIt.registerLazySingleton<ProspectListViewModel>(() =>
+      ProspectListViewModel());
+  getIt.registerLazySingleton<CustomerListViewModel>(() =>
+      CustomerListViewModel());
   getIt.registerFactory<RegistrationViewModel>(() => RegistrationViewModel());
   getIt.registerFactory<PolicyViewModel>(() => PolicyViewModel());
   getIt.registerFactory<CustomerViewModel>(() => CustomerViewModel());
   getIt.registerFactory<SearchPageViewModel>(() => SearchPageViewModel());
- getIt.registerSingleton<DashBoardViewModel>( DashBoardViewModel());
-
+  getIt.registerSingleton<DashBoardViewModel>(DashBoardViewModel());
 }

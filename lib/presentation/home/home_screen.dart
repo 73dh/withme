@@ -1,15 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/icon/const.dart';
-import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
-import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
 import '../../core/di/di_setup_import.dart';
 import '../../core/di/setup.dart';
 import '../../core/domain/enum/home_menu.dart';
-import '../../domain/domain_import.dart';
+import '../../core/presentation/core_presentation_import.dart';
+import '../../core/router/router_import.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,14 +40,39 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: currentIndex != 3 ? () async {
-          await context.push(RoutePath.registration);
-        } : null,
+        onPressed: switch (HomeMenu.values[currentIndex]) {
+          HomeMenu.prospect => () async {
+            final result = await context.push(RoutePath.registration);
+            if (result == true) {
+              await getIt<ProspectListViewModel>().fetchOnce();
+            }
+          },
+          HomeMenu.customer => () async {
+            final result = await context.push(RoutePath.registration);
+            if (result == true) {
+              await getIt<CustomerListViewModel>().fetchOnce();
+            }
+          },
+          _ => null,
+        },
+
+        // currentIndex != 3
+        //     ? () async {
+        //       bool? result = await context.push(RoutePath.registration);
+        //
+        //       if (result != null && result) {
+        //         await getIt<ProspectListViewModel>().refresh();
+        //         print('result: $result');
+        //       }
+        //     }
+        //     : null,
         child: SizedBox(
           width: 24,
           height: 24,
-          child: currentIndex != 3 ? Image.asset(IconsPath.personAdd) : Text(
-              '진도율'),
+          child:
+              currentIndex != 3
+                  ? Image.asset(IconsPath.personAdd)
+                  : Text('진도율'),
         ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
@@ -78,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Image.asset(
                     menu.iconPath,
                     color:
-                    menu.index == currentIndex
-                        ? Colors.black87
-                        : Colors.grey,
+                        menu.index == currentIndex
+                            ? Colors.black87
+                            : Colors.grey,
                   ),
                 );
               }),
