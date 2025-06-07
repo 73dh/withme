@@ -8,7 +8,7 @@ import '../../domain/use_case/customer/register_customer_use_case.dart';
 import '../../domain/use_case/customer_use_case.dart';
 
 class RegistrationViewModel with ChangeNotifier {
-  void onEvent(RegistrationEvent event) {
+  Future<void> onEvent(RegistrationEvent event) async{
     switch (event) {
       case RegisterCustomer():
         _onRegisterCustomer(
@@ -16,17 +16,17 @@ class RegistrationViewModel with ChangeNotifier {
           historyMap: event.historyData,
         );
       case UpdateCustomer():
-        _onUpdateCustomer(customerMap: event.customerData);
+     await   _onUpdateCustomer(customerMap: event.customerData);
       case DeleteCustomer():
-        _deleteCustomer(customerKey: event.customerKey);
+     await   _deleteCustomer(customerKey: event.customerKey);
     }
   }
 
-  void _onRegisterCustomer({
+  Future<void> _onRegisterCustomer({
     required Map<String, dynamic> customerMap,
     required Map<String, dynamic> historyMap,
   }) async {
-    await getIt<CustomerUseCase>().execute(
+    return await getIt<CustomerUseCase>().execute(
       usecase: RegisterCustomerUseCase(
         userKey: 'user1',
         customerData: customerMap,
@@ -35,8 +35,10 @@ class RegistrationViewModel with ChangeNotifier {
     );
   }
 
-  void _onUpdateCustomer({required Map<String, dynamic> customerMap}) {
-    getIt<CustomerUseCase>().execute(
+  Future<void> _onUpdateCustomer({
+    required Map<String, dynamic> customerMap,
+  }) async {
+    return await getIt<CustomerUseCase>().execute(
       usecase: UpdateCustomerUseCase(
         userKey: 'user1',
         customerData: customerMap,
@@ -44,7 +46,7 @@ class RegistrationViewModel with ChangeNotifier {
     );
   }
 
-  Future _deleteCustomer({required String customerKey}) async {
+  Future<void> _deleteCustomer({required String customerKey}) async {
     return await getIt<CustomerUseCase>().execute(
       usecase: DeleteCustomerUseCase(customerKey: customerKey),
     );

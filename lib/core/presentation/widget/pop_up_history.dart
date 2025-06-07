@@ -39,6 +39,5 @@ Future<void> popupAddHistory(
         null;
       }
     }
-  } finally {
-  }
+  } finally {}
 }

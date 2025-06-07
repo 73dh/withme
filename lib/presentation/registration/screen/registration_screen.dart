@@ -93,10 +93,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
       ),
       if (_isReadOnly)
-        DeleteIcon(
-          viewModel: viewModel,
-          customerModel: widget.customerModel!,
-        ),
+        DeleteIcon(viewModel: viewModel, customerModel: widget.customerModel!),
     ],
   );
 
@@ -114,7 +111,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           const PartTitle(text: '소개자'),
           _buildRecommenderPart(),
           height(20),
-          if (_isReadOnly) AddPolicyButton(customerModel: widget.customerModel!),
+          if (_isReadOnly)
+            AddPolicyButton(customerModel: widget.customerModel!),
         ],
       ),
     ),
@@ -127,11 +125,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
-              _buildNameField(),
-              const Spacer(),
-              _buildSexSelector(),
-            ],
+            children: [_buildNameField(), const Spacer(), _buildSexSelector()],
           ),
           height(10),
           _buildBirthSelector(),
@@ -154,10 +148,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     ),
   );
 
-  Widget _buildNameField() => NameField(
-    isReadOnly: _isReadOnly,
-    nameController: _nameController,
-  );
+  Widget _buildNameField() =>
+      NameField(isReadOnly: _isReadOnly, nameController: _nameController);
 
   Widget _buildSexSelector() => SexSelector(
     sex: _sex,
@@ -168,69 +160,72 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget _buildBirthSelector() => BirthSelector(
     isReadOnly: _isReadOnly,
     birth: _birth,
-    onInitPressed: _isReadOnly
-        ? null
-        : () => setState(() {
-      _birth = null;
-      _birthController.clear();
-    }),
-    onSetPressed: _isReadOnly
-        ? null
-        : () async {
-      final date = await selectDate(context);
-      if (date != null) {
-        setState(() {
-          _birth = date;
-          _birthController.text = date.toString();
-        });
-      }
-    },
+    onInitPressed:
+        _isReadOnly
+            ? null
+            : () => setState(() {
+              _birth = null;
+              _birthController.clear();
+            }),
+    onSetPressed:
+        _isReadOnly
+            ? null
+            : () async {
+              final date = await selectDate(context);
+              if (date != null) {
+                setState(() {
+                  _birth = date;
+                  _birthController.text = date.toString();
+                });
+              }
+            },
   );
 
   Widget _buildRegisteredDateSelector() => RegisteredDateSelector(
     isReadOnly: _isReadOnly,
-    registeredDate:
-    DateFormat('yy/MM/dd').parseStrict(_registeredDateController.text),
-    onPressed: _isReadOnly
-        ? null
-        : () async {
-      final date = await selectDate(context);
-      if (date != null) {
-        setState(() {
-          _registeredDateController.text = date.formattedDate;
-        });
-      }
-    },
+    registeredDate: DateFormat(
+      'yy/MM/dd',
+    ).parseStrict(_registeredDateController.text),
+    onPressed:
+        _isReadOnly
+            ? null
+            : () async {
+              final date = await selectDate(context);
+              if (date != null) {
+                setState(() {
+                  _registeredDateController.text = date.formattedDate;
+                });
+              }
+            },
   );
 
   Widget _buildRecommenderSwitch() => ListTile(
     contentPadding: EdgeInsets.zero,
-    title: Text(
-      '소개자 ${_isReadOnly ? '' : '(선택)'}',
-      style: TextStyles.normal14,
-    ),
+    title: Text('소개자 ${_isReadOnly ? '' : '(선택)'}', style: TextStyles.normal14),
     trailing: Switch.adaptive(
       value: _isRecommended,
-      onChanged: _isReadOnly
-          ? null
-          : (val) => setState(() {
-        _isRecommended = val;
-        if (!val) _recommendedController.clear();
-      }),
+      onChanged:
+          _isReadOnly
+              ? null
+              : (val) => setState(() {
+                _isRecommended = val;
+                if (!val) _recommendedController.clear();
+              }),
     ),
   );
 
-  Widget _buildRecommenderField() => _isReadOnly
-      ? Align(
-    alignment: Alignment.centerLeft,
-    child: Text(_recommendedController.text),
-  )
-      : CustomTextFormField(
-    controller: _recommendedController,
-    hintText: '소개자 이름',
-    validator: (text) => text.isEmpty ? '소개자 이름을 입력하세요' : null,
-    onSaved: (text) => _recommendedController.text = text.trim(),
-  );
+  Widget _buildRecommenderField() =>
+      _isReadOnly
+          ? Align(
+            alignment: Alignment.centerLeft,
+            child: Text(_recommendedController.text),
+          )
+          : CustomTextFormField(
+            controller: _recommendedController,
+            hintText: '소개자 이름',
+            validator: (text) => text.isEmpty ? '소개자 이름을 입력하세요' : null,
+            onSaved: (text) => _recommendedController.text = text.trim(),
+          );
 
   Widget _buildSubmitButton() {
     bool isRegistering = false;
@@ -243,65 +238,80 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (context) => StatefulBuilder(
-              builder: (context, setModalState) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    height(15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isRegistering) const MyCircularIndicator(),
-                        ConfirmBoxText(
-                          text: widget.customerModel == null ? '신규등록 확인' : '수정내용 확인',
-                          size: 18,
+            builder:
+                (modalContext) => StatefulBuilder(
+                  builder:
+                      (context, setModalState) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 20,
                         ),
-                      ],
-                    ),
-                    height(10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ConfirmBoxText(
-                          text: '등록자: ',
-                          text2: ' ${_nameController.text} ($_sex)',
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            height(15),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (isRegistering) const MyCircularIndicator(),
+                                ConfirmBoxText(
+                                  text:
+                                      widget.customerModel == null
+                                          ? '신규등록 확인'
+                                          : '수정내용 확인',
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                            height(10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ConfirmBoxText(
+                                  text: '등록자: ',
+                                  text2: ' ${_nameController.text} ($_sex)',
+                                ),
+                                ConfirmBoxText(
+                                  text: '생년월일: ',
+                                  text2:
+                                      _birthController.text.isEmpty
+                                          ? '추후입력'
+                                          : _birth?.formattedDate,
+                                ),
+                                ConfirmBoxText(
+                                  text: '소개자: ',
+                                  text2:
+                                      _recommendedController.text.isEmpty
+                                          ? '없음'
+                                          : _recommendedController.text,
+                                ),
+                                ConfirmBoxText(
+                                  text: '등록일: ',
+                                  text2: _registeredDateController.text,
+                                ),
+                                if (widget.customerModel == null)
+                                  ConfirmBoxText(
+                                    text2: _historyController.text,
+                                  ),
+                              ],
+                            ),
+                            height(20),
+                            RenderFilledButton(
+                              text: widget.customerModel == null ? '등록' : '수정',
+                              onPressed: () async {
+                                setModalState(() => isRegistering = true);
+                                await _submitForm();
+                                if (modalContext.mounted) {
+                                  modalContext.pop(); // Close bottom sheet
+                                }
+                                // setModalState(() => isRegistering = false);
+                              },
+                              foregroundColor: Colors.white,
+                            ),
+                          ],
                         ),
-                        ConfirmBoxText(
-                          text: '생년월일: ',
-                          text2: _birthController.text.isEmpty ? '추후입력' : _birth?.formattedDate,
-                        ),
-                        ConfirmBoxText(
-                          text: '소개자: ',
-                          text2: _recommendedController.text.isEmpty ? '없음' : _recommendedController.text,
-                        ),
-                        ConfirmBoxText(
-                          text: '등록일: ',
-                          text2: _registeredDateController.text,
-                        ),
-                        if (widget.customerModel == null)
-                          ConfirmBoxText(text2: _historyController.text),
-                      ],
-                    ),
-                    height(20),
-                    RenderFilledButton(
-                      text: widget.customerModel == null ? '등록' : '수정',
-                      onPressed: () async {
-                        setModalState(() => isRegistering = true);
-                        await _submitForm();
-                        if (context.mounted && context.canPop()) {
-                          context.pop();
-                          context.pop(true);
-                        }
-                        setModalState(() => isRegistering = false);
-                      },
-                      foregroundColor: Colors.white,
-                    ),
-                  ],
+                      ),
                 ),
-              ),
-            ),
           );
         }
       },
@@ -328,30 +338,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Future<void> _submitForm() async {
     final customerMap = CustomerModel.toMapForCreateCustomer(
-      customerKey: widget.customerModel?.customerKey ?? generateCustomerKey('user1'),
+      customerKey:
+          widget.customerModel?.customerKey ?? generateCustomerKey('user1'),
       name: _nameController.text,
       sex: _sex!,
       recommender: _recommendedController.text,
       birth: _birth,
-      registeredDate: DateFormat('yy/MM/dd').parseStrict(_registeredDateController.text),
+      registeredDate: DateFormat(
+        'yy/MM/dd',
+      ).parseStrict(_registeredDateController.text),
     );
 
     if (widget.customerModel == null) {
       final historyMap = HistoryModel.toMapForHistory(
+        registeredDate: DateFormat(
+          'yy/MM/dd',
+        ).parse(_registeredDateController.text),
         content: _historyController.text,
       );
-      viewModel.onEvent(
+   await   viewModel.onEvent(
         RegistrationEvent.registerCustomer(
           customerData: customerMap,
           historyData: historyMap,
         ),
       );
     } else {
-      viewModel.onEvent(
+    await  viewModel.onEvent(
         RegistrationEvent.updateCustomer(customerData: customerMap),
       );
     }
 
     await getIt<ProspectListViewModel>().refresh();
+    if (mounted) {
+      context.pop(true);
+    }
   }
 }

@@ -34,22 +34,22 @@ class SearchPage extends StatelessWidget {
               AnimatedSwitcher(
                 duration: AppDurations.duration300,
                 child:
-                viewModel.state.currentSearchOption == null
-                    ? const Align(
-                  key: ValueKey(
-                    'select_button_text',
-                  ), // key가 꼭 달라야 애니메이션이 동작함
-                  alignment: FractionalOffset(0.5, 0.33),
-                  child: Text(
-                    'Select Button',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                )
-                    : const SizedBox.shrink(
-                  key: ValueKey(
-                    'empty',
-                  ), // 다른 key를 주어야 AnimatedSwitcher가 인식
-                ),
+                    viewModel.state.currentSearchOption == null
+                        ? const Align(
+                          key: ValueKey(
+                            'select_button_text',
+                          ), // key가 꼭 달라야 애니메이션이 동작함
+                          alignment: FractionalOffset(0.5, 0.33),
+                          child: Text(
+                            'Select Button',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        )
+                        : const SizedBox.shrink(
+                          key: ValueKey(
+                            'empty',
+                          ), // 다른 key를 주어야 AnimatedSwitcher가 인식
+                        ),
               ),
               _buildDraggableFilterSheet(),
             ],
@@ -77,10 +77,7 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _buildCustomerList(BuildContext context) {
-    final bottomPadding = MediaQuery
-        .of(context)
-        .padding
-        .bottom + 100;
+    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
     final customers = viewModel.state.filteredCustomers;
     final policies = viewModel.state.filteredPolicies;
 
@@ -102,9 +99,9 @@ class SearchPage extends StatelessWidget {
       itemBuilder: (context, index) {
         final customer = customers[index];
         final item =
-        customer.policies.isEmpty
-            ? _buildProspectItem(context, customer)
-            : _buildCustomerItem(context, customer);
+            customer.policies.isEmpty
+                ? _buildProspectItem(context, customer)
+                : _buildCustomerItem(context, customer);
 
         return Padding(padding: const EdgeInsets.all(8.0), child: item);
       },
@@ -147,13 +144,13 @@ class SearchPage extends StatelessWidget {
 
   Widget _buildDraggableFilterSheet() {
     return NotificationListener<DraggableScrollableNotification>(
-      onNotification: (notification) {
-        if (notification.extent == 0.51) {
-          viewModel.getAllData();
-          return true;
-        }
-        return false;
-      },
+      // onNotification: (notification) {
+        // if (notification.extent == 0.51) {
+        //   viewModel.getAllData();
+        //   return true;
+        // }
+        // return false;
+      // },
       child: DraggableScrollableSheet(
         initialChildSize: 0.1,
         minChildSize: 0.1,
@@ -220,9 +217,11 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  Future<void> _handleAddHistory(BuildContext context,
-      dynamic histories,
-      dynamic customer,) async {
+  Future<void> _handleAddHistory(
+    BuildContext context,
+    dynamic histories,
+    dynamic customer,
+  ) async {
     await popupAddHistory(
       context,
       histories,

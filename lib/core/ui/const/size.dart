@@ -7,4 +7,5 @@ abstract interface class AppSizes {
       ).size;
 
   static final double myMenuWidth = deviceSize.width * 2 / 3;
+  static final double bottomNavIconSize = 30;
 }

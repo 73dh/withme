@@ -15,14 +15,38 @@ class ProspectListPage extends StatefulWidget {
   State<ProspectListPage> createState() => _ProspectListPageState();
 }
 
-class _ProspectListPageState extends State<ProspectListPage> {
+class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
+  PageRoute? _route; // ✅ 안전하게 캐시
 
   @override
   void initState() {
     super.initState();
     viewModel.fetchOnce(); // 처음 로드할 때 데이터 요청
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      _route = route; // ✅ 저장해두기
+      getIt<RouteObserver<PageRoute>>().subscribe(this, _route!);
+    } }
+
+  @override
+  void dispose() {
+    if (_route != null) {
+      getIt<RouteObserver<PageRoute>>().unsubscribe(this);
+    }
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // 등록화면에서 돌아왔을 때 호출됨
+    viewModel.refresh();
   }
 
   @override
@@ -38,13 +62,13 @@ class _ProspectListPageState extends State<ProspectListPage> {
             return const MyCircularIndicator();
           }
           List<CustomerModel> prospectsOrigin = snapshot.data!;
-          final prospects =
+          final filteredProspects =
               prospectsOrigin.where((e) {
                 return e.name.contains(_searchText ?? '');
               }).toList();
           return Scaffold(
-            appBar: _appBar(prospects),
-            body: _prospectList(prospects),
+            appBar: _appBar(filteredProspects.length),
+            body: _prospectList(filteredProspects),
           );
         },
       ),
@@ -94,9 +118,9 @@ class _ProspectListPageState extends State<ProspectListPage> {
     );
   }
 
-  AppBar _appBar(List<CustomerModel> prospects) {
+  AppBar _appBar(int count) {
     return AppBar(
-      title: Text('Prospect ${prospects.length}명'),
+      title: Text('Prospect $count명'),
       actions: [
         AppBarSearchWidget(
           onSubmitted: (text) {

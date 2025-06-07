@@ -19,6 +19,10 @@ import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
+  SearchPageViewModel(){
+    getAllData();
+  }
+
   SearchPageState _state = SearchPageState();
 
   SearchPageState get state => _state;

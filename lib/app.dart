@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/router/router.dart';
 
+import 'core/di/setup.dart';
 import 'core/ui/theme/theme.dart';
 
 

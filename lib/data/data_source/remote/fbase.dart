@@ -18,7 +18,7 @@ class FBase {
     DocumentReference historyRef =
         customerRef.collection(collectionHistories).doc();
 
-  await  FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(customerRef, customerData);
       tx.set(historyRef, historyData);
     });
@@ -66,8 +66,6 @@ class FBase {
         .collection(collectionHistories)
         .snapshots();
   }
-
-
 
   Future<void> addHistory({
     required String userKey,

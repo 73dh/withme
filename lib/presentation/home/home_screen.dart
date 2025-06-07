@@ -1,4 +1,5 @@
 import 'package:withme/core/ui/const/duration.dart';
+import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/ui/icon/const.dart';
 
 import '../../core/di/di_setup_import.dart';
@@ -24,6 +25,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _onItemTapped(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: AppDurations.duration100,
+      curve: Curves.easeIn,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,76 +48,41 @@ class _HomeScreenState extends State<HomeScreen> {
               .toWidget;
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: switch (HomeMenu.values[currentIndex]) {
-          HomeMenu.prospect => () async {
-            final result = await context.push(RoutePath.registration);
-            if (result == true) {
-              await getIt<ProspectListViewModel>().fetchOnce();
-            }
-          },
-          HomeMenu.customer => () async {
-            final result = await context.push(RoutePath.registration);
-            if (result == true) {
-              await getIt<CustomerListViewModel>().fetchOnce();
-            }
-          },
-          _ => null,
-        },
+      floatingActionButton:
+          currentIndex == HomeMenu.prospect.index
+              ? FloatingActionButton(
+                onPressed: () async {
+                  await context.push(RoutePath.registration);
+                },
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Image.asset(IconsPath.personAdd),
+                ),
+              )
+              : null,
 
-        // currentIndex != 3
-        //     ? () async {
-        //       bool? result = await context.push(RoutePath.registration);
-        //
-        //       if (result != null && result) {
-        //         await getIt<ProspectListViewModel>().refresh();
-        //         print('result: $result');
-        //       }
-        //     }
-        //     : null,
-        child: SizedBox(
-          width: 24,
-          height: 24,
-          child:
-              currentIndex != 3
-                  ? Image.asset(IconsPath.personAdd)
-                  : Text('진도율'),
-        ),
-      ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
 
-      bottomNavigationBar: BottomAppBar(
-        notchMargin: 10,
-        height: 65,
-        clipBehavior: Clip.antiAlias,
-        child: Container(
-          color: Colors.transparent,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ...HomeMenu.values.map((menu) {
-                return GestureDetector(
-                  onTap: () {
-                    _pageController.animateToPage(
-                      menu.index,
-                      duration: AppDurations.duration100,
-                      curve: Curves.easeIn,
-                    );
-                  },
-                  child: Image.asset(
-                    menu.iconPath,
-                    color:
-                        menu.index == currentIndex
-                            ? Colors.black87
-                            : Colors.grey,
-                  ),
-                );
-              }),
-              const SizedBox(width: 30),
-            ],
-          ),
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: _onItemTapped,
+        selectedFontSize: 0,
+        unselectedFontSize: 0,
+        items:
+            HomeMenu.values.map((menu) {
+              return BottomNavigationBarItem(
+                icon: Image.asset(
+                  menu.iconPath,
+                  width: AppSizes.bottomNavIconSize,
+                  height: AppSizes.bottomNavIconSize,
+                  color:
+                      menu.index == currentIndex ? Colors.black87 : Colors.grey,
+                ),
+                label: '',
+              );
+            }).toList(),
       ),
     );
   }

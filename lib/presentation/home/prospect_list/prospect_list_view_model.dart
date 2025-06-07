@@ -27,8 +27,8 @@ class ProspectListViewModel with ChangeNotifier {
   }
 
   Future<void> refresh() async {
+    await Future.delayed(const Duration(seconds: 1));
     await _fetchData();
-    notifyListeners();
   }
 
   Future<void> _fetchData() async {
@@ -40,10 +40,27 @@ class ProspectListViewModel with ChangeNotifier {
       usecase: GetProspectsUseCase(),
     );
 
-    _cachedProspects.add(prospectCustomers);
+    print('[Fetched prospects]: ${prospectCustomers.length}');
+
+    List<CustomerModel> current = _cachedProspects.value;
+    List<CustomerModel> newList = [...prospectCustomers];
+
+    if (_isListChanged(current, newList)) {
+      print('추가 확인');
+      _cachedProspects.add(newList);
+    } else {
+      print('추가 반영 안됨');
+    }
+
     _state = state.copyWith(isLoading: false);
     notifyListeners();
   }
+  bool _isListChanged(List<CustomerModel> oldList, List<CustomerModel> newList) {
+    if (oldList.length != newList.length) return true;
+    for (int i = 0; i < oldList.length; i++) {
+      if (oldList[i].customerKey != newList[i].customerKey) return true;
+    }
+    return false;}
 
   @override
   void dispose() {
