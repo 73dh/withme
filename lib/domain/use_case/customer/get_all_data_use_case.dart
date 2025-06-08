@@ -8,48 +8,34 @@ import '../../model/policy_model.dart';
 import '../base/base_use_case.dart';
 import '../history/get_histories_use_case.dart';
 import '../policy/get_policies_use_case.dart';
-import 'get_all_use_case.dart';
 
 class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
   @override
   Future<List<CustomerModel>> call(CustomerRepository repository) async {
-    final originalCustomers =
-        await getIt<CustomerUseCase>().call(usecase: GetAllUseCase()).first
-            ;
-    final historyFutures = <Future<List<HistoryModel>>>[];
-    final policyFutures = <Future<List<PolicyModel>>>[];
+    final customerRepository = getIt<CustomerRepository>();
+    final historyUseCase = getIt<HistoryUseCase>();
+    final policyUseCase = getIt<PolicyUseCase>();
 
-    for (var customer in originalCustomers) {
-      final historyFuture =
-          getIt<HistoryUseCase>()
-              .call(
-                usecase: GetHistoriesUseCase(customerKey: customer.customerKey),
-              )
-              .first;
+    // Step 1: 모든 고객 데이터 가져오기
+    final originalCustomers = await customerRepository.getAll().first;
 
-      final policyFuture =
-          getIt<PolicyUseCase>()
-              .call(
-                usecase: GetPoliciesUseCase(customerKey: customer.customerKey),
-              )
-              .first;
+    // Step 2: history 및 policy를 병렬로 요청
+    final futures = originalCustomers.map((customer) async {
+      final histories = await historyUseCase
+          .call(usecase: GetHistoriesUseCase(customerKey: customer.customerKey))
+          .first;
 
-      // Future 객체 자체를 리스트에 추가
-      historyFutures.add(historyFuture );
-      policyFutures.add(policyFuture );
-    }
+      final policies = await policyUseCase
+          .call(usecase: GetPoliciesUseCase(customerKey: customer.customerKey))
+          .first;
 
-    // 모든 Future 결과를 기다림
-    final historiesList = await Future.wait(historyFutures);
-    final policiesList = await Future.wait(policyFutures);
-
-    // 각 customer에 해당하는 history, policy 붙이기
-    final updatedCustomers = List.generate(originalCustomers.length, (i) {
-      return originalCustomers[i].copyWith(
-        histories: historiesList[i],
-        policies: policiesList[i],
+      return customer.copyWith(
+        histories: histories,
+        policies: policies,
       );
     });
-    return updatedCustomers;
+
+    // Step 3: 병렬 처리된 고객 목록 반환
+    return await Future.wait(futures);
   }
 }

@@ -53,20 +53,20 @@ class CustomerScreen extends StatelessWidget {
                     if (snapshot.hasError) {
                       log(snapshot.error.toString());
                     }
-                    if(!snapshot.hasData){
+                    if (!snapshot.hasData) {
                       return const MyCircularIndicator();
                     }
-                      List<PolicyModel> policies = snapshot.data!;
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _policyInfo(policies[index]),
-                          );
-                        },
-                        itemCount: policies.length,
-                      );
+                    List<PolicyModel> policies = snapshot.data!;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: _policyInfo(policies[index]),
+                        );
+                      },
+                      itemCount: policies.length,
+                    );
                   },
                 ),
               ),
@@ -128,22 +128,21 @@ class CustomerScreen extends StatelessWidget {
                   customer.customerKey,
                 ),
                 builder: (context, snapshot) {
-                  if(!snapshot.hasData){
+                  if (!snapshot.hasData) {
                     return const MyCircularIndicator();
                   }
-                    List<HistoryModel> histories = snapshot.data!;
-                    return HistoryPartWidget(
-                      histories: histories,
-                      onTap: (histories) {
-                        popupAddHistory(
-                          context,
-                          histories,
-                          customer,
-                          HistoryContent.title.toString(),
-                        );
-                      },
-                    );
-
+                  List<HistoryModel> histories = snapshot.data!;
+                  return HistoryPartWidget(
+                    histories: histories,
+                    onTap: (histories) {
+                      popupAddHistory(
+                        context,
+                        histories,
+                        customer,
+                        HistoryContent.title.toString(),
+                      );
+                    },
+                  );
                 },
               ),
             ],
@@ -204,7 +203,7 @@ class CustomerScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '보험료: ${numFormatter.format(int.parse(policy.premium))} (${policy.paymentMethod})',
+                  '보험료: ${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))} (${policy.paymentMethod})',
                   style:
                       policy.policyState == '해지'
                           ? TextStyles.cancelStyle

@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/domain/enum/home_menu.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
+import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/presentation/registration/components/add_policy_button.dart';
@@ -248,7 +250,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
       await getIt<ProspectListViewModel>().fetchData(force: true);
     }
-
     if (mounted) {
       context.pop(true);
     }

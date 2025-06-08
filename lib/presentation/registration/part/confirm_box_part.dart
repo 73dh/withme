@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
@@ -86,10 +85,16 @@ class ConfirmBoxPart extends StatelessWidget {
           ],
         ),
         if (isRegistering)
-          const Positioned(
+           Positioned(
             left: 10,
             top: 10,
-            child: MyCircularIndicator(size: 10),
+            child: Row(
+              children: [
+                Text('저장중'),
+                width(5),
+                MyCircularIndicator(size: 10),
+              ],
+            ),
           ),
       ],
     );

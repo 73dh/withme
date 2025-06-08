@@ -6,7 +6,6 @@ import 'package:withme/presentation/home/prospect_list/prospect_list_state.dart'
 
 import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
-import '../../../domain/use_case/customer/get_prospects_use_case.dart';
 
 class ProspectListViewModel with ChangeNotifier {
   ProspectListState _state = ProspectListState();
@@ -35,9 +34,15 @@ class ProspectListViewModel with ChangeNotifier {
 
   Future<void> _fetchData(bool force) async {
     await Future.delayed(const Duration(seconds: 1));
-    final prospectCustomers = await getIt<CustomerUseCase>().execute(
-      usecase: GetProspectsUseCase(),
+    // final prospectCustomers = await getIt<CustomerUseCase>().execute(
+    //   usecase: GetProspectsUseCase(),
+    // );
+    //
+
+    List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
+      usecase: GetAllDataUseCase(),
     );
+final prospectCustomers=allCustomers.where((e)=>e.policies.isEmpty).toList();
 
     print('[Fetched prospects]: ${prospectCustomers.length}');
 

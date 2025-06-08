@@ -34,10 +34,14 @@ class CustomerListViewModel with ChangeNotifier {
     // _state = state.copyWith(isLoading: true);
     // notifyListeners();
 
-    final customers = await getIt<CustomerUseCase>().execute(
-      usecase: GetCustomersUseCase(),
+    List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
+      usecase: GetAllDataUseCase(),
     );
-    _cachedCustomers.add(customers);
+    final policyCustomers=allCustomers.where((e)=>e.policies.isNotEmpty).toList();
+    // final customers = await getIt<CustomerUseCase>().execute(
+    //   usecase: GetCustomersUseCase(),
+    // );
+    _cachedCustomers.add(policyCustomers);
     // _state = state.copyWith(isLoading: false);
     // notifyListeners();
   }

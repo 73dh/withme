@@ -125,7 +125,7 @@ class SearchPage extends StatelessWidget {
           Navigator.of(context).pop();
         }
 
-        await viewModel.getAllData();
+        // await viewModel.getAllData();
         await UpdateSearchedCustomersUseCase.call(viewModel);
       },
       child: ProspectItem(
@@ -144,13 +144,6 @@ class SearchPage extends StatelessWidget {
 
   Widget _buildDraggableFilterSheet() {
     return NotificationListener<DraggableScrollableNotification>(
-      // onNotification: (notification) {
-        // if (notification.extent == 0.51) {
-        //   viewModel.getAllData();
-        //   return true;
-        // }
-        // return false;
-      // },
       child: DraggableScrollableSheet(
         initialChildSize: 0.1,
         minChildSize: 0.1,
@@ -172,10 +165,15 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
               if (viewModel.state.isLoadingAllData)
-                const Positioned(
+                 Positioned(
                   top: 15,
                   left: 20,
-                  child: MyCircularIndicator(size: 10),
+                  child: Row(
+                    children: [
+                      Text('업데이트중'),width(5),
+                      MyCircularIndicator(size: 10),
+                    ],
+                  ),
                 ),
             ],
           );
@@ -189,7 +187,7 @@ class SearchPage extends StatelessWidget {
       controller: controller,
       children: [
         _buildDragHandle(),
-        height(16),
+        height(17),
         NoContactFilterButton(viewModel: viewModel),
         height(5),
         ComingBirthFilterButton(viewModel: viewModel),

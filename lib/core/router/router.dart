@@ -8,7 +8,7 @@ import 'package:withme/presentation/registration/screen/registration_screen.dart
 import 'package:withme/presentation/splash/splash_screen.dart';
 
 import '../../domain/model/customer_model.dart';
-import '../../presentation/policy/policy_screen.dart';
+import '../../presentation/policy/screen/policy_screen.dart';
 
 final router = GoRouter(
   initialLocation: RoutePath.splash,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
@@ -13,13 +14,15 @@ import 'package:withme/presentation/home/search/search_page_state.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
+import '../../../domain/model/history_model.dart';
+import '../../../domain/model/policy_model.dart';
 import 'enum/coming_birth.dart';
 import 'enum/no_contact_month.dart';
 import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
-  SearchPageViewModel(){
+  SearchPageViewModel() {
     getAllData();
   }
 
@@ -57,25 +60,42 @@ class SearchPageViewModel with ChangeNotifier {
     _state = state.copyWith(isLoadingAllData: true);
     notifyListeners();
 
-    List<CustomerModel> customersAllData = await getIt<CustomerUseCase>()
-        .execute(usecase: GetAllDataUseCase());
+    final stopwatch = Stopwatch()..start();
 
-    List<String> contractMonths = customersAllData
-        .expand((e) => e.policies)
-        .map((policy) => policy.startDate)
-        .whereType<DateTime>()
-        .map((date) => "${date.year}-${date.month.toString().padLeft(2, '0')}")
-        .toSet()
-        .toList()
-      ..sort();
+    final customersAllData = await getIt<CustomerUseCase>()
+        .execute(usecase: GetAllDataUseCase());
+    final customers = List<CustomerModel>.from(customersAllData);
+
+    // 병렬 처리로 성능 개선
+    final policiesFuture = compute<List<CustomerModel>, List<PolicyModel>>(
+      _extractPolicies,
+      customers,
+    );
+    final historiesFuture = compute<List<CustomerModel>, List<HistoryModel>>(
+      _extractHistories,
+      customers,
+    );
+    final contractMonthsFuture = compute<List<CustomerModel>, List<String>>(
+      _extractContractMonths,
+      customers,
+    );
+
+    final results = await Future.wait([
+      policiesFuture,
+      historiesFuture,
+      contractMonthsFuture,
+    ]);
+
     _state = state.copyWith(
-      customers: customersAllData,
-      histories: customersAllData.expand((e) => e.histories).toList(),
-      policies: customersAllData.expand((e) => e.policies).toList(),
-      contractMonths:contractMonths,
+      customers: customers,
+      policies: results[0] as List<PolicyModel>,
+      histories: results[1] as List<HistoryModel>,
+      contractMonths: results[2] as List<String>,
       isLoadingAllData: false,
     );
+
     notifyListeners();
+    debugPrint('getAllData took: ${stopwatch.elapsedMilliseconds}ms');
   }
 
   Future<void> _filterNoRecentHistoryCustomers({
@@ -95,7 +115,6 @@ class SearchPageViewModel with ChangeNotifier {
 
   Future<void> _filterComingBirth({required ComingBirth birthOption}) async {
     final result = await FilterComingBirthUseCase.call(state.customers);
-
     final filtered = result[birthOption] ?? [];
 
     _state = state.copyWith(
@@ -147,7 +166,6 @@ class SearchPageViewModel with ChangeNotifier {
   void _filterPolicy({
     required ProductCategory productCategory,
     required InsuranceCompany insuranceCompany,
-
   }) async {
     final filtered = await FilterPolicyUseCase.call(
       contractMonth: state.selectedContractMonth,
@@ -161,4 +179,23 @@ class SearchPageViewModel with ChangeNotifier {
     );
     notifyListeners();
   }
+}
+
+// compute에 사용될 함수들
+List<PolicyModel> _extractPolicies(List<CustomerModel> customers) =>
+    customers.expand((e) => e.policies).toList();
+
+List<HistoryModel> _extractHistories(List<CustomerModel> customers) =>
+    customers.expand((e) => e.histories).toList();
+
+List<String> _extractContractMonths(List<CustomerModel> customers) {
+  final months = customers
+      .expand((e) => e.policies)
+      .map((policy) => policy.startDate)
+      .whereType<DateTime>()
+      .map((date) => '${date.year}-${date.month.toString().padLeft(2, '0')}')
+      .toSet()
+      .toList();
+  months.sort();
+  return months;
 }
