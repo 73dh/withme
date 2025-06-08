@@ -33,7 +33,6 @@ class FBase {
         .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerData[keyCustomerKey]);
-
     await customerRef.update(customerData);
   }
 

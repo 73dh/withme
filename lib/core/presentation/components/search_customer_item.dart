@@ -65,7 +65,7 @@ class SearchCustomerItem extends StatelessWidget {
               children: [
                 CircleItem(
                   number: policies.length,
-                  color: Colors.redAccent.shade100,
+                  sex: customer.sex,
                 ),
                 width(20),
                 Column(

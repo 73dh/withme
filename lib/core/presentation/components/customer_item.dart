@@ -59,7 +59,7 @@ class CustomerItem extends StatelessWidget {
                   children: [
                     CircleItem(
                       number: policies.length,
-                      color: Colors.redAccent.shade100,
+                      sex:customer.sex,
                     ),
                     width(20),
                     Column(
@@ -83,16 +83,16 @@ class CustomerItem extends StatelessWidget {
         ).difference(DateTime.now()).inDays;
     return Row(
       children: [
-        Text(shortenedNameText(customer.name), style: TextStyles.bold14),
+        Text(shortenedNameText(customer.name,length: 6), style: TextStyles.bold14),
         width(5),
-        sexIcon(customer.sex),
-        width(5),
+        // sexIcon(customer.sex),
+        // width(5),
         Text(
-          '${calculateAge(customer.birth ?? DateTime.now())}세/보험: ${calculateInsuranceAge(customer.birth ?? DateTime.now())}세',
+          '${calculateAge(customer.birth ?? DateTime.now())}세',
         ),
         width(3),
         Text(
-          '상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
+          ' /상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
           style: TextStyle(
             color: difference <= 90 ? Colors.red : Colors.black87,
           ),

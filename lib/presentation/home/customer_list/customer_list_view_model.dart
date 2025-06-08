@@ -30,16 +30,16 @@ class CustomerListViewModel with ChangeNotifier {
   }
 
   Future<void> _fetchData() async {
-    if (_state.isLoading) return;
-    _state = state.copyWith(isLoading: true);
-    notifyListeners();
+    // if (_state.isLoading) return;
+    // _state = state.copyWith(isLoading: true);
+    // notifyListeners();
 
     final customers = await getIt<CustomerUseCase>().execute(
       usecase: GetCustomersUseCase(),
     );
     _cachedCustomers.add(customers);
-    _state = state.copyWith(isLoading: false);
-    notifyListeners();
+    // _state = state.copyWith(isLoading: false);
+    // notifyListeners();
   }
 
   @override

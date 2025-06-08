@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/presentation/components/sex_widget.dart';
 
 import '../../ui/text_style/text_styles.dart';
 
 
 class CircleItem extends StatelessWidget {
   final int number;
-  final Color? color;
   final double size;
-  const CircleItem({super.key, required this.number, required this.color,  this.size=30});
+  final String sex;
+  const CircleItem({super.key, required this.number,   this.size=30, required this.sex});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: color,
+        color:getSexBackgroundColor(sex),
         borderRadius: BorderRadius.circular(size),
         boxShadow: [
           BoxShadow(

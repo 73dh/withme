@@ -34,7 +34,7 @@ class BirthSelector extends StatelessWidget {
               width: 120,
               child: FilledButton.tonal(
                 onPressed: onSetPressed,
-                child: Text(birth != null ? birth!.formattedDate : 'Birth'),
+                child: Text(birth != null ? birth!.formattedDate : '생년월일'),
               ),
             ),
           ],

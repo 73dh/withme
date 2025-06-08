@@ -74,7 +74,7 @@ class ProspectItem extends StatelessWidget {
                       height(5),
                       CircleItem(
                         number: histories.length,
-                        color: Colors.grey[300],
+                        sex:customer.sex,
                       ),
                     ],
                   ),
@@ -110,10 +110,9 @@ class ProspectItem extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(shortenedNameText(customer.name), style: TextStyles.bold14),
+            Text(shortenedNameText(customer.name,length: 6), style: TextStyles.bold14),
             width(5),
-            sexIcon(customer.sex),
-            width(5),
+
             (isDate != null)
                 ? Text(
                   '${customer.birth?.formattedBirth} (${calculateAge(customer.birth!)}세)',
@@ -133,4 +132,6 @@ class ProspectItem extends StatelessWidget {
       ],
     );
   }
+
+
 }

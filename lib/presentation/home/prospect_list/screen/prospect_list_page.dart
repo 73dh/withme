@@ -23,7 +23,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   @override
   void initState() {
     super.initState();
-    viewModel.fetchOnce(); // 처음 로드할 때 데이터 요청
+    viewModel.fetchData; // 처음 로드할 때 데이터 요청
   }
 
   @override
@@ -46,7 +46,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   @override
   void didPopNext() {
     // 등록화면에서 돌아왔을 때 호출됨
-    viewModel.refresh();
+    viewModel.fetchData;
   }
 
   @override
