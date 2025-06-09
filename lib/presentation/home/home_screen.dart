@@ -16,12 +16,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int currentIndex = 0;
+  int _currentIndex = 0;
   final _pageController = PageController();
 
   void _onPageChanged(int index) {
     setState(() {
-      currentIndex = index % 4;
+      _currentIndex = index % 4;
     });
   }
 
@@ -48,25 +48,47 @@ class _HomeScreenState extends State<HomeScreen> {
               .toWidget;
         },
       ),
-      floatingActionButton:
-          currentIndex == HomeMenu.prospect.index
-              ? FloatingActionButton(
-                onPressed: () async {
-                  await context.push(RoutePath.registration);
-                },
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: Image.asset(IconsPath.personAdd),
-                ),
-              )
-              : null,
-
-      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+      // floatingActionButton:
+      //     _currentIndex == HomeMenu.prospect.index
+      //         ? Stack(
+      //           alignment: Alignment.bottomRight,
+      //           children: [
+      //             // 위쪽 FAB
+      //             Padding(
+      //               padding: const EdgeInsets.only(bottom: 65.0, right: 4.0),
+      //               child: FloatingActionButton.small(
+      //                 heroTag: 'fabSecondary',
+      //                 onPressed: () {
+      //                   debugPrint("위쪽 FAB 클릭됨");
+      //                 },
+      //                 child: const Icon(Icons.search),
+      //               ),
+      //             ),
+      //             // 아래쪽 FAB
+      //             Padding(
+      //               padding: const EdgeInsets.only(right: 4.0),
+      //               child: FloatingActionButton(
+      //                 heroTag: 'fabMain',
+      //                 onPressed: () async {
+      //                   await context.push(RoutePath.registration);
+      //                 },
+      //                 child: SizedBox(
+      //                   width: 24,
+      //                   height: 24,
+      //                   child: Image.asset(IconsPath.personAdd),
+      //                 ),
+      //               ),
+      //             ),
+      //           ],
+      //         )
+      //         : null,
+      //
+      //
+      // floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+      // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
 
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
+        currentIndex: _currentIndex,
         onTap: _onItemTapped,
         selectedFontSize: 0,
         unselectedFontSize: 0,
@@ -78,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: AppSizes.bottomNavIconSize,
                   height: AppSizes.bottomNavIconSize,
                   color:
-                      menu.index == currentIndex ? Colors.black87 : Colors.grey,
+                      menu.index == _currentIndex ? Colors.black87 : Colors.grey,
                 ),
                 label: '',
               );

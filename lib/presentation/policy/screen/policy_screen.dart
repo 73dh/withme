@@ -287,16 +287,6 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
       return;
     }
-    // showModalBottomSheet(
-    //   context: context,
-    //   builder: (context) {
-    //     return SizedBox(
-    //       height: 300,
-    //       width: double.infinity,
-    //       child: _confirmBox(context),
-    //     );
-    //   },
-    // );
   }
 
   _confirmBox(context) {
