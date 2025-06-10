@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
+import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
@@ -21,7 +23,10 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   String? _searchText = '';
   PageRoute? _route; // ✅ 안전하게 캐시
   OverlayEntry? _fabOverlayEntry;
-  bool _fabVisible = true;
+
+  bool _fabExpanded = true; // FAB 확장 여부
+  bool _fabVisibleLocal = false;
+  void Function(void Function())? overlaySetState;
 
   @override
   void initState() {
@@ -53,60 +58,17 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
 
   @override
   void didPopNext() {
-    // 등록화면에서 돌아왔을 때 호출됨
     viewModel.fetchData;
-  }
 
-  void _insertFabOverlay() {
-    _fabOverlayEntry = OverlayEntry(
-      builder:
-          (context) => Positioned(
-            bottom: 66,
-            right: 16,
-            child: AnimatedOpacity(
-              opacity: _fabVisible ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // 🔹 작은 FAB (예: 검색)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: FloatingActionButton.small(
-                      heroTag: 'fabSecondary',
-                      onPressed: () {
-                        debugPrint("위쪽 작은 FAB 클릭됨");
-                        // 원하는 동작 수행
-                      },
-                      child: const Icon(Icons.search),
-                    ),
-                  ),
-
-                  // 🔸 큰 FAB (예: 등록)
-                  FloatingActionButton(
-                    heroTag: 'fabMain',
-                    onPressed: () async {
-                      setState(() => _fabVisible = false);
-                      await Future.delayed(AppDurations.duration300);
-                      if (context.mounted) {
-                        await context.push(RoutePath.registration);
-                      }
-                      setState(() => _fabVisible = true);
-                    },
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Image.asset(IconsPath.personAdd),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-    );
-
-    Overlay.of(context).insert(_fabOverlayEntry!);
+    // 🔁 FAB 다시 보이게 설정
+    if (_fabOverlayEntry?.mounted ?? false) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        overlaySetState?.call(() {
+          _fabVisibleLocal = true;
+          _fabExpanded = true;
+        });
+      });
+    }
   }
 
   @override
@@ -132,6 +94,21 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
           );
         },
       ),
+    );
+  }
+
+  AppBar _appBar(int count) {
+    return AppBar(
+      title: Text('Prospect $count명'),
+      actions: [
+        AppBarSearchWidget(
+          onSubmitted: (text) {
+            setState(() {
+              _searchText = text;
+            });
+          },
+        ),
+      ],
     );
   }
 
@@ -178,18 +155,55 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
     );
   }
 
-  AppBar _appBar(int count) {
-    return AppBar(
-      title: Text('Prospect $count명'),
-      actions: [
-        AppBarSearchWidget(
-          onSubmitted: (text) {
-            setState(() {
-              _searchText = text;
-            });
+  void _insertFabOverlay() {
+    _fabOverlayEntry = OverlayEntry(
+      builder: (context) {
+        overlaySetState = null; // reset
+        return StatefulBuilder(
+          builder: (context, setState) {
+            overlaySetState = setState;
+            return Stack(
+              children: [
+                SmallFab(
+                  fabExpanded: _fabExpanded,
+                  overlaySetState: (void Function() function) {
+                    overlaySetState?.call(() {
+                      _fabExpanded = !_fabExpanded;
+                    });
+                  },
+                  overlaySetStateFold: (void Function() function) {
+                    overlaySetState?.call(() {
+                      _fabExpanded = !_fabExpanded;
+                    });
+                  },
+                ),
+                MainFab(
+                  fabVisibleLocal: _fabVisibleLocal,
+                  onPressed: () async {
+                    overlaySetState?.call(() {
+                      _fabVisibleLocal = false; // MainFAB 숨김
+                      _fabExpanded = false; // SmallFAB 숨김
+                    });
+                    await Future.delayed(AppDurations.duration500);
+                    if (context.mounted) {
+                      await context.push(RoutePath.registration);
+                    }
+                    // 돌아오면 다시 나타나게 될 것 (didPopNext에서 처리)
+                  },
+                ),
+              ],
+            );
           },
-        ),
-      ],
+        );
+      },
     );
+
+    Overlay.of(context).insert(_fabOverlayEntry!);
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (overlaySetState != null) {
+        overlaySetState!(() => _fabVisibleLocal = true);
+      }
+    });
   }
 }
