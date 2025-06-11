@@ -72,10 +72,7 @@ class ProspectItem extends StatelessWidget {
                         style: TextStyles.normal12,
                       ),
                       height(5),
-                      CircleItem(
-                        number: histories.length,
-                        sex:customer.sex,
-                      ),
+                      CircleItem(number: histories.length, sex: customer.sex),
                     ],
                   ),
                   width(20),
@@ -110,7 +107,10 @@ class ProspectItem extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(shortenedNameText(customer.name,length: 6), style: TextStyles.bold14),
+            Text(
+              shortenedNameText(customer.name, length: 6),
+              style: TextStyles.bold14,
+            ),
             width(5),
 
             (isDate != null)
@@ -132,6 +132,4 @@ class ProspectItem extends StatelessWidget {
       ],
     );
   }
-
-
 }

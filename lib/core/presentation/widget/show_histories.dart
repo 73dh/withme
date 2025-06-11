@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/presentation/components/custom_text_form_field.dart';
+import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/widget/history_button.dart';
 import 'package:withme/core/presentation/widget/select_history_menu.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/history_model.dart';
-
-import '../../ui/text_style/text_styles.dart';
 
 class CommonDialog {
   final MenuController menuController;
@@ -27,7 +25,7 @@ class CommonDialog {
       }
     });
     return await showModalBottomSheet<String>(
-      context: context,
+      context: Overlay.of(context).context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
@@ -44,12 +42,14 @@ class CommonDialog {
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1), // 연한 검정색
                       blurRadius: 12, // 퍼짐 정도
-                      offset: Offset(0, -4), // 위쪽에서 퍼지도록 설정
+                      offset: const Offset(0, -4), // 위쪽에서 퍼지도록 설정
                     ),
                   ],
                 ),

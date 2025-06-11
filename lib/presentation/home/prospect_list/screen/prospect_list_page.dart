@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/scheduler.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/presentation/home/prospect_list/components/fab_container.dart';
 import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
@@ -22,25 +23,36 @@ class ProspectListPage extends StatefulWidget {
 class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
-  PageRoute? _route; // ✅ 안전하게 캐시
+  PageRoute? _route;
   OverlayEntry? _fabOverlayEntry;
 
-  bool _fabExpanded = true; // FAB 확장 여부
+  bool _fabExpanded = true;
   bool _fabVisibleLocal = false;
   void Function(void Function())? overlaySetState;
+
+  bool _fabOverlayInserted = false;
 
   @override
   void initState() {
     super.initState();
     viewModel.fetchData();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _insertFabOverlay(); // FAB 삽입
-    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+
+
+    if (!_fabOverlayInserted) {
+      // SchedulerBinding을 활용해 빌드 완료 후 가장 안전한 시점에 실행
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _insertFabOverlay();
+        _fabOverlayInserted = true;
+      });
+    }
+
     final route = ModalRoute.of(context);
     if (route is PageRoute) {
       _route = route;
@@ -64,26 +76,27 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   void didPopNext() {
     viewModel.fetchData();
     log('📌 didPopNext 호출됨, FAB 다시 삽입 시도');
-    _insertFabOverlay(); // insertFabOverlay 내부에서 PostFrameCallback 처리
+    _insertFabOverlay();
   }
+
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: StreamBuilder(
+      child: StreamBuilder<List<CustomerModel>>(
         stream: viewModel.cachedProspects,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             log(snapshot.error.toString());
           }
-          if (!snapshot.hasData ) {
+          if (!snapshot.hasData) {
             return const MyCircularIndicator();
           }
           List<CustomerModel> prospectsOrigin = snapshot.data!;
-          final filteredProspects =
-              prospectsOrigin.where((e) {
-                return e.name.contains(_searchText ?? '');
-              }).toList();
+          final filteredProspects = prospectsOrigin
+              .where((e) => e.name.contains(_searchText ?? ''))
+              .toList();
+
           return Scaffold(
             appBar: _appBar(filteredProspects.length),
             body: _prospectList(filteredProspects),
@@ -132,13 +145,18 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                     },
                     child: ProspectItem(
                       customer: prospects[index],
-                      onTap: (histories) {
-                        popupAddHistory(
+                      onTap: (histories) async {
+                        _fabOverlayEntry?.remove();
+                     bool? result=   await popupAddHistory(
                           context,
                           histories,
                           prospects[index],
                           HistoryContent.title.toString(),
                         );
+                     if(result ==true){
+
+                        _insertFabOverlay();
+                     }
                       },
                     ),
                   ),
@@ -152,15 +170,18 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   }
 
   void _insertFabOverlay() {
-    // 기존 entry 제거
     _fabOverlayEntry?.remove();
     _fabOverlayEntry = null;
 
     _fabVisibleLocal = false;
     _fabExpanded = false;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final overlay = Overlay.of(context);
+    // 다시 한번 FrameCallback으로 삽입 안전시점 보장
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      OverlayState overlay = Overlay.of(context,rootOverlay: true);
+
 
       _fabOverlayEntry = OverlayEntry(
         builder: (context) {
@@ -213,10 +234,11 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
       overlay.insert(_fabOverlayEntry!);
 
       Future.delayed(const Duration(milliseconds: 200), () {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        SchedulerBinding.instance.addPostFrameCallback((_) {
           overlaySetState?.call(() {
             _fabVisibleLocal = true;
-            _fabExpanded = true;
+            _fabExpanded = false;
           });
         });
       });

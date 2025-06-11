@@ -7,7 +7,7 @@ import '../../../domain/use_case/history/add_history_use_case.dart';
 import '../../../domain/use_case/history_use_case.dart';
 import '../../di/setup.dart';
 
-Future<void> popupAddHistory(
+Future<bool?> popupAddHistory(
   BuildContext context,
   List<HistoryModel> histories,
   CustomerModel prospect,
@@ -39,5 +39,7 @@ Future<void> popupAddHistory(
         null;
       }
     }
-  } finally {}
+  } finally {
+    return true;
+  }
 }
