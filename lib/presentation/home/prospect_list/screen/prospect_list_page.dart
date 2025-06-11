@@ -76,7 +76,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
           if (snapshot.hasError) {
             log(snapshot.error.toString());
           }
-          if (!snapshot.hasData || viewModel.state.isLoading == true) {
+          if (!snapshot.hasData ) {
             return const MyCircularIndicator();
           }
           List<CustomerModel> prospectsOrigin = snapshot.data!;
@@ -175,7 +175,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                     children: [
                       FabContainer(
                         fabVisibleLocal: _fabVisibleLocal,
-                        rightPosition: 24,
+                        rightPosition: 16,
                         bottomPosition: 132,
                         child: SmallFab(
                           fabExpanded: _fabExpanded,
