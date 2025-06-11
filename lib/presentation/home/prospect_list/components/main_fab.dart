@@ -16,20 +16,16 @@ class MainFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 66,
-      right: 16,
-      child: AnimatedOpacity(
-        opacity: fabVisibleLocal ? 1.0 : 0.0,
-        duration: AppDurations.duration500,
-        child: FloatingActionButton(
-          heroTag: 'fabMain',
-          onPressed: onPressed,
-          child: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset(IconsPath.personAdd),
-          ),
+    return AnimatedOpacity(
+      opacity: fabVisibleLocal ? 1.0 : 0.0,
+      duration: AppDurations.duration500,
+      child: FloatingActionButton(
+        heroTag: 'fabMain',
+        onPressed: onPressed,
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: Image.asset(IconsPath.personAdd),
         ),
       ),
     );

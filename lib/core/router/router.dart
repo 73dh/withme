@@ -9,14 +9,20 @@ import 'package:withme/presentation/splash/splash_screen.dart';
 
 import '../../domain/model/customer_model.dart';
 import '../../presentation/policy/screen/policy_screen.dart';
+import '../di/setup.dart';
 
 final router = GoRouter(
   initialLocation: RoutePath.splash,
+  // ✅ 필수!
+  observers: [getIt<RouteObserver<PageRoute>>()],
   routes: [
     GoRoute(builder: (_, __) => const SplashScreen(), path: RoutePath.splash),
-    GoRoute(path: RoutePath.home,pageBuilder: (context,state){
-      return _fadePage(child: HomeScreen(), state: state);
-    }, ),
+    GoRoute(
+      path: RoutePath.home,
+      pageBuilder: (context, state) {
+        return _fadePage(child: HomeScreen(), state: state);
+      },
+    ),
     GoRoute(
       path: RoutePath.registration,
       pageBuilder: (context, state) {

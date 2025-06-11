@@ -15,6 +15,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: theme,
+
     );
   }
 }

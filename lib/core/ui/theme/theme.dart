@@ -20,7 +20,7 @@ final theme = ThemeData(
     showUnselectedLabels: false,),
 
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Colors.amber.shade50,
+    backgroundColor:ColorStyles.fabColor,
     shape: const CircleBorder(),
   ),
 );
