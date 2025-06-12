@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,44 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
               .toWidget;
         },
       ),
-      // floatingActionButton:
-      //     _currentIndex == HomeMenu.prospect.index
-      //         ? Stack(
-      //           alignment: Alignment.bottomRight,
-      //           children: [
-      //             // 위쪽 FAB
-      //             Padding(
-      //               padding: const EdgeInsets.only(bottom: 65.0, right: 4.0),
-      //               child: FloatingActionButton.small(
-      //                 heroTag: 'fabSecondary',
-      //                 onPressed: () {
-      //                   debugPrint("위쪽 FAB 클릭됨");
-      //                 },
-      //                 child: const Icon(Icons.search),
-      //               ),
-      //             ),
-      //             // 아래쪽 FAB
-      //             Padding(
-      //               padding: const EdgeInsets.only(right: 4.0),
-      //               child: FloatingActionButton(
-      //                 heroTag: 'fabMain',
-      //                 onPressed: () async {
-      //                   await context.push(RoutePath.registration);
-      //                 },
-      //                 child: SizedBox(
-      //                   width: 24,
-      //                   height: 24,
-      //                   child: Image.asset(IconsPath.personAdd),
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         )
-      //         : null,
-      //
-      //
-      // floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

@@ -27,8 +27,11 @@ class ProspectItem extends StatelessWidget {
 
   const ProspectItem({super.key, required this.customer, required this.onTap});
 
+
   @override
   Widget build(BuildContext context) {
+    List<HistoryModel> histories = customer.histories;
+    histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
     return IntrinsicHeight(
       child: StreamBuilder(
         stream: getIt<HistoryUseCase>().call(
@@ -39,7 +42,7 @@ class ProspectItem extends StatelessWidget {
             log(snapshot.error.toString());
           }
           if (!snapshot.hasData) {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
           List<HistoryModel> histories = snapshot.data!;
           histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
@@ -93,14 +96,17 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
+
   Widget _namePart() {
     DateTime? isDate = customer.birth?.toLocal();
     int difference =
-        customer.birth != null
-            ? getInsuranceAgeChangeDate(
-              customer.birth!,
-            ).difference(DateTime.now()).inDays
-            : 0;
+    customer.birth != null
+        ? getInsuranceAgeChangeDate(
+      customer.birth!,
+    )
+        .difference(DateTime.now())
+        .inDays
+        : 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -115,14 +121,16 @@ class ProspectItem extends StatelessWidget {
 
             (isDate != null)
                 ? Text(
-                  '${customer.birth?.formattedBirth} (${calculateAge(customer.birth!)}세)',
-                )
+              '${customer.birth?.formattedBirth} (${calculateAge(
+                  customer.birth!)}세)',
+            )
                 : const SizedBox.shrink(),
           ],
         ),
         Text(
           customer.birth?.toLocal() != null
-              ? '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}'
+              ? '상령일: ${getInsuranceAgeChangeDate(customer.birth!)
+              .formattedDate}'
               : '',
           style: TextStyle(
             color: difference <= 90 ? Colors.red : Colors.black87,

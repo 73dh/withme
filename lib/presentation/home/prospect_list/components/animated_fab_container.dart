@@ -1,21 +1,25 @@
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 
-class MainFab extends StatefulWidget {
+class AnimatedFabContainer extends StatefulWidget {
   final bool fabVisibleLocal;
-  final VoidCallback? onPressed;
+  final Widget child;
+  final double? rightPosition;
+  final double? bottomPosition;
 
-  const MainFab({
+  const AnimatedFabContainer({
     super.key,
     required this.fabVisibleLocal,
-    this.onPressed,
+    required this.child,
+    required this.rightPosition,
+    required this.bottomPosition,
   });
 
   @override
-  State<MainFab> createState() => _MainFabState();
+  State<AnimatedFabContainer> createState() => _AnimatedFabContainerState();
 }
 
-class _MainFabState extends State<MainFab>
+class _AnimatedFabContainerState extends State<AnimatedFabContainer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
@@ -37,7 +41,7 @@ class _MainFabState extends State<MainFab>
   }
 
   @override
-  void didUpdateWidget(covariant MainFab oldWidget) {
+  void didUpdateWidget(covariant AnimatedFabContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.fabVisibleLocal) {
       _controller.forward();
@@ -54,18 +58,14 @@ class _MainFabState extends State<MainFab>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacity,
-      child: ScaleTransition(
-        scale: _scale,
-        child: FloatingActionButton(
-          heroTag: 'fabMain',
-          onPressed: widget.onPressed,
-          child: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset(IconsPath.personAdd),
-          ),
+    return Positioned(
+      right: widget.rightPosition,
+      bottom: widget.bottomPosition,
+      child: FadeTransition(
+        opacity: _opacity,
+        child: ScaleTransition(
+          scale: _scale,
+          child: widget.child,
         ),
       ),
     );
