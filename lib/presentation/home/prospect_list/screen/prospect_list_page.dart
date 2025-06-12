@@ -1,11 +1,9 @@
 import 'dart:developer';
-
 import 'package:flutter/scheduler.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/presentation/home/prospect_list/components/fab_container.dart';
 import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
 import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
-
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
@@ -24,13 +22,13 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
   PageRoute? _route;
-  OverlayEntry? _fabOverlayEntry;
 
+  OverlayEntry? _fabOverlayEntry;
   bool _fabExpanded = true;
   bool _fabVisibleLocal = false;
-  void Function(void Function())? overlaySetState;
-
   bool _fabOverlayInserted = false;
+  bool _fabCanShow = true;
+  void Function(void Function())? overlaySetState;
 
   @override
   void initState() {
@@ -42,43 +40,32 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-
-
-    if (!_fabOverlayInserted) {
-      // SchedulerBinding을 활용해 빌드 완료 후 가장 안전한 시점에 실행
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        _insertFabOverlay();
-        _fabOverlayInserted = true;
-      });
-    }
-
     final route = ModalRoute.of(context);
     if (route is PageRoute) {
       _route = route;
       getIt<RouteObserver<PageRoute>>().subscribe(this, _route!);
-      log('✅ RouteObserver 구독 완료');
-    } else {
-      log('❌ PageRoute 아님!');
+    }
+
+    if (!_fabOverlayInserted) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _insertFabOverlay();
+      });
     }
   }
 
   @override
   void dispose() {
-    if (_route != null) {
-      getIt<RouteObserver<PageRoute>>().unsubscribe(this);
-    }
-    _fabOverlayEntry?.remove();
+    getIt<RouteObserver<PageRoute>>().unsubscribe(this);
+    _removeFabOverlay();
     super.dispose();
   }
 
   @override
   void didPopNext() {
     viewModel.fetchData();
-    log('📌 didPopNext 호출됨, FAB 다시 삽입 시도');
     _insertFabOverlay();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -92,10 +79,12 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
           if (!snapshot.hasData) {
             return const MyCircularIndicator();
           }
-          List<CustomerModel> prospectsOrigin = snapshot.data!;
-          final filteredProspects = prospectsOrigin
-              .where((e) => e.name.contains(_searchText ?? ''))
-              .toList();
+
+          final prospectsOrigin = snapshot.data!;
+          final filteredProspects =
+              prospectsOrigin
+                  .where((e) => e.name.contains(_searchText ?? ''))
+                  .toList();
 
           return Scaffold(
             appBar: _appBar(filteredProspects.length),
@@ -121,74 +110,88 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
     );
   }
 
-  SingleChildScrollView _prospectList(List<CustomerModel> prospects) {
+  Widget _prospectList(List<CustomerModel> prospects) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListView.builder(
-              primary: false,
-              shrinkWrap: true,
-              physics: const ScrollPhysics(),
-              itemCount: prospects.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      context.push(
-                        RoutePath.registration,
-                        extra: prospects[index],
-                      );
-                    },
-                    child: ProspectItem(
-                      customer: prospects[index],
-                      onTap: (histories) async {
-                        _fabOverlayEntry?.remove();
-                     bool? result=   await popupAddHistory(
-                          context,
-                          histories,
-                          prospects[index],
-                          HistoryContent.title.toString(),
-                        );
-                     if(result ==true){
-
-                        _insertFabOverlay();
-                     }
-                      },
-                    ),
-                  ),
-                );
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: List.generate(prospects.length, (index) {
+          final customer = prospects[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: GestureDetector(
+              onTap: () {
+                context.push(RoutePath.registration, extra: customer);
               },
+              child: ProspectItem(
+                customer: customer,
+                onTap: (histories) async {
+                  // 1. 팝업 뜨기 전 FAB 숨기기
+                  _fabCanShow = false;
+                  _removeFabOverlay();
+                  setState(() {});
+
+                  // 팝업 열기 전에 아주 잠깐 대기 (UI 안정화)
+                  await Future.delayed(const Duration(milliseconds: 100));
+
+                  if (!mounted) return;
+
+                  // 2. 팝업 실행 및 결과 기다림
+                  final result = await popupAddHistory(
+                    context,
+                    histories,
+                    customer,
+                    HistoryContent.title.toString(),
+                  );
+
+                  // 3. 팝업 종료 후 FAB 다시 보여주기 허용 및 삽입
+                  if (!mounted) return;
+
+                  if (result == true) {
+                    _fabCanShow = true;
+                    _insertFabOverlay();
+                  } else {
+                    // 팝업 취소됐으면 다시 허용만 하고 Overlay는 안 넣음
+                    _fabCanShow = true;
+                  }
+                },
+              ),
             ),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
 
+  /// ✅ FAB Overlay 삽입
   void _insertFabOverlay() {
-    _fabOverlayEntry?.remove();
-    _fabOverlayEntry = null;
+    // 팝업이 떠 있는 동안 삽입 막기
+    if (!_fabCanShow) return;
 
-    _fabVisibleLocal = false;
+    _removeFabOverlay();
+
     _fabExpanded = false;
+    _fabVisibleLocal = false;
 
-    // 다시 한번 FrameCallback으로 삽입 안전시점 보장
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      OverlayState overlay = Overlay.of(context,rootOverlay: true);
+      final overlay = Navigator.of(context).overlay;
+      if (overlay == null) return;
 
+      OverlayEntry? localEntry;
 
-      _fabOverlayEntry = OverlayEntry(
+      localEntry = OverlayEntry(
         builder: (context) {
           overlaySetState = null;
+
           return StatefulBuilder(
             builder: (context, setState) {
-              overlaySetState = setState;
+              overlaySetState = (fn) {
+                if (!mounted || localEntry != _fabOverlayEntry) return;
+                setState(fn);
+              };
+
               return Positioned.fill(
                 child: IgnorePointer(
                   ignoring: !_fabVisibleLocal,
@@ -231,11 +234,15 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
         },
       );
 
+      _fabOverlayEntry = localEntry;
       overlay.insert(_fabOverlayEntry!);
+      _fabOverlayInserted = true;
 
-      Future.delayed(const Duration(milliseconds: 200), () {
-        if (!mounted) return;
+      // 딜레이는 충분히 주되, 팝업이 없을 때만 visible true
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (!mounted || _fabOverlayEntry != localEntry || !_fabCanShow) return;
         SchedulerBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _fabOverlayEntry != localEntry || !_fabCanShow) return;
           overlaySetState?.call(() {
             _fabVisibleLocal = true;
             _fabExpanded = false;
@@ -243,6 +250,23 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
         });
       });
     });
+  }
+  void _removeFabOverlayAndHide() {
+    _removeFabOverlay();
+    _fabCanShow = false;
+  }
+
+  void _insertFabOverlayIfAllowed() {
+    if (_fabCanShow && mounted) {
+      _insertFabOverlay();
+    }
+  }
+
+  /// ✅ FAB Overlay 제거
+  void _removeFabOverlay() {
+    _fabOverlayEntry?.remove();
+    _fabOverlayEntry = null;
+    _fabOverlayInserted = false;
   }
 
   void _toggleFabExpanded() {
