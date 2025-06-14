@@ -1,6 +1,6 @@
-import 'package:withme/presentation/home/prospect_list/enum/sort_type.dart';
 
 import '../../../core/utils/core_utils_import.dart';
+import '../../../presentation/home/prospect_list/model/sort_type.dart';
 import '../../domain_import.dart';
 
 class ApplyCurrentSortUseCase {

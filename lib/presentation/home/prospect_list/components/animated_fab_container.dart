@@ -63,10 +63,7 @@ class _AnimatedFabContainerState extends State<AnimatedFabContainer>
       bottom: widget.bottomPosition,
       child: FadeTransition(
         opacity: _opacity,
-        child: ScaleTransition(
-          scale: _scale,
-          child: widget.child,
-        ),
+        child: ScaleTransition(scale: _scale, child: widget.child),
       ),
     );
   }

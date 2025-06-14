@@ -1,6 +1,6 @@
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
-import '../enum/sort_type.dart';
+import '../model/sort_type.dart';
 
 class SmallFab extends StatefulWidget {
   final bool fabVisibleLocal;
@@ -11,7 +11,8 @@ class SmallFab extends StatefulWidget {
   final void Function()? onSortByBirth;
   final void Function()? onSortByInsuredDate;
   final void Function()? onSortByManage;
-  final SortType? selectedSortType;  // 현재 선택된 정렬 기준
+  final SortStatus? selectedSortStatus; // 정렬 상태 및 방향 정보
+
   const SmallFab({
     super.key,
     required this.fabVisibleLocal,
@@ -21,15 +22,15 @@ class SmallFab extends StatefulWidget {
     this.onSortByName,
     this.onSortByBirth,
     this.onSortByInsuredDate,
-    this.onSortByManage, this.selectedSortType,
+    this.onSortByManage,
+    this.selectedSortStatus,
   });
 
   @override
   State<SmallFab> createState() => _SmallFabState();
 }
 
-class _SmallFabState extends State<SmallFab>
-    with TickerProviderStateMixin {
+class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
   late final AnimationController _expandController;
   late final Animation<double> _expandAnimation;
 
@@ -46,18 +47,24 @@ class _SmallFabState extends State<SmallFab>
       vsync: this,
       duration: AppDurations.duration300,
     );
-    _expandAnimation =
-        CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
+    _expandAnimation = CurvedAnimation(
+      parent: _expandController,
+      curve: Curves.easeInOut,
+    );
 
     // Visibility animation (fabVisibleLocal)
     _visibilityController = AnimationController(
       vsync: this,
       duration: AppDurations.duration100,
     );
-    _scaleAnimation =
-        CurvedAnimation(parent: _visibilityController, curve: Curves.easeOutBack);
-    _fadeAnimation =
-        CurvedAnimation(parent: _visibilityController, curve: Curves.easeInOut);
+    _scaleAnimation = CurvedAnimation(
+      parent: _visibilityController,
+      curve: Curves.easeOutBack,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _visibilityController,
+      curve: Curves.easeInOut,
+    );
 
     if (widget.fabVisibleLocal) {
       _visibilityController.forward();
@@ -69,7 +76,9 @@ class _SmallFabState extends State<SmallFab>
     super.didUpdateWidget(oldWidget);
 
     // Animate expand/collapse
-    widget.fabExpanded ? _expandController.forward() : _expandController.reverse();
+    widget.fabExpanded
+        ? _expandController.forward()
+        : _expandController.reverse();
 
     // Animate show/hide
     if (widget.fabVisibleLocal) {
@@ -125,10 +134,15 @@ class _SmallFabState extends State<SmallFab>
   }
 
   Widget _buildSortActions() {
+    final status = widget.selectedSortStatus;
     final actions = [
       {'label': '이름순', 'onTap': widget.onSortByName, 'type': SortType.name},
       {'label': '생일순', 'onTap': widget.onSortByBirth, 'type': SortType.birth},
-      {'label': '상령일순', 'onTap': widget.onSortByInsuredDate, 'type': SortType.insuredDate},
+      {
+        'label': '상령일순',
+        'onTap': widget.onSortByInsuredDate,
+        'type': SortType.insuredDate,
+      },
       {'label': '관리순', 'onTap': widget.onSortByManage, 'type': SortType.manage},
     ];
 
@@ -139,7 +153,12 @@ class _SmallFabState extends State<SmallFab>
         for (var action in actions)
           GestureDetector(
             onTap: action['onTap'] as void Function()?,
-            child: _buildMiniAction(action['label'] as String,isSelected:widget.selectedSortType==action['type']),
+            child: _buildMiniAction(
+              action['label'] as String,
+              isSelected: status?.type == action['type'],
+              isAscending:
+                  status?.type == action['type'] ? status?.isAscending : null,
+            ),
           ),
         const SizedBox(height: 8),
         FloatingActionButton.small(
@@ -152,20 +171,39 @@ class _SmallFabState extends State<SmallFab>
     );
   }
 
-  Widget _buildMiniAction(String label,{bool isSelected = false}) {
+  Widget _buildMiniAction(
+    String label, {
+    required bool isSelected,
+    bool? isAscending,
+  }) {
+    IconData? icon;
+    if (isSelected && isAscending != null) {
+      icon = isAscending ? Icons.arrow_downward : Icons.arrow_upward;
+    }
+
     return Container(
       width: 90,
       height: 32,
       margin: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
-        color:isSelected ? ColorStyles.fabOpenColor : ColorStyles.fabColor,
+        color: isSelected ? ColorStyles.selectedFabColor : ColorStyles.fabColor,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Center(
-        child: Text(
-          label,
-          style:  TextStyle(color:isSelected ? Colors.black87: Colors.black38, fontSize: 13),
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.black87 : Colors.black38,
+              fontSize: 13,
+            ),
+          ),
+          if (icon != null) ...[
+            const SizedBox(width: 4),
+            Icon(icon, size: 14, color: Colors.black54),
+          ],
+        ],
       ),
     );
   }

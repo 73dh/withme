@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/setup.dart';
 import 'package:withme/core/presentation/components/policy_item.dart';
@@ -165,12 +164,13 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
               if (viewModel.state.isLoadingAllData)
-                 Positioned(
+                Positioned(
                   top: 15,
                   left: 20,
                   child: Row(
                     children: [
-                      Text('업데이트중'),width(5),
+                      Text('업데이트중'),
+                      width(5),
                       MyCircularIndicator(size: 10),
                     ],
                   ),

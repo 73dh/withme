@@ -8,7 +8,7 @@ import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart
 import '../../../core/di/setup.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
-import 'enum/sort_type.dart';
+import 'model/sort_type.dart';
 
 class ProspectListViewModel with ChangeNotifier {
   final BehaviorSubject<List<CustomerModel>> _cachedProspects =
@@ -17,9 +17,9 @@ class ProspectListViewModel with ChangeNotifier {
   Stream<List<CustomerModel>> get cachedProspects => _cachedProspects.stream;
 
   bool _isAscending = true;
-  SortType? _currentSortType;
+  SortStatus _sortStatus =  SortStatus(SortType.name, true); // 기본값: 이름순 오름차순
+  SortStatus get sortStatus => _sortStatus;
 
-  SortType? get currentSortType => _currentSortType;
 
   void clearCache() {
     _cachedProspects.add([]);
@@ -40,10 +40,9 @@ class ProspectListViewModel with ChangeNotifier {
     List<CustomerModel> current = _cachedProspects.value;
 
     if (force || _isListChanged(current, prospectCustomers)) {
-      _currentSortType ??=SortType.name;
       final sorted = ApplyCurrentSortUseCase(
-        isAscending: _isAscending,
-        currentSortType: _currentSortType!,
+        isAscending: _sortStatus.isAscending,
+        currentSortType: _sortStatus.type,
       ).call(prospectCustomers);
 
       _cachedProspects.add(sorted);
@@ -72,12 +71,16 @@ class ProspectListViewModel with ChangeNotifier {
   void _sort(SortType type) {
     final currentList = _cachedProspects.valueOrNull;
     if (currentList != null) {
-      _isAscending = !_isAscending;
-      _currentSortType = type;
+      // 정렬 타입이 같으면 방향만 토글, 다르면 새로운 타입 + 오름차순
+      bool ascending = (_sortStatus.type == type)
+          ? !_sortStatus.isAscending
+          : true;
+
+      _sortStatus = SortStatus(type, ascending);
 
       final sortedList = ApplyCurrentSortUseCase(
-        isAscending: _isAscending,
-        currentSortType: _currentSortType!,
+        isAscending: _sortStatus.isAscending,
+        currentSortType: _sortStatus.type,
       ).call(currentList);
 
       _cachedProspects.add(sortedList);

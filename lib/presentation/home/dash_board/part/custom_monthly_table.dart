@@ -38,13 +38,13 @@ class CustomMonthlyTable extends StatelessWidget {
         cells: ['가망고객', ...prospectData],
         backgroundColor: Colors.grey.shade100,
         isBarProspect: true,
-        isHeader: true// ✅ Data row 색상 적용
+        isHeader: true, // ✅ Data row 색상 적용
       ),
       renderTableRow(
         cells: ['총 계약건수', ...contractData],
         backgroundColor: Colors.grey.shade100,
         isBarContract: true,
-        isHeader: true// ✅ Data row 색상 적용
+        isHeader: true, // ✅ Data row 색상 적용
       ),
     ];
 

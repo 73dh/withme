@@ -113,10 +113,10 @@ class SearchCustomerItem extends StatelessWidget {
           children: [
             Text(shortenedNameText(customer.name), style: TextStyles.bold14),
             width(5),
-            sexIcon(customer.sex),
-            width(5),
+            // sexIcon(customer.sex),
+            // width(5),
             Text(
-              '${customer.birth?.formattedBirth} ${calculateAge(customer.birth ?? DateTime.now())}세/',
+              '${customer.birth?.formattedBirth} (${calculateAge(customer.birth ?? DateTime.now())}세)',
             ),
             width(3),
           ],

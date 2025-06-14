@@ -19,7 +19,10 @@ class ProspectListPage extends StatefulWidget {
   State<ProspectListPage> createState() => _ProspectListPageState();
 }
 
-class _ProspectListPageState extends State<ProspectListPage> {
+class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
+  final RouteObserver<PageRoute> routeObserver =
+      getIt<RouteObserver<PageRoute>>();
+
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
 
@@ -37,9 +40,26 @@ class _ProspectListPageState extends State<ProspectListPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // RouteObserver 등록
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _removeFabOverlay();
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // 다른 화면에서 복귀 시 실행됨
+    _fabCanShow = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _insertFabOverlayIfAllowed();
+    });
   }
 
   @override
@@ -47,11 +67,11 @@ class _ProspectListPageState extends State<ProspectListPage> {
     return VisibilityDetector(
       key: const Key('prospect-list-visibility'),
       onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.9) {
+        if (info.visibleFraction < 0.9) {
+          _removeFabOverlayAndHide();
+        } else {
           _fabCanShow = true;
           _insertFabOverlayIfAllowed();
-        } else {
-          _removeFabOverlayAndHide();
         }
       },
       child: SafeArea(
@@ -69,9 +89,10 @@ class _ProspectListPageState extends State<ProspectListPage> {
                 }
 
                 final prospectsOrigin = snapshot.data!;
-                final filteredProspects = prospectsOrigin
-                    .where((e) => e.name.contains(_searchText ?? ''))
-                    .toList();
+                final filteredProspects =
+                    prospectsOrigin
+                        .where((e) => e.name.contains(_searchText ?? ''))
+                        .toList();
 
                 return Scaffold(
                   appBar: _appBar(filteredProspects.length),
@@ -112,10 +133,7 @@ class _ProspectListPageState extends State<ProspectListPage> {
             child: GestureDetector(
               onTap: () {
                 _removeFabOverlayAndHide();
-                context.push(RoutePath.registration, extra: customer).then((_) {
-                  _fabCanShow = true;
-                  _insertFabOverlayIfAllowed();
-                });
+                context.push(RoutePath.registration, extra: customer);
               },
               child: ProspectItem(
                 customer: customer,
@@ -205,7 +223,7 @@ class _ProspectListPageState extends State<ProspectListPage> {
                             viewModel.sortByHistoryCount();
                             overlaySetState?.call(() {});
                           },
-                          selectedSortType: viewModel.currentSortType,
+                          selectedSortStatus:viewModel.sortStatus,
                         ),
                       ),
                       AnimatedFabContainer(

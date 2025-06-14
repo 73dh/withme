@@ -12,5 +12,5 @@ abstract interface class ColorStyles{
   static Color barChartContractColor=Colors.deepPurple.shade300;
   static Color confirmTextColor=Colors.blueAccent.shade400;
   static Color fabColor=Colors.amber.shade50;
-  static Color fabOpenColor=Colors.amber.shade100;
+  static Color selectedFabColor=Colors.amber.shade100;
 }

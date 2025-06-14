@@ -5,6 +5,8 @@ import 'package:withme/presentation/home/dash_board/model/customer_data_model.da
 import 'package:withme/presentation/home/dash_board/part/custom_bar_chart.dart';
 import 'package:withme/presentation/home/dash_board/part/custom_monthly_table.dart';
 import 'package:withme/presentation/home/dash_board/part/custom_summery_table.dart';
+import 'package:withme/presentation/home/dash_board/part/insurance_company_summery_table.dart';
+import 'package:withme/presentation/home/dash_board/part/product_category_summery_table.dart';
 
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
@@ -29,6 +31,7 @@ class DashBoardPage extends StatelessWidget {
       viewModel.state.customers,
       viewModel.state.monthlyCustomers,
     );
+    final customers = viewModel.state.customers;
 
     return AnimatedPositioned(
       duration: AppDurations.duration300,
@@ -39,7 +42,7 @@ class DashBoardPage extends StatelessWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: const Text('Performance'),
+          title: const Text('DashBoard'),
           actions: [
             IconButton(onPressed: onMenuTap, icon: const Icon(Icons.settings)),
           ],
@@ -62,12 +65,24 @@ class DashBoardPage extends StatelessWidget {
                       prospect: processedData.prospect,
                       contract: processedData.contract,
                     ),
-                    height(15),
-                    const PartTitle(text: 'Monthly'),
                     height(5),
+                    const PartTitle(text: 'InsuranceCompany Summery'),
+                    InsuranceCompanySummaryTable(
+                      cellWidth: cellWidth,
+                      customers: customers,
+                    ),
+                    height(5),
+                    const PartTitle(text: 'ProductCategory Summery'),
+                    ProductCategorySummaryTable(
+                      cellWidth: cellWidth,
+                      customers: customers,
+                    ),
+                    height(5),
+                    const PartTitle(text: 'Monthly'),
                     CustomMonthlyTable(
                       monthlyData: processedData.flattenedMonthly,
                     ),
+
                     height(20),
                     const PartTitle(text: 'Monthly Chart'),
                     height(10),
