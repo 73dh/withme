@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
@@ -88,5 +89,9 @@ class DashBoardViewModel with ChangeNotifier {
     } catch (e, stack) {
       log(e.toString());
     }
+  }
+
+  void logout() {
+    FirebaseAuth.instance.signOut();
   }
 }

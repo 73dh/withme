@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
+import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
@@ -7,6 +8,7 @@ import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart'
 import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
 
 import '../../../../core/di/setup.dart';
+import '../../../../core/ui/core_ui_import.dart';
 import '../dash_board_view_model.dart';
 
 class DashBoardRoot extends StatefulWidget {
@@ -65,7 +67,14 @@ class _DashBoardRootState extends State<DashBoardRoot>
         listenable: viewModel,
         builder: (context, widget) {
           return switch (viewModel.state.isLoading) {
-            true => MyCircularIndicator(),
+            true => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('통계 작성중',style: TextStyles.bold16,),
+                height(20),
+                const MyCircularIndicator(),
+              ],
+            ),
             false => Stack(
               children: [
                 DashBoardPage(
@@ -77,7 +86,10 @@ class _DashBoardRootState extends State<DashBoardRoot>
                 DashBoardSideMenu(
                   menuXPosition: _menuXPosition,
                   menuWidth: AppSizes.myMenuWidth,
-                  onTap: () {},
+                  onTap: () {
+                    viewModel.logout();
+                    _toggleMenu();
+                  },
                 ),
               ],
             ),

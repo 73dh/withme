@@ -62,8 +62,9 @@ class SearchPageViewModel with ChangeNotifier {
 
     final stopwatch = Stopwatch()..start();
 
-    final customersAllData = await getIt<CustomerUseCase>()
-        .execute(usecase: GetAllDataUseCase());
+    final customersAllData = await getIt<CustomerUseCase>().execute(
+      usecase: GetAllDataUseCase(),
+    );
     final customers = List<CustomerModel>.from(customersAllData);
 
     // 병렬 처리로 성능 개선
@@ -141,10 +142,12 @@ class SearchPageViewModel with ChangeNotifier {
 
   Future<void> _filterNoBirthCustomers() async {
     final filtered = await FilterNoBirthUseCase.call(state.customers);
+
     _state = state.copyWith(
-      filteredCustomers: List.from(filtered),
+      filteredCustomers: List.from(filtered), // ← 꼭 새 인스턴스로 만들어야 함
       currentSearchOption: SearchOption.noBirth,
     );
+
     notifyListeners();
   }
 
@@ -189,13 +192,16 @@ List<HistoryModel> _extractHistories(List<CustomerModel> customers) =>
     customers.expand((e) => e.histories).toList();
 
 List<String> _extractContractMonths(List<CustomerModel> customers) {
-  final months = customers
-      .expand((e) => e.policies)
-      .map((policy) => policy.startDate)
-      .whereType<DateTime>()
-      .map((date) => '${date.year}-${date.month.toString().padLeft(2, '0')}')
-      .toSet()
-      .toList();
+  final months =
+      customers
+          .expand((e) => e.policies)
+          .map((policy) => policy.startDate)
+          .whereType<DateTime>()
+          .map(
+            (date) => '${date.year}-${date.month.toString().padLeft(2, '0')}',
+          )
+          .toSet()
+          .toList();
   months.sort();
   return months;
 }

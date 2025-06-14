@@ -4,7 +4,7 @@ import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 import '../../ui/color/color_style.dart';
 
 class RenderFilledButton extends StatelessWidget {
-  final void Function() onPressed;
+  final void Function()? onPressed;
   final String text;
   final double borderRadius;
   final Color? backgroundColor;

@@ -13,6 +13,7 @@ import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/ui/core_ui_import.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({super.key});
@@ -40,8 +41,8 @@ class SearchPage extends StatelessWidget {
                           ), // key가 꼭 달라야 애니메이션이 동작함
                           alignment: FractionalOffset(0.5, 0.33),
                           child: Text(
-                            'Select Button',
-                            style: TextStyle(fontSize: 16),
+                            '검색하고자 하는 조건을 선택하세요.',
+                            style: TextStyles.bold16,
                           ),
                         )
                         : const SizedBox.shrink(
@@ -76,34 +77,46 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _buildCustomerList(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
     final customers = viewModel.state.filteredCustomers;
-    final policies = viewModel.state.filteredPolicies;
+    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
 
-    if (viewModel.state.currentSearchOption == SearchOption.filterPolicy) {
-      return ListView.builder(
+    // 고객 리스트 고유 key 생성 (고객 키를 join해서 고유값으로)
+    final customersKey = customers.map((e) => e.customerKey).join(',');
+
+    return AnimatedSwitcher(
+      duration: AppDurations.duration300,
+      switchInCurve: Curves.easeIn,
+      switchOutCurve: Curves.easeOut,
+      child: customers.isEmpty
+          ? const Center(
+        key: ValueKey('empty'),
+        child: Text('조건에 맞는 고객이 없습니다.'),
+      )
+          : ListView.builder(
+        key: ValueKey('option-${viewModel.state.currentSearchOption}-$customersKey'),
         padding: EdgeInsets.only(bottom: bottomPadding),
-        itemCount: policies.length,
+        itemCount: customers.length,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: PolicyItem(policy: policies[index]),
+          final customer = customers[index];
+          final item = customer.policies.isEmpty
+              ? _buildProspectItem(context, customer)
+              : _buildCustomerItem(context, customer);
+
+          return AnimatedSlide(
+            key: ValueKey(customer.customerKey),
+            offset: const Offset(0, 0.1),
+            duration: Duration(milliseconds: 300 + index * 30),
+            child: AnimatedOpacity(
+              opacity: 1,
+              duration: Duration(milliseconds: 300 + index * 30),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: item,
+              ),
+            ),
           );
         },
-      );
-    }
-    return ListView.builder(
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      itemCount: customers.length,
-      itemBuilder: (context, index) {
-        final customer = customers[index];
-        final item =
-            customer.policies.isEmpty
-                ? _buildProspectItem(context, customer)
-                : _buildCustomerItem(context, customer);
-
-        return Padding(padding: const EdgeInsets.all(8.0), child: item);
-      },
+      ),
     );
   }
 
