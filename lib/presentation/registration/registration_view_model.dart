@@ -8,27 +8,29 @@ import '../../domain/use_case/customer/register_customer_use_case.dart';
 import '../../domain/use_case/customer_use_case.dart';
 
 class RegistrationViewModel with ChangeNotifier {
-  Future<void> onEvent(RegistrationEvent event) async{
+  Future<void> onEvent(RegistrationEvent event) async {
     switch (event) {
       case RegisterCustomer():
         _onRegisterCustomer(
+          userKey: event.userKey,
           customerMap: event.customerData,
           historyMap: event.historyData,
         );
       case UpdateCustomer():
-     await   _onUpdateCustomer(customerMap: event.customerData);
+        await _onUpdateCustomer(customerMap: event.customerData);
       case DeleteCustomer():
-     await   _deleteCustomer(customerKey: event.customerKey);
+        await _deleteCustomer(customerKey: event.customerKey);
     }
   }
 
   Future<void> _onRegisterCustomer({
+    required String userKey,
     required Map<String, dynamic> customerMap,
     required Map<String, dynamic> historyMap,
   }) async {
     return await getIt<CustomerUseCase>().execute(
       usecase: RegisterCustomerUseCase(
-        userKey: 'user1',
+        userKey: userKey,
         customerData: customerMap,
         historyData: historyMap,
       ),

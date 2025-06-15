@@ -30,20 +30,12 @@ class CustomerListViewModel with ChangeNotifier {
   }
 
   Future<void> _fetchData() async {
-    // if (_state.isLoading) return;
-    // _state = state.copyWith(isLoading: true);
-    // notifyListeners();
 
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(),
+      usecase: GetAllDataUseCase(userKey: 'user1'),
     );
     final policyCustomers=allCustomers.where((e)=>e.policies.isNotEmpty).toList();
-    // final customers = await getIt<CustomerUseCase>().execute(
-    //   usecase: GetCustomersUseCase(),
-    // );
     _cachedCustomers.add(policyCustomers);
-    // _state = state.copyWith(isLoading: false);
-    // notifyListeners();
   }
 
   @override

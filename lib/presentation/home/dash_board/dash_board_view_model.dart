@@ -6,6 +6,7 @@ import 'package:withme/domain/domain_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
 
 import '../../../core/di/setup.dart';
+import '../../../core/router/router.dart';
 
 class DashBoardViewModel with ChangeNotifier {
   DashBoardViewModel() {
@@ -27,7 +28,7 @@ class DashBoardViewModel with ChangeNotifier {
       notifyListeners();
 
       final customersAllData =
-          await getIt<CustomerUseCase>().execute(usecase: GetAllDataUseCase())
+          await getIt<CustomerUseCase>().execute(usecase: GetAllDataUseCase(userKey: 'user1'))
               as List<CustomerModel>;
 
       // 월별 계약 고객 그룹 (startDate 기준)
@@ -91,7 +92,8 @@ class DashBoardViewModel with ChangeNotifier {
     }
   }
 
-  void logout() {
-    FirebaseAuth.instance.signOut();
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
+    authChangeNotifier.notify(); // ✅ 로그인 상태 변화 알림
   }
 }

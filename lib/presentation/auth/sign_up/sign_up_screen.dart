@@ -1,19 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/presentation/components/custom_text_form_field.dart';
 import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
 import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 
-import '../../core/di/setup.dart';
-import '../../core/router/router_import.dart';
-import '../../core/ui/color/color_style.dart';
-import '../../core/ui/core_ui_import.dart';
-import '../../core/ui/text_style/text_styles.dart';
-import '../home/customer_list/customer_list_view_model.dart';
-import '../home/prospect_list/prospect_list_view_model.dart';
+import '../../../core/di/setup.dart';
+import '../../../core/router/router_import.dart';
+import '../../../core/ui/color/color_style.dart';
+import '../../../core/ui/core_ui_import.dart';
+import '../../../core/ui/text_style/text_styles.dart';
+import '../../home/customer_list/customer_list_view_model.dart';
+import '../../home/prospect_list/prospect_list_view_model.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -50,20 +52,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
       final user = userCredential.user;
+
+      // ✅ 온보딩 상태 저장
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboardingComplete', false);
+
+      // 이메일 인증 요청
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
       }
 
-
+      // 이메일 인증 화면으로 이동
       if (mounted) {
-        context.go(RoutePath.verifyEmail); // 이메일 인증 대기 화면으로 이동
+        context.go(RoutePath.verifyEmail);
       }
+
     } on FirebaseAuthException catch (e) {
       String message = switch (e.code) {
         'email-already-in-use' => '이미 사용 중인 이메일입니다.',
@@ -73,8 +83,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       };
 
       if (mounted) renderSnackBar(context, text: message);
+
     } catch (e) {
       if (mounted) renderSnackBar(context, text: '오류 발생: $e');
+
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -138,16 +150,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () => showAgreementDialog(
-                        context,
-                        onPressed: () {
-                          setState(() {
-                            _isChecked = true;
-                            _agreedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
-                          });
-                          Navigator.of(context).pop();
-                        },
-                      ),
+                      onTap:
+                          () => showAgreementDialog(
+                            context,
+                            onPressed: () {
+                              setState(() {
+                                _isChecked = true;
+                                _agreedDateTime = DateFormat(
+                                  'yyyy-MM-dd HH:mm',
+                                ).format(DateTime.now());
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
                       child: Text(
                         '약관확인',
                         style: TextStyles.bold14.copyWith(
@@ -159,17 +174,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     width(10),
                     _isChecked
                         ? Text(
-                      '동의일시: $_agreedDateTime',
-                      style: TextStyles.normal14.copyWith(color: Colors.grey[700]),
-                    )
+                          '동의일시: $_agreedDateTime',
+                          style: TextStyles.normal14.copyWith(
+                            color: Colors.grey[700],
+                          ),
+                        )
                         : const Text('미동의'),
                   ],
                 ),
                 height(20),
-               RenderFilledButton(
+                RenderFilledButton(
                   text: '회원가입',
                   foregroundColor: _isChecked ? Colors.white : Colors.grey,
-                  backgroundColor: _isChecked ? ColorStyles.menuButtonColor : Colors.grey[300],
+                  backgroundColor:
+                      _isChecked
+                          ? ColorStyles.menuButtonColor
+                          : Colors.grey[300],
                   onPressed: _isChecked ? _signUp : null,
                 ),
                 height(20),
@@ -181,7 +201,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onTap: () => context.go(RoutePath.login),
                       child: Text(
                         ' 로그인',
-                        style: TextStyles.bold16.copyWith(color: ColorStyles.menuButtonColor),
+                        style: TextStyles.bold16.copyWith(
+                          color: ColorStyles.menuButtonColor,
+                        ),
                       ),
                     ),
                   ],

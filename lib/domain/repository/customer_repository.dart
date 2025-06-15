@@ -16,5 +16,5 @@ abstract interface class CustomerRepository implements Repository {
 
   Future<void> deleteCustomer({required String customerKey});
 
-  Stream<List<CustomerModel>> getAll();
+  Stream<List<CustomerModel>> getAll({required String userKey});
 }

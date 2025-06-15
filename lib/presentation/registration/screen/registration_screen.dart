@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/di/di_setup_import.dart';
@@ -218,40 +219,89 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Future<void> _submitForm() async {
-    final customerMap = CustomerModel.toMapForCreateCustomer(
-      customerKey:
-          widget.customerModel?.customerKey ?? generateCustomerKey('user1'),
-      name: _nameController.text,
-      sex: _sex!,
-      recommender: _recommendedController.text,
-      birth: _birth,
-      registeredDate: DateFormat(
-        'yy/MM/dd',
-      ).parseStrict(_registeredDateController.text),
-    );
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      final customerMap = CustomerModel.toMapForCreateCustomer(
+        userKey: currentUser?.uid ?? '',
+        customerKey: widget.customerModel?.customerKey ??
+            generateCustomerKey('${currentUser?.email}'),
+        name: _nameController.text,
+        sex: _sex!,
+        recommender: _recommendedController.text,
+        birth: _birth,
+        registeredDate: DateFormat('yy/MM/dd').parseStrict(_registeredDateController.text),
+      );
 
-    if (widget.customerModel == null) {
-      final historyMap = HistoryModel.toMapForHistory(
-        registeredDate: DateFormat(
-          'yy/MM/dd',
-        ).parse(_registeredDateController.text),
-        content: _historyController.text,
-      );
-      await viewModel.onEvent(
-        RegistrationEvent.registerCustomer(
-          customerData: customerMap,
-          historyData: historyMap,
-        ),
-      );
-      await getIt<ProspectListViewModel>().fetchData();
-    } else {
-      await viewModel.onEvent(
-        RegistrationEvent.updateCustomer(customerData: customerMap),
-      );
+      if (widget.customerModel == null) {
+        final historyMap = HistoryModel.toMapForHistory(
+          registeredDate: DateFormat('yy/MM/dd').parseStrict(_registeredDateController.text),
+          content: _historyController.text,
+        );
+
+        await viewModel.onEvent(
+          RegistrationEvent.registerCustomer(
+            userKey: currentUser!.uid,
+            customerData: customerMap,
+            historyData: historyMap,
+          ),
+        );
+      } else {
+        await viewModel.onEvent(
+          RegistrationEvent.updateCustomer(customerData: customerMap),
+        );
+      }
+
       await getIt<ProspectListViewModel>().fetchData(force: true);
-    }
-    if (mounted) {
-      context.pop(true);
+
+      if (mounted) context.pop(true);
+    } catch (e) {
+      if(mounted){
+
+      renderSnackBar(context, text: '등록에 실패했습니다. 다시 시도해주세요.');
+      }
     }
   }
+
+
+// Future<void> _submitForm() async {
+  //   User? currentUser = FirebaseAuth.instance.currentUser;
+  //   final customerMap = CustomerModel.toMapForCreateCustomer(
+  //     userKey: currentUser?.uid??'',
+  //     customerKey:
+  //         widget.customerModel?.customerKey ??
+  //         generateCustomerKey('${currentUser?.email}'),
+  //     name: _nameController.text,
+  //     sex: _sex!,
+  //     recommender: _recommendedController.text,
+  //     birth: _birth,
+  //     registeredDate: DateFormat(
+  //       'yy/MM/dd',
+  //     ).parseStrict(_registeredDateController.text),
+  //   );
+  //
+  //   if (widget.customerModel == null) {
+  //     final historyMap = HistoryModel.toMapForHistory(
+  //       registeredDate: DateFormat(
+  //         'yy/MM/dd',
+  //       ).parse(_registeredDateController.text),
+  //       content: _historyController.text,
+  //     );
+  //     await viewModel.onEvent(
+  //       RegistrationEvent.registerCustomer(
+  //         userKey: currentUser!.uid,
+  //         customerData: customerMap,
+  //         historyData: historyMap,
+  //       ),
+  //     );
+  //     await getIt<ProspectListViewModel>().fetchData(force: true);
+  //   } else {
+  //     await viewModel.onEvent(
+  //       RegistrationEvent.updateCustomer(customerData: customerMap),
+  //     );
+  //     await getIt<ProspectListViewModel>().fetchData(force: true);
+  //   }
+  //   if (mounted) {
+  //     context.pop(true);
+  //   }
+  // }
 }

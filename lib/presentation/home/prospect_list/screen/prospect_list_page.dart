@@ -57,6 +57,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   void didPopNext() {
     // 다른 화면에서 복귀 시 실행됨
     _fabCanShow = true;
+    viewModel.fetchData(force: true); // <-- 이 줄 추가
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _insertFabOverlayIfAllowed();
     });
@@ -84,9 +85,11 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                 if (snapshot.hasError) {
                   log(snapshot.error.toString());
                 }
-                if (!snapshot.hasData) {
-                  return const MyCircularIndicator();
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  _insertFabOverlayIfAllowed(); // prospect 없어도 호출되도록
+                  return const Center(child: Text('가망고객이 없습니다.'));
                 }
+
 
                 final prospectsOrigin = snapshot.data!;
                 final filteredProspects =
@@ -131,9 +134,12 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: GestureDetector(
-              onTap: () {
+              onTap: ()async {
                 _removeFabOverlayAndHide();
-                context.push(RoutePath.registration, extra: customer);
+            final result= await context.push(RoutePath.registration, extra: customer);
+if(result==true){
+  viewModel.fetchData(force: true);
+}
               },
               child: ProspectItem(
                 customer: customer,
@@ -238,7 +244,9 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                               _fabVisibleLocal = false;
                             });
                             if (context.mounted) {
-                              await context.push(RoutePath.registration);
+                           final result=   await context.push(RoutePath.registration);
+                           if (result == true) {
+                              viewModel.fetchData(force: true);}
                             }
                           },
                         ),

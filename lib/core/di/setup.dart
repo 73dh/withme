@@ -8,8 +8,9 @@ import 'di_setup_import.dart';
 final getIt = GetIt.instance;
 
 Future<void> diSetup() async {
-  getIt.registerLazySingleton<RouteObserver<PageRoute>>(() => RouteObserver<PageRoute>());
-
+  getIt.registerLazySingleton<RouteObserver<PageRoute>>(
+    () => RouteObserver<PageRoute>(),
+  );
 
   // data
   getIt.registerSingleton<FBase>(FBase());
@@ -37,14 +38,15 @@ Future<void> diSetup() async {
   );
 
   // viewModel
-  getIt.registerLazySingleton<ProspectListViewModel>(() =>
-      ProspectListViewModel());
-  getIt.registerLazySingleton<CustomerListViewModel>(() =>
-      CustomerListViewModel());
+  getIt.registerLazySingleton<ProspectListViewModel>(
+    () => ProspectListViewModel(),
+  );
+  getIt.registerLazySingleton<CustomerListViewModel>(
+    () => CustomerListViewModel(),
+  );
   getIt.registerFactory<RegistrationViewModel>(() => RegistrationViewModel());
   getIt.registerFactory<PolicyViewModel>(() => PolicyViewModel());
   getIt.registerFactory<CustomerViewModel>(() => CustomerViewModel());
-  getIt.registerSingleton<SearchPageViewModel>( SearchPageViewModel());
+  getIt.registerSingleton<SearchPageViewModel>(SearchPageViewModel());
   getIt.registerSingleton<DashBoardViewModel>(DashBoardViewModel());
-
 }

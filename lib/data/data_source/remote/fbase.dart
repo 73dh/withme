@@ -45,10 +45,10 @@ class FBase {
     await customerRef.delete();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAll() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAll({required String userKey}) {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc('user1')
+        .doc(userKey)
         .collection(collectionCustomer)
         .snapshots();
   }

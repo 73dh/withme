@@ -16,7 +16,6 @@ class ProspectListViewModel with ChangeNotifier {
 
   Stream<List<CustomerModel>> get cachedProspects => _cachedProspects.stream;
 
-  bool _isAscending = true;
   SortStatus _sortStatus =  SortStatus(SortType.name, true); // 기본값: 이름순 오름차순
   SortStatus get sortStatus => _sortStatus;
 
@@ -26,10 +25,11 @@ class ProspectListViewModel with ChangeNotifier {
   }
 
   Future<void> fetchData({bool force = false}) async {
+
     await Future.delayed(AppDurations.duration100);
 
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(),
+      usecase: GetAllDataUseCase(userKey: 'dCQwqcdN19RWQtv5dbLV0hx1v7H3'),
     );
 
     final prospectCustomers =
@@ -50,16 +50,15 @@ class ProspectListViewModel with ChangeNotifier {
     }
   }
 
-  bool _isListChanged(
-      List<CustomerModel> oldList,
-      List<CustomerModel> newList,
-      ) {
+  bool _isListChanged(List<CustomerModel> oldList, List<CustomerModel> newList) {
     if (oldList.length != newList.length) return true;
-    for (int i = 0; i < oldList.length; i++) {
-      if (oldList[i].customerKey != newList[i].customerKey) return true;
-    }
-    return false;
+
+    final oldKeys = oldList.map((e) => e.customerKey).toSet();
+    final newKeys = newList.map((e) => e.customerKey).toSet();
+
+    return !oldKeys.containsAll(newKeys) || !newKeys.containsAll(oldKeys);
   }
+
 
   @override
   void dispose() {

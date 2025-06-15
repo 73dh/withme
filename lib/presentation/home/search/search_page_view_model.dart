@@ -22,9 +22,9 @@ import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
-  SearchPageViewModel() {
-    getAllData();
-  }
+  // SearchPageViewModel() {
+  //   getAllData();
+  // }
 
   SearchPageState _state = SearchPageState();
 
@@ -63,7 +63,7 @@ class SearchPageViewModel with ChangeNotifier {
     final stopwatch = Stopwatch()..start();
 
     final customersAllData = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(),
+      usecase: GetAllDataUseCase(userKey: 'user1'),
     );
     final customers = List<CustomerModel>.from(customersAllData);
 

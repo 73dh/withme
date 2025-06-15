@@ -33,11 +33,8 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   }
 
   @override
-  Stream<List<CustomerModel>> getAll() {
-    // fBase.getAll().transform(toPools).listen((data){
-    //   print('pools length: ${data.length}');
-    // });
-    return fBase.getAll().transform(toPools);
+  Stream<List<CustomerModel>> getAll({required String userKey}) {
+    return fBase.getAll(userKey: userKey).transform(toPools);
   }
 
   @override

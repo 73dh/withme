@@ -21,7 +21,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       await user?.reload(); // 사용자 정보 새로고침
       final refreshedUser = FirebaseAuth.instance.currentUser;
 
-      if (refreshedUser?.emailVerified == true) {
+      if (refreshedUser?.emailVerified == true && mounted) {
+
         context.go(RoutePath.splash);
       } else {
         _showSnackBar('이메일 인증이 완료되지 않았습니다.');

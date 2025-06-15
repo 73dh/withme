@@ -10,6 +10,9 @@ import '../history/get_histories_use_case.dart';
 import '../policy/get_policies_use_case.dart';
 
 class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
+  final String userKey;
+
+  GetAllDataUseCase({required this.userKey});
   @override
   Future<List<CustomerModel>> call(CustomerRepository repository) async {
     final customerRepository = getIt<CustomerRepository>();
@@ -17,7 +20,7 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
     final policyUseCase = getIt<PolicyUseCase>();
 
     // Step 1: 모든 고객 데이터 가져오기
-    final originalCustomers = await customerRepository.getAll().first;
+    final originalCustomers = await customerRepository.getAll(userKey:userKey ).first;
 
     // Step 2: history 및 policy를 병렬로 요청
     final futures = originalCustomers.map((customer) async {

@@ -79,6 +79,7 @@ class CustomerModel {
       );
 
   static Map<String, dynamic> toMapForCreateCustomer({
+    required String userKey,
     required String customerKey,
     required String name,
     required String sex,
@@ -88,7 +89,7 @@ class CustomerModel {
 
   }) {
     final map = <String, dynamic>{};
-    map[keyUserKey] = 'user1';
+    map[keyUserKey] = userKey;
     map[keyCustomerKey] = customerKey;
     map[keyCustomerName] = name;
     map[keyCustomerSex] = sex;
