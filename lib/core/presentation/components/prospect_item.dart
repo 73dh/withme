@@ -22,10 +22,11 @@ import '../../../domain/model/customer_model.dart';
 import '../../../presentation/home/prospect_list/prospect_list_view_model.dart';
 
 class ProspectItem extends StatelessWidget {
+  final String userKey;
   final CustomerModel customer;
   final void Function(List<HistoryModel> histories) onTap;
 
-  const ProspectItem({super.key, required this.customer, required this.onTap});
+  const ProspectItem({super.key,required this.userKey, required this.customer, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class ProspectItem extends StatelessWidget {
     return IntrinsicHeight(
       child: StreamBuilder(
         stream: getIt<HistoryUseCase>().call(
-          usecase: GetHistoriesUseCase(customerKey: customer.customerKey),
+          usecase: GetHistoriesUseCase(userKey:userKey , customerKey: customer.customerKey),
         ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {

@@ -2,32 +2,11 @@ import 'package:go_router/go_router.dart';
 
 import '../core_presentation_import.dart'; // MyCircularIndicator 위치에 맞게 import
 
-class ConfirmDialog extends StatefulWidget {
+class CommonConfirmDialog extends StatelessWidget {
   final String text;
   final Future<void> Function() onConfirm;
 
-  const ConfirmDialog({super.key, required this.text, required this.onConfirm});
-
-  @override
-  State<ConfirmDialog> createState() => _ConfirmDialogState();
-}
-
-class _ConfirmDialogState extends State<ConfirmDialog> {
-  bool isDeleting = false;
-
-  void _onDeletePressed() async {
-    setState(() => isDeleting = true);
-
-    try {
-      await widget.onConfirm(); // 외부에서 주입된 로직 실행
-      if (mounted) context.pop(true);
-    } catch (e) {
-      // 에러 처리 원하면 여기에 추가 가능
-      if (mounted) {
-        setState(() => isDeleting = false); // 실패 시 다시 활성화
-      }
-    }
-  }
+  const CommonConfirmDialog({super.key, required this.text, required this.onConfirm});
 
   @override
   Widget build(BuildContext context) {
@@ -51,33 +30,24 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
                     left: 12,
                     right: 12,
                   ),
-                  child: Text(widget.text, textAlign: TextAlign.center),
+                  child: Text(text, textAlign: TextAlign.center),
                 ),
                 height(20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilledButton(
-                      onPressed: isDeleting ? null : () => context.pop(),
-                      child: const Text('취소'),
+                      onPressed:  () => context.pop(),
+                      child: const Text('확인'),
                     ),
-                    width(20),
-                    FilledButton(
-                      onPressed: isDeleting ? null : _onDeletePressed,
-                      child: const Text('삭제'),
-                    ),
+
                   ],
                 ),
                 height(10),
               ],
             ),
           ),
-          if (isDeleting)
-            const Positioned(
-              left: 40,
-              top: 33,
-              child: MyCircularIndicator(size: 10),
-            ),
+
         ],
       ),
     );

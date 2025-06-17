@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart';
 
@@ -29,7 +31,7 @@ class ProspectListViewModel with ChangeNotifier {
     await Future.delayed(AppDurations.duration100);
 
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(userKey: 'dCQwqcdN19RWQtv5dbLV0hx1v7H3'),
+      usecase: GetAllDataUseCase(userKey: UserSession.userId),
     );
 
     final prospectCustomers =

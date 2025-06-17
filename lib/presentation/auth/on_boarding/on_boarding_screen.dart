@@ -9,8 +9,10 @@ import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/generate_user_key.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/di_setup_import.dart';
 import '../../../core/di/setup.dart';
+import '../../../core/domain/enum/membership_status.dart';
 import '../../../core/router/router.dart';
 import '../../../domain/model/user_model.dart';
 
@@ -41,11 +43,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       debugPrint('이메일 인증 완료, 홈 화면으로 이동합니다., firebase 생성');
       await FirebaseFirestore.instance
           .collection(collectionUsers)
-          .doc(currentUser?.uid)
+          .doc(UserSession.userId)
           .set(
         UserModel(
           userKey: currentUser?.uid??'',       // 실제 uid 사용
           email: currentUser?.email ?? '',
+         membershipStatus: MembershipStatus.free,
           agreedDate: DateTime.now(),
         ).toMap(),
       );

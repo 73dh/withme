@@ -4,7 +4,6 @@ const String collectionPolicies = 'Policies';
 const String collectionHistories = 'Histories';
 
 // Customer
-const String keyUserKey = 'user_key';
 const String keyCustomerKey = 'customer_key';
 const String keyCustomerName = 'customer_name';
 const String keyCustomerSex='Customer_sex';
@@ -34,9 +33,13 @@ const String keyPayPeriod='payPeriod';
 const String keyPolicyState='policyState';
 
 
-// const String keyPolicyDate='policy_date';
-// const String keyProductName='product_name';
 
 // History
 const String keyContactDate='contact_date';
 const String keyContent='content';
+
+// User
+const String keyUserKey='userKey';
+const String keyEmail='email';
+const String keyAgreedDate='agreedDate';
+const String keyMembershipStatus='memberShipStatus';

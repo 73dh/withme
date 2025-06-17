@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/setup.dart';
 import 'package:withme/core/presentation/components/policy_item.dart';
@@ -20,6 +21,7 @@ class SearchPage extends StatelessWidget {
 
   final viewModel = getIt<SearchPageViewModel>();
 
+    final userKey=FirebaseAuth.instance.currentUser?.uid;
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -29,7 +31,9 @@ class SearchPage extends StatelessWidget {
           appBar: _buildAppBar(),
           body: Stack(
             children: [
-              if (viewModel.state.currentSearchOption != null)
+              if (viewModel.state.currentSearchOption == SearchOption.filterPolicy)
+                _buildPolicyList(context)
+            else  if (viewModel.state.currentSearchOption != null)
                 _buildCustomerList(context),
               AnimatedSwitcher(
                 duration: AppDurations.duration300,
@@ -73,6 +77,22 @@ class SearchPage extends StatelessWidget {
     final count = viewModel.state.filteredCustomers.length;
     return AppBar(
       title: option != '' ? Text('$option $count명') : const Text(''),
+    );
+  }
+
+  Widget _buildPolicyList(BuildContext context) {
+    final policies = viewModel.state.filteredPolicies;
+
+    if (policies.isEmpty) {
+      return const Center(child: Text('조건에 맞는 계약이 없습니다.'));
+    }
+
+    return ListView.builder(
+      itemCount: policies.length,
+      itemBuilder: (context, index) {
+        final policy = policies[index];
+        return PolicyItem(policy: policy);
+      },
     );
   }
 
@@ -141,6 +161,7 @@ class SearchPage extends StatelessWidget {
         await UpdateSearchedCustomersUseCase.call(viewModel);
       },
       child: ProspectItem(
+        userKey: userKey!,
         customer: customer,
         onTap: (histories) => _handleAddHistory(context, histories, customer),
       ),
@@ -149,6 +170,7 @@ class SearchPage extends StatelessWidget {
 
   Widget _buildCustomerItem(BuildContext context, dynamic customer) {
     return SearchCustomerItem(
+      userKey: userKey!,
       customer: customer,
       onTap: (histories) => _handleAddHistory(context, histories, customer),
     );

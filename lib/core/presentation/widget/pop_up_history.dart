@@ -3,6 +3,7 @@ import 'package:withme/core/presentation/widget/show_histories.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/use_case/history/add_history_use_case.dart';
+import '../../data/fire_base/user_session.dart';
 import '../../di/di_setup_import.dart';
 import '../../di/setup.dart';
 import '../core_presentation_import.dart';
@@ -31,7 +32,7 @@ Future<bool?> popupAddHistory(
       if (historyData.isNotEmpty) {
         await getIt<HistoryUseCase>().execute(
           usecase: AddHistoryUseCase(
-            userKey: 'user1',
+            userKey: UserSession.userId,
             customerKey: prospect.customerKey,
             historyData: historyData,
           ),

@@ -2,18 +2,21 @@ import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
 
 import '../../../domain/model/history_model.dart';
+import '../../../domain/model/user_model.dart';
 
 class DashBoardState {
   final List<CustomerModel> customers;
   final List<HistoryModel> histories;
   final List<PolicyModel> policies;
   final Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers;
+  final UserModel? userInfo;
   final bool isLoading;
 
   DashBoardState({
     this.customers = const [],
     this.histories = const [],
     this.policies = const [],
+    this.userInfo ,
     this.monthlyCustomers=const {},
     this.isLoading=false,
   });
@@ -23,6 +26,7 @@ class DashBoardState {
     List<HistoryModel>? histories,
     List<PolicyModel>? policies,
     Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers,
+    UserModel? userInfo,
     bool? isLoading,
   }) {
     return DashBoardState(
@@ -30,6 +34,7 @@ class DashBoardState {
       histories: histories ?? this.histories,
       policies: policies ?? this.policies,
       monthlyCustomers: monthlyCustomers??this.monthlyCustomers,
+      userInfo: userInfo?? this.userInfo,
       isLoading: isLoading?? this.isLoading,
     );
   }

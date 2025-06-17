@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
@@ -42,13 +43,11 @@ class CustomerScreen extends StatelessWidget {
               const PartTitle(text: '보험계약 정보'),
               Expanded(
                 child: StreamBuilder<List<PolicyModel>>(
-                  stream:
-                      getIt<PolicyUseCase>().call(
-                            usecase: GetPoliciesUseCase(
-                              customerKey: customer.customerKey,
-                            ),
-                          )
-                          as Stream<List<PolicyModel>>,
+                  stream: getIt<PolicyUseCase>().call(
+                    usecase: GetPoliciesUseCase(
+                      customerKey: customer.customerKey,
+                    ),
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       log(snapshot.error.toString());
@@ -125,6 +124,7 @@ class CustomerScreen extends StatelessWidget {
               ),
               StreamBuilder<List<HistoryModel>>(
                 stream: getIt<CustomerViewModel>().getHistories(
+                  FirebaseAuth.instance.currentUser!.uid,
                   customer.customerKey,
                 ),
                 builder: (context, snapshot) {

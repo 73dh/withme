@@ -9,6 +9,7 @@ import 'package:withme/presentation/policy/part/customer_part.dart';
 import 'package:withme/presentation/policy/part/policy_part.dart';
 import 'package:withme/presentation/policy/policy_view_model.dart';
 
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
@@ -234,7 +235,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
     );
   }
 
-  void _tryValidation() {
+  void _tryValidation() async{
     if (_formKey.currentState!.validate()) {
       if (_policyHolderBirth == null) {
         renderSnackBar(context, text: '계약자 생일을 확인하세요');
@@ -274,7 +275,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
       }
       setState(() => _isCompleted = true);
       _formKey.currentState!.save();
-      showModalBottomSheet(
+ final result=await     showModalBottomSheet(
         context: context,
         builder: (context) {
           return SizedBox(
@@ -284,8 +285,11 @@ class _PolicyScreenState extends State<PolicyScreen> {
           );
         },
       );
+ if(result==true&&mounted){
+   context.pop(true);
+      // return;
+ }
 
-      return;
     }
   }
 
@@ -325,29 +329,16 @@ class _PolicyScreenState extends State<PolicyScreen> {
     // original
     return PolicyConfirmBox(
       policyMap: policyMap,
-      onChecked: (bool result) {
+      onChecked: (bool result) async{
         if (result == true) {
-          getIt<PolicyViewModel>().addPolicy(
-            userKey: 'user1',
+       await   getIt<PolicyViewModel>().addPolicy(
+            userKey: UserSession.userId,
             customerKey: widget.customer.customerKey,
             policyData: policyMap,
           );
+       Navigator.pop(context,true);
         }
       },
     );
-
-    // sample
-    // return PolicyConfirmBox(
-    //   policyMap: policyMapSample,
-    //   onChecked: (bool result) {
-    //     if (result == true) {
-    //       getIt<PolicyViewModel>().addPolicy(
-    //         userKey: 'user1',
-    //         customerKey: widget.customer.customerKey,
-    //         policyData: policyMapSample,
-    //       );
-    //     }
-    //   },
-    // );
   }
 }

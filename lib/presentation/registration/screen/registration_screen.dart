@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/domain/enum/home_menu.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
@@ -223,18 +224,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       User? currentUser = FirebaseAuth.instance.currentUser;
       final customerMap = CustomerModel.toMapForCreateCustomer(
         userKey: currentUser?.uid ?? '',
-        customerKey: widget.customerModel?.customerKey ??
+        customerKey:
+            widget.customerModel?.customerKey ??
             generateCustomerKey('${currentUser?.email}'),
         name: _nameController.text,
         sex: _sex!,
         recommender: _recommendedController.text,
         birth: _birth,
-        registeredDate: DateFormat('yy/MM/dd').parseStrict(_registeredDateController.text),
+        registeredDate: DateFormat(
+          'yy/MM/dd',
+        ).parseStrict(_registeredDateController.text),
       );
 
       if (widget.customerModel == null) {
         final historyMap = HistoryModel.toMapForHistory(
-          registeredDate: DateFormat('yy/MM/dd').parseStrict(_registeredDateController.text),
+          registeredDate: DateFormat(
+            'yy/MM/dd',
+          ).parseStrict(_registeredDateController.text),
           content: _historyController.text,
         );
 
@@ -247,7 +253,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         );
       } else {
         await viewModel.onEvent(
-          RegistrationEvent.updateCustomer(customerData: customerMap),
+          RegistrationEvent.updateCustomer(
+            userKey: UserSession.userId,
+            customerData: customerMap,
+          ),
         );
       }
 
@@ -255,53 +264,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       if (mounted) context.pop(true);
     } catch (e) {
-      if(mounted){
-
-      renderSnackBar(context, text: '등록에 실패했습니다. 다시 시도해주세요.');
+      if (mounted) {
+        renderSnackBar(context, text: '등록에 실패했습니다. 다시 시도해주세요.');
       }
     }
   }
-
-
-// Future<void> _submitForm() async {
-  //   User? currentUser = FirebaseAuth.instance.currentUser;
-  //   final customerMap = CustomerModel.toMapForCreateCustomer(
-  //     userKey: currentUser?.uid??'',
-  //     customerKey:
-  //         widget.customerModel?.customerKey ??
-  //         generateCustomerKey('${currentUser?.email}'),
-  //     name: _nameController.text,
-  //     sex: _sex!,
-  //     recommender: _recommendedController.text,
-  //     birth: _birth,
-  //     registeredDate: DateFormat(
-  //       'yy/MM/dd',
-  //     ).parseStrict(_registeredDateController.text),
-  //   );
-  //
-  //   if (widget.customerModel == null) {
-  //     final historyMap = HistoryModel.toMapForHistory(
-  //       registeredDate: DateFormat(
-  //         'yy/MM/dd',
-  //       ).parse(_registeredDateController.text),
-  //       content: _historyController.text,
-  //     );
-  //     await viewModel.onEvent(
-  //       RegistrationEvent.registerCustomer(
-  //         userKey: currentUser!.uid,
-  //         customerData: customerMap,
-  //         historyData: historyMap,
-  //       ),
-  //     );
-  //     await getIt<ProspectListViewModel>().fetchData(force: true);
-  //   } else {
-  //     await viewModel.onEvent(
-  //       RegistrationEvent.updateCustomer(customerData: customerMap),
-  //     );
-  //     await getIt<ProspectListViewModel>().fetchData(force: true);
-  //   }
-  //   if (mounted) {
-  //     context.pop(true);
-  //   }
-  // }
 }

@@ -27,7 +27,10 @@ final router = GoRouter(
   refreshListenable: authChangeNotifier,
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
-    final isLoggedIn = user != null && user.emailVerified;
+    final isFirebaseLoggedIn = user != null && user.emailVerified;
+    final isLoggedIn = isFirebaseLoggedIn && authChangeNotifier.isLoggedIn;
+
+    // final isLoggedIn = user != null && user.emailVerified;
 
     final location = state.uri.toString(); // location 대신 사용
 
@@ -140,10 +143,12 @@ CustomTransitionPage _fadePage({
 class AuthChangeNotifier extends ChangeNotifier {
   bool _needsOnboarding = false;
   bool _isDataLoaded = false;
-
+  bool _isLoggedIn = true; // 기본값은 로그인 상태라 가정
   bool get needsOnboarding => _needsOnboarding;
 
   bool get isDataLoaded => _isDataLoaded;
+
+  bool get isLoggedIn => _isLoggedIn;
 
   void setNeedsOnboarding(bool value) {
     if (_needsOnboarding != value) {
@@ -159,7 +164,10 @@ class AuthChangeNotifier extends ChangeNotifier {
     }
   }
 
-  void notify() {
-    notifyListeners();
+  void setLoggedIn(bool value) {
+    if (_isLoggedIn != value) {
+      _isLoggedIn = value;
+      notifyListeners();
+    }
   }
 }

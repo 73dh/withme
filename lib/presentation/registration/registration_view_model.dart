@@ -1,25 +1,29 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/domain/use_case/customer/delete_customer_use_case.dart';
 import 'package:withme/domain/use_case/customer/update_customer_use_case.dart';
 import 'package:withme/presentation/registration/registration_event.dart';
 
+import '../../core/data/fire_base/user_session.dart';
 import '../../core/di/setup.dart';
 import '../../domain/use_case/customer/register_customer_use_case.dart';
 import '../../domain/use_case/customer_use_case.dart';
 
 class RegistrationViewModel with ChangeNotifier {
+
+
   Future<void> onEvent(RegistrationEvent event) async {
     switch (event) {
       case RegisterCustomer():
-        _onRegisterCustomer(
-          userKey: event.userKey,
+      await  _onRegisterCustomer(
+          userKey: UserSession.userId,
           customerMap: event.customerData,
           historyMap: event.historyData,
         );
       case UpdateCustomer():
-        await _onUpdateCustomer(customerMap: event.customerData);
+        await _onUpdateCustomer(userKey: UserSession.userId, customerMap: event.customerData);
       case DeleteCustomer():
-        await _deleteCustomer(customerKey: event.customerKey);
+        await _deleteCustomer(userKey: UserSession.userId, customerKey: event.customerKey);
     }
   }
 
@@ -38,19 +42,20 @@ class RegistrationViewModel with ChangeNotifier {
   }
 
   Future<void> _onUpdateCustomer({
+    required String userKey,
     required Map<String, dynamic> customerMap,
   }) async {
     return await getIt<CustomerUseCase>().execute(
       usecase: UpdateCustomerUseCase(
-        userKey: 'user1',
+        userKey: userKey,
         customerData: customerMap,
       ),
     );
   }
 
-  Future<void> _deleteCustomer({required String customerKey}) async {
+  Future<void> _deleteCustomer({required String userKey, required String customerKey}) async {
     return await getIt<CustomerUseCase>().execute(
-      usecase: DeleteCustomerUseCase(customerKey: customerKey),
+      usecase: DeleteCustomerUseCase(userKey: userKey, customerKey: customerKey),
     );
   }
 }

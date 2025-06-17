@@ -6,10 +6,11 @@ sealed class RegistrationEvent {
   }) = RegisterCustomer;
 
   factory RegistrationEvent.updateCustomer({
+    required String userKey,
     required Map<String, dynamic> customerData,
   }) = UpdateCustomer;
 
-  factory RegistrationEvent.deleteCustomer({required String customerKey}) =
+  factory RegistrationEvent.deleteCustomer({required String userKey, required String customerKey}) =
       DeleteCustomer;
 }
 
@@ -26,13 +27,15 @@ class RegisterCustomer implements RegistrationEvent {
 }
 
 class UpdateCustomer implements RegistrationEvent {
+  final String userKey;
   final Map<String, dynamic> customerData;
 
-  UpdateCustomer({required this.customerData});
+  UpdateCustomer({required this.userKey, required this.customerData});
 }
 
 class DeleteCustomer implements RegistrationEvent {
+  final String userKey;
   final String customerKey;
 
-  DeleteCustomer({required this.customerKey});
+  DeleteCustomer({required this.userKey, required this.customerKey});
 }

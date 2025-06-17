@@ -1,23 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../core/data/fire_base/firestore_keys.dart';
+import '../../core/domain/enum/membership_status.dart';
+
 class UserModel {
   final String userKey;
   final String email;
   final DateTime agreedDate;
+  final MembershipStatus membershipStatus;
   final DocumentReference? documentReference;
 
   UserModel({
     required this.userKey,
     required this.email,
     required this.agreedDate,
+    required this.membershipStatus,
     this.documentReference,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      userKey: json['userKey'] as String,
-      email: json['email'] as String,
-      agreedDate: (json['createdAt'] as Timestamp).toDate(),
+      userKey: json[keyUserKey] as String,
+      email: json[keyEmail] as String,
+      agreedDate: (json[keyAgreedDate] as Timestamp).toDate(),
+      membershipStatus: MembershipStatusExtension.fromString(json[keyMembershipStatus] ?? 'free'),
       documentReference: json['documentReference'] as DocumentReference?,
     );
   }
@@ -29,8 +35,9 @@ class UserModel {
       }) {
     return UserModel(
       userKey: userKey,
-      email: map['email'] ?? '',
-      agreedDate: (map['createdAt'] as Timestamp).toDate(),
+      email: map[keyEmail] ?? '',
+      agreedDate: (map[keyAgreedDate] as Timestamp).toDate(),
+      membershipStatus: MembershipStatusExtension.fromString(map[keyMembershipStatus] ?? 'free'),
       documentReference: documentReference,
     );
   }
@@ -42,14 +49,15 @@ class UserModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'userKey': userKey,
-      'email': email,
-      'agreedDate': Timestamp.fromDate(agreedDate),
+      keyUserKey: userKey,
+      keyEmail: email,
+      keyAgreedDate: Timestamp.fromDate(agreedDate),
+      keyMembershipStatus: membershipStatus.name,
     };
   }
 
   @override
   String toString() {
-    return 'UserModel{userKey: $userKey, email: $email, agreedDate: $agreedDate}';
+    return 'UserModel{userKey: $userKey, email: $email, agreedDate: $agreedDate, membershipStatus: ${membershipStatus.name}}';
   }
 }

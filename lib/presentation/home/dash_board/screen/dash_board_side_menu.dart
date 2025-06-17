@@ -43,6 +43,14 @@ class DashBoardSideMenu extends StatelessWidget {
                       ],
                     ),
                     height(15),
+                    Row(
+                      children: [
+                        const Icon(Icons.person, color: Colors.black87),
+                        width(5),
+                        Text('${FirebaseAuth.instance.currentUser?.email}'),
+                      ],
+                    ),
+                    height(15),
                     GestureDetector(
                       onTap: onTap,
                       child: Row(

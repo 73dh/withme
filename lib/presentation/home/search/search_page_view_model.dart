@@ -12,6 +12,7 @@ import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case
 import 'package:withme/presentation/home/search/search_page_event.dart';
 import 'package:withme/presentation/home/search/search_page_state.dart';
 
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
@@ -22,9 +23,9 @@ import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
-  // SearchPageViewModel() {
-  //   getAllData();
-  // }
+  SearchPageViewModel() {
+    getAllData();
+  }
 
   SearchPageState _state = SearchPageState();
 
@@ -59,11 +60,10 @@ class SearchPageViewModel with ChangeNotifier {
   Future<void> getAllData() async {
     _state = state.copyWith(isLoadingAllData: true);
     notifyListeners();
-
     final stopwatch = Stopwatch()..start();
 
     final customersAllData = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(userKey: 'user1'),
+      usecase: GetAllDataUseCase(userKey: UserSession.userId),
     );
     final customers = List<CustomerModel>.from(customersAllData);
 
@@ -96,7 +96,7 @@ class SearchPageViewModel with ChangeNotifier {
     );
 
     notifyListeners();
-    debugPrint('getAllData took: ${stopwatch.elapsedMilliseconds}ms');
+    debugPrint('[getAllData take time(milliseconds]: ${stopwatch.elapsedMilliseconds}ms');
   }
 
   Future<void> _filterNoRecentHistoryCustomers({

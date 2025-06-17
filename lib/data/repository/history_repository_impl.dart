@@ -9,8 +9,8 @@ class HistoryRepositoryImpl with Transformers implements HistoryRepository {
 
   HistoryRepositoryImpl({required this.fBase});
   @override
-  Stream<List<HistoryModel>> getHistories({required String customerKey}) {
-    return fBase.getHistories(customerKey: customerKey).transform(toHistories);
+  Stream<List<HistoryModel>> getHistories({required String userKey, required String customerKey}) {
+    return fBase.getHistories(userKey: userKey, customerKey: customerKey).transform(toHistories);
   }
 
   @override

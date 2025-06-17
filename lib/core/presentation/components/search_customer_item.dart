@@ -19,11 +19,13 @@ import '../core_presentation_import.dart';
 import '../widget/history_part_widget.dart';
 
 class SearchCustomerItem extends StatelessWidget {
+  final String userKey;
   final CustomerModel customer;
   final void Function(List<HistoryModel> histories) onTap;
 
   const SearchCustomerItem({
     super.key,
+    required this.userKey,
     required this.customer,
     required this.onTap,
   });
@@ -77,6 +79,7 @@ class SearchCustomerItem extends StatelessWidget {
                   child: StreamBuilder(
                     stream: getIt<HistoryUseCase>().call(
                       usecase: GetHistoriesUseCase(
+                        userKey: userKey,
                         customerKey: customer.customerKey,
                       ),
                     ),

@@ -19,4 +19,4 @@ export '../../../core/presentation/widget/select_date.dart';
 export 'components/my_circular_indicator.dart';
 export 'components/sex_widget.dart';
 export 'package:flutter/material.dart';
-export 'package:withme/core/presentation/components/confirm_dialog.dart';
+export 'package:withme/core/presentation/components/delete_confirm_dialog.dart';

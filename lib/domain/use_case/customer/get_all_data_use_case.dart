@@ -25,7 +25,7 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
     // Step 2: history 및 policy를 병렬로 요청
     final futures = originalCustomers.map((customer) async {
       final histories = await historyUseCase
-          .call(usecase: GetHistoriesUseCase(customerKey: customer.customerKey))
+          .call(usecase: GetHistoriesUseCase(userKey: userKey, customerKey: customer.customerKey))
           .first;
 
       final policies = await policyUseCase

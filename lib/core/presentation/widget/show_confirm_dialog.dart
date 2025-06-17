@@ -1,3 +1,5 @@
+import 'package:withme/core/presentation/components/common_confirm_dialog.dart';
+
 import '../core_presentation_import.dart';
 
 Future<bool?> showConfirmDialog(
@@ -7,6 +9,6 @@ Future<bool?> showConfirmDialog(
 }) {
   return showDialog<bool>(
     context: context,
-    builder: (context) => ConfirmDialog(text: text, onConfirm: onConfirm),
+    builder: (context) => CommonConfirmDialog(text: text, onConfirm: onConfirm),
   );
 }

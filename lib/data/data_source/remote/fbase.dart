@@ -1,8 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
 
 class FBase {
+  // User
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
+    return await FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(UserSession.userId)
+        .get();
+  }
+
   // Customer
 
   Future registerCustomer({
@@ -28,6 +37,7 @@ class FBase {
     required String userKey,
     required Map<String, dynamic> customerData,
   }) async {
+    print(customerData);
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
@@ -36,16 +46,21 @@ class FBase {
     await customerRef.update(customerData);
   }
 
-  Future<void> deleteCustomer({required String customerKey}) async {
+  Future<void> deleteCustomer({
+    required String userKey,
+    required String customerKey,
+  }) async {
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc('user1')
+        .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerKey);
     await customerRef.delete();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAll({required String userKey}) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
+    required String userKey,
+  }) {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
@@ -55,11 +70,12 @@ class FBase {
 
   // History
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({
+    required String userKey,
     required String customerKey,
   }) {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc('user1')
+        .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerKey)
         .collection(collectionHistories)
@@ -91,7 +107,7 @@ class FBase {
   }) {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc('user1')
+        .doc(UserSession.userId)
         .collection(collectionCustomer)
         .doc(customerKey)
         .collection(collectionPolicies)
@@ -103,7 +119,7 @@ class FBase {
   }) {
     return FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc('user1')
+        .doc(UserSession.userId)
         .collection(collectionCustomer)
         .doc(customerKey)
         .collection(collectionPolicies)
@@ -117,14 +133,14 @@ class FBase {
   }) async {
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc('user1')
+        .doc(UserSession.userId)
         .collection(collectionCustomer)
         .doc(customerKey);
 
     DocumentReference policyRef =
         FirebaseFirestore.instance
             .collection(collectionUsers)
-            .doc('user1')
+            .doc(UserSession.userId)
             .collection(collectionCustomer)
             .doc(customerKey)
             .collection(collectionPolicies)

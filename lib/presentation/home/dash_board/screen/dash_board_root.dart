@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/const/duration.dart';
@@ -49,6 +50,9 @@ class _DashBoardRootState extends State<DashBoardRoot>
       _menuStatus = isOpening ? MenuStatus.isOpened : MenuStatus.isClosed;
 
       if (isOpening) {
+        if(viewModel.state.userInfo==null){
+          final userInfo=getIt<FBase>().getUserInfo();
+        }
         _animationController.forward();
         _bodyXPosition = -AppSizes.myMenuWidth;
         _menuXPosition = AppSizes.deviceSize.width - AppSizes.myMenuWidth;
@@ -87,7 +91,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
                   menuXPosition: _menuXPosition,
                   menuWidth: AppSizes.myMenuWidth,
                   onTap: () {
-                    viewModel.logout();
+                    viewModel.logout(context);
                     _toggleMenu();
                   },
                 ),

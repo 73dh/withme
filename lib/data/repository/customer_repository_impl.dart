@@ -38,7 +38,7 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   }
 
   @override
-  Future<void> deleteCustomer({required String customerKey}) async {
-    return await fBase.deleteCustomer(customerKey: customerKey);
+  Future<void> deleteCustomer({required String userKey, required String customerKey}) async {
+    return await fBase.deleteCustomer(userKey: userKey, customerKey: customerKey);
   }
 }

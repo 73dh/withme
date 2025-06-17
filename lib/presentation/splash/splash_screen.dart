@@ -31,7 +31,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || !user.emailVerified) {
-      authChangeNotifier.notify(); // 로그인 안 됨 상태 알림
+      authChangeNotifier.setLoggedIn(false); // 👈 명확히 로그아웃 상태 전달
+      if (mounted) {
+        context.go(RoutePath.login); // ✅ 이것도 넣으면 확실함
+      }
       return;
     }
 

@@ -6,6 +6,7 @@ import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/ui/text_style/text_styles.dart';
 
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/router/router_import.dart';
@@ -92,13 +93,21 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+    final credential=  await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      final user = credential.user;
+
+      if (user != null && user.emailVerified) {
+        // ✅ 로그인 성공 → userKey 저장
+        // UserSession.userId = user.uid;
 
       if (!mounted) return;
-      context.go(RoutePath.splash);
+      context.go(RoutePath.splash);}
+      else {
+        _showErrorMessage('이메일 인증을 완료해주세요.');
+      }
     } on FirebaseAuthException catch (e) {
       _showErrorMessage(_firebaseErrorMessage(e));
     } catch (e) {

@@ -3,7 +3,7 @@ import 'package:withme/domain/repository/repository.dart';
 import '../model/history_model.dart';
 
 abstract interface class HistoryRepository implements Repository{
-  Stream<List<HistoryModel>> getHistories({required String customerKey});
+  Stream<List<HistoryModel>> getHistories({required String userKey, required String customerKey});
 
 
   Future<void> addHistory({

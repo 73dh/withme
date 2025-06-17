@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
@@ -39,6 +41,7 @@ class CustomAppBar extends StatelessWidget {
                   // 삭제 처리
                   viewModel.onEvent(
                     RegistrationEvent.deleteCustomer(
+                      userKey:UserSession.userId,
                       customerKey: customerModel!.customerKey,
                     ),
                   );
