@@ -44,8 +44,7 @@ class RenderFilledButton extends StatelessWidget {
         child:
 
         Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
             if (menuItems != null)
               PopupMenuButton<dynamic>(
@@ -55,10 +54,12 @@ class RenderFilledButton extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 splashRadius: 20,
               ),
-            Text(
-              menuItems != null ? (selectedMenu ?? text) : text,
-              textAlign: menuItems != null ? TextAlign.left : TextAlign.center,
-              overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: Text(
+                menuItems != null ? (selectedMenu ?? text) : text,
+                textAlign: menuItems != null ? TextAlign.left : TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

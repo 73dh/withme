@@ -2,22 +2,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/ui/const/duration.dart';
+import 'package:withme/core/ui/const/size.dart';
+import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/model/user_model.dart';
 
 class DashBoardSideMenu extends StatelessWidget {
-  final double menuXPosition;
-  final double menuWidth;
+  final DashBoardViewModel viewModel;
   final void Function() onTap;
   final UserModel? currentUser;
   final void Function() onInquiryTap;
 
   const DashBoardSideMenu({
     super.key,
-    required this.menuXPosition,
-    required this.menuWidth,
+    required this.viewModel,
     required this.onTap,
     required this.currentUser,
     required this.onInquiryTap,
@@ -27,12 +27,16 @@ class DashBoardSideMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: AnimatedContainer(
-        color: Colors.white, // 꼭 넣어주세요!
+        color: Colors.white,
         duration: AppDurations.duration300,
         curve: Curves.easeInOut,
-        transform: Matrix4.translationValues(menuXPosition, 0, 0),
+        transform: Matrix4.translationValues(
+          viewModel.state.menuXPosition,
+          0,
+          0,
+        ),
         child: SizedBox(
-          width: menuWidth,
+          width: AppSizes.myMenuWidth,
           child: Padding(
             padding: const EdgeInsets.all(6.0),
             child: PartBox(
@@ -46,7 +50,6 @@ class DashBoardSideMenu extends StatelessWidget {
                       children: [
                         const Icon(Icons.person, color: Colors.black87),
                         width(5),
-                        // Text('${FirebaseAuth.instance.currentUser?.email}'),
                         Text('${currentUser?.email}'),
                       ],
                     ),
@@ -55,20 +58,20 @@ class DashBoardSideMenu extends StatelessWidget {
                       children: [
                         const Icon(Icons.person, color: Colors.black87),
                         width(5),
-                        // Text('${FirebaseAuth.instance.currentUser?.email}'),
                         Text('${currentUser?.membershipStatus.toString()}'),
-                        Spacer(),
+                       Spacer(),
                         SizedBox(
                           width: 130,
-                          child: FilledButton(
-
-                            onPressed:onInquiryTap,
-
-                           child: Text('유료회원 문의'),
+                          child: RenderFilledButton(
+                            foregroundColor: Colors.white,
+                            borderRadius: 5,
+                            onPressed: onInquiryTap,
+                            text: '유료회원 문의',
                           ),
                         ),
                       ],
                     ),
+
                     height(15),
                     GestureDetector(
                       onTap: onTap,

@@ -3,6 +3,7 @@ import 'package:withme/domain/model/policy_model.dart';
 
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/user_model.dart';
+import 'enum/menu_status.dart';
 
 class DashBoardState {
   final List<CustomerModel> customers;
@@ -12,6 +13,11 @@ class DashBoardState {
   final UserModel? userInfo;
   final bool isLoading;
 
+  // ✅ 메뉴 상태
+  final MenuStatus menuStatus;
+  final double bodyXPosition;
+  final double menuXPosition;
+
   DashBoardState({
     this.customers = const [],
     this.histories = const [],
@@ -19,6 +25,10 @@ class DashBoardState {
     this.userInfo ,
     this.monthlyCustomers=const {},
     this.isLoading=false,
+
+    this.menuStatus = MenuStatus.isClosed,
+    this.bodyXPosition = 0,
+    this.menuXPosition = 480, // default: 화면 너비
   });
 
   DashBoardState copyWith({
@@ -28,6 +38,10 @@ class DashBoardState {
     Map<String, Map<String, List<CustomerModel>>>? monthlyCustomers,
     UserModel? userInfo,
     bool? isLoading,
+
+    MenuStatus? menuStatus,
+    double? bodyXPosition,
+    double? menuXPosition,
   }) {
     return DashBoardState(
       customers: customers ?? this.customers,
@@ -36,52 +50,12 @@ class DashBoardState {
       monthlyCustomers: monthlyCustomers??this.monthlyCustomers,
       userInfo: userInfo?? this.userInfo,
       isLoading: isLoading?? this.isLoading,
+
+      menuStatus: menuStatus ?? this.menuStatus,
+      bodyXPosition: bodyXPosition ?? this.bodyXPosition,
+      menuXPosition: menuXPosition ?? this.menuXPosition,
     );
   }
 }
 
 
-// class MonthlyCustomerStats {
-//   final String month;
-//   final int prospectCount;
-//   final int customerCount;
-//   final List<CustomerModel> customers;
-//
-//   MonthlyCustomerStats({
-//     required this.month,
-//     required this.prospectCount,
-//     required this.customerCount,
-//     required this.customers,
-//   });
-// }
-
-// List<MonthlyCustomerStats> generateMonthlyStatsList(List<CustomerModel> customers) {
-//   final Map<String, List<CustomerModel>> grouped = {};
-//
-//   for (var customer in customers) {
-//     final date = customer.registeredDate;
-//     final key = '${date.year}/${date.month.toString().padLeft(2, '0')}';
-//     grouped.putIfAbsent(key, () => []);
-//     grouped[key]!.add(customer);
-//   }
-//
-//   final statsList = grouped.entries.map((entry) {
-//     final month = entry.key;
-//     final customerList = entry.value;
-//
-//     final prospectCount = customerList.where((c) => c.policies.isEmpty).length;
-//     final customerCount = customerList.where((c) => c.policies.isNotEmpty).length;
-//
-//     return MonthlyCustomerStats(
-//       month: month,
-//       prospectCount: prospectCount,
-//       customerCount: customerCount,
-//       customers: customerList,
-//     );
-//   }).toList();
-//
-//   // 월 기준 정렬
-//   statsList.sort((a, b) => a.month.compareTo(b.month));
-//
-//   return statsList;
-// }

@@ -14,15 +14,13 @@ import '../../../../core/ui/core_ui_import.dart';
 class DashBoardPage extends StatelessWidget {
   final DashBoardViewModel viewModel;
   final void Function() onMenuTap;
-  final double bodyXPosition;
   final AnimationController animationController;
-  final void Function() onInquiryTap;
+
   const DashBoardPage({
     super.key,
     required this.viewModel,
     required this.onMenuTap,
-    required this.bodyXPosition,
-    required this.animationController, required this.onInquiryTap,
+    required this.animationController,
   });
 
   @override
@@ -35,8 +33,8 @@ class DashBoardPage extends StatelessWidget {
 
     return AnimatedPositioned(
       duration: AppDurations.duration300,
-      left: bodyXPosition,
-      right: -bodyXPosition,
+      left: viewModel.state.bodyXPosition,
+      right: -viewModel.state.bodyXPosition,
       top: 0,
       bottom: 0,
       child: Scaffold(
@@ -44,8 +42,7 @@ class DashBoardPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('DashBoard'),
           actions: [
-
-            IconButton(onPressed: onInquiryTap, icon: const Icon(Icons.settings)),
+            // IconButton(onPressed: onInquiryTap, icon: const Icon(Icons.settings)),
             IconButton(onPressed: onMenuTap, icon: const Icon(Icons.settings)),
           ],
         ),

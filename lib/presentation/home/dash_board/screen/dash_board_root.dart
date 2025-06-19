@@ -23,10 +23,6 @@ class DashBoardRoot extends StatefulWidget {
 
 class _DashBoardRootState extends State<DashBoardRoot>
     with SingleTickerProviderStateMixin {
-  MenuStatus _menuStatus = MenuStatus.isClosed;
-  double _bodyXPosition = 0;
-  double _menuXPosition = AppSizes.deviceSize.width;
-
   late AnimationController _animationController;
   final viewModel = getIt<DashBoardViewModel>();
 
@@ -46,31 +42,6 @@ class _DashBoardRootState extends State<DashBoardRoot>
     super.dispose();
   }
 
-  Future<void> _toggleMenu()async {
-    final isOpening = _menuStatus == MenuStatus.isClosed;
-
-    if (isOpening) {
-      // 비동기 처리: userInfo 로드
-      if (viewModel.state.userInfo == null) {
-        final snapshot = await getIt<FBase>().getUserInfo(); // await 추가
-        final user = UserModel.fromSnapshot(snapshot);       // 파싱
-        viewModel.setUserInfo(user);                         // 저장 or 상태 갱신
-      }
-      _animationController.forward();
-      _bodyXPosition = -AppSizes.myMenuWidth;
-      _menuXPosition = AppSizes.deviceSize.width - AppSizes.myMenuWidth;
-    } else {
-      _animationController.reverse();
-      _bodyXPosition = 0;
-      _menuXPosition = AppSizes.deviceSize.width;
-    }
-
-    setState(() {
-      _menuStatus = isOpening ? MenuStatus.isOpened : MenuStatus.isClosed;
-    });
-    
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -81,30 +52,48 @@ class _DashBoardRootState extends State<DashBoardRoot>
             true => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('통계 작성중',style: TextStyles.bold16,),
+                const Text('통계 작성중', style: TextStyles.bold16),
                 height(20),
                 const MyCircularIndicator(),
               ],
             ),
             false => Stack(
               children: [
-                DashBoardPage(
-                  viewModel: viewModel,
-                  bodyXPosition: _bodyXPosition,
-                  animationController: _animationController,
-                  onMenuTap: _toggleMenu,
-                  onInquiryTap: (){
-                    viewModel.showInquiryDialog(context); // ✅ ViewModel에서 처리
-                  },
-                ),
                 DashBoardSideMenu(
-                  menuXPosition: _menuXPosition,
-                  menuWidth: AppSizes.myMenuWidth,
+                  viewModel: viewModel,
                   onTap: () {
                     viewModel.logout(context);
                   },
                   currentUser: viewModel.state.userInfo,
-                  onInquiryTap:_toggleMenu,
+                  onInquiryTap: () {
+                    showDialog(
+                      context: context,
+                      builder:
+                          (_) => AlertDialog(
+                        title: const Text('유료회원 문의'),
+                        content: const Text('문의 메일을 보내시겠습니까?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('취소'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                             viewModel.sendInquiryEmail(context);
+                            },
+                            child: const Text('확인'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  ,
+                ),
+                DashBoardPage(
+                  viewModel: viewModel,
+                  animationController: _animationController,
+                  onMenuTap: () => viewModel.toggleMenu(_animationController),
                 ),
               ],
             ),
@@ -113,6 +102,4 @@ class _DashBoardRootState extends State<DashBoardRoot>
       ),
     );
   }
-
-
 }

@@ -11,7 +11,10 @@ import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/router/router.dart';
 import '../../../core/router/router_path.dart';
+import '../../../core/ui/const/size.dart';
+import '../../../data/data_source/remote/fbase.dart';
 import '../../../domain/model/user_model.dart';
+import 'enum/menu_status.dart';
 
 class DashBoardViewModel with ChangeNotifier {
   DashBoardViewModel() {
@@ -32,10 +35,10 @@ class DashBoardViewModel with ChangeNotifier {
       notifyListeners();
 
       final customersAllData =
-      await getIt<CustomerUseCase>().execute(
-        usecase: GetAllDataUseCase(userKey: UserSession.userId),
-      )
-      as List<CustomerModel>;
+          await getIt<CustomerUseCase>().execute(
+                usecase: GetAllDataUseCase(userKey: UserSession.userId),
+              )
+              as List<CustomerModel>;
 
       // 월별 계약 고객 그룹 (startDate 기준)
       final Map<String, List<CustomerModel>> contractGrouped = {};
@@ -74,8 +77,8 @@ class DashBoardViewModel with ChangeNotifier {
       final Map<String, Map<String, List<CustomerModel>>> monthlyGrouped = {};
 
       final allMonths =
-      <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()
-        ..sort();
+          <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()
+            ..sort();
 
       for (var month in allMonths) {
         monthlyGrouped[month] = {
@@ -102,6 +105,37 @@ class DashBoardViewModel with ChangeNotifier {
     _state = state.copyWith(userInfo: user);
   }
 
+  Future<void> toggleMenu(AnimationController controller) async {
+    final isOpening = state.menuStatus == MenuStatus.isClosed;
+
+    if (isOpening) {
+      // 1. 사용자 정보 로드 (필요 시)
+      if (state.userInfo == null) {
+        final snapshot = await getIt<FBase>().getUserInfo();
+        final user = UserModel.fromSnapshot(snapshot);
+        setUserInfo(user);
+      }
+
+      // 2. 메뉴 열기 애니메이션
+      controller.forward();
+      _state = state.copyWith(
+        menuStatus: MenuStatus.isOpened,
+        bodyXPosition: -AppSizes.myMenuWidth,
+        menuXPosition: AppSizes.deviceSize.width - AppSizes.myMenuWidth,
+      );
+    } else {
+      // 3. 메뉴 닫기 애니메이션
+      controller.reverse();
+      _state = state.copyWith(
+        menuStatus: MenuStatus.isClosed,
+        bodyXPosition: 0,
+        menuXPosition: AppSizes.deviceSize.width,
+      );
+    }
+
+    notifyListeners(); // ✅ UI에 변경사항 알림
+  }
+
   Future<void> logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     final authChangeNotifier = getIt<AuthChangeNotifier>();
@@ -110,32 +144,11 @@ class DashBoardViewModel with ChangeNotifier {
       context.go(RoutePath.login); // ✅ 명시적으로 이동 (안전망 역할)
     }
   }
-}
-  extension InquiryDialogHandler on DashBoardViewModel {
-  void showInquiryDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('유료회원 문의'),
-        content: const Text('문의 메일을 보내시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _sendInquiryEmail(context);
-            },
-            child: const Text('확인'),
-          ),
-        ],
-      ),
-    );
-  }
 
-  void _sendInquiryEmail(BuildContext context) async {
+
+
+
+  void sendInquiryEmail(BuildContext context) async {
     final email = state.userInfo?.email ?? 'unknown@unknown.com';
 
     final Uri emailUri = Uri(
@@ -151,11 +164,10 @@ class DashBoardViewModel with ChangeNotifier {
       await launchUrl(emailUri);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('메일 앱을 열 수 없습니다.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('메일 앱을 열 수 없습니다.')));
       }
     }
   }
 }
-
