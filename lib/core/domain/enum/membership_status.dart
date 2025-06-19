@@ -1,5 +1,11 @@
 enum MembershipStatus{
   free,paid;
+
+  @override
+  String toString() => switch (this) {
+    MembershipStatus.free => '무료 회원',
+    MembershipStatus.paid => '유료 회원',
+  };
 }
 
 extension MembershipStatusExtension on MembershipStatus {

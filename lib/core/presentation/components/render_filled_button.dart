@@ -30,7 +30,10 @@ class RenderFilledButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: onPressed,
+        onPressed:(){
+          print('button test');
+          onPressed?.call();
+        } ,
         style: FilledButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
@@ -38,7 +41,9 @@ class RenderFilledButton extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
           ),
         ),
-        child: Row(
+        child:
+
+        Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

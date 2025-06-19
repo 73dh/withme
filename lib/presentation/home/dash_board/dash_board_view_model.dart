@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
@@ -10,6 +11,7 @@ import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/router/router.dart';
 import '../../../core/router/router_path.dart';
+import '../../../domain/model/user_model.dart';
 
 class DashBoardViewModel with ChangeNotifier {
   DashBoardViewModel() {
@@ -30,10 +32,10 @@ class DashBoardViewModel with ChangeNotifier {
       notifyListeners();
 
       final customersAllData =
-          await getIt<CustomerUseCase>().execute(
-                usecase: GetAllDataUseCase(userKey: UserSession.userId),
-              )
-              as List<CustomerModel>;
+      await getIt<CustomerUseCase>().execute(
+        usecase: GetAllDataUseCase(userKey: UserSession.userId),
+      )
+      as List<CustomerModel>;
 
       // 월별 계약 고객 그룹 (startDate 기준)
       final Map<String, List<CustomerModel>> contractGrouped = {};
@@ -72,8 +74,8 @@ class DashBoardViewModel with ChangeNotifier {
       final Map<String, Map<String, List<CustomerModel>>> monthlyGrouped = {};
 
       final allMonths =
-          <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()
-            ..sort();
+      <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()
+        ..sort();
 
       for (var month in allMonths) {
         monthlyGrouped[month] = {
@@ -96,13 +98,64 @@ class DashBoardViewModel with ChangeNotifier {
     }
   }
 
-  Future<void> logout(BuildContext context ) async {
+  void setUserInfo(UserModel user) {
+    _state = state.copyWith(userInfo: user);
+  }
+
+  Future<void> logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     final authChangeNotifier = getIt<AuthChangeNotifier>();
     authChangeNotifier.setLoggedIn(false); // ✅ 로그인 상태 변화 알림
-   if(context.mounted){
-
-    context.go(RoutePath.login); // ✅ 명시적으로 이동 (안전망 역할)
-   }
+    if (context.mounted) {
+      context.go(RoutePath.login); // ✅ 명시적으로 이동 (안전망 역할)
+    }
   }
 }
+  extension InquiryDialogHandler on DashBoardViewModel {
+  void showInquiryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('유료회원 문의'),
+        content: const Text('문의 메일을 보내시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _sendInquiryEmail(context);
+            },
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sendInquiryEmail(BuildContext context) async {
+    final email = state.userInfo?.email ?? 'unknown@unknown.com';
+
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'kdaehee@gamil.com',
+      queryParameters: {
+        'subject': '유료회원 문의',
+        'body': '안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.',
+      },
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('메일 앱을 열 수 없습니다.')),
+        );
+      }
+    }
+  }
+}
+

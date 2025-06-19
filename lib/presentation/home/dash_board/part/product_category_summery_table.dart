@@ -24,15 +24,12 @@ class ProductCategorySummaryTable extends StatelessWidget {
         final category = policy.productCategory;
         if (category == null || category.trim().isEmpty) continue;
 
-        // 계약 건수
         categoryStats.putIfAbsent(category, () => _CategoryStats());
         categoryStats[category]!.contractCount += 1;
 
-        // 고객 수 중복 제거용
         categoriesPerCustomer.add(category);
       }
 
-      // 고객 수는 중복 제거 후 카운트
       for (final category in categoriesPerCustomer) {
         categoryStats[category]!.customerCount += 1;
       }
@@ -40,22 +37,31 @@ class ProductCategorySummaryTable extends StatelessWidget {
 
     final sortedKeys = categoryStats.keys.toList()..sort();
 
-    return RenderTable(
-      columnWidths: {
-        0: FixedColumnWidth(cellWidth * 1.5),
-        1: FixedColumnWidth(cellWidth),
-        2: FixedColumnWidth(cellWidth),
-      },
-      tableRows: [
+    final List<TableRow> rows = [
+      TableRow(
+        decoration: BoxDecoration(color: Colors.blue.shade50),
+        children: const [
+          RenderTableCellText('상품 카테고리', isHeader: true),
+          RenderTableCellText('고객 수', isHeader: true),
+          RenderTableCellText('계약 건수', isHeader: true),
+        ],
+      ),
+    ];
+
+    if (sortedKeys.isEmpty) {
+      rows.add(
         TableRow(
-          decoration: BoxDecoration(color: Colors.blue.shade50),
+          decoration: BoxDecoration(color: Colors.grey.shade100),
           children: const [
-            RenderTableCellText('상품 카테고리', isHeader: true),
-            RenderTableCellText('고객 수', isHeader: true),
-            RenderTableCellText('계약 건수', isHeader: true),
+            RenderTableCellText('해당건 없음'),
+            RenderTableCellText(''),
+            RenderTableCellText(''),
           ],
         ),
-        for (final category in sortedKeys)
+      );
+    } else {
+      for (final category in sortedKeys) {
+        rows.add(
           TableRow(
             decoration: BoxDecoration(color: Colors.grey.shade100),
             children: [
@@ -64,7 +70,17 @@ class ProductCategorySummaryTable extends StatelessWidget {
               RenderTableCellText('${categoryStats[category]!.contractCount}건'),
             ],
           ),
-      ],
+        );
+      }
+    }
+
+    return RenderTable(
+      columnWidths: {
+        0: FixedColumnWidth(cellWidth * 1.5),
+        1: FixedColumnWidth(cellWidth),
+        2: FixedColumnWidth(cellWidth),
+      },
+      tableRows: rows,
     );
   }
 }

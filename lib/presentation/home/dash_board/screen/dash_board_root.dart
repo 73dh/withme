@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/size.dart';
+import 'package:withme/domain/model/user_model.dart';
 import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
@@ -44,24 +46,29 @@ class _DashBoardRootState extends State<DashBoardRoot>
     super.dispose();
   }
 
-  void _toggleMenu() {
-    setState(() {
-      final isOpening = _menuStatus == MenuStatus.isClosed;
-      _menuStatus = isOpening ? MenuStatus.isOpened : MenuStatus.isClosed;
+  Future<void> _toggleMenu()async {
+    final isOpening = _menuStatus == MenuStatus.isClosed;
 
-      if (isOpening) {
-        if(viewModel.state.userInfo==null){
-          final userInfo=getIt<FBase>().getUserInfo();
-        }
-        _animationController.forward();
-        _bodyXPosition = -AppSizes.myMenuWidth;
-        _menuXPosition = AppSizes.deviceSize.width - AppSizes.myMenuWidth;
-      } else {
-        _animationController.reverse();
-        _bodyXPosition = 0;
-        _menuXPosition = AppSizes.deviceSize.width;
+    if (isOpening) {
+      // 비동기 처리: userInfo 로드
+      if (viewModel.state.userInfo == null) {
+        final snapshot = await getIt<FBase>().getUserInfo(); // await 추가
+        final user = UserModel.fromSnapshot(snapshot);       // 파싱
+        viewModel.setUserInfo(user);                         // 저장 or 상태 갱신
       }
+      _animationController.forward();
+      _bodyXPosition = -AppSizes.myMenuWidth;
+      _menuXPosition = AppSizes.deviceSize.width - AppSizes.myMenuWidth;
+    } else {
+      _animationController.reverse();
+      _bodyXPosition = 0;
+      _menuXPosition = AppSizes.deviceSize.width;
+    }
+
+    setState(() {
+      _menuStatus = isOpening ? MenuStatus.isOpened : MenuStatus.isClosed;
     });
+    
   }
 
   @override
@@ -86,14 +93,18 @@ class _DashBoardRootState extends State<DashBoardRoot>
                   bodyXPosition: _bodyXPosition,
                   animationController: _animationController,
                   onMenuTap: _toggleMenu,
+                  onInquiryTap: (){
+                    viewModel.showInquiryDialog(context); // ✅ ViewModel에서 처리
+                  },
                 ),
                 DashBoardSideMenu(
                   menuXPosition: _menuXPosition,
                   menuWidth: AppSizes.myMenuWidth,
                   onTap: () {
                     viewModel.logout(context);
-                    _toggleMenu();
                   },
+                  currentUser: viewModel.state.userInfo,
+                  onInquiryTap:_toggleMenu,
                 ),
               ],
             ),
@@ -102,4 +113,6 @@ class _DashBoardRootState extends State<DashBoardRoot>
       ),
     );
   }
+
+
 }

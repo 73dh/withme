@@ -16,13 +16,13 @@ class DashBoardPage extends StatelessWidget {
   final void Function() onMenuTap;
   final double bodyXPosition;
   final AnimationController animationController;
-
+  final void Function() onInquiryTap;
   const DashBoardPage({
     super.key,
     required this.viewModel,
     required this.onMenuTap,
     required this.bodyXPosition,
-    required this.animationController,
+    required this.animationController, required this.onInquiryTap,
   });
 
   @override
@@ -44,6 +44,8 @@ class DashBoardPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('DashBoard'),
           actions: [
+
+            IconButton(onPressed: onInquiryTap, icon: const Icon(Icons.settings)),
             IconButton(onPressed: onMenuTap, icon: const Icon(Icons.settings)),
           ],
         ),

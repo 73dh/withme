@@ -36,22 +36,31 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
 
     final sortedKeys = statsMap.keys.toList()..sort();
 
-    return RenderTable(
-      columnWidths: {
-        0: FixedColumnWidth(cellWidth * 1.5),
-        1: FixedColumnWidth(cellWidth),
-        2: FixedColumnWidth(cellWidth),
-      },
-      tableRows: [
+    final List<TableRow> rows = [
+      TableRow(
+        decoration: BoxDecoration(color: Colors.blue.shade50),
+        children: const [
+          RenderTableCellText('보험사', isHeader: true),
+          RenderTableCellText('고객 수', isHeader: true),
+          RenderTableCellText('계약 건수', isHeader: true),
+        ],
+      ),
+    ];
+
+    if (sortedKeys.isEmpty) {
+      rows.add(
         TableRow(
-          decoration: BoxDecoration(color: Colors.blue.shade50),
+          decoration: BoxDecoration(color: Colors.grey.shade100),
           children: const [
-            RenderTableCellText('보험사', isHeader: true),
-            RenderTableCellText('고객 수', isHeader: true),
-            RenderTableCellText('계약 건수', isHeader: true),
+            RenderTableCellText('해당건 없음'),
+            RenderTableCellText(''),
+            RenderTableCellText(''),
           ],
         ),
-        for (final company in sortedKeys)
+      );
+    } else {
+      for (final company in sortedKeys) {
+        rows.add(
           TableRow(
             decoration: BoxDecoration(color: Colors.grey.shade100),
             children: [
@@ -60,7 +69,17 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
               RenderTableCellText('${statsMap[company]!.contractCount}건'),
             ],
           ),
-      ],
+        );
+      }
+    }
+
+    return RenderTable(
+      columnWidths: {
+        0: FixedColumnWidth(cellWidth * 1.5),
+        1: FixedColumnWidth(cellWidth),
+        2: FixedColumnWidth(cellWidth),
+      },
+      tableRows: rows,
     );
   }
 }
