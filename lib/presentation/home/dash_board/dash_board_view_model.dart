@@ -145,23 +145,54 @@ class DashBoardViewModel with ChangeNotifier {
     }
   }
 
+  void sendSMS({required String phoneNumber,required String message}) async {
+    final Uri smsUri = Uri(
+      scheme: 'sms',
+      path: phoneNumber,
+      queryParameters: {
+        'body': message,
+      },
+    );
 
-
+    if (await canLaunchUrl(smsUri)) {
+      await launchUrl(smsUri, mode: LaunchMode.externalApplication);
+    } else {
+      // 앱을 열 수 없을 때 처리
+      print('문자 앱을 열 수 없습니다.');
+    }
+  }
 
   void sendInquiryEmail(BuildContext context) async {
     final email = state.userInfo?.email ?? 'unknown@unknown.com';
 
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'kdaehee@gamil.com',
+      path: 'kimdddhhh@naver.com',
       queryParameters: {
         'subject': '유료회원 문의',
         'body': '안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.',
       },
     );
-
+    if (!await canLaunchUrl(emailUri)) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('메일 앱 없음'),
+            content: const Text('메일 앱이 설치되어 있지 않거나 실행할 수 없습니다.\n앱스토어에서 메일 앱을 설치해 주세요.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
     if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
+      await launchUrl(emailUri,mode: LaunchMode.externalApplication,);
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(

@@ -59,6 +59,11 @@ class _DashBoardRootState extends State<DashBoardRoot>
             ),
             false => Stack(
               children: [
+                DashBoardPage(
+                  viewModel: viewModel,
+                  animationController: _animationController,
+                  onMenuTap: () => viewModel.toggleMenu(_animationController),
+                ),
                 DashBoardSideMenu(
                   viewModel: viewModel,
                   onTap: () {
@@ -81,19 +86,14 @@ class _DashBoardRootState extends State<DashBoardRoot>
                             onPressed: () {
                               Navigator.pop(context);
                              viewModel.sendInquiryEmail(context);
+                             // viewModel.sendSMS(phoneNumber: '01086049173',message: '문의드립니다.');
                             },
                             child: const Text('확인'),
                           ),
                         ],
                       ),
                     );
-                  }
-                  ,
-                ),
-                DashBoardPage(
-                  viewModel: viewModel,
-                  animationController: _animationController,
-                  onMenuTap: () => viewModel.toggleMenu(_animationController),
+                  },
                 ),
               ],
             ),

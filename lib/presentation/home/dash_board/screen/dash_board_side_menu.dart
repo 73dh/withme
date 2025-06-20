@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/size.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
 import '../../../../core/presentation/core_presentation_import.dart';
@@ -54,23 +55,34 @@ class DashBoardSideMenu extends StatelessWidget {
                       ],
                     ),
                     height(15),
+
                     Row(
                       children: [
-                        const Icon(Icons.person, color: Colors.black87),
+                        Icon(Icons.monetization_on),
                         width(5),
                         Text('${currentUser?.membershipStatus.toString()}'),
-                       Spacer(),
-                        SizedBox(
-                          width: 130,
-                          child: RenderFilledButton(
-                            foregroundColor: Colors.white,
-                            borderRadius: 5,
-                            onPressed: onInquiryTap,
-                            text: '유료회원 문의',
-                          ),
-                        ),
                       ],
                     ),
+                    height(15),
+                    Row(
+                      children: [
+                        Icon(Icons.date_range),
+                        width(5),
+                        Text('가입일시: ${currentUser?.agreedDate.formattedDate}'),
+                      ],
+                    ),
+                   DashedDivider(height: 30,),
+                    GestureDetector(
+                      onTap: onInquiryTap,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.email_outlined, color: Colors.black87),
+                          width(5),
+                          const Text('유료회원 문의'),
+                        ],
+                      ),
+                    ),
+
 
                     height(15),
                     GestureDetector(

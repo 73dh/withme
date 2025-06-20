@@ -12,6 +12,7 @@ class RenderFilledButton extends StatelessWidget {
   final List<PopupMenuEntry<dynamic>>? menuItems;
   final void Function(dynamic)? onMenuSelected;
   final String? selectedMenu;
+  final double? width; // 추가 옵션
 
   const RenderFilledButton({
     super.key,
@@ -23,47 +24,57 @@ class RenderFilledButton extends StatelessWidget {
     this.menuItems,
     this.onMenuSelected,
     this.selectedMenu,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
-      child: FilledButton(
-        onPressed:(){
-          print('button test');
-          onPressed?.call();
-        } ,
-        style: FilledButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: foregroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
-          ),
-        ),
-        child:
+      width: width ?? double.infinity, // 외부에서 전달 시 사용
+      child: _buildButton(),
+    );
+  }
 
-        Row(
-          mainAxisSize: MainAxisSize.max,
+  Widget _buildButton() {
+    final style = FilledButton.styleFrom(
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+    );
+
+    if (menuItems != null && menuItems!.isNotEmpty) {
+      return FilledButton(
+        onPressed: null,
+        style: style,
+        child: Row(
           children: [
-            if (menuItems != null)
-              PopupMenuButton<dynamic>(
-                itemBuilder: (context) => menuItems!,
-                onSelected: onMenuSelected as dynamic,
-                icon:  Icon(Icons.arrow_drop_down, size: 20,color: ColorStyles.menuButtonColor,),
-                padding: EdgeInsets.zero,
-                splashRadius: 20,
-              ),
+            PopupMenuButton<dynamic>(
+              itemBuilder: (context) => menuItems!,
+              onSelected: onMenuSelected,
+              icon: Icon(Icons.arrow_drop_down),
+              padding: EdgeInsets.zero,
+              splashRadius: 20,
+            ),
             Expanded(
               child: Text(
-                menuItems != null ? (selectedMenu ?? text) : text,
-                textAlign: menuItems != null ? TextAlign.left : TextAlign.center,
+                selectedMenu ?? text,
+                textAlign: TextAlign.left,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-      ),
+      );
+    }
+
+    return FilledButton(
+      onPressed: onPressed,
+      style: style,
+      child: Text(text, textAlign: TextAlign.center),
     );
   }
 }
+
+
