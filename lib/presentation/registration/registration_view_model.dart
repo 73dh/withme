@@ -54,6 +54,9 @@ class RegistrationViewModel with ChangeNotifier {
   }
 
   Future<void> _deleteCustomer({required String userKey, required String customerKey}) async {
+  print(userKey);
+  print(customerKey);
+
     return await getIt<CustomerUseCase>().execute(
       usecase: DeleteCustomerUseCase(userKey: userKey, customerKey: customerKey),
     );

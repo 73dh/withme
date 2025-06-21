@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
+import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/model/user_model.dart';
 
 import '../../di/setup.dart';
@@ -24,10 +25,9 @@ class FreeLimitDialog {
       );
 
       // ② Prospect 개수 확인
-      final itemList = await viewModel.cachedProspects.firstWhere(
-        (list) => list.isNotEmpty,
-        orElse: () => [],
-      );
+      final itemList = await viewModel.cachedProspects
+          .firstWhere((list) => list.isNotEmpty, orElse: () => [])
+          .timeout(AppDurations.duration50, onTimeout: () => []);
       final itemCount = itemList.length;
 
       // ③ 제한 조건 충족 시 다이얼로그 표시

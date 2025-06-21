@@ -37,7 +37,10 @@ class CommonConfirmDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilledButton(
-                      onPressed:  () => context.pop(),
+                      onPressed:  ()async{
+                       await onConfirm();
+                       if(context.mounted) context.pop();
+                      },
                       child: const Text('확인'),
                     ),
 

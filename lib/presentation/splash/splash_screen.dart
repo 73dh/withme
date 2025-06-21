@@ -30,10 +30,10 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(AppDurations.duration300);
 
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null || !user.emailVerified) {
-      authChangeNotifier.setLoggedIn(false); // 👈 명확히 로그아웃 상태 전달
+    if (user == null || !user.emailVerified || (user.uid.isEmpty)) {
+      authChangeNotifier.setLoggedIn(false);
       if (mounted) {
-        context.go(RoutePath.login); // ✅ 이것도 넣으면 확실함
+        context.go(RoutePath.login);
       }
       return;
     }

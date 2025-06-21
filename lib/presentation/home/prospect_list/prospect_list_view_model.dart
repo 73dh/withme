@@ -28,11 +28,11 @@ class ProspectListViewModel with ChangeNotifier {
 
   Future<void> fetchData({bool force = false}) async {
 
-    await Future.delayed(AppDurations.duration100);
 
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
       usecase: GetAllDataUseCase(userKey: UserSession.userId),
     );
+    await Future.delayed(AppDurations.duration100);
 
     final prospectCustomers =
     allCustomers.where((e) => e.policies.isEmpty).toList();
@@ -40,6 +40,8 @@ class ProspectListViewModel with ChangeNotifier {
     debugPrint('[Fetched prospects]: ${prospectCustomers.length}');
 
     List<CustomerModel> current = _cachedProspects.value;
+    bool listChanged = _isListChanged(current, prospectCustomers);
+    debugPrint('force: $force, listChanged: $listChanged');
 
     if (force || _isListChanged(current, prospectCustomers)) {
       final sorted = ApplyCurrentSortUseCase(
@@ -47,18 +49,35 @@ class ProspectListViewModel with ChangeNotifier {
         currentSortType: _sortStatus.type,
       ).call(prospectCustomers);
 
-      _cachedProspects.add(sorted);
+      debugPrint('Adding sorted list with length: ${sorted.length}');
+      _cachedProspects.add(List<CustomerModel>.from(sorted));
       notifyListeners();
+    } else {
+      debugPrint('No update needed, skipping add.');
     }
+    // if (force || _isListChanged(current, prospectCustomers)) {
+    //   final sorted = ApplyCurrentSortUseCase(
+    //     isAscending: _sortStatus.isAscending,
+    //     currentSortType: _sortStatus.type,
+    //   ).call(prospectCustomers);
+    //
+    //   _cachedProspects.add([...sorted]);
+    //   notifyListeners();
+    // }
   }
 
   bool _isListChanged(List<CustomerModel> oldList, List<CustomerModel> newList) {
     if (oldList.length != newList.length) return true;
 
-    final oldKeys = oldList.map((e) => e.customerKey).toSet();
-    final newKeys = newList.map((e) => e.customerKey).toSet();
+    for (int i = 0; i < oldList.length; i++) {
+      if (oldList[i].customerKey != newList[i].customerKey) return true;
 
-    return !oldKeys.containsAll(newKeys) || !newKeys.containsAll(oldKeys);
+      // 원하는 필드 몇 개 더 비교 (예: 이름, 생일 등)
+      if (oldList[i].name != newList[i].name) return true;
+      if (oldList[i].birth != newList[i].birth) return true;
+      // 필요시 더 비교
+    }
+    return false;
   }
 
 

@@ -58,6 +58,11 @@ class SearchPageViewModel with ChangeNotifier {
   }
 
   Future<void> getAllData() async {
+    final userKey = UserSession.userId;
+    if (userKey.isEmpty) {
+      debugPrint('[SearchPageViewModel] userKey is empty. Aborting data load.');
+      return;
+    }
     _state = state.copyWith(isLoadingAllData: true);
     notifyListeners();
     final stopwatch = Stopwatch()..start();

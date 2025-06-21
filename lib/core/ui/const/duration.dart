@@ -1,5 +1,6 @@
 abstract interface class AppDurations{
 
+static const  duration50= Duration(milliseconds: 50);
 static const  duration100= Duration(milliseconds: 100);
 static const  duration300= Duration(milliseconds: 300);
 static const  duration500= Duration(milliseconds: 500);

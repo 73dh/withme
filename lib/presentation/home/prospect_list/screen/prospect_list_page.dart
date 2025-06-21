@@ -88,14 +88,16 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
             return StreamBuilder<List<CustomerModel>>(
               stream: viewModel.cachedProspects,
               builder: (context, snapshot) {
+                debugPrint('StreamBuilder rebuild - hasData: ${snapshot.hasData}, length: ${snapshot.data?.length}');
+
                 if (snapshot.hasError) {
                   log(snapshot.error.toString());
                 }
+
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   _insertFabOverlayIfAllowed(); // prospect 없어도 호출되도록
                   return const Center(child: Text('가망고객이 없습니다.'));
                 }
-
                 final prospectsOrigin = snapshot.data!;
                 final filteredProspects =
                     prospectsOrigin
@@ -103,6 +105,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                         .toList();
 
                 return Scaffold(
+                  backgroundColor: Colors.transparent,
                   appBar: _appBar(filteredProspects.length),
                   body: _prospectList(filteredProspects),
                 );
@@ -146,7 +149,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                   extra: customer,
                 );
                 if (result == true) {
-                  viewModel.fetchData(force: true);
+                await  viewModel.fetchData(force: true);
                 }
               },
               child: ProspectItem(
@@ -255,6 +258,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                                     viewModel: viewModel,
                                   );
 
+                            print('isLimited: $isLimited');
                               if (isLimited) return;
                               overlaySetState?.call(() {
                                 _fabExpanded = false;
@@ -265,8 +269,9 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                                 final result = await context.push(
                                   RoutePath.registration,
                                 );
+                                print('result from registration: $result');
                                 if (result == true) {
-                                  viewModel.fetchData(force: true);
+                                await  viewModel.fetchData(force: true);
                                 }
                               }
                             }

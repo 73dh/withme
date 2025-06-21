@@ -39,6 +39,7 @@ class CustomAppBar extends StatelessWidget {
                 text: '가망고객을 삭제하시겠습니까?',
                 onConfirm: () async {
                   // 삭제 처리
+                  print('delete');
                   viewModel.onEvent(
                     RegistrationEvent.deleteCustomer(
                       userKey:UserSession.userId,

@@ -183,10 +183,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           registeredDateController: _registeredDateController,
                           isRegistering: _isRegistering,
                           onPressed: () async {
+                            print('Submit button pressed');
                             setModalState(() => _isRegistering = true);
                             await _submitForm();
+                            print('After _submitForm call');
                             if (modalContext.mounted) {
-                              modalContext.pop(); // Close bottom sheet
+                              modalContext.pop(true); // Close bottom sheet
                             }
                             // setModalState(() => isRegistering = false);
                           },
@@ -219,7 +221,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return false;
   }
 
-  Future<void> _submitForm() async {
+  Future _submitForm() async {
     try {
       User? currentUser = FirebaseAuth.instance.currentUser;
       final customerMap = CustomerModel.toMapForCreateCustomer(
@@ -261,9 +263,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       }
 
       await getIt<ProspectListViewModel>().fetchData(force: true);
-
+      debugPrint('fetchData completed');
       if (mounted) context.pop(true);
-    } catch (e) {
+    } catch (e,st) {
+      debugPrint('submitForm error: $e');
+      debugPrint('$st');
       if (mounted) {
         renderSnackBar(context, text: '등록에 실패했습니다. 다시 시도해주세요.');
       }

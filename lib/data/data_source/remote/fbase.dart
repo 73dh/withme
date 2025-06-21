@@ -61,6 +61,7 @@ class FBase {
   Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
     required String userKey,
   }) {
+
     return FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
