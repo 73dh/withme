@@ -70,12 +70,13 @@ class PolicyPart extends StatelessWidget {
 
   PopupMenuButton<dynamic> _selectProductCategory() {
     return PopupMenuButton(
-      icon: const Icon(Icons.drag_indicator),
+      icon: const Icon(Icons.dehaze_outlined),
       onSelected: (value) => onCategoryTap(value.toString()),
       itemBuilder: (context) {
         return ProductCategory.values
             .map(
               (e) => PopupMenuItem(
+           value: e,
                 child: Row(
                   children: [
                     Icon(e.getCategoryIcon()),
@@ -92,12 +93,13 @@ class PolicyPart extends StatelessWidget {
 
   PopupMenuButton<dynamic> _selectInsuranceCompany() {
     return PopupMenuButton(
-      icon: const Icon(Icons.drag_indicator),
+      icon: const Icon(Icons.warehouse_outlined),
       onSelected: (value)=> onCompanyTap(value.toString()),
       itemBuilder: (context) {
         return InsuranceCompany.values
             .map(
               (e) => PopupMenuItem(
+                value: e,
                 child: Text(e.toString()),
               ),
             )

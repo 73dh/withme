@@ -13,6 +13,7 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
   final String userKey;
 
   GetAllDataUseCase({required this.userKey});
+
   @override
   Future<List<CustomerModel>> call(CustomerRepository repository) async {
     final customerRepository = getIt<CustomerRepository>();
@@ -20,22 +21,29 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
     final policyUseCase = getIt<PolicyUseCase>();
 
     // Step 1: 모든 고객 데이터 가져오기
-    final originalCustomers = await customerRepository.getAll(userKey:userKey ).first;
+    final originalCustomers =
+        await customerRepository.getAll(userKey: userKey).first;
 
     // Step 2: history 및 policy를 병렬로 요청
     final futures = originalCustomers.map((customer) async {
-      final histories = await historyUseCase
-          .call(usecase: GetHistoriesUseCase(userKey: userKey, customerKey: customer.customerKey))
-          .first;
+      final histories =
+          await historyUseCase
+              .call(
+                usecase: GetHistoriesUseCase(
+                  userKey: userKey,
+                  customerKey: customer.customerKey,
+                ),
+              )
+              .first;
 
-      final policies = await policyUseCase
-          .call(usecase: GetPoliciesUseCase(customerKey: customer.customerKey))
-          .first;
+      final policies =
+          await policyUseCase
+              .call(
+                usecase: GetPoliciesUseCase(customerKey: customer.customerKey),
+              )
+              .first;
 
-      return customer.copyWith(
-        histories: histories,
-        policies: policies,
-      );
+      return customer.copyWith(histories: histories, policies: policies);
     });
 
     // Step 3: 병렬 처리된 고객 목록 반환

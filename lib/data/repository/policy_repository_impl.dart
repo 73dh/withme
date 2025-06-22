@@ -1,4 +1,4 @@
-import 'package:withme/core/utils/transformers.dart';
+import 'package:withme/core/utils/transformers/transformers.dart';
 import 'package:withme/data/data_source/remote/fbase.dart';
 import 'package:withme/domain/repository/policy_repository.dart';
 
@@ -14,11 +14,18 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
     return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
   }
 
+  // @override
+  // Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
+  //   return (await fBase.getPolicies(
+  //     customerKey: customerKey,
+  //   )).docs.map((e) => PolicyModel.fromSnapshot(e)).toList();
+  // }
   @override
   Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
-    return (await fBase.getPolicies(
-      customerKey: customerKey,
-    )).docs.map((e) => PolicyModel.fromSnapshot(e)).toList();
+    final snapshot = await fBase.fetchPolicies(customerKey: customerKey).first;
+
+    // snapshot.docs가 DocumentSnapshot의 리스트라면 다음과 같이 처리
+    return snapshot.docs.map((doc) => PolicyModel.fromSnapshot(doc)).toList();
   }
 
   @override
@@ -31,6 +38,19 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
       userKey: userKey,
       customerKey: customerKey,
       policyData: policyData,
+    );
+  }
+
+  @override
+  Future<void> changePolicyState({
+    required String customerKey,
+    required String policyKey,
+    required String policyState,
+  })async {
+    return await fBase.changePolicyState(
+      customerKey: customerKey,
+      policyKey: policyKey,
+      policyState: policyState,
     );
   }
 }

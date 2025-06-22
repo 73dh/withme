@@ -7,12 +7,26 @@ import '../../../core/router/router_path.dart';
 
 class AddPolicyButton extends StatelessWidget {
   final CustomerModel customerModel;
-  const AddPolicyButton({super.key, required this.customerModel});
+  final VoidCallback? onRegistered;
+
+  const AddPolicyButton({
+    super.key,
+    required this.customerModel,
+    this.onRegistered,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return  AddPolicyWidget(
-      onTap: () => context.push(RoutePath.policy, extra: customerModel),
+    return AddPolicyWidget(
+      onTap: () async {
+        final result = await context.push(
+          RoutePath.policy,
+          extra: customerModel,
+        );
+        if (result == true) {
+          onRegistered?.call(); // ✅ 등록 성공 시 콜백 실행
+        }
+      },
     );
   }
 }

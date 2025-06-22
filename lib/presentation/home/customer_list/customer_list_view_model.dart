@@ -7,6 +7,7 @@ import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/domain/use_case/policy_use_case.dart';
 import 'package:withme/presentation/home/customer_list/customer_list_state.dart';
 
+import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/domain_import.dart';
 
 class CustomerListViewModel with ChangeNotifier {
@@ -32,11 +33,13 @@ class CustomerListViewModel with ChangeNotifier {
   }
 
   Future<void> _fetchData() async {
-
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(userKey: FirebaseAuth.instance.currentUser?.uid??''),
+      usecase: GetAllDataUseCase(
+        userKey: FirebaseAuth.instance.currentUser?.uid ?? '',
+      ),
     );
-    final policyCustomers=allCustomers.where((e)=>e.policies.isNotEmpty).toList();
+    final policyCustomers =
+        allCustomers.where((e) => e.policies.isNotEmpty).toList();
     _cachedCustomers.add(policyCustomers);
   }
 

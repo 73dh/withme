@@ -110,11 +110,11 @@ class DashBoardViewModel with ChangeNotifier {
 
     if (isOpening) {
       // 1. 사용자 정보 로드 (필요 시)
-      if (state.userInfo == null) {
+      // if (state.userInfo == null) {
         final snapshot = await getIt<FBase>().getUserInfo();
         final user = UserModel.fromSnapshot(snapshot);
         setUserInfo(user);
-      }
+      // }
 
       // 2. 메뉴 열기 애니메이션
       controller.forward();

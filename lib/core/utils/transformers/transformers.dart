@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/model/policy_model.dart';
 
-import '../../domain/model/customer_model.dart';
+import '../../../domain/model/customer_model.dart';
 
 mixin class Transformers {
   final toPools = StreamTransformer<

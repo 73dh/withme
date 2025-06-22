@@ -111,7 +111,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           _buildRecommenderPart(),
           height(20),
           if (_isReadOnly)
-            AddPolicyButton(customerModel: widget.customerModel!),
+            AddPolicyButton(
+              customerModel: widget.customerModel!,
+              onRegistered: () async {
+                await getIt<CustomerListViewModel>()
+                    .refresh(); // ✅ 등록 후 리스트 재갱신
+              },
+            ),
         ],
       ),
     ),
@@ -139,7 +145,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     onSexChanged: (value) => setState(() => _sex = value),
     birthController: _birthController,
     onBirthInitPressed:
-        () => setState(() {
+        ()async => setState(() {
           _birth = null;
           _birthController.clear();
         }),
@@ -187,11 +193,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             setModalState(() => _isRegistering = true);
                             await _submitForm();
                             print('After _submitForm call');
+
                             if (modalContext.mounted) {
-                              modalContext.pop(true); // Close bottom sheet
+                              setModalState(() => _isRegistering = false);
+                              Navigator.of(modalContext).pop(); // BottomSheet 닫기만!
                             }
-                            // setModalState(() => isRegistering = false);
+
+                            // 실제 등록 화면 pop(true)는 여기에!
+                            if (context.mounted) context.pop(true);
                           },
+
                           sex: _sex,
                           birth: _birth,
                         ),
@@ -264,8 +275,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       await getIt<ProspectListViewModel>().fetchData(force: true);
       debugPrint('fetchData completed');
-      if (mounted) context.pop(true);
-    } catch (e,st) {
+    } catch (e, st) {
       debugPrint('submitForm error: $e');
       debugPrint('$st');
       if (mounted) {

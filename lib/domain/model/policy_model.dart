@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
+import '../../core/domain/enum/policy_state.dart';
 import '../domain_import.dart';
 
 class PolicyModel {
@@ -68,7 +69,7 @@ class PolicyModel {
           map[keyEndDate] is Timestamp
               ? (map[keyEndDate] as Timestamp).toDate()
               : DateTime.now().toUtc(),
-      policyState: map[keyPolicyState] ?? '유지',
+      policyState: map[keyPolicyState] ?? PolicyState.keep.label,
 
       documentReference: reference,
     );
@@ -116,7 +117,7 @@ class PolicyModel {
     map[keyPremium] = premium;
     map[keyStartDate] = startDate;
     map[keyEndDate] = endDate;
-    map[keyPolicyState] = '유지';
+    map[keyPolicyState] = PolicyState.keep.label;
 
     return map;
   }

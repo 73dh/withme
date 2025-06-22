@@ -6,7 +6,11 @@ class CommonConfirmDialog extends StatelessWidget {
   final String text;
   final Future<void> Function() onConfirm;
 
-  const CommonConfirmDialog({super.key, required this.text, required this.onConfirm});
+  const CommonConfirmDialog({
+    super.key,
+    required this.text,
+    required this.onConfirm,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,20 +41,23 @@ class CommonConfirmDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilledButton(
-                      onPressed:  ()async{
-                       await onConfirm();
-                       if(context.mounted) context.pop();
+                      onPressed: () async {
+                        await onConfirm();
+
+                        if (context.mounted) {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
+                        }
                       },
                       child: const Text('확인'),
                     ),
-
                   ],
                 ),
                 height(10),
               ],
             ),
           ),
-
         ],
       ),
     );

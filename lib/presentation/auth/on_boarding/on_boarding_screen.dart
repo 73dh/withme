@@ -39,25 +39,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     // 데이터 로딩 수행
     try {
-      final currentUser=FirebaseAuth.instance.currentUser;
+      final currentUser = FirebaseAuth.instance.currentUser;
       debugPrint('이메일 인증 완료, 홈 화면으로 이동합니다., firebase 생성');
       await FirebaseFirestore.instance
           .collection(collectionUsers)
           .doc(UserSession.userId)
           .set(
-        UserModel(
-          userKey: currentUser?.uid??'',       // 실제 uid 사용
-          email: currentUser?.email ?? '',
-         membershipStatus: MembershipStatus.free,
-          agreedDate: DateTime.now(),
-        ).toMap(),
-      );
+            UserModel(
+              userKey: currentUser?.uid ?? '', // 실제 uid 사용
+              email: currentUser?.email ?? '',
+              membershipStatus: MembershipStatus.free,
+              paidAt:DateTime(2020),
+              agreedDate: DateTime.now(),
+            ).toMap(),
+          );
 
       await getIt<ProspectListViewModel>().fetchData();
       await getIt<CustomerListViewModel>().refresh();
     } catch (_) {}
 
-    authChangeNotifier.setDataLoaded(true);  // 데이터 로딩 완료 표시
+    authChangeNotifier.setDataLoaded(true); // 데이터 로딩 완료 표시
 
     if (mounted) {
       setState(() {
@@ -81,25 +82,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height(40),
             const Text(
               '이 앱은 가망고객을 발굴한 후\n고객을 손쉽게 체계적으로 관리할수 있도록\n만들었습니다.'
-                  '\n\n생일, 상령일, 미관리 고객등을 선별해 볼수도 있으며\n계약자의 경우 계약내용까지 관리가 가능합니다.'
-                  '\n\n또한, Dashboard에서는 현재 관리중인 가망고객이나 계약자의 통계를 확인할 수 있습니다.'
-                  '\n\n\n50명 고객까지는 무료로 사용이 가능하며, \n이상의 고객을 관리하기 위해서는 유료 서비스를 신청하시기 바랍니다.'
-                  '\n\n\n\n 문의: kdaehee@gmail.com',
+              '\n\n생일, 상령일, 미관리 고객등을 선별해 볼수도 있으며\n계약자의 경우 계약내용까지 관리가 가능합니다.'
+              '\n\n또한, Dashboard에서는 현재 관리중인 가망고객이나 계약자의 통계를 확인할 수 있습니다.'
+              '\n\n\n50명 고객까지는 무료로 사용이 가능하며, \n이상의 고객을 관리하기 위해서는 유료 서비스를 신청하시기 바랍니다.'
+              '\n\n\n\n 문의: kdaehee@gmail.com',
               style: TextStyles.normal14,
             ),
             height(40),
             ElevatedButton(
               onPressed: _isLoading ? null : _completeOnboarding,
-              child: _isLoading
-                  ? SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-                  : const Text('시작하기'),
+              child:
+                  _isLoading
+                      ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : const Text('시작하기'),
             ),
           ],
         ),

@@ -6,7 +6,7 @@ class AddPolicyWidget extends StatefulWidget {
   final void Function() onTap;
   final double size;
 
-  const AddPolicyWidget({super.key, required this.onTap,  this.size=50});
+  const AddPolicyWidget({super.key, required this.onTap, this.size = 50});
 
   @override
   State<AddPolicyWidget> createState() => _AddPolicyWidgetState();
@@ -33,7 +33,7 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
 
   @override
   void dispose() {
- _animationController?.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 

@@ -43,3 +43,4 @@ const String keyUserKey='userKey';
 const String keyEmail='email';
 const String keyAgreedDate='agreedDate';
 const String keyMembershipStatus='memberShipStatus';
+const String keyPaidAt='paidDate';

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import 'package:withme/domain/model/policy_model.dart';
@@ -133,13 +134,13 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     onCategoryTap: (value) {
                       setState(() {
                         _productCategory = value.toString();
-                        context.pop();
+                        // context.pop();
                       });
                     },
                     onCompanyTap: (value) {
                       setState(() {
                         _insuranceCompany = value.toString();
-                        context.pop();
+                        // context.pop();
                       });
                     },
                     productNameController: _productNameController,
@@ -235,7 +236,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
     );
   }
 
-  void _tryValidation() async{
+  void _tryValidation() async {
     if (_formKey.currentState!.validate()) {
       if (_policyHolderBirth == null) {
         renderSnackBar(context, text: '계약자 생일을 확인하세요');
@@ -275,7 +276,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
       }
       setState(() => _isCompleted = true);
       _formKey.currentState!.save();
- final result=await     showModalBottomSheet(
+      final result = await showModalBottomSheet(
         context: context,
         builder: (context) {
           return SizedBox(
@@ -285,15 +286,21 @@ class _PolicyScreenState extends State<PolicyScreen> {
           );
         },
       );
- if(result==true&&mounted){
-   context.pop(true);
-      // return;
- }
-
+      if (result == true && mounted) {
+        context.pop(true);
+      }
     }
   }
 
-  _confirmBox(context) {
+  _confirmBox(BuildContext context) {
+    // 안전성 확인용 null 체크
+    if (_policyHolderBirth == null ||
+        _insuredBirth == null ||
+        _startDate == null ||
+        _endDate == null) {
+      return const Center(child: Text('입력 누락 발생'));
+    }
+
     final policyMap = PolicyModel.toMapForCreatePolicy(
       policyHolder: _policyHolderName,
       policyHolderBirth: _policyHolderBirth!,
@@ -310,33 +317,23 @@ class _PolicyScreenState extends State<PolicyScreen> {
       endDate: _endDate!,
     );
 
-    // final policyMapSample = PolicyModel.toMapForCreatePolicy(
-    //   policyHolder: '홍길동',
-    //   policyHolderBirth: DateTime.now(),
-    //   policyHolderSex: '여',
-    //   insured: '김신한',
-    //   insuredBirth: DateTime.now(),
-    //   insuredSex: '남',
-    //   productCategory: '저축보험',
-    //   insuranceCompany: '삼성생명',
-    //   productName: '(무)삼성저축보험',
-    //   paymentMethod: '월납',
-    //   premium: '100000',
-    //   startDate: DateTime.now(),
-    //   endDate: DateTime.now(),
-    // );
-
-    // original
     return PolicyConfirmBox(
       policyMap: policyMap,
-      onChecked: (bool result) async{
+      onChecked: (bool result) async {
         if (result == true) {
-       await   getIt<PolicyViewModel>().addPolicy(
+          if (widget.customer.customerKey.isEmpty) {
+            renderSnackBar(context, text: '고객 정보 오류');
+            return;
+          }
+
+          await getIt<PolicyViewModel>().addPolicy(
             userKey: UserSession.userId,
             customerKey: widget.customer.customerKey,
             policyData: policyMap,
           );
-       Navigator.pop(context,true);
+
+          await getIt<CustomerListViewModel>().refresh();
+          if (context.mounted) Navigator.pop(context, true);
         }
       },
     );

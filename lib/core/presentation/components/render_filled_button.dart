@@ -46,23 +46,22 @@ class RenderFilledButton extends StatelessWidget {
 
     if (menuItems != null && menuItems!.isNotEmpty) {
       return FilledButton(
-        onPressed: null,
+        onPressed: onPressed,
         style: style,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             PopupMenuButton<dynamic>(
               itemBuilder: (context) => menuItems!,
               onSelected: onMenuSelected,
-              icon: Icon(Icons.arrow_drop_down),
+              icon: Icon(Icons.arrow_drop_down,size: 25,),
               padding: EdgeInsets.zero,
               splashRadius: 20,
             ),
-            Expanded(
-              child: Text(
-                selectedMenu ?? text,
-                textAlign: TextAlign.left,
-                overflow: TextOverflow.ellipsis,
-              ),
+            Text(
+              selectedMenu ?? text,
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

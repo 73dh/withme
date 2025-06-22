@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/router/router_path.dart';
@@ -14,6 +15,7 @@ import 'package:withme/presentation/customer/customer_view_model.dart';
 
 import '../../core/di/setup.dart';
 import '../../core/domain/enum/history_content.dart';
+import '../../core/domain/enum/policy_state.dart';
 import '../../core/presentation/core_presentation_import.dart';
 import '../../core/utils/extension/number_format.dart';
 import '../../domain/model/customer_model.dart';
@@ -26,6 +28,7 @@ class CustomerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = getIt<CustomerViewModel>();
     return SafeArea(
       child: Scaffold(
         appBar: _appBar(context),
@@ -38,16 +41,12 @@ class CustomerScreen extends StatelessWidget {
               PartTitle(
                 text: '고객 정보 (등록일: ${customer.registeredDate.formattedDate})',
               ),
-              _customerPart(),
+              _customerPart(viewModel),
               height(15),
               const PartTitle(text: '보험계약 정보'),
               Expanded(
                 child: StreamBuilder<List<PolicyModel>>(
-                  stream: getIt<PolicyUseCase>().call(
-                    usecase: GetPoliciesUseCase(
-                      customerKey: customer.customerKey,
-                    ),
-                  ),
+                  stream: viewModel.getPolicies(customer.customerKey),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       log(snapshot.error.toString());
@@ -92,7 +91,7 @@ class CustomerScreen extends StatelessWidget {
     );
   }
 
-  PartBox _customerPart() {
+  PartBox _customerPart(CustomerViewModel viewModel) {
     return PartBox(
       child: SizedBox(
         width: double.infinity,
@@ -113,7 +112,9 @@ class CustomerScreen extends StatelessWidget {
                   ),
                   height(5),
                   Text(
-                    '생년월일: ${customer.birth?.formattedDate ?? ''} (${calculateAge(customer.birth!)}세)',
+                    customer.birth != null
+                        ? '생년월일: ${customer.birth!.formattedDate} (${calculateAge(customer.birth!)}세)'
+                        : '생년월일 정보 없음',
                   ),
                   height(5),
                   Text(
@@ -123,8 +124,8 @@ class CustomerScreen extends StatelessWidget {
                 ],
               ),
               StreamBuilder<List<HistoryModel>>(
-                stream: getIt<CustomerViewModel>().getHistories(
-                  FirebaseAuth.instance.currentUser!.uid,
+                stream: viewModel.getHistories(
+                  UserSession.userId,
                   customer.customerKey,
                 ),
                 builder: (context, snapshot) {
@@ -173,9 +174,11 @@ class CustomerScreen extends StatelessWidget {
                     ),
                     sexIcon(policy.insuredSex),
                     width(10),
-                    Text(
-                      '${policy.insuredBirth?.formattedDate} (${calculateAge(policy.insuredBirth!)}세)',
-                    ),
+                    policy.insuredBirth != null
+                        ? Text(
+                          '${policy.insuredBirth!.formattedDate} (${calculateAge(policy.insuredBirth!)}세)',
+                        )
+                        : const Text('피보험자 생년월일 정보 없음'),
                   ],
                 ),
               ],
@@ -205,14 +208,14 @@ class CustomerScreen extends StatelessWidget {
                 Text(
                   '보험료: ${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))} (${policy.paymentMethod})',
                   style:
-                      policy.policyState == '해지'
+                      policy.policyState == PolicyState.cancelled.label
                           ? TextStyles.cancelStyle
                           : null,
                 ),
                 Text(
                   policy.policyState,
                   style:
-                      policy.policyState == '해지'
+                      policy.policyState == PolicyState.cancelled.label
                           ? TextStyles.cancelStyle
                           : null,
                 ),

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
+import '../../../domain/model/user_model.dart';
 
 class FBase {
   // User
@@ -37,7 +38,6 @@ class FBase {
     required String userKey,
     required Map<String, dynamic> customerData,
   }) async {
-    print(customerData);
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
@@ -61,7 +61,6 @@ class FBase {
   Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
     required String userKey,
   }) {
-
     return FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
@@ -115,17 +114,17 @@ class FBase {
         .snapshots();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getPolicies({
-    required String customerKey,
-  }) {
-    return FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .get();
-  }
+  // Future<QuerySnapshot<Map<String, dynamic>>> getPolicies({
+  //   required String customerKey,
+  // }) {
+  //   return FirebaseFirestore.instance
+  //       .collection(collectionUsers)
+  //       .doc(UserSession.userId)
+  //       .collection(collectionCustomer)
+  //       .doc(customerKey)
+  //       .collection(collectionPolicies)
+  //       .get();
+  // }
 
   Future<void> addPolicy({
     required String userKey,
@@ -155,5 +154,23 @@ class FBase {
     });
 
     await policyRef.set(policyData);
+  }
+
+  Future<void> changePolicyState({
+    required String customerKey,
+    required String policyKey,
+    required String policyState,
+  }) async {
+    DocumentReference policyRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(UserSession.userId)
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionPolicies)
+        .doc(policyKey); // <- 기존 정책 문서의 key 사용
+
+    await policyRef.update({
+      keyPolicyState: policyState, // 이 필드만 업데이트됨
+    });
   }
 }

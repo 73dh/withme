@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/setup.dart';
+import 'package:withme/core/presentation/components/animated_text.dart';
 import 'package:withme/core/presentation/components/policy_item.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/const/duration.dart';
@@ -15,15 +16,32 @@ import 'package:withme/presentation/home/search/search_page_view_model.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
 
-class SearchPage extends StatelessWidget {
-  SearchPage({super.key});
+class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
 
-  final viewModel = getIt<SearchPageViewModel>();
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
 
-    final userKey=FirebaseAuth.instance.currentUser?.uid;
+class _SearchPageState extends State<SearchPage> {
+  late final viewModel = getIt<SearchPageViewModel>();
+
+  final userKey = FirebaseAuth.instance.currentUser?.uid;
+  bool _hasFetchedDataOnExpand = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Future.microtask(()=>viewModel.getAllData());
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (userKey == null) {
+      return const Center(child: Text('로그인 정보가 없습니다.'));
+    }
     return ListenableBuilder(
       listenable: viewModel,
       builder: (context, _) {
@@ -31,30 +49,37 @@ class SearchPage extends StatelessWidget {
           appBar: _buildAppBar(),
           body: Stack(
             children: [
-              if (viewModel.state.currentSearchOption == SearchOption.filterPolicy)
+              if (viewModel.state.currentSearchOption ==
+                  SearchOption.filterPolicy)
                 _buildPolicyList(context)
-            else  if (viewModel.state.currentSearchOption != null)
+              else if (viewModel.state.currentSearchOption != null)
                 _buildCustomerList(context),
               AnimatedSwitcher(
                 duration: AppDurations.duration300,
-                child:
-                    viewModel.state.currentSearchOption == null
-                        ? const Align(
-                          key: ValueKey(
-                            'select_button_text',
-                          ), // key가 꼭 달라야 애니메이션이 동작함
-                          alignment: FractionalOffset(0.5, 0.33),
-                          child: Text(
-                            '검색하고자 하는 조건을 선택하세요.',
-                            style: TextStyles.bold16,
-                          ),
-                        )
-                        : const SizedBox.shrink(
-                          key: ValueKey(
-                            'empty',
-                          ), // 다른 key를 주어야 AnimatedSwitcher가 인식
-                        ),
-              ),
+                child: viewModel.state.currentSearchOption == null
+                    ? Stack(
+                  key: const ValueKey('select_button_text'),
+                  children: [
+                    Positioned(
+                      top: 45,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.search),
+                          width(20),
+                          const AnimatedText(text: '아래 조건을 선택하세요.'),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+                    : const SizedBox.shrink(
+                  key: ValueKey('empty'),
+                ),
+              )
+,
               _buildDraggableFilterSheet(),
             ],
           ),
@@ -107,40 +132,44 @@ class SearchPage extends StatelessWidget {
       duration: AppDurations.duration300,
       switchInCurve: Curves.easeIn,
       switchOutCurve: Curves.easeOut,
-      child: customers.isEmpty
-          ? const Center(
-        key: ValueKey('empty'),
-        child: Text('조건에 맞는 고객이 없습니다.'),
-      )
-          : ListView.builder(
-        key: ValueKey('option-${viewModel.state.currentSearchOption}-$customersKey'),
-        padding: EdgeInsets.only(bottom: bottomPadding),
-        itemCount: customers.length,
-        itemBuilder: (context, index) {
-          final customer = customers[index];
-          final item = customer.policies.isEmpty
-              ? _buildProspectItem(context, customer)
-              : _buildCustomerItem(context, customer);
+      child:
+          customers.isEmpty
+              ? const Center(
+                key: ValueKey('empty'),
+                child: Text('조건에 맞는 고객이 없습니다.'),
+              )
+              : ListView.builder(
+                key: ValueKey(
+                  'option-${viewModel.state.currentSearchOption}-$customersKey',
+                ),
+                padding: EdgeInsets.only(bottom: bottomPadding),
+                itemCount: customers.length,
+                itemBuilder: (context, index) {
+                  final customer = customers[index];
+                  final item =
+                      customer.policies.isEmpty
+                          ? _buildProspectItem(context, customer)
+                          : _buildCustomerItem(context, customer);
 
-          return AnimatedSlide(
-            key: ValueKey(customer.customerKey),
-            offset: const Offset(0, 0.1),
-            duration: Duration(milliseconds: 300 + index * 30),
-            child: AnimatedOpacity(
-              opacity: 1,
-              duration: Duration(milliseconds: 300 + index * 30),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: item,
+                  return AnimatedSlide(
+                    key: ValueKey(customer.customerKey),
+                    offset: const Offset(0, 0.1),
+                    duration: Duration(milliseconds: 300 + index * 30),
+                    child: AnimatedOpacity(
+                      opacity: 1,
+                      duration: Duration(milliseconds: 300 + index * 30),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: item,
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
-        },
-      ),
     );
   }
 
-  Widget _buildProspectItem(BuildContext context, dynamic customer) {
+  Widget _buildProspectItem(BuildContext context, CustomerModel customer) {
     return GestureDetector(
       onTap: () async {
         showDialog(
@@ -178,6 +207,13 @@ class SearchPage extends StatelessWidget {
 
   Widget _buildDraggableFilterSheet() {
     return NotificationListener<DraggableScrollableNotification>(
+      onNotification: (notification) {
+        if (!_hasFetchedDataOnExpand && notification.extent > 0.2) {
+          _hasFetchedDataOnExpand = true;
+          viewModel.getAllData();
+        }
+        return true;
+      },
       child: DraggableScrollableSheet(
         initialChildSize: 0.1,
         minChildSize: 0.1,
@@ -200,13 +236,13 @@ class SearchPage extends StatelessWidget {
               ),
               if (viewModel.state.isLoadingAllData)
                 Positioned(
-                  top: 15,
+                  top: 13,
                   left: 20,
                   child: Row(
                     children: [
-                      Text('업데이트중'),
+                      const Text('Loading'),
                       width(5),
-                      MyCircularIndicator(size: 10),
+                      const MyCircularIndicator(size: 10),
                     ],
                   ),
                 ),

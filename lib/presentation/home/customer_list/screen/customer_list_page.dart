@@ -5,6 +5,7 @@ import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
 import '../../../../../core/di/setup.dart';
+import '../../../../core/presentation/components/animated_text.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../domain/domain_import.dart';
 
@@ -15,7 +16,7 @@ class CustomerListPage extends StatefulWidget {
   State<CustomerListPage> createState() => _CustomerListPageState();
 }
 
-class _CustomerListPageState extends State<CustomerListPage> {
+class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
   final viewModel = getIt<CustomerListViewModel>();
   String _searchText = '';
 
@@ -23,8 +24,27 @@ class _CustomerListPageState extends State<CustomerListPage> {
   void initState() {
     super.initState();
     viewModel.fetchOnce();
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final routeObserver = getIt<RouteObserver<PageRoute>>();
+    final modalRoute = ModalRoute.of(context);
+    if (modalRoute is PageRoute) {
+      routeObserver.subscribe(this, modalRoute);
+    }
+  }
 
+  @override
+  void dispose() {
+    getIt<RouteObserver<PageRoute>>().unsubscribe(this);
+    super.dispose();
+  }
+  @override
+  void didPopNext() {
+    debugPrint('✅ didPopNext: 고객 등록 후 돌아옴 - 강제 새로고침');
+    viewModel.refresh(); // 중요
   }
 
   @override
@@ -33,12 +53,14 @@ class _CustomerListPageState extends State<CustomerListPage> {
       child: StreamBuilder(
         stream: viewModel.cachedCustomers,
         builder: (context, snapshot) {
+          final data = snapshot.data ?? [];
           if (snapshot.hasError) {
-            log(snapshot.error.toString());
+            log('StreamBuilder error: ${snapshot.error}');}
+
+          if (data.isEmpty) {
+            return const Center(child: AnimatedText(text: '고객정보 없음'));
           }
-          if (!snapshot.hasData || viewModel.state.isLoading == true) {
-            return const MyCircularIndicator();
-          }
+
           List<CustomerModel> originalCustomers = snapshot.data!;
           List<CustomerModel> customers =
               originalCustomers

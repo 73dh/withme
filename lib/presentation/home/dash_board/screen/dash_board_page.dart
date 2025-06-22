@@ -42,7 +42,6 @@ class DashBoardPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('DashBoard'),
           actions: [
-            // IconButton(onPressed: onInquiryTap, icon: const Icon(Icons.settings)),
             IconButton(onPressed: onMenuTap, icon: const Icon(Icons.settings)),
           ],
         ),

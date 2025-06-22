@@ -22,7 +22,7 @@ class CustomerModel {
     required this.name,
     required this.sex,
     required this.birth,
-    required this.policies,
+     this.policies=const [],
     required this.recommended,
     required this.registeredDate,
     required this.histories,

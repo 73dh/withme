@@ -61,7 +61,7 @@ class PolicyItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '보험료: ${numFormatter.format(int.parse(policy.premium))} (${policy.paymentMethod})',
+                  '보험료: ${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))} (${policy.paymentMethod})',
                   style:
                   policy.policyState == '해지'
                       ? TextStyles.cancelStyle

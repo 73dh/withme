@@ -4,7 +4,7 @@ import 'package:withme/data/data_source/remote/fbase.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/repository/customer_repository.dart';
 
-import '../../core/utils/transformers.dart';
+import '../../core/utils/transformers/transformers.dart';
 
 class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   final FBase fBase;
