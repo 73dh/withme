@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
+import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/calculate_insurance_age.dart';
 import 'package:withme/core/utils/days_until_insurance_age.dart';
@@ -26,7 +27,12 @@ class ProspectItem extends StatelessWidget {
   final CustomerModel customer;
   final void Function(List<HistoryModel> histories) onTap;
 
-  const ProspectItem({super.key,required this.userKey, required this.customer, required this.onTap});
+  const ProspectItem({
+    super.key,
+    required this.userKey,
+    required this.customer,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +41,10 @@ class ProspectItem extends StatelessWidget {
     return IntrinsicHeight(
       child: StreamBuilder(
         stream: getIt<HistoryUseCase>().call(
-          usecase: GetHistoriesUseCase(userKey:userKey , customerKey: customer.customerKey),
+          usecase: GetHistoriesUseCase(
+            userKey: userKey,
+            customerKey: customer.customerKey,
+          ),
         ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -46,64 +55,46 @@ class ProspectItem extends StatelessWidget {
           }
           List<HistoryModel> histories = snapshot.data!;
           histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
-          return Container(
-            height: 90,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: ColorStyles.customerItemColor,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5), // 그림자 색상
-                  offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
-                  blurRadius: 6, // 흐림 정도
-                  spreadRadius: 1, // 퍼짐 정도
-                ),
-              ],
-            ),
 
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+          return ItemContainer(child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        customer.registeredDate.formattedMonth,
-                        style: TextStyles.normal12,
-                      ),
-                      height(5),
-                      CircleItem(number: histories.length, sex: customer.sex),
-                    ],
+                  Text(
+                    customer.registeredDate.formattedMonth,
+                    style: TextStyles.normal12,
                   ),
-                  width(20),
-                  _namePart(),
-                  const Spacer(),
-                  Expanded(
-                    child: HistoryPartWidget(
-                      histories: histories,
-                      onTap: (histories) => onTap(histories),
-                    ),
-                  ),
+                  height(5),
+                  CircleItem(number: histories.length, sex: customer.sex),
                 ],
               ),
-            ),
-          );
+              width(20),
+              _namePart(),
+              const Spacer(),
+              Expanded(
+                child: HistoryPartWidget(
+                  histories: histories,
+                  onTap: (histories) => onTap(histories),
+                ),
+              ),
+            ],
+          ));
         },
       ),
     );
   }
 
   Widget _namePart() {
-    DateTime? isDate = customer.birth?.toLocal();
+    DateTime? birthDate = customer.birth?.toLocal();
     int difference =
-        customer.birth != null
+        birthDate != null
             ? getInsuranceAgeChangeDate(
-              customer.birth!,
+              birthDate,
             ).difference(DateTime.now()).inDays
             : 0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -112,27 +103,74 @@ class ProspectItem extends StatelessWidget {
           children: [
             Text(
               shortenedNameText(customer.name, length: 6),
-              style: TextStyles.bold14,
+              style: TextStyles.bold14.copyWith(color: Colors.black87),
             ),
-            width(5),
-
-            (isDate != null)
-                ? Text(
-                  '${customer.birth?.formattedBirth} (${calculateAge(customer.birth!)}세)',
-                )
-                : const SizedBox.shrink(),
+            width(6),
+            if (birthDate != null)
+              Text(
+                '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
+                style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+              ),
           ],
         ),
+        const SizedBox(height: 6),
         Text(
-          customer.birth?.toLocal() != null
-              ? '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}'
+          birthDate != null
+              ? '상령일: ${getInsuranceAgeChangeDate(birthDate).formattedDate}'
               : '',
-          style: TextStyle(
-            color: difference <= 90 ? Colors.red : Colors.black87,
+          style: TextStyles.normal12.copyWith(
+            color: difference <= 90 ? Colors.red : Colors.grey[600],
+            fontWeight: difference <= 90 ? FontWeight.bold : FontWeight.normal,
           ),
         ),
-        Text(customer.recommended != '' ? '소개자: ${customer.recommended}' : ''),
+        if (customer.recommended.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            '소개자: ${customer.recommended}',
+            style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+          ),
+        ],
       ],
     );
   }
+
+  // Widget _namePart() {
+  //   DateTime? isDate = customer.birth?.toLocal();
+  //   int difference =
+  //       customer.birth != null
+  //           ? getInsuranceAgeChangeDate(
+  //             customer.birth!,
+  //           ).difference(DateTime.now()).inDays
+  //           : 0;
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Text(
+  //             shortenedNameText(customer.name, length: 6),
+  //             style: TextStyles.bold14,
+  //           ),
+  //           width(5),
+  //
+  //           (isDate != null)
+  //               ? Text(
+  //                 '${customer.birth?.formattedBirth} (${calculateAge(customer.birth!)}세)',
+  //               )
+  //               : const SizedBox.shrink(),
+  //         ],
+  //       ),
+  //       Text(
+  //         customer.birth?.toLocal() != null
+  //             ? '상령일: ${getInsuranceAgeChangeDate(customer.birth!).formattedDate}'
+  //             : '',
+  //         style: TextStyle(
+  //           color: difference <= 90 ? Colors.red : Colors.black87,
+  //         ),
+  //       ),
+  //       Text(customer.recommended != '' ? '소개자: ${customer.recommended}' : ''),
+  //     ],
+  //   );
+  // }
 }

@@ -22,17 +22,5 @@ class CustomerViewModel with ChangeNotifier {
     );
   }
 
-  Future<void> changePolicyState(
-    String customerKey,
-    String policyKey,
-    String policyState,
-  ) async {
-    return getIt<PolicyUseCase>().execute(
-      usecase: ChangePolicyStateUseCase(
-        customerKey: customerKey,
-        policyKey: policyKey,
-        policyState: policyState,
-      ),
-    );
-  }
+
 }

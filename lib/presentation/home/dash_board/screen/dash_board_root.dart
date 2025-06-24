@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/animated_text.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/ui/const/duration.dart';
@@ -52,7 +53,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
             true => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('통계 작성중', style: TextStyles.bold16),
+                const AnimatedText(text:  '통계 작성중'),
                 height(20),
                 const MyCircularIndicator(),
               ],

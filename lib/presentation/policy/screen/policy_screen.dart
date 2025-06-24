@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -300,7 +301,16 @@ class _PolicyScreenState extends State<PolicyScreen> {
         _endDate == null) {
       return const Center(child: Text('입력 누락 발생'));
     }
+    final userId = UserSession.userId;
+    final customerKey = widget.customer.customerKey;
 
+    final policyDocRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('customers')
+        .doc(customerKey)
+        .collection('policies')
+        .doc();
     final policyMap = PolicyModel.toMapForCreatePolicy(
       policyHolder: _policyHolderName,
       policyHolderBirth: _policyHolderBirth!,
@@ -314,7 +324,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
       paymentMethod: _paymentMethod,
       premium: _premiumController.text,
       startDate: _startDate!,
-      endDate: _endDate!,
+      endDate: _endDate!, customerKey: customerKey, policyKey: policyDocRef.id,
     );
 
     return PolicyConfirmBox(

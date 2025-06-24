@@ -15,6 +15,7 @@ const String keyCustomerHistory = 'histories';
 const String keyDocumentRef = 'documentRef';
 
 // Policy
+const String keyPolicyKey='policyKey';
 const String keyPolicyHolder='policyHolder';
 const String keyPolicyHolderBirth='policyHolderBirth';
 const String keyPolicyHolderSex='policyHolderSex';

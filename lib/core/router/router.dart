@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/presentation/auth/log_in/log_in_screen.dart';
-import 'package:withme/presentation/customer/customer_screen.dart';
+import 'package:withme/presentation/customer/screen/customer_screen.dart';
 import 'package:withme/presentation/home/home_screen.dart';
 import 'package:withme/presentation/registration/screen/registration_screen.dart';
 import 'package:withme/presentation/splash/splash_screen.dart';

@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:withme/core/domain/enum/policy_state.dart';
+import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 
@@ -32,46 +34,20 @@ class CustomerItem extends StatelessWidget {
           log(snapshot.error.toString());
         }
         if (!snapshot.hasData) {
-          return SizedBox.shrink();}
+          return SizedBox.shrink();
+        }
 
-          List<PolicyModel> policies = snapshot.data;
-          return Container(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: ColorStyles.customerItemColor,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5), // 그림자 색상
-                  offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
-                  blurRadius: 6, // 흐림 정도
-                  spreadRadius: 1, // 퍼짐 정도
-                ),
-              ],
+        List<PolicyModel> policies = snapshot.data;
+        return ItemContainer(child: Row(
+          children: [
+            CircleItem(number: policies.length, sex: customer.sex),
+            width(20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [_namePart(), _policyPart(policies)],
             ),
-
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    CircleItem(
-                      number: policies.length,
-                      sex:customer.sex,
-                    ),
-                    width(20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [_namePart(), _policyPart(policies)],
-                    ),
-
-                  ],
-                ),
-              ),
-            ),
-          );
+          ],
+        ));
       },
     );
   }
@@ -83,13 +59,14 @@ class CustomerItem extends StatelessWidget {
         ).difference(DateTime.now()).inDays;
     return Row(
       children: [
-        Text(shortenedNameText(customer.name,length: 6), style: TextStyles.bold14),
+        Text(
+          shortenedNameText(customer.name, length: 6),
+          style: TextStyles.bold14,
+        ),
         width(5),
         // sexIcon(customer.sex),
         // width(5),
-        Text(
-          '${calculateAge(customer.birth ?? DateTime.now())}세',
-        ),
+        Text('${calculateAge(customer.birth ?? DateTime.now())}세'),
         width(3),
         Text(
           ' /상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
@@ -107,7 +84,11 @@ class CustomerItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children:
           policies.map((e) {
-            final style = e.policyState == '해지' ? TextStyles.cancelStyle : null;
+            final style =
+                e.policyState == PolicyState.cancelled.label ||
+                        e.policyState == PolicyState.lapsed.label
+                    ? TextStyles.cancelStyle
+                    : null;
 
             return Row(
               children: [

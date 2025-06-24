@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             const Text('withMe', style: TextStyles.bold20),
             height(10),
-            const MyCircularIndicator(size: 20),
+            const MyCircularIndicator(),
           ],
         ),
       ),
