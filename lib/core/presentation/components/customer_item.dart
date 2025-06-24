@@ -18,6 +18,7 @@ import '../../utils/shortened_text.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../../presentation/home/customer_list/customer_list_view_model.dart';
+import '../widget/insurance_age_widget.dart';
 
 class CustomerItem extends StatelessWidget {
   final CustomerModel customer;
@@ -38,25 +39,23 @@ class CustomerItem extends StatelessWidget {
         }
 
         List<PolicyModel> policies = snapshot.data;
-        return ItemContainer(child: Row(
-          children: [
-            CircleItem(number: policies.length, sex: customer.sex),
-            width(20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [_namePart(), _policyPart(policies)],
-            ),
-          ],
-        ));
+        return ItemContainer(
+          child: Row(
+            children: [
+              CircleItem(number: policies.length, sex: customer.sex),
+              width(20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [_namePart(), _policyPart(policies)],
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 
   Widget _namePart() {
-    int difference =
-        getInsuranceAgeChangeDate(
-          customer.birth ?? DateTime.now(),
-        ).difference(DateTime.now()).inDays;
     return Row(
       children: [
         Text(
@@ -66,14 +65,9 @@ class CustomerItem extends StatelessWidget {
         width(5),
         // sexIcon(customer.sex),
         // width(5),
-        Text('${calculateAge(customer.birth ?? DateTime.now())}세'),
+        Text('${calculateAge(customer.birth ?? DateTime.now())}세/'),
         width(3),
-        Text(
-          ' /상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
-          style: TextStyle(
-            color: difference <= 90 ? Colors.red : Colors.black87,
-          ),
-        ),
+        InsuranceAgeWidget(birthDate: customer.birth ?? DateTime.now()),
         Text(customer.recommended != '' ? customer.recommended : ''),
       ],
     );

@@ -9,11 +9,11 @@ import '../../di/setup.dart';
 import '../core_presentation_import.dart';
 
 Future<bool?> popupAddHistory(
-    BuildContext context,
-    List<HistoryModel> histories,
-    CustomerModel prospect,
-    String initContent,
-    ) async {
+  BuildContext context,
+  List<HistoryModel> histories,
+  CustomerModel prospect,
+  String initContent,
+) async {
   final MenuController menuController = MenuController();
   final TextEditingController textController = TextEditingController(
     text: initContent,

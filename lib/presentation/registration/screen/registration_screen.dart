@@ -102,7 +102,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          const TitleWidget(title: '가망고객 정보'),
+          const TitleWidget(title: 'Prospect Info'),
           height(20),
           const PartTitle(text: '가망고객'),
           _buildCustomerInfoPart(),

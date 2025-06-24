@@ -14,16 +14,16 @@ class CommonDialog {
   final scrollController = ScrollController();
 
   CommonDialog({required this.menuController, required this.textController});
-
   Future<String?> showHistories(
-    BuildContext context,
-    List<HistoryModel> histories,
-  ) async {
+      BuildContext context,
+      List<HistoryModel> histories,
+      ) async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
       }
     });
+
     return await showModalBottomSheet<String>(
       context: Overlay.of(context).context,
       isScrollControlled: true,
@@ -36,71 +36,89 @@ class CommonDialog {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Container(
+              child: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.5,
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // 연한 검정색
-                      blurRadius: 12, // 퍼짐 정도
-                      offset: const Offset(0, -4), // 위쪽에서 퍼지도록 설정
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text(
-                      '관리이력',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // 최소 크기 유지
+                    children: [
+                      const SizedBox(height: 12),
+                      const Text(
+                        '관리 이력',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Flexible(
-                      child: ListView.builder(
-                        controller: scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        shrinkWrap: true,
-                        itemCount: histories.length,
-                        itemBuilder: (_, index) {
-                          final e = histories[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${e.contactDate.formattedDate}: ',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                      const SizedBox(height: 12),
+                      Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
+                      if (histories.isNotEmpty)
+                        Flexible(
+                          child: ListView.separated(
+                            controller: scrollController,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            itemCount: histories.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            itemBuilder: (_, index) {
+                              final e = histories[index];
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    e.contactDate.formattedDate,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
-                                Expanded(child: Text(e.content)),
-                              ],
-                            ),
-                          );
-                        },
+                                  const SizedBox(height: 2),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      e.content,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        )
+                      else
+                        const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            '등록된 이력이 없습니다.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _inputArea(context, setState),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _inputArea(
-                        context,
-                        setState,
-                      ), // <- 여기에 TextField 들어 있음
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -108,7 +126,104 @@ class CommonDialog {
         );
       },
     );
-  }
+
+
+}
+
+  // Future<String?> showHistories(
+  //   BuildContext context,
+  //   List<HistoryModel> histories,
+  // ) async {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (scrollController.hasClients) {
+  //       scrollController.jumpTo(scrollController.position.maxScrollExtent);
+  //     }
+  //   });
+  //   return await showModalBottomSheet<String>(
+  //     context: Overlay.of(context).context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return AnimatedPadding(
+  //             duration: AppDurations.duration100,
+  //             padding: EdgeInsets.only(
+  //               bottom: MediaQuery.of(context).viewInsets.bottom,
+  //             ),
+  //             child: Container(
+  //               constraints: BoxConstraints(
+  //                 maxHeight: MediaQuery.of(context).size.height * 0.5,
+  //               ),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white,
+  //                 borderRadius: const BorderRadius.vertical(
+  //                   top: Radius.circular(16),
+  //                 ),
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     color: Colors.black.withOpacity(0.1), // 연한 검정색
+  //                     blurRadius: 12, // 퍼짐 정도
+  //                     offset: const Offset(0, -4), // 위쪽에서 퍼지도록 설정
+  //                   ),
+  //                 ],
+  //               ),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   const SizedBox(height: 16),
+  //                   const Text(
+  //                     '관리이력',
+  //                     style: TextStyle(
+  //                       fontWeight: FontWeight.bold,
+  //                       fontSize: 16,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 8),
+  //                   Flexible(
+  //                     child: ListView.builder(
+  //                       controller: scrollController,
+  //                       padding: const EdgeInsets.symmetric(horizontal: 16),
+  //                       shrinkWrap: true,
+  //                       itemCount: histories.length,
+  //                       itemBuilder: (_, index) {
+  //                         final e = histories[index];
+  //                         return Padding(
+  //                           padding: const EdgeInsets.symmetric(vertical: 4.0),
+  //                           child: Row(
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                               Text(
+  //                                 '${e.contactDate.formattedDate}: ',
+  //                                 style: const TextStyle(
+  //                                   fontWeight: FontWeight.bold,
+  //                                 ),
+  //                               ),
+  //                               Expanded(child: Text(e.content)),
+  //                             ],
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 10),
+  //                   Padding(
+  //                     padding: const EdgeInsets.symmetric(horizontal: 16),
+  //                     child: _inputArea(
+  //                       context,
+  //                       setState,
+  //                     ), // <- 여기에 TextField 들어 있음
+  //                   ),
+  //                   const SizedBox(height: 20),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _inputArea(BuildContext context, StateSetter setState) {
     final showTextField = textController.text.isEmpty;

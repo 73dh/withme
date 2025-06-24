@@ -17,6 +17,7 @@ import '../../utils/days_until_insurance_age.dart';
 import '../../utils/shortened_text.dart';
 import '../core_presentation_import.dart';
 import '../widget/history_part_widget.dart';
+import '../widget/insurance_age_widget.dart';
 
 class SearchCustomerItem extends StatelessWidget {
   final String userKey;
@@ -65,10 +66,7 @@ class SearchCustomerItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircleItem(
-                  number: policies.length,
-                  sex: customer.sex,
-                ),
+                CircleItem(number: policies.length, sex: customer.sex),
                 width(20),
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -124,12 +122,13 @@ class SearchCustomerItem extends StatelessWidget {
             width(3),
           ],
         ),
-        Text(
-          '상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
-          style: TextStyle(
-            color: difference <= 90 ? Colors.red : Colors.black87,
-          ),
-        ),
+        InsuranceAgeWidget(birthDate: customer.birth ?? DateTime.now()),
+        // Text(
+        //   '상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
+        //   style: TextStyle(
+        //     color: difference <= 90 ? Colors.red : Colors.black87,
+        //   ),
+        // ),
         if (customer.recommended != '') Text(customer.recommended),
       ],
     );

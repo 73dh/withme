@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 abstract interface class TextStyles {
+  static const normal9 = TextStyle(fontSize: 9);
+  static const normal10 = TextStyle(fontSize: 10);
   static const normal12 = TextStyle(fontSize: 12);
   static const normal13 = TextStyle(fontSize: 13);
   static const normal14 = TextStyle(fontSize: 14);

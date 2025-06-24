@@ -20,3 +20,4 @@ export 'components/my_circular_indicator.dart';
 export 'components/sex_widget.dart';
 export 'package:flutter/material.dart';
 export 'package:withme/core/presentation/components/delete_confirm_dialog.dart';
+export 'package:withme/core/presentation/widget/rotating_dots.dart';

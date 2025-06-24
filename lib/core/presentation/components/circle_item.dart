@@ -3,18 +3,23 @@ import 'package:withme/core/presentation/components/sex_widget.dart';
 
 import '../../ui/text_style/text_styles.dart';
 
-
 class CircleItem extends StatelessWidget {
   final int number;
   final double size;
   final String sex;
-  const CircleItem({super.key, required this.number,   this.size=30, required this.sex});
+
+  const CircleItem({
+    super.key,
+    required this.number,
+    this.size = 30,
+    required this.sex,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:getSexBackgroundColor(sex),
+        color: getSexBackgroundColor(sex),
         borderRadius: BorderRadius.circular(size),
         boxShadow: [
           BoxShadow(
@@ -27,9 +32,7 @@ class CircleItem extends StatelessWidget {
       ),
       width: size,
       height: size,
-      child: Center(
-        child: Text('$number', style: TextStyles.bold20),
-      ),
+      child: Center(child: Text('$number', style: TextStyles.bold20)),
     );
   }
 }
