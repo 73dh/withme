@@ -1,30 +1,19 @@
-import 'dart:developer';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/my_circular_indicator.dart';
-import 'package:withme/core/presentation/components/prospect_item_icon.dart';
+import 'package:withme/core/presentation/components/item_icon.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/utils/calculate_age.dart';
-import 'package:withme/core/utils/calculate_insurance_age.dart';
-import 'package:withme/core/utils/days_until_insurance_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/shortened_text.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
-import '../../di/setup.dart';
-import '../../ui/color/color_style.dart';
-import '../widget/insurance_age_widget.dart';
-import '../widget/rotating_dots.dart';
-import 'circle_item.dart';
-import 'sex_widget.dart';
-import 'width_height.dart';
-import '../../ui/text_style/text_styles.dart';
 import '../../../domain/model/customer_model.dart';
-import '../../../presentation/home/prospect_list/prospect_list_view_model.dart';
+import '../../di/setup.dart';
+import '../../ui/text_style/text_styles.dart';
+import '../widget/insurance_age_widget.dart';
+import 'width_height.dart';
 
 class ProspectItem extends StatelessWidget {
   final String userKey;
@@ -72,7 +61,7 @@ class ProspectItem extends StatelessWidget {
                       style: TextStyles.normal12,
                     ),
                     height(5),
-                    ProspectItemIcon(
+                    ItemIcon(
                       number: histories.length,
                       sex: customer.sex,
                       backgroundImagePath: 'assets/icons/pool_person.png',

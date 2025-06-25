@@ -36,6 +36,10 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   Stream<List<CustomerModel>> getAll({required String userKey}) {
     return fBase.getAll(userKey: userKey).transform(toPools);
   }
+  // @override
+  // Future<List<CustomerModel>> getAll({required String userKey}) {
+  //   return fBase.getAll(userKey: userKey);
+  // }
 
   @override
   Future<void> deleteCustomer({required String userKey, required String customerKey}) async {

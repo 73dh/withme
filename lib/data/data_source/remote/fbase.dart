@@ -2,15 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
+import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/user_model.dart';
 
 class FBase {
   // User
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
-    return await FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .get();
+    try {
+      return await FirebaseFirestore.instance
+          .collection(collectionUsers)
+          .doc(UserSession.userId)
+          .get(const GetOptions(source: Source.cache));
+    } catch (_) {
+      return await FirebaseFirestore.instance
+          .collection(collectionUsers)
+          .doc(UserSession.userId)
+          .get(); // fallback to server
+    }
   }
 
   // Customer
@@ -67,6 +75,28 @@ class FBase {
         .collection(collectionCustomer)
         .snapshots();
   }
+  // Future<List<CustomerModel>> getAll({
+  //   required String userKey,
+  // }) async {
+  //   try {
+  //     final snapshot = await FirebaseFirestore.instance
+  //         .collection(collectionUsers)
+  //         .doc(userKey)
+  //         .collection(collectionCustomer)
+  //         .get(const GetOptions(source: Source.cache));
+  //
+  //     return snapshot.docs.map((doc) => CustomerModel.fromJson(doc.data())).toList();
+  //   } catch (_) {
+  //     final snapshot = await FirebaseFirestore.instance
+  //         .collection(collectionUsers)
+  //         .doc(userKey)
+  //         .collection(collectionCustomer)
+  //         .get();
+  //
+  //     return snapshot.docs.map((doc) => CustomerModel.fromJson(doc.data())).toList();
+  //   }
+  // }
+
 
   // History
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({

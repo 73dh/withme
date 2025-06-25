@@ -23,6 +23,9 @@ class GetAllDataUseCase extends BaseUseCase<CustomerRepository> {
     // Step 1: 모든 고객 데이터 가져오기
     final originalCustomers =
         await customerRepository.getAll(userKey: userKey).first;
+    // final originalCustomers =
+    // await customerRepository.getAll(userKey: userKey);
+    print('originalCustomers: ${originalCustomers.length}');
 
     // Step 2: history 및 policy를 병렬로 요청
     final futures = originalCustomers.map((customer) async {

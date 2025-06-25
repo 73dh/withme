@@ -34,7 +34,6 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    // Future.microtask(()=>viewModel.getAllData());
   }
 
   @override
@@ -56,30 +55,28 @@ class _SearchPageState extends State<SearchPage> {
                 _buildCustomerList(context),
               AnimatedSwitcher(
                 duration: AppDurations.duration300,
-                child: viewModel.state.currentSearchOption == null
-                    ? Stack(
-                  key: const ValueKey('select_button_text'),
-                  children: [
-                    Positioned(
-                      top: 45,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.search),
-                          width(20),
-                          const AnimatedText(text: '아래 조건을 선택하세요.'),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-                    : const SizedBox.shrink(
-                  key: ValueKey('empty'),
-                ),
-              )
-,
+                child:
+                    viewModel.state.currentSearchOption == null
+                        ? Stack(
+                          key: const ValueKey('select_button_text'),
+                          children: [
+                            Positioned(
+                              top: 45,
+                              left: 0,
+                              right: 0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.search),
+                                  width(20),
+                                  const AnimatedText(text: '아래 조건을 선택하세요.'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                        : const SizedBox.shrink(key: ValueKey('empty')),
+              ),
               _buildDraggableFilterSheet(),
             ],
           ),
@@ -109,7 +106,9 @@ class _SearchPageState extends State<SearchPage> {
     final policies = viewModel.state.filteredPolicies;
 
     if (policies.isEmpty) {
-      return const Center(child: Text('조건에 맞는 계약이 없습니다.'));
+      return Column(
+        children: [height(200), const AnimatedText(text: '조건에 맞는 고객이 없습니다.')],
+      );
     }
 
     return ListView.builder(
@@ -134,9 +133,14 @@ class _SearchPageState extends State<SearchPage> {
       switchOutCurve: Curves.easeOut,
       child:
           customers.isEmpty
-              ? const Center(
-                key: ValueKey('empty'),
-                child: Text('조건에 맞는 고객이 없습니다.'),
+              ? Center(
+                key: const ValueKey('empty'),
+                child: Column(
+                  children: [
+                    height(200),
+                    const AnimatedText(text: '조건에 맞는 고객이 없습니다.'),
+                  ],
+                ),
               )
               : ListView.builder(
                 key: ValueKey(
@@ -198,10 +202,30 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildCustomerItem(BuildContext context, dynamic customer) {
-    return SearchCustomerItem(
-      userKey: userKey!,
-      customer: customer,
-      onTap: (histories) => _handleAddHistory(context, histories, customer),
+    return GestureDetector(
+      onTap: () async {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+
+        await Future.delayed(AppDurations.duration100);
+        if (context.mounted) {
+          await context.push(RoutePath.customer, extra: customer);
+        }
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+
+        // await viewModel.getAllData();
+        await UpdateSearchedCustomersUseCase.call(viewModel);
+      },
+      child: SearchCustomerItem(
+        userKey: userKey!,
+        customer: customer,
+        onTap: (histories) => _handleAddHistory(context, histories, customer),
+      ),
     );
   }
 

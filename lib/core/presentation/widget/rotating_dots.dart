@@ -14,7 +14,7 @@ class RotatingDots extends StatefulWidget {
     this.size = 40,
     this.dotBaseSize = 6,
     this.dotPulseRange = 3,
-    this.speed = const Duration(milliseconds: 5000),
+    this.speed = const Duration(milliseconds: 3000),
     this.colors = const [Colors.red, Colors.blue],
   });
 

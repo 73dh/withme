@@ -28,7 +28,6 @@ class ProspectListViewModel with ChangeNotifier {
       usecase: GetAllDataUseCase(userKey: UserSession.userId),
     );
     allCustomers = result;
-    // await Future.delayed(AppDurations.duration300);
 
     final prospectCustomers =
         allCustomers.where((e) => e.policies.isEmpty).toList();

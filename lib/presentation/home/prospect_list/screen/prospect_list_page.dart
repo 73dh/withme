@@ -164,6 +164,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   }
 
   Widget _prospectList(List<CustomerModel> prospects) {
+    print('prospects length: ${prospects.length}');
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(

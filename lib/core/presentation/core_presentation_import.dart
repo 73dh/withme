@@ -10,7 +10,6 @@ export 'package:withme/core/presentation/widget/app_bar_search_widget.dart';
 export 'package:withme/core/presentation/widget/confirm_box_text.dart';
 export 'package:withme/core/presentation/widget/pop_up_history.dart';
 export 'package:withme/core/presentation/widget/show_confirm_dialog.dart';
-export '../../../../core/presentation/components/circle_item.dart';
 export '../../../core/presentation/components/custom_text_form_field.dart';
 export '../../../core/presentation/components/render_filled_button.dart';
 export '../../../core/presentation/core_presentation_import.dart';

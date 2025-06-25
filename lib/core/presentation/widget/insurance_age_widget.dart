@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
-import '../components/width_height.dart';
 import '../core_presentation_import.dart'; // width 함수
 
 class InsuranceAgeWidget extends StatelessWidget {
@@ -15,7 +13,7 @@ class InsuranceAgeWidget extends StatelessWidget {
         getInsuranceAgeChangeDate(birthDate).difference(DateTime.now()).inDays;
     final bool isUrgent = difference <= 90;
 
-    return   Row(
+    return Row(
       children: [
         Text(
           '상령일: ${getInsuranceAgeChangeDate(birthDate).formattedDate}',
@@ -24,7 +22,7 @@ class InsuranceAgeWidget extends StatelessWidget {
         width(6),
         // 음수 부호 포함 잔여일 텍스트
         Text(
-          '(D-${difference.abs()})',  // 항상 - 부호 붙이고 절댓값 표시
+          '(D-${difference.abs()})', // 항상 - 부호 붙이고 절댓값 표시
           style: TextStyles.normal12.copyWith(
             color: Colors.black,
             fontWeight: FontWeight.normal,
