@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
@@ -163,43 +164,49 @@ class DashBoardViewModel with ChangeNotifier {
   void sendInquiryEmail(BuildContext context) async {
     final email = state.userInfo?.email ?? 'unknown@unknown.com';
 
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: 'kdaehee@gmail.com',
-      queryParameters: {
-        'subject': '유료회원 문의',
-        'body': '안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.',
-      },
+    final String subject = Uri.encodeComponent('유료회원 문의');
+    final String body = Uri.encodeComponent(
+      '안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.',
     );
-    if (!await canLaunchUrl(emailUri)) {
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder:
-              (_) => AlertDialog(
-                title: const Text('메일 앱 없음'),
-                content: const Text(
-                  '메일 앱이 설치되어 있지 않거나 실행할 수 없습니다.\n앱스토어에서 메일 앱을 설치해 주세요.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('확인'),
-                  ),
-                ],
+
+    final Uri emailUri = Uri.parse(
+      'mailto:kdaehee@gmail.com?subject=$subject&body=$body',
+    );
+
+    final bool launched = await launchUrl(
+      emailUri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched && context.mounted) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: const Text('메일 앱 없음'),
+              content: const Text(
+                '메일 앱이 설치되어 있지 않거나 실행할 수 없습니다.\n앱스토어에서 메일 앱을 설치해 주세요.',
               ),
-        );
-      }
-      return;
-    }
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-    } else {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('메일 앱을 열 수 없습니다.')));
-      }
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Clipboard.setData(
+                      const ClipboardData(text: 'kdaehee@gmail.com'),
+                    );
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('이메일 주소가 복사되었습니다.')),
+                    );
+                  },
+                  child: const Text('이메일 복사'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인'),
+                ),
+              ],
+            ),
+      );
     }
   }
 }
