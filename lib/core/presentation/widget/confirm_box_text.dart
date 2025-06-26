@@ -10,19 +10,22 @@ class ConfirmBoxText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        style: TextStyle(fontSize: size),
-        children: [
-          TextSpan(text: text, style: const TextStyle(color: Colors.black87)),
-          TextSpan(
-            text: text2,
-            style:  TextStyle(
-              color: ColorStyles.confirmTextColor,
-              fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(fontSize: size),
+          children: [
+            TextSpan(text: text, style: const TextStyle(color: Colors.black87)),
+            TextSpan(
+              text: text2,
+              style:  TextStyle(
+                color: ColorStyles.confirmTextColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
 

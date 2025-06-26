@@ -30,29 +30,37 @@ final router = GoRouter(
     final isFirebaseLoggedIn = user != null && user.emailVerified;
     final isLoggedIn = isFirebaseLoggedIn && authChangeNotifier.isLoggedIn;
 
-    // final isLoggedIn = user != null && user.emailVerified;
-
     final location = state.uri.toString(); // location 대신 사용
 
-    final isOnboarding = location == RoutePath.onboarding;
     final isLoginRoute = [
       RoutePath.login,
       RoutePath.signUp,
       RoutePath.verifyEmail,
     ].contains(location);
+    final isSplash = location == RoutePath.splash;
+    final isOnboarding = location == RoutePath.onboarding;
 
+    // 1. 로그인 안 되어 있으면 로그인 화면으로
     if (!isLoggedIn) {
       return isLoginRoute ? null : RoutePath.login;
     }
 
+    // 2. 온보딩 필요 시 온보딩 화면으로
     if (authChangeNotifier.needsOnboarding) {
       return isOnboarding ? null : RoutePath.onboarding;
     }
 
-    if (!authChangeNotifier.isDataLoaded && location != RoutePath.splash) {
-      return RoutePath.splash;
+    // 3. 데이터 아직 안 불러왔으면 Splash 유지
+    if (!authChangeNotifier.isDataLoaded) {
+      return isSplash ? null : RoutePath.splash;
     }
 
+    // 4. Splash 상태인데 데이터 다 불러왔으면 Home으로 이동
+    if (authChangeNotifier.isDataLoaded && isSplash) {
+      return RoutePath.home;
+    }
+
+    // 5. 로그인 상태인데 로그인 화면에 있으면 Home으로
     if (isLoggedIn && isLoginRoute) {
       return RoutePath.home;
     }

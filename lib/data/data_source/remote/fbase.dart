@@ -8,17 +8,22 @@ import '../../../domain/model/user_model.dart';
 class FBase {
   // User
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
-    try {
-      return await FirebaseFirestore.instance
-          .collection(collectionUsers)
-          .doc(UserSession.userId)
-          .get(const GetOptions(source: Source.cache));
-    } catch (_) {
-      return await FirebaseFirestore.instance
-          .collection(collectionUsers)
-          .doc(UserSession.userId)
-          .get(); // fallback to server
-    }
+
+    return await FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(UserSession.userId)
+        .get();
+    // try {
+    //   return await FirebaseFirestore.instance
+    //       .collection(collectionUsers)
+    //       .doc(UserSession.userId)
+    //       .get(const GetOptions(source: Source.cache));
+    // } catch (_) {
+    //   return await FirebaseFirestore.instance
+    //       .collection(collectionUsers)
+    //       .doc(UserSession.userId)
+    //       .get(); // fallback to server
+    // }
   }
 
   // Customer
@@ -58,18 +63,27 @@ class FBase {
     required String userKey,
     required String customerKey,
   }) async {
-    DocumentReference customerRef = FirebaseFirestore.instance
+    final customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
         .collection(collectionCustomer)
         .doc(customerKey);
+
+    // 하위 컬렉션 삭제 (예: histories 존재할 경우)
+    final historiesCollection = customerRef.collection(collectionHistories);
+    final histories = await historiesCollection.get();
+    for (var doc in histories.docs) {
+      await doc.reference.delete();
+    }
+
+    // 상위 문서 삭제
     await customerRef.delete();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
     required String userKey,
-  }) {
-    return FirebaseFirestore.instance
+  })  {
+    return  FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
         .collection(collectionCustomer)
@@ -125,7 +139,7 @@ class FBase {
             .doc(customerKey)
             .collection(collectionHistories)
             .doc();
-    FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+  await  FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(historyRef, historyData);
     });
   }
@@ -179,7 +193,7 @@ class FBase {
             .collection(collectionPolicies)
             .doc();
 
-    FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+ await   FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.update(customerRef, {
         keyCustomerBirth: policyData[keyPolicyHolderBirth],
       });

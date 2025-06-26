@@ -81,16 +81,20 @@ class CustomerInfoPart extends StatelessWidget {
             },
   );
 
-  Widget _buildRegisteredDateSelector(BuildContext context) => RegisteredDateSelector(
-    isReadOnly: isReadOnly,
-    registeredDate: DateFormat(
-      'yy/MM/dd',
-    ).parseStrict(registeredDateController.text),
-    onPressed:isReadOnly?null:()async {
-      final date = await selectDate(context);
-      if (date != null) {
-        onRegisteredDatePressed(date);
-      }
-    }
-  );
+  Widget _buildRegisteredDateSelector(BuildContext context) =>
+      RegisteredDateSelector(
+        isReadOnly: isReadOnly,
+        registeredDate: DateFormat(
+          'yy/MM/dd',
+        ).parseStrict(registeredDateController.text),
+        onPressed:
+            isReadOnly
+                ? null
+                : () async {
+                  final date = await selectDate(context);
+                  if (date != null) {
+                    onRegisteredDatePressed(date);
+                  }
+                },
+      );
 }

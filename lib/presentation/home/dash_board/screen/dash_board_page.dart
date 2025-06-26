@@ -56,7 +56,7 @@ class DashBoardPage extends StatelessWidget {
                 return ListView(
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    const PartTitle(text: 'Summery'),
+                    const PartTitle(text: '고객수 종합'),
                     CustomSummeryTable(
                       cellWidth: cellWidth,
                       total: processedData.total,
@@ -64,19 +64,19 @@ class DashBoardPage extends StatelessWidget {
                       contract: processedData.contract,
                     ),
                     height(5),
-                    const PartTitle(text: 'InsuranceCompany Summery'),
+                    const PartTitle(text: '보험사 종류'),
                     InsuranceCompanySummaryTable(
                       cellWidth: cellWidth,
                       customers: customers,
                     ),
                     height(5),
-                    const PartTitle(text: 'ProductCategory Summery'),
+                    const PartTitle(text: '판매상품 종류'),
                     ProductCategorySummaryTable(
                       cellWidth: cellWidth,
                       customers: customers,
                     ),
                     height(5),
-                    const PartTitle(text: 'Monthly'),
+                    const PartTitle(text: '월별 고객 및 건수'),
                     CustomMonthlyTable(
                       monthlyData: processedData.flattenedMonthly,
                     ),

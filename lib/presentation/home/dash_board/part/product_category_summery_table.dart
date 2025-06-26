@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
@@ -22,7 +23,7 @@ class ProductCategorySummaryTable extends StatelessWidget {
 
       for (final policy in customer.policies) {
         final category = policy.productCategory;
-        if (category == null || category.trim().isEmpty) continue;
+        if (category.trim().isEmpty) continue;
 
         categoryStats.putIfAbsent(category, () => _CategoryStats());
         categoryStats[category]!.contractCount += 1;
@@ -39,7 +40,7 @@ class ProductCategorySummaryTable extends StatelessWidget {
 
     final List<TableRow> rows = [
       TableRow(
-        decoration: BoxDecoration(color: Colors.blue.shade50),
+        decoration: BoxDecoration(color: ColorStyles.tableHeadColor),
         children: const [
           RenderTableCellText('상품 카테고리', isHeader: true),
           RenderTableCellText('고객 수', isHeader: true),

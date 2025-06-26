@@ -9,6 +9,7 @@ import 'package:withme/core/ui/text_style/text_styles.dart';
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/router/router.dart';
 import '../../../core/router/router_import.dart';
 import '../../home/customer_list/customer_list_view_model.dart';
 import '../../home/prospect_list/prospect_list_view_model.dart';
@@ -93,19 +94,18 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-    final credential=  await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
       final user = credential.user;
 
       if (user != null && user.emailVerified) {
-        // ✅ 로그인 성공 → userKey 저장
-        // UserSession.userId = user.uid;
-
-      if (!mounted) return;
-      context.go(RoutePath.splash);}
-      else {
+        print('로그인 성공, uid: ${user.uid}');
+        authChangeNotifier.setLoggedIn(true); // 로그인 상태 갱신
+        if (!mounted) return;
+        context.go(RoutePath.splash);
+      } else {
         _showErrorMessage('이메일 인증을 완료해주세요.');
       }
     } on FirebaseAuthException catch (e) {
@@ -130,13 +130,14 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'wrong-password':
         return '비밀번호가 일치하지 않습니다.';
       case 'invalid-credential':
-        return '인증 정보가 유효하지 않거나 만료되었습니다.';
+        return '사용자 정보가 없습니다.';
       case 'too-many-requests':
         return '잠시 후 다시 시도해 주세요.';
       default:
         return '로그인 실패: ${e.message ?? e.code}';
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,14 +186,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   text: _isLoading ? '로그인 중...' : '로그인',
                   foregroundColor: Colors.white,
                   backgroundColor:
-                  _isFormValid ? ColorStyles.menuButtonColor : Colors.grey[300],
+                      _isFormValid
+                          ? ColorStyles.menuButtonColor
+                          : Colors.grey[300],
                   onPressed: _isFormValid && !_isLoading ? _login : null,
                 ),
                 height(20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?", style: TextStyles.bold16),
+                    const Text(
+                      "Don't have an account?",
+                      style: TextStyles.bold16,
+                    ),
                     GestureDetector(
                       onTap: () => context.go(RoutePath.signUp),
                       child: Text(

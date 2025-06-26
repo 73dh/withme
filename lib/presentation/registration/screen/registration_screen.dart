@@ -145,7 +145,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     onSexChanged: (value) => setState(() => _sex = value),
     birthController: _birthController,
     onBirthInitPressed:
-        ()async => setState(() {
+        () async => setState(() {
           _birth = null;
           _birthController.clear();
         }),
@@ -189,18 +189,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           registeredDateController: _registeredDateController,
                           isRegistering: _isRegistering,
                           onPressed: () async {
-                            print('Submit button pressed');
                             setModalState(() => _isRegistering = true);
                             await _submitForm();
-                            print('After _submitForm call');
 
                             if (modalContext.mounted) {
                               setModalState(() => _isRegistering = false);
-                              Navigator.of(modalContext).pop(); // BottomSheet 닫기만!
+                              Navigator.of(
+                                modalContext,
+                              ).pop(); // BottomSheet 닫기만!
                             }
-
                             // 실제 등록 화면 pop(true)는 여기에!
-                            if (context.mounted) context.pop(true);
+                            // if (context.mounted) context.pop(true);
                           },
 
                           sex: _sex,
@@ -273,8 +272,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         );
       }
 
-      await getIt<ProspectListViewModel>().fetchData(force: true);
-      debugPrint('fetchData completed');
+      // ✅ 🔽 삭제 (중복 갱신 방지)
+      // await getIt<ProspectListViewModel>().fetchData(force: true);
+
+      debugPrint('등록 완료 - pop(true) 실행');
+      if (mounted) {
+        context.pop(true); // 등록 완료 결과만 전달
+      }
     } catch (e, st) {
       debugPrint('submitForm error: $e');
       debugPrint('$st');

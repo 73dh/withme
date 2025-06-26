@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/router/router_path.dart';
+import 'package:withme/core/ui/const/free_count.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/generate_user_key.dart';
 
@@ -46,10 +47,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           .doc(UserSession.userId)
           .set(
             UserModel(
-              userKey: currentUser?.uid ?? '', // 실제 uid 사용
+              userKey: currentUser?.uid ?? '',
+              // 실제 uid 사용
               email: currentUser?.email ?? '',
               membershipStatus: MembershipStatus.free,
-              paidAt:DateTime(2020),
+              paidAt: DateTime(2020),
               agreedDate: DateTime.now(),
             ).toMap(),
           );
@@ -71,9 +73,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('앱 소개')),
+      appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -84,7 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               '이 앱은 가망고객을 발굴한 후\n고객을 손쉽게 체계적으로 관리할수 있도록\n만들었습니다.'
               '\n\n생일, 상령일, 미관리 고객등을 선별해 볼수도 있으며\n계약자의 경우 계약내용까지 관리가 가능합니다.'
               '\n\n또한, Dashboard에서는 현재 관리중인 가망고객이나 계약자의 통계를 확인할 수 있습니다.'
-              '\n\n\n50명 고객까지는 무료로 사용이 가능하며, \n이상의 고객을 관리하기 위해서는 유료 서비스를 신청하시기 바랍니다.'
+              '\n\n${freeCount}명 고객까지는 무료로 사용이 가능하며, \n이상의 고객을 관리하기 위해서는 유료 서비스를 신청하시기 바랍니다.'
               '\n\n\n\n 문의: kdaehee@gmail.com',
               style: TextStyles.normal14,
             ),

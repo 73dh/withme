@@ -72,8 +72,8 @@ class ConfirmBoxPart extends StatelessWidget {
                   text: '등록일: ',
                   text2: registeredDateController.text,
                 ),
-                if (customerModel == null)
-                  ConfirmBoxText(text2: historyController.text),
+                // if (customerModel == null)
+                //   ConfirmBoxText(text2: historyController.text),
               ],
             ),
             height(20),
@@ -85,14 +85,14 @@ class ConfirmBoxPart extends StatelessWidget {
           ],
         ),
         if (isRegistering)
-           Positioned(
+          Positioned(
             left: 10,
             top: 10,
             child: Row(
               children: [
-                Text('저장중'),
+                const Text('저장중'),
                 width(5),
-                MyCircularIndicator(size: 10),
+                const MyCircularIndicator(size: 10),
               ],
             ),
           ),

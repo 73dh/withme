@@ -54,7 +54,7 @@ class RenderFilledButton extends StatelessWidget {
             PopupMenuButton<dynamic>(
               itemBuilder: (context) => menuItems!,
               onSelected: onMenuSelected,
-              icon: Icon(Icons.arrow_drop_down,size: 25,),
+              icon: const Icon(Icons.arrow_drop_down,size: 25,),
               padding: EdgeInsets.zero,
               splashRadius: 20,
             ),

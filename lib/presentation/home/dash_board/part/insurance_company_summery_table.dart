@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
@@ -38,7 +39,7 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
 
     final List<TableRow> rows = [
       TableRow(
-        decoration: BoxDecoration(color: Colors.blue.shade50),
+        decoration: BoxDecoration(color: ColorStyles.tableHeadColor),
         children: const [
           RenderTableCellText('보험사', isHeader: true),
           RenderTableCellText('고객 수', isHeader: true),

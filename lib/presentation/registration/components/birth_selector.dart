@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/core_utils_import.dart';
 
 class BirthSelector extends StatelessWidget {
@@ -26,15 +27,22 @@ class BirthSelector extends StatelessWidget {
             Text('생년월일 ${isReadOnly ? '' : '(선택)'}'),
             const Spacer(),
             if (birth != null)
-              FilledButton.tonal(
+              RenderFilledButton(
+                width: 100,
+
+                backgroundColor: ColorStyles.activeButtonColor,
+                borderRadius: 5,
                 onPressed: onInitPressed,
-                child: const Text('초기화'),
+                text: '초기화',
               ),
             SizedBox(
               width: 120,
-              child: FilledButton.tonal(
+              child: RenderFilledButton(
+                width: 100,
+                backgroundColor: ColorStyles.activeButtonColor,
+                borderRadius: 5,
                 onPressed: onSetPressed,
-                child: Text(birth != null ? birth!.formattedDate : '생년월일'),
+                text: birth != null ? birth!.formattedDate : '생년월일',
               ),
             ),
           ],

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
+import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/ui/core_ui_import.dart';
+
 class RegisteredDateSelector extends StatelessWidget {
   final bool isReadOnly;
   final DateTime registeredDate;
@@ -24,9 +27,12 @@ class RegisteredDateSelector extends StatelessWidget {
 
             SizedBox(
               width: 120,
-              child: FilledButton.tonal(
+              child: RenderFilledButton(
+                width: 100,
+                backgroundColor: ColorStyles.activeButtonColor,
+                borderRadius: 5,
                 onPressed: onPressed,
-                child: Text(registeredDate.formattedDate),
+                text: registeredDate.formattedDate,
               ),
             ),
           ],

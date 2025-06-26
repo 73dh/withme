@@ -14,7 +14,7 @@ final theme = ThemeData(
       color: Colors.black38,
     ),
   ),
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.white,elevation: 0,
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: Colors.white,elevation: 0,
     type: BottomNavigationBarType.fixed,
     showSelectedLabels: false,
     showUnselectedLabels: false,),

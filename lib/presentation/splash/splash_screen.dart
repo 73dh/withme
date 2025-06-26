@@ -27,17 +27,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initScreen() async {
-    await Future.delayed(AppDurations.duration300);
-
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || !user.emailVerified || (user.uid.isEmpty)) {
       authChangeNotifier.setLoggedIn(false);
+      await Future.delayed(AppDurations.duration300);
       if (mounted) {
         context.go(RoutePath.login);
       }
       return;
     }
-
     final prefs = await SharedPreferences.getInstance();
     final onboardingComplete = prefs.getBool('onboardingComplete') ?? false;
 
@@ -48,6 +46,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (authChangeNotifier.isDataLoaded) {
       authChangeNotifier.setNeedsOnboarding(false);
+      if (mounted) {
+        context.go(RoutePath.home); // 여기에 홈 이동 추가!
+      }
       return;
     }
 

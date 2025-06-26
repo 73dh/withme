@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/dash_board/components/render_table_cell_text.dart';
 
+import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 
@@ -26,7 +27,7 @@ class CustomSummeryTable extends StatelessWidget {
       },
       tableRows: [
         TableRow(
-          decoration: BoxDecoration(color: Colors.blue.shade50),
+          decoration: BoxDecoration(color: ColorStyles.tableHeadColor),
           children: const [
             RenderTableCellText('구분', isHeader: true),
             RenderTableCellText('전체 (Total)', isHeader: true),
