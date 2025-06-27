@@ -14,59 +14,58 @@ class FreeLimitDialog {
     required ProspectListViewModel viewModel,
   }) async {
     final limitCount = freeCount;
+
     try {
       // ① Firestore에서 유저 상태 확인
       final userInfo = UserModel.fromSnapshot(
         await getIt<FBase>().getUserInfo(),
       );
-      final DateTime? paidAt = userInfo.paidAt; // ✅ 여기에서 paidAt 선언
-
-      final membershipStatusString = userInfo.membershipStatus.name as String?;
+      final DateTime? paidAt = userInfo.paidAt;
+      final membershipStatusString = userInfo.membershipStatus.name;
       final membershipStatus = MembershipStatusExtension.fromString(
-        membershipStatusString ?? 'free',
+        membershipStatusString,
       );
 
-      // ② customers 개수 확인
-      // final itemList = await viewModel.cachedProspects
-      final itemList =  viewModel.allCustomers;
-          // .firstWhere((list) => list.isNotEmpty, orElse: () => [])
-          // .timeout(AppDurations.duration50, onTimeout: () => []);
-      final itemCount = itemList.length;
-
-      // ③ 무료회원 갯수 제한
-      if (membershipStatus == MembershipStatus.free &&
-          itemCount >= limitCount) {
-        if (context.mounted) {
-          await showConfirmDialog(
-            context,
-            text:
-                '무료 회원은 최대 $limitCount건 까지만 등록할 수 있습니다.'
-                '\n이메일 문의 후 제한을 해제 하세요.',
-            onConfirm: () async => context.pop(),
-          );
-          return true; // 제한 걸림
+      // ② 현재 등록된 고객 수 확인
+      final itemCount = viewModel.allCustomers.length;
+print('{itemCount: $itemCount}');
+      // ③ 무료회원: 등록 제한 조건
+      if (membershipStatus == MembershipStatus.free) {
+        if (itemCount >= limitCount) {
+          if (context.mounted) {
+            await showConfirmDialog(
+              context,
+              text:
+                  '무료 회원은 최대 $limitCount건까지만 등록할 수 있습니다.\n'
+                  '이메일 문의 후 제한을 해제하세요.',
+              onConfirm: () async => context.pop(),
+            );
+          }
+          return true;
         }
+        return false; // 무료회원이지만 제한 미만 → 등록 허용
       }
-      // ④ 유료 회원의 유효기간 만료 여부 체크
+
+      // ④ 유료회원: 유효기간 만료 시 제한 조건
       if (membershipStatus.isPaid) {
         final validity = membershipStatus.validityDuration;
+
+        // 유효기간이 존재하고, 결제일 기준 만료되었는지 확인
         if (validity != null && paidAt != null) {
-          final expired = DateTime.now().isAfter(paidAt.add(validity));
-          if (expired) {
-            // 단, itemCount가 limitCount 이내면 제한하지 않음
-            if (itemCount > limitCount) {
-              if (context.mounted) {
-                await showConfirmDialog(
-                  context,
-                  text:
-                  '${membershipStatus.toString()}의 사용 기간이 만료되었습니다.\n'
-                      '계속 이용하려면 결제를 갱신하세요.',
-                  onConfirm: () async => context.pop(),
-                );
-              }
-              return true; // 제한 걸림
+          final expiryDate = paidAt.add(validity);
+          final isExpired = DateTime.now().isAfter(expiryDate);
+
+          if (isExpired && itemCount >= limitCount) {
+            if (context.mounted) {
+              await showConfirmDialog(
+                context,
+                text:
+                    '${membershipStatus.toString()}의 사용 기간이 만료되었습니다.\n'
+                    '계속 이용하려면 결제를 갱신하세요.',
+                onConfirm: () async => context.pop(),
+              );
             }
-            // itemCount <= limitCount 이면 제한 안 함 (사용 가능)
+            return true;
           }
         }
       }

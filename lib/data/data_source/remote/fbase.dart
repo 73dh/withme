@@ -89,27 +89,20 @@ class FBase {
         .collection(collectionCustomer)
         .snapshots();
   }
-  // Future<List<CustomerModel>> getAll({
-  //   required String userKey,
-  // }) async {
-  //   try {
-  //     final snapshot = await FirebaseFirestore.instance
-  //         .collection(collectionUsers)
-  //         .doc(userKey)
-  //         .collection(collectionCustomer)
-  //         .get(const GetOptions(source: Source.cache));
-  //
-  //     return snapshot.docs.map((doc) => CustomerModel.fromJson(doc.data())).toList();
-  //   } catch (_) {
-  //     final snapshot = await FirebaseFirestore.instance
-  //         .collection(collectionUsers)
-  //         .doc(userKey)
-  //         .collection(collectionCustomer)
-  //         .get();
-  //
-  //     return snapshot.docs.map((doc) => CustomerModel.fromJson(doc.data())).toList();
-  //   }
-  // }
+
+
+  Future<List<CustomerModel>> getEditedAll({required String userKey}) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(userKey)
+        .collection(collectionCustomer)
+        .get(const GetOptions(source: Source.server)); // ✅ 서버에서 강제 fetch
+
+    return snapshot.docs
+        .map((doc) => CustomerModel.fromMap(doc.data(), doc.id, documentReference: doc.reference))
+        .toList();
+  }
+
 
 
   // History

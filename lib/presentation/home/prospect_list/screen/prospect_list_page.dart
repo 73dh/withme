@@ -308,6 +308,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
 
                               if (result == true) {
                                 _fabCanShow = true;
+                                print('test result**************: $result');
                                 await viewModel.fetchData(force: true);
                               }
                             }

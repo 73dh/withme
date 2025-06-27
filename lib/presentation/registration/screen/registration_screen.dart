@@ -190,14 +190,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           isRegistering: _isRegistering,
                           onPressed: () async {
                             setModalState(() => _isRegistering = true);
-                            await _submitForm();
+                       final success=     await _submitForm();
+setModalState(()=>_isRegistering=false);
+if(modalContext.mounted){
+  Navigator.of(modalContext).pop();
+}
+if(success&&mounted){
+  if(context.mounted){
 
-                            if (modalContext.mounted) {
-                              setModalState(() => _isRegistering = false);
-                              Navigator.of(
-                                modalContext,
-                              ).pop(); // BottomSheet 닫기만!
-                            }
+  context.pop(true);
+  }
+}
+                            // if (modalContext.mounted) {
+                            //   setModalState(() => _isRegistering = false);
+                            //   Navigator.of(
+                            //     modalContext,
+                            //   ).pop(); // BottomSheet 닫기만!
+                            // }
                             // 실제 등록 화면 pop(true)는 여기에!
                             // if (context.mounted) context.pop(true);
                           },
@@ -275,16 +284,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       // ✅ 🔽 삭제 (중복 갱신 방지)
       // await getIt<ProspectListViewModel>().fetchData(force: true);
 
-      debugPrint('등록 완료 - pop(true) 실행');
-      if (mounted) {
-        context.pop(true); // 등록 완료 결과만 전달
-      }
+      // debugPrint('등록 완료 - pop(true) 실행');
+      // if (mounted) {
+      //   context.pop(true); // 등록 완료 결과만 전달
+      // }
+      return true;
     } catch (e, st) {
       debugPrint('submitForm error: $e');
-      debugPrint('$st');
       if (mounted) {
         renderSnackBar(context, text: '등록에 실패했습니다. 다시 시도해주세요.');
       }
+      return false;
     }
   }
 }
