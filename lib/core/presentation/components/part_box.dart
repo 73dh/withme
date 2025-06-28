@@ -13,7 +13,7 @@ class PartBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? Colors.grey.shade100,
         border: Border.all(color: Colors.grey.shade500, width: 1.2),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5), // 그림자 색상

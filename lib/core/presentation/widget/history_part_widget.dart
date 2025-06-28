@@ -53,18 +53,15 @@ class HistoryPartWidget extends StatelessWidget {
     required HistoryModel history,
     required bool isRecent,
   }) {
-    final Color backgroundColor =
-        isRecent ? Colors.blue.shade50 : Colors.grey.shade200;
-
     final TextStyle contentStyle =
         isRecent
-            ? TextStyles.normal12.copyWith(fontWeight: FontWeight.w500)
-            : TextStyles.normal10.copyWith(color: Colors.grey[700]);
+            ? TextStyles.normal10.copyWith(fontWeight: FontWeight.w500)
+            : TextStyles.normal9.copyWith(color: Colors.grey[700]);
 
     final TextStyle dateStyle =
         isRecent
-            ? TextStyles.normal10.copyWith(color: Colors.grey[700])
-            : TextStyles.normal9.copyWith(color: Colors.grey[600]);
+            ? TextStyles.normal9.copyWith(color: Colors.grey[700])
+            : TextStyles.normal8.copyWith(color: Colors.grey[600]);
 
     final Color dotColor = isRecent ? Colors.blueAccent : Colors.grey;
 

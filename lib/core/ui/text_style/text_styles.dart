@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract interface class TextStyles {
+  static const normal8 = TextStyle(fontSize: 8);
   static const normal9 = TextStyle(fontSize: 9);
   static const normal10 = TextStyle(fontSize: 10);
   static const normal12 = TextStyle(fontSize: 12);
@@ -17,11 +18,20 @@ abstract interface class TextStyles {
   );
   static const hintStyle = TextStyle(color: Colors.blueGrey, fontSize: 14.0);
   static const labelStyle = TextStyle(color: Colors.black87, fontSize: 14.0);
-  static const iconTextStyle = TextStyle(color: Colors.black87, fontSize: 8.0,fontStyle: FontStyle.italic);
-
- static TextStyle? get cancelStyle => const TextStyle(
-    decoration: TextDecoration.lineThrough,
-    decorationColor: Colors.red,
-    decorationThickness: 2,
+  static const iconTextStyle = TextStyle(
+    color: Colors.black87,
+    fontSize: 8.0,
+    fontStyle: FontStyle.italic,
   );
+  static const caption = TextStyle(fontSize: 12, color: Colors.grey);
+  static const bodyBold = TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+  static const bold = TextStyle(fontWeight: FontWeight.bold);
+  static const subTitle = TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
+  static const cancelStyle = TextStyle(
+    color: Colors.red,
+    fontWeight: FontWeight.w600,
+    decoration: TextDecoration.lineThrough,
+  );
+
+
 }

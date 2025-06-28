@@ -9,7 +9,7 @@ import '../../ui/icon/const.dart';
 
 enum HomeMenu {
   prospect(name: 'Prospect', iconPath: IconsPath.prospectPerson),
-  customer(name: 'Customer', iconPath: IconsPath.customerPerson),
+  customer(name: 'Customer', iconPath: IconsPath.folderIcon),
   search(name: 'Search', iconPath: IconsPath.searchPerson),
   dashBoard(name: 'DashBoard', iconPath: IconsPath.dashBoard);
 
@@ -19,9 +19,9 @@ enum HomeMenu {
   const HomeMenu({required this.name, required this.iconPath});
 
   Widget get toWidget => switch (this) {
-    HomeMenu.prospect =>  const ProspectListPage(),
+    HomeMenu.prospect => const ProspectListPage(),
     HomeMenu.customer => const CustomerListPage(),
-    HomeMenu.search =>  SearchPage(),
+    HomeMenu.search => const SearchPage(),
     HomeMenu.dashBoard => const DashBoardRoot(),
   };
 }

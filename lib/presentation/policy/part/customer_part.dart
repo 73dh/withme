@@ -1,3 +1,4 @@
+import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/presentation/policy/part/insured_holder_part.dart';
 import 'package:withme/presentation/policy/part/policy_holder_part.dart';
 
@@ -32,9 +33,9 @@ class CustomerPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PartBox(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return
+      ItemContainer(height: 130, child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           PolicyHolderPart(
             policyHolderName: policyHolderName,
@@ -54,7 +55,29 @@ class CustomerPart extends StatelessWidget {
           ),
           // _insuredPart(),
         ],
-      ),
-    );
+      ));
+      // PartBox(
+      // child: Column(
+      //   crossAxisAlignment: CrossAxisAlignment.start,
+      //   children: [
+      //     PolicyHolderPart(
+      //       policyHolderName: policyHolderName,
+      //       policyHolderSex: policyHolderSex,
+      //       policyHolderBirth: policyHolderBirth,
+      //       onBirthPressed:(value)=> onBirthPressed(value),
+      //     ),
+      //     height(5),
+      //     InsuredHolderPart(
+      //       insuredNameController: insuredNameController,
+      //       insuredSex: insuredSex,
+      //       insuredBirth: insuredBirth,
+      //       onInsuredNameChanged: onInsuredNameChanged,
+      //       onManChanged:(value)=> onManChanged(value),
+      //       onWomanChanged:(value)=> onWomanChanged(value),
+      //       onBirthChanged:(value)=> onBirthChanged(value),
+      //     ),
+      //     // _insuredPart(),
+      //   ],
+      // ),
   }
 }

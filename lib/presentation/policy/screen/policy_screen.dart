@@ -87,14 +87,18 @@ class _PolicyScreenState extends State<PolicyScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            key: _formKey,
+        body: Form(
+          key: _formKey,
+          child: AnimatedPadding(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.only(
+              bottom: 50, // filledButton 기본 높이
+            ),
             child: SingleChildScrollView(
+              padding: EdgeInsets.all(8),
               child: Column(
                 children: [
-                  const TitleWidget(title: 'Registration Policy Info'),
+                  const TitleWidget(title: '계약 정보 등록'),
                   height(40),
                   const PartTitle(text: '계약관계자 정보'),
 
@@ -186,8 +190,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
                   _startDate != null
                       ? ColorStyles.unActiveButtonColor
                       : ColorStyles.activeButtonColor,
-              foregroundColor:
-                  _startDate != null ? Colors.black87 : Colors.white,
+              foregroundColor: Colors.black87,
               onPressed: () async {
                 DateTime? selectedDate = await selectDate(context);
                 if (selectedDate != null) {
@@ -208,7 +211,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
                   _endDate != null
                       ? ColorStyles.unActiveButtonColor
                       : ColorStyles.activeButtonColor,
-              foregroundColor: _endDate != null ? Colors.black87 : Colors.white,
+              foregroundColor: Colors.black87,
               onPressed: () async {
                 DateTime? selectedDate = await selectDate(context);
                 if (selectedDate != null) {
@@ -241,6 +244,10 @@ class _PolicyScreenState extends State<PolicyScreen> {
     if (_formKey.currentState!.validate()) {
       if (_policyHolderBirth == null) {
         renderSnackBar(context, text: '계약자 생일을 확인하세요');
+        return;
+      }
+      if (_insuredNameController.text.trim().isEmpty) {
+        renderSnackBar(context, text: '피보험자 이름을 입력하세요');
         return;
       }
       if (_insuredSex == '') {
@@ -304,13 +311,14 @@ class _PolicyScreenState extends State<PolicyScreen> {
     final userId = UserSession.userId;
     final customerKey = widget.customer.customerKey;
 
-    final policyDocRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('customers')
-        .doc(customerKey)
-        .collection('policies')
-        .doc();
+    final policyDocRef =
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('customers')
+            .doc(customerKey)
+            .collection('policies')
+            .doc();
     final policyMap = PolicyModel.toMapForCreatePolicy(
       policyHolder: _policyHolderName,
       policyHolderBirth: _policyHolderBirth!,
@@ -324,7 +332,9 @@ class _PolicyScreenState extends State<PolicyScreen> {
       paymentMethod: _paymentMethod,
       premium: _premiumController.text,
       startDate: _startDate!,
-      endDate: _endDate!, customerKey: customerKey, policyKey: policyDocRef.id,
+      endDate: _endDate!,
+      customerKey: customerKey,
+      policyKey: policyDocRef.id,
     );
 
     return PolicyConfirmBox(

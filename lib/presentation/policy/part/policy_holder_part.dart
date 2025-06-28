@@ -1,3 +1,4 @@
+import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
@@ -13,53 +14,84 @@ class PolicyHolderPart extends StatelessWidget {
     super.key,
     required this.policyHolderName,
     required this.policyHolderSex,
-    this.policyHolderBirth, required this.onBirthPressed,
+    this.policyHolderBirth,
+    required this.onBirthPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: constraints.maxWidth * 0.25,
-              child: Text(policyHolderName, textAlign: TextAlign.center),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                RadioMenuButton<String>(
-                  value: '남',
-                  groupValue: policyHolderSex,
-                  onChanged: null,
-                  child: const Text('남'),
+        return IntrinsicWidth(
+          child: Row(
+            children: [
+              /// 이름 표시
+              Container(
+                width: 120,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                RadioMenuButton<String>(
-                  value: '여',
-                  groupValue: policyHolderSex,
-                  onChanged: null,
-                  child: const Text('여'),
+                child: Text(
+                  policyHolderName,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
-              ],
-            ),
-            SizedBox(
-              width: 130,
-              child: RenderFilledButton(
-                borderRadius: 10,
-                backgroundColor:
-                    policyHolderBirth == null
-                        ? ColorStyles.activeButtonColor
-                        : ColorStyles.unActiveButtonColor,
-                foregroundColor:
-                    Colors.black87 ,
-                onPressed:()=>onBirthPressed(policyHolderBirth),
-                text: policyHolderBirth?.formattedDate ?? '생년월일',
               ),
-            ),
-          ],
+              width(12),
+
+              /// 성별 라디오
+              ToggleButtons(
+                isSelected: [policyHolderSex == '남', policyHolderSex == '여'],
+                onPressed: null,
+                // 읽기 전용
+                borderRadius: BorderRadius.circular(6),
+                constraints: BoxConstraints(
+                  minWidth: AppSizes.toggleMinWidth,
+                  minHeight: 38,
+                ),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: Text('남'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: Text('여'),
+                  ),
+                ],
+              ),
+              width(12),
+
+              /// 생년월일 버튼
+              SizedBox(
+                width: 130,
+                child: ElevatedButton.icon(
+                  onPressed: () => onBirthPressed(policyHolderBirth),
+                  icon: const Icon(Icons.calendar_today, size: 18),
+                  label: Text(
+                    policyHolderBirth?.formattedDate ?? '생년월일',
+                    style: TextStyles.normal12,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 10,
+                    ),
+                    backgroundColor:
+                        policyHolderBirth == null
+                            ? ColorStyles.activeButtonColor
+                            : ColorStyles.unActiveButtonColor,
+                    foregroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

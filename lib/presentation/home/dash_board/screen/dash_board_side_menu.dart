@@ -66,7 +66,7 @@ class DashBoardSideMenu extends StatelessWidget {
                       children: [
                         const Icon(Icons.person, color: Colors.black87),
                         width(5),
-                        Text('${currentUser?.email ?? '로그인 정보 없음'}'),
+                        Text(currentUser?.email ?? '로그인 정보 없음'),
                       ],
                     ),
                     height(15),
@@ -201,4 +201,3 @@ class DashBoardSideMenu extends StatelessWidget {
     );
   }
 }
-

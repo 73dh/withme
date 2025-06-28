@@ -1,25 +1,19 @@
 import 'dart:developer';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/core/presentation/components/animated_text.dart';
 import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
+
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/domain/enum/membership_status.dart';
-import '../../../../core/presentation/components/free_limit_dialog.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/router/router_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/main_fab.dart';
-
-// 생략된 import는 그대로 유지
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -96,13 +90,13 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
           _removeFabOverlayAndHide();
           _visibilityBlocked = true;
           // 잠시 딜레이 후 재진입 가능하도록 해제
-          Future.delayed(const Duration(milliseconds: 500), () {
+          Future.delayed(AppDurations.duration300, () {
             _visibilityBlocked = false;
           });
         } else {
           debugPrint('[VisibilityDetector] 다시 보여짐 감지, FAB 삽입 시도');
-
-          if (!_fabCanShow) return; // 👈 추가
+          _fabCanShow = true; // 👈 여기 추가!
+          // if (!_fabCanShow) return; // 👈 추가
           _insertFabOverlayIfAllowed();
         }
       },
@@ -306,7 +300,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
 
                               if (result == true) {
                                 _fabCanShow = true;
-                                print('test result**************: $result');
                                 await viewModel.fetchData(force: true);
                               }
                             }

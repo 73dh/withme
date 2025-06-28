@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/presentation/components/policy_item.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
@@ -51,10 +52,12 @@ class CustomerScreen extends StatelessWidget {
                       itemBuilder:
                           (context, index) => Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: PolicyPart(
-                              policy: policies[index],
-                              customer: customer,
-                            ),
+                            child: PolicyItem(policy: policies[index])
+                            
+                            // PolicyPart(
+                            //   policy: policies[index],
+                            //   customer: customer,
+                            // ),
                           ),
                     );
                   },

@@ -91,7 +91,7 @@ class ProspectItem extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -107,11 +107,11 @@ class ProspectItem extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 6),
+        height(6),
         if (birthDate != null) InsuranceAgeWidget(birthDate: birthDate),
 
         if (customer.recommended.isNotEmpty) ...[
-          const SizedBox(height: 4),
+         height(2),
           Text(
             '소개자: ${customer.recommended}',
             style: TextStyles.normal12.copyWith(color: Colors.grey[700]),

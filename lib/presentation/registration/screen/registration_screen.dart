@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/domain/enum/home_menu.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
@@ -81,6 +80,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(56),
           child: CustomAppBar(
@@ -96,32 +96,40 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildForm() => Form(
-    key: _formKey,
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          const TitleWidget(title: 'Registration Info'),
-          height(20),
-          const PartTitle(text: '가망고객'),
-          _buildCustomerInfoPart(),
-          height(15),
-          const PartTitle(text: '소개자'),
-          _buildRecommenderPart(),
-          height(20),
-          if (_isReadOnly)
-            AddPolicyButton(
-              customerModel: widget.customerModel!,
-              onRegistered: () async {
-                await getIt<CustomerListViewModel>()
-                    .refresh(); // ✅ 등록 후 리스트 재갱신
-              },
-            ),
-        ],
+  Widget _buildForm() {
+    return Form(
+      key: _formKey,
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.only(
+          bottom: 40, // filledButton 기본 높이
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              const TitleWidget(title: '고객 정보'),
+              height(20),
+              const PartTitle(text: '가망고객'),
+              _buildCustomerInfoPart(),
+              height(15),
+              const PartTitle(text: '소개자'),
+              _buildRecommenderPart(),
+              height(20),
+              if (_isReadOnly)
+                AddPolicyButton(
+                  customerModel: widget.customerModel!,
+                  onRegistered: () async {
+                    await getIt<CustomerListViewModel>()
+                        .refresh(); // ✅ 등록 후 리스트 재갱신
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _buildRecommenderPart() => PartBox(
     child: RecommenderPart(
@@ -190,25 +198,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           isRegistering: _isRegistering,
                           onPressed: () async {
                             setModalState(() => _isRegistering = true);
-                       final success=     await _submitForm();
-setModalState(()=>_isRegistering=false);
-if(modalContext.mounted){
-  Navigator.of(modalContext).pop();
-}
-if(success&&mounted){
-  if(context.mounted){
-
-  context.pop(true);
-  }
-}
-                            // if (modalContext.mounted) {
-                            //   setModalState(() => _isRegistering = false);
-                            //   Navigator.of(
-                            //     modalContext,
-                            //   ).pop(); // BottomSheet 닫기만!
-                            // }
-                            // 실제 등록 화면 pop(true)는 여기에!
-                            // if (context.mounted) context.pop(true);
+                            final success = await _submitForm();
+                            setModalState(() => _isRegistering = false);
+                            if (modalContext.mounted) {
+                              Navigator.of(modalContext).pop();
+                            }
+                            if (success && mounted) {
+                              if (context.mounted) {
+                                context.pop(true);
+                              }
+                            }
                           },
 
                           sex: _sex,
@@ -281,13 +280,6 @@ if(success&&mounted){
         );
       }
 
-      // ✅ 🔽 삭제 (중복 갱신 방지)
-      // await getIt<ProspectListViewModel>().fetchData(force: true);
-
-      // debugPrint('등록 완료 - pop(true) 실행');
-      // if (mounted) {
-      //   context.pop(true); // 등록 완료 결과만 전달
-      // }
       return true;
     } catch (e, st) {
       debugPrint('submitForm error: $e');

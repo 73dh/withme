@@ -115,7 +115,10 @@ class _SearchPageState extends State<SearchPage> {
       itemCount: policies.length,
       itemBuilder: (context, index) {
         final policy = policies[index];
-        return PolicyItem(policy: policy);
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 8),
+          child: PolicyItem(policy: policy),
+        );
       },
     );
   }

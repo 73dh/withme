@@ -5,7 +5,7 @@ class ItemContainer extends StatelessWidget {
   final Widget child;
   final double? height;
 
-  const ItemContainer({super.key, required this.child, this.height=95});
+  const ItemContainer({super.key, required this.child, this.height=88});
 
   @override
   Widget build(BuildContext context) {
