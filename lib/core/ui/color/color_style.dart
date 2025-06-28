@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 abstract interface class ColorStyles{
   static Color bottomNavColor=Colors.grey.shade100;
-  // static Color customerItemColor=Colors.brown.shade50;
   static Color customerItemColor=Colors.white;
   static Color activeButtonColor=Colors.deepPurple.shade100;
   static Color unActiveButtonColor=Colors.deepPurple.shade50;
@@ -15,4 +14,5 @@ abstract interface class ColorStyles{
   static Color fabColor=Colors.deepPurple.shade50;
   static Color selectedFabColor=Colors.amber.shade100;
   static Color tableHeadColor=Colors.deepPurple.shade50;
+  static Color activeSwitchColor=Colors.deepPurple.shade300;
 }

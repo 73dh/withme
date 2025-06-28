@@ -28,22 +28,20 @@ class BirthSelector extends StatelessWidget {
             const Spacer(),
             if (birth != null)
               RenderFilledButton(
-                width: 100,
+                width: 120,
 
                 backgroundColor: ColorStyles.activeButtonColor,
                 borderRadius: 5,
                 onPressed: onInitPressed,
-                text: '초기화',
+                text: '모름',
               ),
-            SizedBox(
+            width(5),
+            RenderFilledButton(
               width: 120,
-              child: RenderFilledButton(
-                width: 100,
-                backgroundColor: ColorStyles.activeButtonColor,
-                borderRadius: 5,
-                onPressed: onSetPressed,
-                text: birth != null ? birth!.formattedDate : '생년월일',
-              ),
+              backgroundColor: ColorStyles.activeButtonColor,
+              borderRadius: 5,
+              onPressed: onSetPressed,
+              text: birth != null ? birth!.formattedDate : '생년월일',
             ),
           ],
         ),

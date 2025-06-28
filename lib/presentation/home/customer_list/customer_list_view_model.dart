@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/setup.dart';
+import 'package:withme/domain/use_case/customer/get_edited_all_use_case.dart';
 import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/domain/use_case/policy_use_case.dart';
 import 'package:withme/presentation/home/customer_list/customer_list_state.dart';
@@ -34,6 +35,9 @@ class CustomerListViewModel with ChangeNotifier {
 
   Future<void> _fetchData() async {
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
+      // usecase: GetEditedAllUseCase(
+      //   userKey: FirebaseAuth.instance.currentUser?.uid ?? '',
+      // ),
       usecase: GetAllDataUseCase(
         userKey: FirebaseAuth.instance.currentUser?.uid ?? '',
       ),

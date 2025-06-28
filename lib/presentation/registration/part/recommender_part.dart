@@ -33,6 +33,7 @@ class RecommenderPart extends StatelessWidget {
     title: Text('소개자 ${isReadOnly ? '' : '(선택)'}', style: TextStyles.normal14),
     trailing: Switch.adaptive(
       value: isRecommended,
+      activeColor: ColorStyles.activeSwitchColor,
       onChanged: isReadOnly ? null : (val) => onChanged(val),
     ),
   );

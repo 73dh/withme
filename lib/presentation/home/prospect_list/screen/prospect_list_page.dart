@@ -114,7 +114,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
               stream: viewModel.cachedProspects,
               builder: (context, snapshot) {
                 final data = snapshot.data ?? [];
-
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!mounted) return;
                   if (_fabCanShow && !_fabOverlayInserted) {
@@ -164,7 +163,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   }
 
   Widget _prospectList(List<CustomerModel> prospects) {
-    print('prospects length: ${prospects.length}');
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(

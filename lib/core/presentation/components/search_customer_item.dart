@@ -19,6 +19,7 @@ import '../../utils/shortened_text.dart';
 import '../core_presentation_import.dart';
 import '../widget/history_part_widget.dart';
 import '../widget/insurance_age_widget.dart';
+import '../widget/item_container.dart';
 
 class SearchCustomerItem extends StatelessWidget {
   final String userKey;
@@ -46,21 +47,23 @@ class SearchCustomerItem extends StatelessWidget {
         }
 
         List<PolicyModel> policies = snapshot.data;
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: ColorStyles.customerItemColor,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5), // 그림자 색상
-                offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
-                blurRadius: 6, // 흐림 정도
-                spreadRadius: 1, // 퍼짐 정도
-              ),
-            ],
-          ),
+        return  ItemContainer(height: null,
+
+          // Container(
+          // padding: const EdgeInsets.symmetric(vertical: 5.0),
+          // width: double.infinity,
+          // decoration: BoxDecoration(
+          //   color: ColorStyles.customerItemColor,
+          //   borderRadius: BorderRadius.circular(10),
+          //   boxShadow: [
+          //     BoxShadow(
+          //       color: Colors.grey.withOpacity(0.5), // 그림자 색상
+          //       offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
+          //       blurRadius: 6, // 흐림 정도
+          //       spreadRadius: 1, // 퍼짐 정도
+          //     ),
+          //   ],
+          // ),
 
           child: Padding(
             padding: const EdgeInsets.all(8.0),

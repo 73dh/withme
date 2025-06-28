@@ -29,27 +29,23 @@ class ProspectListViewModel with ChangeNotifier {
   }
 
   Future<void> fetchData({bool force = false}) async {
-    List<CustomerModel> result;
-    if (force) {
-      result = await getIt<CustomerUseCase>().execute(
-        usecase: GetEditedAllUseCase(userKey: UserSession.userId),
-      );
-      debugPrint(
-        '[ProspectListViewModel] fetchData from SERVER: ${result.length}',
-      );
-      print('데이터 갯수: ${result.length}');
-    } else {
-      result = await getIt<CustomerUseCase>().execute(
-        usecase: GetAllDataUseCase(userKey: UserSession.userId),
-      );
-      debugPrint(
-        '[ProspectListViewModel] fetchData from CACHE/STREAM: ${result.length}',
-      );
-    }
+    final usecase =
+        force
+            ? GetEditedAllUseCase(userKey: UserSession.userId)
+            : GetAllDataUseCase(userKey: UserSession.userId);
 
-     allCustomers = result;
+    final List<CustomerModel> result = await getIt<CustomerUseCase>().execute(
+      usecase: usecase,
+    );
+    debugPrint(
+      '[ProspectListViewModel] fetchData (${force ? "SERVER" : "CACHE"}): ${result.length}',
+    );
 
-    final prospects = allCustomers.where((e) => e.policies.isEmpty).toList();
+    allCustomers = result;
+
+    final List<CustomerModel> prospects =
+        result.where((e) => e.policies.isEmpty).toList();
+
     await Future.delayed(AppDurations.duration100); // UX 안정성을 위한 지연
 
     final sorted = ApplyCurrentSortUseCase(
@@ -57,17 +53,9 @@ class ProspectListViewModel with ChangeNotifier {
       currentSortType: _sortStatus.type,
     ).call(prospects);
 
-    // 🟢 캐시를 강제로 새 인스턴스로 바꿔 emit
-    final newList = List<CustomerModel>.from(sorted);
-
-    _cachedProspects.add(newList);
+    _cachedProspects.add(List<CustomerModel>.from(sorted)); // 새 인스턴스로 emit
     notifyListeners();
-
-    debugPrint(
-      '[ProspectListViewModel] fetchData completed: ${sorted.length} prospects',
-    );
   }
-
 
   @override
   void dispose() {
@@ -99,4 +87,3 @@ class ProspectListViewModel with ChangeNotifier {
 
   void sortByHistoryCount() => _sort(SortType.manage);
 }
-

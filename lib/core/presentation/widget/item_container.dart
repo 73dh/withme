@@ -3,13 +3,15 @@ import '../core_presentation_import.dart';
 
 class ItemContainer extends StatelessWidget {
   final Widget child;
+  final double? height;
 
-  const ItemContainer({super.key, required this.child});
+  const ItemContainer({super.key, required this.child, this.height=95});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      height: height,
       decoration: BoxDecoration(
         color: ColorStyles.customerItemColor,
         borderRadius: BorderRadius.circular(10),
