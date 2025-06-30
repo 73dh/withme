@@ -28,20 +28,22 @@ class CustomerPart extends StatelessWidget {
     required this.onInsuredNameChanged,
     required this.onManChanged,
     required this.onWomanChanged,
-    required this.onBirthChanged, this.insuredBirth,
+    required this.onBirthChanged,
+    this.insuredBirth,
   });
 
   @override
   Widget build(BuildContext context) {
-    return
-      ItemContainer(height: 130, child: Column(
+    return ItemContainer(
+      height: 130,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           PolicyHolderPart(
             policyHolderName: policyHolderName,
             policyHolderSex: policyHolderSex,
             policyHolderBirth: policyHolderBirth,
-            onBirthPressed:(value)=> onBirthPressed(value),
+            onBirthPressed: (value) => onBirthPressed(value),
           ),
           height(5),
           InsuredHolderPart(
@@ -49,35 +51,13 @@ class CustomerPart extends StatelessWidget {
             insuredSex: insuredSex,
             insuredBirth: insuredBirth,
             onInsuredNameChanged: onInsuredNameChanged,
-            onManChanged:(value)=> onManChanged(value),
-            onWomanChanged:(value)=> onWomanChanged(value),
-            onBirthChanged:(value)=> onBirthChanged(value),
+            onManChanged: (value) => onManChanged(value),
+            onWomanChanged: (value) => onWomanChanged(value),
+            onBirthChanged: (value) => onBirthChanged(value),
           ),
           // _insuredPart(),
         ],
-      ));
-      // PartBox(
-      // child: Column(
-      //   crossAxisAlignment: CrossAxisAlignment.start,
-      //   children: [
-      //     PolicyHolderPart(
-      //       policyHolderName: policyHolderName,
-      //       policyHolderSex: policyHolderSex,
-      //       policyHolderBirth: policyHolderBirth,
-      //       onBirthPressed:(value)=> onBirthPressed(value),
-      //     ),
-      //     height(5),
-      //     InsuredHolderPart(
-      //       insuredNameController: insuredNameController,
-      //       insuredSex: insuredSex,
-      //       insuredBirth: insuredBirth,
-      //       onInsuredNameChanged: onInsuredNameChanged,
-      //       onManChanged:(value)=> onManChanged(value),
-      //       onWomanChanged:(value)=> onWomanChanged(value),
-      //       onBirthChanged:(value)=> onBirthChanged(value),
-      //     ),
-      //     // _insuredPart(),
-      //   ],
-      // ),
+      ),
+    );
   }
 }

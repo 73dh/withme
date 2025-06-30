@@ -44,21 +44,35 @@ class PolicyHolderPart extends StatelessWidget {
               /// 성별 라디오
               ToggleButtons(
                 isSelected: [policyHolderSex == '남', policyHolderSex == '여'],
-                onPressed: null,
+
+                onPressed: (sex) {},
                 // 읽기 전용
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(8),
                 constraints: BoxConstraints(
                   minWidth: AppSizes.toggleMinWidth,
                   minHeight: 38,
                 ),
+
                 children: const [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: Text('남'),
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.male, size: 18),
+                        SizedBox(width: 2),
+                        Text('남'),
+                      ],
+                    ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: Text('여'),
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.female, size: 18),
+                        SizedBox(width: 2),
+                        Text('여'),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -69,7 +83,7 @@ class PolicyHolderPart extends StatelessWidget {
                 width: 130,
                 child: ElevatedButton.icon(
                   onPressed: () => onBirthPressed(policyHolderBirth),
-                  icon: const Icon(Icons.calendar_today, size: 18),
+                  icon: const Icon(Icons.cake_outlined, size: 18),
                   label: Text(
                     policyHolderBirth?.formattedDate ?? '생년월일',
                     style: TextStyles.normal12,

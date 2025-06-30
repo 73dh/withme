@@ -55,11 +55,9 @@ class InsuredHolderPart extends StatelessWidget {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    // validator:
-                    //     (value) =>
-                    //         value == null || value.isEmpty ? '이름 입력' : null,
                     onChanged: onInsuredNameChanged,
                     onSaved: (value) => insuredNameController.text = value!,
+
                   ),
                 ),
                 width(12),

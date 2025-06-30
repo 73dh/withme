@@ -49,21 +49,7 @@ class SearchCustomerItem extends StatelessWidget {
         List<PolicyModel> policies = snapshot.data;
         return  ItemContainer(height: null,
 
-          // Container(
-          // padding: const EdgeInsets.symmetric(vertical: 5.0),
-          // width: double.infinity,
-          // decoration: BoxDecoration(
-          //   color: ColorStyles.customerItemColor,
-          //   borderRadius: BorderRadius.circular(10),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.grey.withOpacity(0.5), // 그림자 색상
-          //       offset: const Offset(4, 4), // x, y 방향 으로 이동 (오른쪽 아래)
-          //       blurRadius: 6, // 흐림 정도
-          //       spreadRadius: 1, // 퍼짐 정도
-          //     ),
-          //   ],
-          // ),
+
 
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -76,35 +62,48 @@ class SearchCustomerItem extends StatelessWidget {
                   backgroundImagePath: 'assets/icons/folder.png',
                 ),
                 width(20),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_namePart(), _policyPart(policies)],
-                ),
-                Expanded(
-                  child: StreamBuilder(
-                    stream: getIt<HistoryUseCase>().call(
-                      usecase: GetHistoriesUseCase(
-                        userKey: userKey,
-                        customerKey: customer.customerKey,
+                Expanded( // ✅ Row 안에서 넘치는 부분을 감싸 제한함
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [_namePart(), _policyPart(policies)],
+                        ),
                       ),
-                    ),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const MyCircularIndicator();
-                      }
+                      width(10),
+                      Flexible(
+                        flex: 1,
+                        child: StreamBuilder(
+                          stream: getIt<HistoryUseCase>().call(
+                            usecase: GetHistoriesUseCase(
+                              userKey: userKey,
+                              customerKey: customer.customerKey,
+                            ),
+                          ),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const MyCircularIndicator();
+                            }
 
-                      List<HistoryModel> histories = snapshot.data!;
-                      return HistoryPartWidget(
-                        histories: histories,
-                        onTap: (histories) => onTap(histories),
-                      );
-                    },
+                            List<HistoryModel> histories = snapshot.data!;
+                            return HistoryPartWidget(
+                              histories: histories,
+                              onTap: (histories) => onTap(histories),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
+
         );
       },
     );
@@ -153,13 +152,10 @@ class SearchCustomerItem extends StatelessWidget {
               children: [
                 Text(e.startDate?.formattedDate ?? '', style: style),
                 width(5),
-                Text(e.productCategory, style: style),
+                Text(e.productCategory, style: style,
+                  overflow: TextOverflow.ellipsis,),
                 width(5),
-                Text(
-                  '${numFormatter.format(int.tryParse(e.premium) ?? 0)} (${e.paymentMethod})',
-                  style: style,
-                  overflow: TextOverflow.ellipsis,
-                ),
+
               ],
             );
           }).toList(),

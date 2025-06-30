@@ -14,6 +14,7 @@ import 'package:withme/presentation/home/search/components/upcoming_insurance_ag
 import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/components/customer_item.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
@@ -61,7 +62,7 @@ class _SearchPageState extends State<SearchPage> {
                           key: const ValueKey('select_button_text'),
                           children: [
                             Positioned(
-                              top: 45,
+                              top: 200,
                               left: 0,
                               right: 0,
                               child: Row(
@@ -107,7 +108,7 @@ class _SearchPageState extends State<SearchPage> {
 
     if (policies.isEmpty) {
       return Column(
-        children: [height(200), const AnimatedText(text: '조건에 맞는 고객이 없습니다.')],
+        children: [height(200), const AnimatedText(text: '조건에 맞는 계약이 없습니다.')],
       );
     }
 

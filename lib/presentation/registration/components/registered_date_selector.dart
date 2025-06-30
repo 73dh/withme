@@ -29,7 +29,7 @@ class RegisteredDateSelector extends StatelessWidget {
               width: 120,
               child: RenderFilledButton(
                 width: 100,
-                backgroundColor: ColorStyles.activeButtonColor,
+                backgroundColor: ColorStyles.unActiveButtonColor,
                 borderRadius: 5,
                 onPressed: onPressed,
                 text: registeredDate.formattedDate,

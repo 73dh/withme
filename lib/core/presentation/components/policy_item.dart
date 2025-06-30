@@ -14,11 +14,12 @@ class PolicyItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ItemContainer(
-      height: 230,
+      height: 240,
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             /// 계약자 & 피보험자 (타이틀만)
             Row(
@@ -48,16 +49,7 @@ class PolicyItem extends StatelessWidget {
             // height(4),
             const DashedDivider(),
 
-            /// 계약일 & 만기일
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _labelValue('계약일', policy.startDate?.formattedDate ?? '-'),
-                _labelValue('만기일', policy.endDate?.formattedDate ?? '-'),
-              ],
-            ),
-            // height(4),
-            const DashedDivider(),
+
 
             /// 보험사 & 상품 정보
             Row(
@@ -72,6 +64,16 @@ class PolicyItem extends StatelessWidget {
               '상품명: ${policy.productName}',
               style: TextStyles.subTitle,
               overflow: TextOverflow.ellipsis,
+            ),
+            // height(4),
+            const DashedDivider(),
+            /// 계약일 & 만기일
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _labelValue('계약일', policy.startDate?.formattedDate ?? '-'),
+                _labelValue('만기일', policy.endDate?.formattedDate ?? '-'),
+              ],
             ),
             // height(4),
             const DashedDivider(),

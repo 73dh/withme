@@ -1,14 +1,16 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
 import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/policy_model.dart';
 import '../../../domain/model/user_model.dart';
 
 class FBase {
   // User
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
-
     return await FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(UserSession.userId)
@@ -82,14 +84,13 @@ class FBase {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
     required String userKey,
-  })  {
-    return  FirebaseFirestore.instance
+  }) {
+    return FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userKey)
         .collection(collectionCustomer)
         .snapshots();
   }
-
 
   Future<List<CustomerModel>> getEditedAll({required String userKey}) async {
     final snapshot = await FirebaseFirestore.instance
@@ -99,11 +100,15 @@ class FBase {
         .get(const GetOptions(source: Source.server)); // ✅ 서버에서 강제 fetch
 
     return snapshot.docs
-        .map((doc) => CustomerModel.fromMap(doc.data(), doc.id, documentReference: doc.reference))
+        .map(
+          (doc) => CustomerModel.fromMap(
+            doc.data(),
+            doc.id,
+            documentReference: doc.reference,
+          ),
+        )
         .toList();
   }
-
-
 
   // History
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({
@@ -132,7 +137,7 @@ class FBase {
             .doc(customerKey)
             .collection(collectionHistories)
             .doc();
-  await  FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(historyRef, historyData);
     });
   }
@@ -151,21 +156,6 @@ class FBase {
         .snapshots();
   }
 
-
-
-
-  // Future<QuerySnapshot<Map<String, dynamic>>> getPolicies({
-  //   required String customerKey,
-  // }) {
-  //   return FirebaseFirestore.instance
-  //       .collection(collectionUsers)
-  //       .doc(UserSession.userId)
-  //       .collection(collectionCustomer)
-  //       .doc(customerKey)
-  //       .collection(collectionPolicies)
-  //       .get();
-  // }
-
   Future<void> addPolicy({
     required String userKey,
     required String customerKey,
@@ -177,16 +167,15 @@ class FBase {
         .collection(collectionCustomer)
         .doc(customerKey);
 
-    DocumentReference policyRef =
-        FirebaseFirestore.instance
-            .collection(collectionUsers)
-            .doc(UserSession.userId)
-            .collection(collectionCustomer)
-            .doc(customerKey)
-            .collection(collectionPolicies)
-            .doc();
+    DocumentReference policyRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(UserSession.userId)
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionPolicies)
+        .doc(policyData[keyPolicyKey]);
 
- await   FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.update(customerRef, {
         keyCustomerBirth: policyData[keyPolicyHolderBirth],
       });
@@ -212,5 +201,24 @@ class FBase {
     await policyRef.update({
       keyPolicyState: policyState, // 이 필드만 업데이트됨
     });
+  }
+
+  Future<void> updatePolicy({
+    required String customerKey,
+    required PolicyModel policy,
+  }) async {
+    try {
+      DocumentReference policyRef = FirebaseFirestore.instance
+          .collection(collectionUsers)
+          .doc(UserSession.userId)
+          .collection(collectionCustomer)
+          .doc(customerKey)
+          .collection(collectionPolicies)
+          .doc(policy.policyKey);
+
+      await policyRef.update(policy.toJson());
+    } catch (e) {
+      log('Error updating policy: $e');
+    }
   }
 }

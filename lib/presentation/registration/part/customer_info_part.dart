@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
+
 import '../components/birth_selector.dart';
 import '../components/name_field.dart';
 import '../components/registered_date_selector.dart';
@@ -34,67 +35,70 @@ class CustomerInfoPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PartBox(
+    return ItemContainer(
+      height: 258,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// 이름 & 성별
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildNameField(),
-                const Spacer(),
-                _buildSexSelector(),
+                Expanded(
+                  child: NameField(
+                    isReadOnly: isReadOnly,
+                    nameController: nameController,
+                  ),
+                ),
+                // width(10),
+                SexSelector(
+                  sex: sex,
+                  isReadOnly: isReadOnly,
+                  onChanged:
+                      isReadOnly ? null : (sex) => onSexChanged(sex),
+                ),
               ],
             ),
-            height(10),
-            _buildBirthSelector(context),
-            height(10),
-            _buildRegisteredDateSelector(context),
+            height(12),
+
+            /// 생년월일 선택
+            BirthSelector(
+              birth: birth,
+              isReadOnly: isReadOnly,
+              onInitPressed: isReadOnly ? null : onBirthInitPressed,
+              onSetPressed:
+                  isReadOnly
+                      ? null
+                      : () async {
+                        final date = await selectDate(context);
+                        if (date != null) {
+                          onBirthSetPressed(date);
+                        }
+                      },
+            ),
+            height(12),
+
+            /// 등록일 선택
+            RegisteredDateSelector(
+              isReadOnly: isReadOnly,
+              registeredDate: DateFormat(
+                'yy/MM/dd',
+              ).parseStrict(registeredDateController.text),
+              onPressed:
+                  isReadOnly
+                      ? null
+                      : () async {
+                        final date = await selectDate(context);
+                        if (date != null) {
+                          onRegisteredDatePressed(date);
+                        }
+                      },
+            ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildNameField() =>
-      NameField(isReadOnly: isReadOnly, nameController: nameController);
-
-  Widget _buildSexSelector() => SexSelector(
-    sex: sex,
-    isReadOnly: isReadOnly,
-    onChanged: isReadOnly ? null : (sex) => onSexChanged(sex!),
-  );
-
-  Widget _buildBirthSelector(BuildContext context) => BirthSelector(
-    birth: birth,
-    isReadOnly: isReadOnly,
-    onInitPressed: isReadOnly ? null : onBirthInitPressed,
-    onSetPressed:
-        isReadOnly
-            ? null
-            : () async {
-              final date = await selectDate(context);
-              if (date != null) {
-                onBirthSetPressed(date);
-              }
-            },
-  );
-
-  Widget _buildRegisteredDateSelector(BuildContext context) =>
-      RegisteredDateSelector(
-        isReadOnly: isReadOnly,
-        registeredDate: DateFormat(
-          'yy/MM/dd',
-        ).parseStrict(registeredDateController.text),
-        onPressed:
-            isReadOnly
-                ? null
-                : () async {
-                  final date = await selectDate(context);
-                  if (date != null) {
-                    onRegisteredDatePressed(date);
-                  }
-                },
-      );
 }

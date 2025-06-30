@@ -1,3 +1,8 @@
+import 'package:withme/core/presentation/widget/item_container.dart';
+
+import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/ui/core_ui_import.dart';
+
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 
@@ -17,37 +22,54 @@ class RecommenderPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-      child: Column(
-        children: [
-          _buildRecommenderSwitch(),
-          if (isRecommended) _buildRecommenderField(),
-        ],
+    // 높이 조건: 추천자 입력 여부에 따라 조절
+    final double height = isRecommended ? 150 : 90;
+
+    return ItemContainer(
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            /// 상단 소개자 텍스트 + 스위치
+            Row(
+              children: [
+                const Text('소개자', style: TextStyles.normal14),
+                if (!isReadOnly)
+                  const Text(' (선택)', style: TextStyles.normal14),
+                const Spacer(),
+                Switch.adaptive(
+                  value: isRecommended,
+                  activeColor: ColorStyles.activeSwitchColor,
+                  onChanged: isReadOnly ? null : onChanged,
+                ),
+              ],
+            ),
+
+            /// 추천 여부가 true일 때 이름 출력 or 입력
+            if (isRecommended)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child:
+                    isReadOnly
+                        ? Text(
+                          recommendedController.text,
+                          style: TextStyles.bold14,
+                        )
+                        : CustomTextFormField(
+                          controller: recommendedController,
+                          hintText: '소개자 이름 입력',
+                          onSaved:
+                              (text) =>
+                                  recommendedController.text = text.trim(),
+
+                        ),
+              ),
+          ],
+        ),
       ),
     );
   }
-
-  Widget _buildRecommenderSwitch() => ListTile(
-    contentPadding: EdgeInsets.zero,
-    title: Text('소개자 ${isReadOnly ? '' : '(선택)'}', style: TextStyles.normal14),
-    trailing: Switch.adaptive(
-      value: isRecommended,
-      activeColor: ColorStyles.activeSwitchColor,
-      onChanged: isReadOnly ? null : (val) => onChanged(val),
-    ),
-  );
-
-  Widget _buildRecommenderField() =>
-      isReadOnly
-          ? Align(
-            alignment: Alignment.centerLeft,
-            child: Text(recommendedController.text),
-          )
-          : CustomTextFormField(
-            controller: recommendedController,
-            hintText: '소개자 이름',
-            validator: (text) => text.isEmpty ? '소개자 이름을 입력하세요' : null,
-            onSaved: (text) => recommendedController.text = text.trim(),
-          );
 }

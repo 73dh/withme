@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
@@ -41,7 +42,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
   String _insuredSex = '';
   DateTime? _insuredBirth;
-  String _productCategory = '상품 종류';
+  String _productCategory='상품종류';
   String _insuranceCompany = '보험사';
 
   String _paymentMethod = '';
@@ -163,68 +164,18 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     onInputPremiumTap: (value) {
                       setState(() => _premiumController.text = value);
                     },
+                    startDate: _startDate,
+                    endDate: _endDate,
+                    onStartDateChanged:
+                        (date) => setState(() => _startDate = date),
+                    onEndDateChanged: (date) => setState(() => _endDate = date),
                   ),
-                  height(20),
-                  const PartTitle(text: '계약일, 만기일'),
-                  PartBox(child: _periodPart(context)),
                 ],
               ),
             ),
           ),
         ),
         bottomSheet: _submitButton(context),
-      ),
-    );
-  }
-
-  Padding _periodPart(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(
-            child: RenderFilledButton(
-              borderRadius: 10,
-              backgroundColor:
-                  _startDate != null
-                      ? ColorStyles.unActiveButtonColor
-                      : ColorStyles.activeButtonColor,
-              foregroundColor: Colors.black87,
-              onPressed: () async {
-                DateTime? selectedDate = await selectDate(context);
-                if (selectedDate != null) {
-                  setState(() => _startDate = selectedDate);
-                }
-              },
-              text:
-                  _startDate == null
-                      ? '계약일 선택'
-                      : '개시일: ${_startDate!.toLocal().toString().split(' ')[0]}',
-            ),
-          ),
-          width(10),
-          Expanded(
-            child: RenderFilledButton(
-              borderRadius: 10,
-              backgroundColor:
-                  _endDate != null
-                      ? ColorStyles.unActiveButtonColor
-                      : ColorStyles.activeButtonColor,
-              foregroundColor: Colors.black87,
-              onPressed: () async {
-                DateTime? selectedDate = await selectDate(context);
-                if (selectedDate != null) {
-                  setState(() => _endDate = selectedDate);
-                }
-              },
-              text:
-                  _endDate == null
-                      ? '만기일 선택'
-                      : '만기일: ${_endDate!.toLocal().toString().split(' ')[0]}',
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -241,13 +192,20 @@ class _PolicyScreenState extends State<PolicyScreen> {
   }
 
   void _tryValidation() async {
+
     if (_formKey.currentState!.validate()) {
+      final name = _insuredNameController.text.trim();
+      final nameRegex = RegExp(r'^[a-zA-Z가-힣]+$');
       if (_policyHolderBirth == null) {
         renderSnackBar(context, text: '계약자 생일을 확인하세요');
         return;
       }
-      if (_insuredNameController.text.trim().isEmpty) {
+      if (name.isEmpty) {
         renderSnackBar(context, text: '피보험자 이름을 입력하세요');
+        return;
+      }
+      if (!nameRegex.hasMatch(name)) {
+        renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
         return;
       }
       if (_insuredSex == '') {
@@ -258,12 +216,24 @@ class _PolicyScreenState extends State<PolicyScreen> {
         renderSnackBar(context, text: '피보험자 생일을 확인하세요');
         return;
       }
-      if (_productCategory.isEmpty || _insuranceCompany.isEmpty) {
-        renderSnackBar(context, text: '상품종류와 보험사를 선택하세요.');
+      if (_productCategory=='상품종류') {
+        renderSnackBar(context, text: '상품종류를 선택하세요.');
+        return;
+      }
+      if ( _insuranceCompany=='보험사') {
+        renderSnackBar(context, text: '보험사를 선택하세요.');
+        return;
+      }
+      if (_productNameController.text.trim().isEmpty) {
+        renderSnackBar(context, text: '상품명을 입력하세요.');
         return;
       }
       if (_paymentMethod.isEmpty) {
         renderSnackBar(context, text: '납입방법을 선택하세요.');
+        return;
+      }
+      if (_premiumController.text.trim().isEmpty) {
+        renderSnackBar(context, text: '보험료를 입력하세요.');
         return;
       }
 
@@ -288,7 +258,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
         context: context,
         builder: (context) {
           return SizedBox(
-            height: 300,
+            height: 400,
             width: double.infinity,
             child: _confirmBox(context),
           );
@@ -313,11 +283,11 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
     final policyDocRef =
         FirebaseFirestore.instance
-            .collection('users')
+            .collection(collectionUsers)
             .doc(userId)
-            .collection('customers')
+            .collection(collectionCustomer)
             .doc(customerKey)
-            .collection('policies')
+            .collection(collectionPolicies)
             .doc();
     final policyMap = PolicyModel.toMapForCreatePolicy(
       policyHolder: _policyHolderName,

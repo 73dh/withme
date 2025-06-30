@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/search/enum/coming_birth.dart';
 import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
+import 'package:withme/presentation/home/search/enum/upcoming_insurance_age.dart';
 
 import '../../ui/color/color_style.dart';
 
@@ -54,7 +56,7 @@ class RenderFilledButton extends StatelessWidget {
             PopupMenuButton<dynamic>(
               itemBuilder: (context) => menuItems!,
               onSelected: onMenuSelected,
-              icon: const Icon(Icons.arrow_drop_down,size: 25,),
+              icon: _getMenuIcon(),
               padding: EdgeInsets.zero,
               splashRadius: 20,
             ),
@@ -74,6 +76,20 @@ class RenderFilledButton extends StatelessWidget {
       child: Text(text, textAlign: TextAlign.center),
     );
   }
+
+  Icon _getMenuIcon() {
+    if (menuItems != null && menuItems!.isNotEmpty) {
+      final firstItem = menuItems!.first;
+
+      if (firstItem is PopupMenuItem<NoContactMonth>) {
+        return const Icon(Icons.schedule, size: 22);
+      } else if (firstItem is PopupMenuItem<ComingBirth>) {
+        return const Icon(Icons.cake_outlined, size: 22);
+      } else if (firstItem is PopupMenuItem<UpcomingInsuranceAge>) {
+        return const Icon(Icons.calendar_today, size: 22);
+      }
+    }
+
+    return const Icon(Icons.arrow_drop_down, size: 25); // 기본 아이콘
+  }
 }
-
-

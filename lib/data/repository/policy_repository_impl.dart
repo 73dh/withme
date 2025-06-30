@@ -14,12 +14,7 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
     return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
   }
 
-  // @override
-  // Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
-  //   return (await fBase.getPolicies(
-  //     customerKey: customerKey,
-  //   )).docs.map((e) => PolicyModel.fromSnapshot(e)).toList();
-  // }
+
   @override
   Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
     final snapshot = await fBase.fetchPolicies(customerKey: customerKey).first;
@@ -41,16 +36,10 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
     );
   }
 
+
+
   @override
-  Future<void> changePolicyState({
-    required String customerKey,
-    required String policyKey,
-    required String policyState,
-  })async {
-    return await fBase.changePolicyState(
-      customerKey: customerKey,
-      policyKey: policyKey,
-      policyState: policyState,
-    );
+  Future<void> updatePolicy({required String customerKey, required PolicyModel policy})async {
+  return await fBase.updatePolicy(customerKey: customerKey, policy: policy);
   }
 }

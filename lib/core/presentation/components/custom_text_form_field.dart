@@ -41,12 +41,10 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseBorder =OutlineInputBorder(borderSide: BorderSide.none);
-    // const OutlineInputBorder(
-    //   borderSide: BorderSide(color: Colors.blueGrey, width: 1.0),
-    // );
+    final baseBorder = const OutlineInputBorder(borderSide: BorderSide.none);
 
     return TextFormField(
+
       controller: controller,
       readOnly: readOnly,
       cursorColor: Colors.black87,
@@ -56,10 +54,9 @@ class CustomTextFormField extends StatelessWidget {
       textAlign: textAlign!,
       style: textStyle,
       keyboardType: inputType,
-      onChanged: (text) => onChanged,
       onEditingComplete: onCompleted,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+        contentPadding:  EdgeInsets.zero,
         hintText: hintText,
         hintStyle: TextStyles.hintStyle,
         labelText: labelText,
@@ -74,8 +71,20 @@ class CustomTextFormField extends StatelessWidget {
           borderSide: baseBorder.borderSide.copyWith(color: Colors.blueGrey),
         ),
       ),
-      validator: (text) => validator!(text!),
-      onSaved: (text) => onSaved ?? (text!),
+      onChanged: (text) {
+        if (onChanged != null) onChanged!(text);
+      },
+
+      validator: (text) {
+        if (validator != null) return validator!(text!);
+        return null;
+      },
+
+      onSaved: (text) {
+        if (onSaved != null) {
+          onSaved!(text!);
+        }
+      },
     );
   }
 }

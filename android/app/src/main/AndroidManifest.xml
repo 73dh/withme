@@ -1,5 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!-- 앱 외부 저장소 접근 (Android 10 이하) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- 앱 전용 디렉토리 접근은 별도 권한 필요 없음 -->
+
+
     <application
         android:label="withme"
         android:name="${applicationName}"

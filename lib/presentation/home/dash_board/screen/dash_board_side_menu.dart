@@ -9,6 +9,7 @@ import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/presentation/widget/export_and_and_send_email_with_excel.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/model/user_model.dart';
 
@@ -180,7 +181,7 @@ class DashBoardSideMenu extends StatelessWidget {
                         ],
                       ),
                     ),
-                    height(10),
+
                     GestureDetector(
                       onTap: onTap,
                       child: Row(
@@ -191,6 +192,11 @@ class DashBoardSideMenu extends StatelessWidget {
                         ],
                       ),
                     ),
+                    height(100),
+                    FilledButton(
+                      onPressed: () => exportAndSendEmailWithExcel(context),
+                      child: Text('엑셀 보내기'),
+                    )
                   ],
                 ),
               ),

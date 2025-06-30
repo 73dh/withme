@@ -61,12 +61,10 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Image.asset(
-                    IconsPath.signature,
-                    color: Colors.white,
-                    width: 23,
-                  ),
+                child: const Icon(
+                  Icons.description,
+                  color: Colors.white,
+                  size: 28,
                 ),
               );
             },

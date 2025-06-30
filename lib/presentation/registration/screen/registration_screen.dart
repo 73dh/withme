@@ -131,45 +131,48 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildRecommenderPart() => PartBox(
-    child: RecommenderPart(
+  Widget _buildRecommenderPart() {
+    return RecommenderPart(
       isReadOnly: _isReadOnly,
       isRecommended: _isRecommended,
-      onChanged:
-          (val) => setState(() {
-            _isRecommended = val;
-            if (!val) _recommendedController.clear();
-          }),
       recommendedController: _recommendedController,
-    ),
-  );
+      onChanged: (val) {
+        setState(() {
+          _isRecommended = val;
+          if (!val) _recommendedController.clear();
+        });
+      },
+    );
+  }
 
-  Widget _buildCustomerInfoPart() => CustomerInfoPart(
-    isReadOnly: _isReadOnly,
-    nameController: _nameController,
-    registeredDateController: _registeredDateController,
-    sex: _sex,
-    birth: _birth,
-    onSexChanged: (value) => setState(() => _sex = value),
-    birthController: _birthController,
-    onBirthInitPressed:
-        () async => setState(() {
-          _birth = null;
-          _birthController.clear();
-        }),
-    onBirthSetPressed: (date) async {
-      setState(() {
-        _birth = date;
-        _birthController.text = date.toString();
-      });
-    },
+  Widget _buildCustomerInfoPart() {
+    return CustomerInfoPart(
+      isReadOnly: _isReadOnly,
+      nameController: _nameController,
+      registeredDateController: _registeredDateController,
+      sex: _sex,
+      birth: _birth,
+      onSexChanged: (value) => setState(() => _sex = value),
+      birthController: _birthController,
+      onBirthInitPressed:
+          () async => setState(() {
+            _birth = null;
+            _birthController.clear();
+          }),
+      onBirthSetPressed: (date) async {
+        setState(() {
+          _birth = date;
+          _birthController.text = date.toString();
+        });
+      },
 
-    onRegisteredDatePressed: (date) async {
-      setState(() {
-        _registeredDateController.text = date.formattedDate;
-      });
-    },
-  );
+      onRegisteredDatePressed: (date) async {
+        setState(() {
+          _registeredDateController.text = date.formattedDate;
+        });
+      },
+    );
+  }
 
   Widget _buildSubmitButton() {
     return RenderFilledButton(
@@ -223,15 +226,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   bool _tryValidation() {
     final isValid = _formKey.currentState?.validate() ?? false;
-    if (_nameController.text.isNotEmpty && _sex == null) {
+    final name = _nameController.text.trim();
+    final recommenderName = _recommendedController.text.trim();
+    final nameRegex = RegExp(r'^[a-zA-Z가-힣]+$');
+    if (name.isEmpty) {
+      renderSnackBar(context, text: '고객 이름을 입력 하세요');
+      return false;
+    }
+    if (!nameRegex.hasMatch(name)) {
+      renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
+      return false;
+    }
+    if (_sex == null) {
       renderSnackBar(context, text: '성별을 선택 하세요');
       return false;
     }
-    if (widget.customerModel == null &&
-        _historyController.text == HistoryContent.title.toString()) {
-      renderSnackBar(context, text: '상담 이력을 선택 하세요');
+    if (_isRecommended && recommenderName.isEmpty) {
+      renderSnackBar(context, text: '소개자 이름을 입력 하세요');
       return false;
     }
+    if (_isRecommended&& !nameRegex.hasMatch(recommenderName)) {
+      renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
+      return false;
+    }
+
     if (isValid) {
       _formKey.currentState!.save();
       return true;

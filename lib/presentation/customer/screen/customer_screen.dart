@@ -9,9 +9,9 @@ import 'package:withme/presentation/customer/customer_view_model.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/presentation/widget/show_edit_policy_dialog.dart';
 import '../../../domain/model/customer_model.dart';
 import '../components/customer_info.dart';
-import '../components/policy_part.dart';
 
 class CustomerScreen extends StatelessWidget {
   final CustomerModel customer;
@@ -52,12 +52,16 @@ class CustomerScreen extends StatelessWidget {
                       itemBuilder:
                           (context, index) => Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: PolicyItem(policy: policies[index])
-                            
-                            // PolicyPart(
-                            //   policy: policies[index],
-                            //   customer: customer,
-                            // ),
+                            child: GestureDetector(
+                              onTap: () async {
+                                await showEditPolicyDialog(
+                                  context: context,
+                                  policy: policies[index],
+                                  viewModel: viewModel,
+                                );
+                              },
+                              child: PolicyItem(policy: policies[index]),
+                            ),
                           ),
                     );
                   },
