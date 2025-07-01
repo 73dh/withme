@@ -15,17 +15,7 @@ class FBase {
         .collection(collectionUsers)
         .doc(UserSession.userId)
         .get();
-    // try {
-    //   return await FirebaseFirestore.instance
-    //       .collection(collectionUsers)
-    //       .doc(UserSession.userId)
-    //       .get(const GetOptions(source: Source.cache));
-    // } catch (_) {
-    //   return await FirebaseFirestore.instance
-    //       .collection(collectionUsers)
-    //       .doc(UserSession.userId)
-    //       .get(); // fallback to server
-    // }
+
   }
 
   // Customer
