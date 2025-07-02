@@ -1,6 +1,6 @@
 
 import '../../../core/utils/core_utils_import.dart';
-import '../../../presentation/home/prospect_list/model/sort_type.dart';
+import '../../../core/domain/sort_status.dart';
 import '../../domain_import.dart';
 
 class ApplyCurrentSortUseCase {

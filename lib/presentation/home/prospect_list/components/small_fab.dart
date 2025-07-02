@@ -1,6 +1,6 @@
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
-import '../model/sort_type.dart';
+import '../../../../core/domain/sort_status.dart';
 
 class SmallFab extends StatefulWidget {
   final bool fabVisibleLocal;
@@ -121,8 +121,8 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
             const SizedBox(height: 4),
             if (!widget.fabExpanded)
               FloatingActionButton.small(
-                key: const ValueKey('fabMain'),
-                heroTag: 'fabMain',
+                key: const ValueKey('smallFab'),
+                heroTag: 'smallFab',
                 backgroundColor: ColorStyles.fabColor,
                 onPressed: () => widget.overlaySetState?.call(() {}),
                 child: const Icon(Icons.sort_outlined, color: Colors.black87),
@@ -135,16 +135,36 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
 
   Widget _buildSortActions() {
     final status = widget.selectedSortStatus;
-    final actions = [
-      {'label': '이름순', 'onTap': widget.onSortByName, 'type': SortType.name},
-      {'label': '생일순', 'onTap': widget.onSortByBirth, 'type': SortType.birth},
-      {
+    final actions = <Map<String, dynamic>>[];
+
+    if (widget.onSortByName != null) {
+      actions.add({
+        'label': '이름순',
+        'onTap': widget.onSortByName,
+        'type': SortType.name,
+      });
+    }
+    if (widget.onSortByBirth != null) {
+      actions.add({
+        'label': '생일순',
+        'onTap': widget.onSortByBirth,
+        'type': SortType.birth,
+      });
+    }
+    if (widget.onSortByInsuredDate != null) {
+      actions.add({
         'label': '상령일순',
         'onTap': widget.onSortByInsuredDate,
         'type': SortType.insuredDate,
-      },
-      {'label': '관리순', 'onTap': widget.onSortByManage, 'type': SortType.manage},
-    ];
+      });
+    }
+    if (widget.onSortByManage != null) {
+      actions.add({
+        'label': '관리순',
+        'onTap': widget.onSortByManage,
+        'type': SortType.manage,
+      });
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,

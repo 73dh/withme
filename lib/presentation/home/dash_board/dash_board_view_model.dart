@@ -127,6 +127,7 @@ class DashBoardViewModel with ChangeNotifier {
     } else {
       // 3. 메뉴 닫기 애니메이션
       controller.reverse();
+      print('close');
       _state = state.copyWith(
         menuStatus: MenuStatus.isClosed,
         bodyXPosition: 0,
@@ -135,6 +136,18 @@ class DashBoardViewModel with ChangeNotifier {
     }
 
     notifyListeners(); // ✅ UI에 변경사항 알림
+  }
+
+  // 화면 이동시 sideMenu 닫음
+  void forceCloseMenu() {
+    if (state.menuStatus == MenuStatus.isOpened) {
+      _state = state.copyWith(
+        menuStatus: MenuStatus.isClosed,
+        bodyXPosition: 0,
+        menuXPosition: AppSizes.deviceSize.width,
+      );
+      notifyListeners();
+    }
   }
 
   Future<void> logout(BuildContext context) async {

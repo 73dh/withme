@@ -28,7 +28,7 @@ class FreeLimitDialog {
 
       // ② 현재 등록된 고객 수 확인
       final itemCount = viewModel.allCustomers.length;
-print('{itemCount: $itemCount}');
+      debugPrint('{itemCount: $itemCount}');
       // ③ 무료회원: 등록 제한 조건
       if (membershipStatus == MembershipStatus.free) {
         if (itemCount >= limitCount) {

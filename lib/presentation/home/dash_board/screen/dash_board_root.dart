@@ -39,6 +39,9 @@ class _DashBoardRootState extends State<DashBoardRoot>
 
   @override
   void dispose() {
+    if (viewModel.state.menuStatus == MenuStatus.isOpened) {
+      viewModel.forceCloseMenu();
+    }
     _animationController.dispose();
     super.dispose();
   }
@@ -53,7 +56,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
             true => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const AnimatedText(text:  '통계 작성중'),
+                const AnimatedText(text: '통계 작성중'),
                 height(20),
                 const MyCircularIndicator(),
               ],
@@ -76,23 +79,23 @@ class _DashBoardRootState extends State<DashBoardRoot>
                       context: context,
                       builder:
                           (_) => AlertDialog(
-                        title: const Text('유료회원 문의'),
-                        content: const Text('문의 메일을 보내시겠습니까?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('취소'),
+                            title: const Text('유료회원 문의'),
+                            content: const Text('문의 메일을 보내시겠습니까?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  viewModel.sendInquiryEmail(context);
+                                  // viewModel.sendSMS(phoneNumber: '01086049173',message: '문의드립니다.');
+                                },
+                                child: const Text('확인'),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                             viewModel.sendInquiryEmail(context);
-                             // viewModel.sendSMS(phoneNumber: '01086049173',message: '문의드립니다.');
-                            },
-                            child: const Text('확인'),
-                          ),
-                        ],
-                      ),
                     );
                   },
                 ),

@@ -8,13 +8,20 @@ import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/domain/use_case/policy_use_case.dart';
 import 'package:withme/presentation/home/customer_list/customer_list_state.dart';
 
+import '../../../core/domain/sort_status.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/domain_import.dart';
+import '../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 
 class CustomerListViewModel with ChangeNotifier {
   CustomerListState _state = CustomerListState();
 
   CustomerListState get state => _state;
+
+  SortStatus _sortStatus = SortStatus(SortType.name, true);
+
+  SortStatus get sortStatus => _sortStatus;
+
 
   final BehaviorSubject<List<CustomerModel>> _cachedCustomers =
       BehaviorSubject.seeded([]);
@@ -35,17 +42,44 @@ class CustomerListViewModel with ChangeNotifier {
 
   Future<void> _fetchData() async {
     List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
-      // usecase: GetEditedAllUseCase(
-      //   userKey: FirebaseAuth.instance.currentUser?.uid ?? '',
-      // ),
       usecase: GetAllDataUseCase(
         userKey: FirebaseAuth.instance.currentUser?.uid ?? '',
       ),
     );
     final policyCustomers =
         allCustomers.where((e) => e.policies.isNotEmpty).toList();
-    _cachedCustomers.add(policyCustomers);
+
+    final sorted = ApplyCurrentSortUseCase(
+      isAscending: _sortStatus.isAscending,
+      currentSortType: _sortStatus.type,
+    ).call(policyCustomers);
+
+    // _cachedCustomers.add(policyCustomers);
+    _cachedCustomers.add(List<CustomerModel>.from(sorted));
   }
+
+  void _sort(SortType type) {
+    final currentList = _cachedCustomers.valueOrNull ?? [];
+    bool ascending =
+    (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
+
+    _sortStatus = SortStatus(type, ascending);
+
+    final sortedList = ApplyCurrentSortUseCase(
+      isAscending: _sortStatus.isAscending,
+      currentSortType: _sortStatus.type,
+    ).call(currentList);
+
+    _cachedCustomers.add(List<CustomerModel>.from(sortedList));
+    notifyListeners();
+  }
+
+  void sortByName() => _sort(SortType.name);
+
+  void sortByBirth() => _sort(SortType.birth);
+
+
+
 
   @override
   void dispose() {

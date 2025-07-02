@@ -9,7 +9,7 @@ import 'package:withme/domain/use_case/customer/get_edited_all_use_case.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
-import 'model/sort_type.dart';
+import '../../../core/domain/sort_status.dart';
 
 class ProspectListViewModel with ChangeNotifier {
   final BehaviorSubject<List<CustomerModel>> _cachedProspects =

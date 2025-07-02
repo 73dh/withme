@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
+import '../../../core/presentation/core_presentation_import.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../../domain/model/user_model.dart';
@@ -15,7 +17,33 @@ class FBase {
         .collection(collectionUsers)
         .doc(UserSession.userId)
         .get();
+  }
 
+  Future<void> deleteUserAccountAndData({required String userId}) async {
+    final userDocRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(userId);
+
+    try {
+      // 🔸 1. Firestore 사용자 데이터 삭제
+      await userDocRef.delete();
+
+      // 🔸 2. Firebase Auth 계정 삭제
+      await FirebaseAuth.instance.currentUser!.delete();
+
+      debugPrint('계정과 데이터가 모두 삭제되었습니다.');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        debugPrint('최근 로그인 후 다시 시도해야 합니다.');
+        // 👉 UI로 re-authentication 유도 필요
+      } else {
+        debugPrint('FirebaseAuth 오류: ${e.message}');
+      }
+      rethrow;
+    } catch (e) {
+      debugPrint('알 수 없는 오류: $e');
+      rethrow;
+    }
   }
 
   // Customer

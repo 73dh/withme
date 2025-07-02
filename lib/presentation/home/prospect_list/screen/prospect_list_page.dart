@@ -23,7 +23,7 @@ class ProspectListPage extends StatefulWidget {
 }
 
 class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
-  final RouteObserver<PageRoute> routeObserver =
+  final RouteObserver<PageRoute> _routeObserver =
       getIt<RouteObserver<PageRoute>>();
   final viewModel = getIt<ProspectListViewModel>();
   String? _searchText = '';
@@ -53,13 +53,13 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
     super.didChangeDependencies();
     final ModalRoute? modalRoute = ModalRoute.of(context);
     if (modalRoute is PageRoute) {
-      routeObserver.subscribe(this, modalRoute);
+      _routeObserver.subscribe(this, modalRoute);
     }
   }
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this);
+    _routeObserver.unsubscribe(this);
     _removeFabOverlay(); // clean up overlay
     super.dispose();
   }
@@ -96,7 +96,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
         } else {
           debugPrint('[VisibilityDetector] 다시 보여짐 감지, FAB 삽입 시도');
           _fabCanShow = true; // 👈 여기 추가!
-          // if (!_fabCanShow) return; // 👈 추가
           _insertFabOverlayIfAllowed();
         }
       },

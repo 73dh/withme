@@ -61,143 +61,177 @@ class DashBoardSideMenu extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.person, color: Colors.black87),
-                        width(5),
-                        Text(currentUser?.email ?? '로그인 정보 없음'),
-                      ],
-                    ),
-                    height(15),
-                    Row(
-                      children: [
-                        const Icon(Icons.date_range),
-                        width(5),
-                        Text(
-                          '가입일시: ${currentUser?.agreedDate.formattedDate ?? '-'}',
-                        ),
-                      ],
-                    ),
-                    const DashedDivider(height: 30),
-
-                    // 무료회원일 경우 사용가능 건수 표시
-                    if (currentUser?.membershipStatus ==
-                        MembershipStatus.free) ...[
-                      const Text(
-                        '사용가능 건수: $freeCount 건',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      height(10),
-                    ],
-
-                    // 유료회원이면서 만료된 경우 고객 추가등록 불가 안내
-                    if (currentUser != null &&
-                        currentUser!.membershipStatus.isPaid &&
-                        !currentUser!.isMembershipValid) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red.shade300),
-                        ),
-                        child: const Row(
+                        Row(
                           children: [
-                            Icon(Icons.warning, color: Colors.red),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '유료회원 서비스가 만료되어 고객 추가 등록이 불가합니다.\n멤버십을 갱신해주세요.',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                            const Icon(Icons.person, color: Colors.black87),
+                            width(5),
+                            Text(currentUser?.email ?? '로그인 정보 없음'),
+                          ],
+                        ),
+                        height(15),
+                        Row(
+                          children: [
+                            const Icon(Icons.date_range),
+                            width(5),
+                            Text(
+                              '가입일시: ${currentUser?.agreedDate.formattedDate ?? '-'}',
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const DashedDivider(height: 30),
 
-                    Row(
-                      children: [
-                        const Icon(Icons.monetization_on),
-                        width(5),
-                        Text(currentUser?.membershipStatus.toString() ?? ''),
-                        if (currentUser != null &&
-                            currentUser!.membershipStatus !=
-                                MembershipStatus.free) ...[
-                          width(8),
-                          currentUser!.isMembershipValid
-                              ? Text(
-                                '(만료일: ${currentUser!.membershipExpiresAt?.formattedDate ?? '-'})',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
-                                ),
-                              )
-                              : const Text(
-                                '(만료됨)',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
-                                ),
-                              ),
+                        // 무료회원일 경우 사용가능 건수 표시
+                        if (currentUser?.membershipStatus ==
+                            MembershipStatus.free) ...[
+                          const Text(
+                            '사용가능 건수: $freeCount 건',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          height(10),
                         ],
-                      ],
-                    ),
-                    height(5),
-                    // 무료회원일 경우 상단에서 이미 건수 보여주므로 중복 표시하지 않음
-                    (currentUser?.membershipStatus.isPaid == true)
-                        ? Column(
-                          children: [
-                            height(15),
-                            Row(
+
+                        // 유료회원이면서 만료된 경우 고객 추가등록 불가 안내
+                        if (currentUser != null &&
+                            currentUser!.membershipStatus.isPaid &&
+                            !currentUser!.isMembershipValid) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.red.shade300),
+                            ),
+                            child: const Row(
                               children: [
-                                const Icon(Icons.date_range),
-                                width(5),
-                                Text(
-                                  '직전결제일: ${currentUser?.paidAt?.formattedDate == DateTime(2020).formattedDate ? '이력 없음' : currentUser?.paidAt?.formattedDate ?? '-'}',
+                                Icon(Icons.warning, color: Colors.red),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '유료회원 서비스가 만료되어 고객 추가 등록이 불가합니다.\n멤버십을 갱신해주세요.',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ],
-                        )
-                        : const SizedBox.shrink(),
-                    const DashedDivider(height: 30),
-                    GestureDetector(
-                      onTap: onInquiryTap,
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.email_outlined,
-                            color: Colors.black87,
                           ),
-                          width(5),
-                          const Text('유료회원 문의'),
                         ],
-                      ),
-                    ),
 
-                    GestureDetector(
-                      onTap: onTap,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.exit_to_app, color: Colors.black87),
-                          width(5),
-                          const Text('Logout'),
-                        ],
-                      ),
+                        Row(
+                          children: [
+                            const Icon(Icons.monetization_on),
+                            width(5),
+                            Text(currentUser?.membershipStatus.toString() ?? ''),
+
+                            if (currentUser != null &&
+                                currentUser!.membershipStatus !=
+                                    MembershipStatus.free) ...[
+                              width(8),
+                              currentUser!.isMembershipValid
+                                  ? Text(
+                                    '(만료일: ${currentUser!.membershipExpiresAt?.formattedDate ?? '-'})',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                  : const Text(
+                                    '(만료됨)',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                            ],
+                          ],
+                        ),
+
+                        height(5),
+                        // 무료회원일 경우 상단에서 이미 건수 보여주므로 중복 표시하지 않음
+                        (currentUser?.membershipStatus.isPaid == true)
+                            ? Column(
+                              children: [
+                                height(15),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.date_range),
+                                    width(5),
+                                    Text(
+                                      '직전결제일: ${currentUser?.paidAt?.formattedDate == DateTime(2020).formattedDate ? '이력 없음' : currentUser?.paidAt?.formattedDate ?? '-'}',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                            : const SizedBox.shrink(),
+                        const DashedDivider(height: 30),
+                        GestureDetector(
+                          onTap: onInquiryTap,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.email_outlined,
+                                color: Colors.black87,
+                              ),
+                              width(5),
+                              const Text('유료회원 문의'),
+                            ],
+                          ),
+                        ),
+                        height(5),
+                        GestureDetector(
+                          onTap:
+                              currentUser != null
+                                  ? currentUser!.isMembershipValid
+                                      ? () => exportAndSendEmailWithExcel(
+                                        context,
+                                        viewModel.state.customers,
+                                        currentUser!.email,
+                                      )
+                                      : null
+                                  : null,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.save_alt_outlined,
+                                color: Colors.black87,
+                              ),
+                              width(5),
+                              const Text('데이터 내보내기 (Excel)'),
+                            ],
+                          ),
+                        ),
+                        const DashedDivider(height: 30),
+                        GestureDetector(
+                          onTap: onTap,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.exit_to_app, color: Colors.black87),
+                              width(5),
+                              const Text('Logout'),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    height(100),
-                    FilledButton(
-                      onPressed: () => exportAndSendEmailWithExcel(context),
-                      child: Text('엑셀 보내기'),
-                    )
-                  ],
+                GestureDetector(
+                  onTap: (){},
+                  child: Row(
+                    children: [
+                      const Icon(Icons.layers_clear_outlined, color: Colors.black87),
+                      width(5),
+                      const Text('회원탈퇴'),
+                    ],
+                  ),
+                )],
                 ),
               ),
             ),
