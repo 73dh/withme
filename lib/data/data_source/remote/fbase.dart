@@ -19,23 +19,37 @@ class FBase {
         .get();
   }
 
-  Future<void> deleteUserAccountAndData({required String userId}) async {
+  Future<void> deleteUserAccountAndData({
+    required String userId,
+    required String email,
+    required String password,
+  }) async {
     final userDocRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userId);
 
     try {
-      // 🔸 1. Firestore 사용자 데이터 삭제
+      final user = FirebaseAuth.instance.currentUser!;
+
+      // 🔸 1. 재인증 (email/password 로그인 사용자 기준)
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      // 🔸 2. Firestore 사용자 데이터 삭제
       await userDocRef.delete();
 
-      // 🔸 2. Firebase Auth 계정 삭제
-      await FirebaseAuth.instance.currentUser!.delete();
+      // 🔸 3. Firebase Auth 계정 삭제
+      await user.delete();
 
       debugPrint('계정과 데이터가 모두 삭제되었습니다.');
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
-        debugPrint('최근 로그인 후 다시 시도해야 합니다.');
-        // 👉 UI로 re-authentication 유도 필요
+      if (e.code == 'wrong-password') {
+        debugPrint('비밀번호가 틀렸습니다.');
+      } else if (e.code == 'user-mismatch') {
+        debugPrint('계정이 일치하지 않습니다.');
       } else {
         debugPrint('FirebaseAuth 오류: ${e.message}');
       }

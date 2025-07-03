@@ -4,11 +4,13 @@ import '../core_presentation_import.dart'; // MyCircularIndicator 위치에 맞�
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
+  final String buttonText;
   final Future<void> Function() onConfirm;
 
   const CommonConfirmDialog({
     super.key,
     required this.text,
+   required this.buttonText,
     required this.onConfirm,
   });
 
@@ -50,7 +52,7 @@ class CommonConfirmDialog extends StatelessWidget {
                           }
                         }
                       },
-                      child: const Text('확인'),
+                      child:  Text(buttonText),
                     ),
                   ],
                 ),

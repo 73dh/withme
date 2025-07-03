@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/animated_text.dart';
@@ -11,7 +13,10 @@ import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
 
+import '../../../../core/data/fire_base/user_session.dart';
 import '../../../../core/di/setup.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/presentation/widget/show_reauth_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../dash_board_view_model.dart';
 
@@ -70,8 +75,43 @@ class _DashBoardRootState extends State<DashBoardRoot>
                 ),
                 DashBoardSideMenu(
                   viewModel: viewModel,
-                  onTap: () {
+                  onLogOutTap: () {
                     viewModel.logout(context);
+                  },
+                  onSignOutTap: () async {
+                    await showConfirmDialog(
+                      context,
+                      text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
+                      buttonText: '회원탈퇴',
+                      onConfirm: () async {
+                        final credentials = await showReauthDialog(context);
+                        if (credentials == null) return; // 취소 시 종료
+
+                        try {
+                          if (context.mounted) {
+                            await viewModel.signOut(context, credentials);
+                          }
+                          // await getIt<FBase>().deleteUserAccountAndData(
+                          //   userId: UserSession.userId,
+                          //   email: credentials['email']!,
+                          //   password: credentials['password']!,
+                          if (context.mounted) {
+                            renderSnackBar(context, text: '계정이 삭제되었습니다.');
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          if (context.mounted) {
+                            renderSnackBar(
+                              context,
+                              text:
+                                  '계정 삭제 중 오류 발생: ${switch (e.toString()) {
+                                    'The email address is badly formatted.' => '이메일을 확인하세요',
+                                    _ => '기타 오류',
+                                  }}',
+                            );
+                          }
+                        }
+                      },
+                    );
                   },
                   currentUser: viewModel.state.userInfo,
                   onInquiryTap: () {

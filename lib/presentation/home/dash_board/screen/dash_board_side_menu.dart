@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/free_count.dart';
@@ -7,9 +8,13 @@ import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
+import '../../../../core/data/fire_base/user_session.dart';
+import '../../../../core/di/di_setup_import.dart';
+import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/export_and_and_send_email_with_excel.dart';
+import '../../../../core/presentation/widget/show_reauth_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/model/user_model.dart';
 
@@ -29,14 +34,16 @@ import '../../../../domain/model/user_model.dart';
 
 class DashBoardSideMenu extends StatelessWidget {
   final DashBoardViewModel viewModel;
-  final void Function() onTap;
+  final void Function() onLogOutTap;
+  final void Function() onSignOutTap;
   final UserModel? currentUser;
   final void Function() onInquiryTap;
 
   const DashBoardSideMenu({
     super.key,
     required this.viewModel,
-    required this.onTap,
+    required this.onLogOutTap,
+    required this.onSignOutTap,
     required this.currentUser,
     required this.onInquiryTap,
   });
@@ -129,7 +136,9 @@ class DashBoardSideMenu extends StatelessWidget {
                           children: [
                             const Icon(Icons.monetization_on),
                             width(5),
-                            Text(currentUser?.membershipStatus.toString() ?? ''),
+                            Text(
+                              currentUser?.membershipStatus.toString() ?? '',
+                            ),
 
                             if (currentUser != null &&
                                 currentUser!.membershipStatus !=
@@ -211,10 +220,13 @@ class DashBoardSideMenu extends StatelessWidget {
                         ),
                         const DashedDivider(height: 30),
                         GestureDetector(
-                          onTap: onTap,
+                          onTap: onLogOutTap,
                           child: Row(
                             children: [
-                              const Icon(Icons.exit_to_app, color: Colors.black87),
+                              const Icon(
+                                Icons.exit_to_app,
+                                color: Colors.black87,
+                              ),
                               width(5),
                               const Text('Logout'),
                             ],
@@ -222,16 +234,20 @@ class DashBoardSideMenu extends StatelessWidget {
                         ),
                       ],
                     ),
-                GestureDetector(
-                  onTap: (){},
-                  child: Row(
-                    children: [
-                      const Icon(Icons.layers_clear_outlined, color: Colors.black87),
-                      width(5),
-                      const Text('회원탈퇴'),
-                    ],
-                  ),
-                )],
+                    GestureDetector(
+                      onTap: onSignOutTap,
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.layers_clear_outlined,
+                            color: Colors.black87,
+                          ),
+                          width(5),
+                          const Text('회원탈퇴'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

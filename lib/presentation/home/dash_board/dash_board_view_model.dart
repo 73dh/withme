@@ -159,6 +159,18 @@ class DashBoardViewModel with ChangeNotifier {
     }
   }
 
+  Future<void> signOut(BuildContext context, Map<String,dynamic> credentials) async {
+    await getIt<FBase>().deleteUserAccountAndData(
+        userId: UserSession.userId,
+        email: credentials['email']!,
+        password: credentials['password']!);
+    final authChangeNotifier = getIt<AuthChangeNotifier>();
+    authChangeNotifier.setLoggedIn(false); // ✅ 로그인 상태 변화 알림
+    if (context.mounted) {
+      context.go(RoutePath.login); // ✅ 명시적으로 이동 (안전망 역할)
+    }
+  }
+
   void sendSMS({required String phoneNumber, required String message}) async {
     final Uri smsUri = Uri(
       scheme: 'sms',
