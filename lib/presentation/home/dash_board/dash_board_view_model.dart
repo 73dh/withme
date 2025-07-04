@@ -182,7 +182,7 @@ class DashBoardViewModel with ChangeNotifier {
       await launchUrl(smsUri, mode: LaunchMode.externalApplication);
     } else {
       // 앱을 열 수 없을 때 처리
-      print('문자 앱을 열 수 없습니다.');
+      debugPrint('문자 앱을 열 수 없습니다.');
     }
   }
 

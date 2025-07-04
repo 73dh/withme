@@ -8,6 +8,7 @@ import 'package:withme/core/ui/text_style/text_styles.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
+import '../../../core/domain/error_handling/login_error.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/router/router.dart';
 import '../../../core/router/router_import.dart';
@@ -101,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = credential.user;
 
       if (user != null && user.emailVerified) {
-        print('로그인 성공, uid: ${user.uid}');
+        debugPrint('로그인 성공, uid: ${user.uid}');
         authChangeNotifier.setLoggedIn(true); // 로그인 상태 갱신
         if (!mounted) return;
         context.go(RoutePath.splash);
@@ -109,9 +110,11 @@ class _LoginScreenState extends State<LoginScreen> {
         _showErrorMessage('이메일 인증을 완료해주세요.');
       }
     } on FirebaseAuthException catch (e) {
-      _showErrorMessage(_firebaseErrorMessage(e));
+      final error = LoginError.fromCode(e.code);
+
+      _showErrorMessage(error.toString());
     } catch (e) {
-      _showErrorMessage('오류가 발생했습니다: $e');
+      _showErrorMessage(LoginError.unknownError.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -119,23 +122,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _showErrorMessage(String message) {
     if (mounted) renderSnackBar(context, text: message);
-  }
-
-  String _firebaseErrorMessage(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'user-not-found':
-        return '등록되지 않은 이메일입니다.';
-      case 'invalid-email':
-        return '이메일 형식이 잘못되었습니다.';
-      case 'wrong-password':
-        return '비밀번호가 일치하지 않습니다.';
-      case 'invalid-credential':
-        return '사용자 정보가 없습니다.';
-      case 'too-many-requests':
-        return '잠시 후 다시 시도해 주세요.';
-      default:
-        return '로그인 실패: ${e.message ?? e.code}';
-    }
   }
 
   @override

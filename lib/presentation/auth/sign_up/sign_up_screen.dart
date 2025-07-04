@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:withme/core/domain/error_handling/signup_error.dart';
 import 'package:withme/core/presentation/components/custom_text_form_field.dart';
 import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
@@ -54,9 +55,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       final userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
 
       final user = userCredential.user;
 
@@ -73,23 +74,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (mounted) {
         context.go(RoutePath.verifyEmail);
       }
-
     } on FirebaseAuthException catch (e) {
-      String message = switch (e.code) {
-        'email-already-in-use' => '이미 사용 중인 이메일입니다.',
-        'invalid-email' => '이메일 형식을 확인하세요.',
-        'weak-password' => '비밀번호가 너무 약합니다.',
-        _ => '회원가입 실패: ${e.message ?? e.code}',
-      };
+      final error = SignUpError.fromCode(e.code);
 
-      if (mounted) renderSnackBar(context, text: message);
-
+      _showErrorMessage(error.toString());
     } catch (e) {
-      if (mounted) renderSnackBar(context, text: '오류 발생: $e');
-
+      _showErrorMessage(SignUpError.unknownError.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showErrorMessage(String message) {
+    if (mounted) renderSnackBar(context, text: message);
   }
 
   @override

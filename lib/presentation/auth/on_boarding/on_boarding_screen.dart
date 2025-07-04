@@ -95,7 +95,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onPressed: _isLoading ? null : _completeOnboarding,
               child:
                   _isLoading
-                      ? SizedBox(
+                      ? const SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/domain/error_handling/signout_error.dart';
 import 'package:withme/core/presentation/components/animated_text.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
@@ -91,22 +92,16 @@ class _DashBoardRootState extends State<DashBoardRoot>
                           if (context.mounted) {
                             await viewModel.signOut(context, credentials);
                           }
-                          // await getIt<FBase>().deleteUserAccountAndData(
-                          //   userId: UserSession.userId,
-                          //   email: credentials['email']!,
-                          //   password: credentials['password']!,
                           if (context.mounted) {
                             renderSnackBar(context, text: '계정이 삭제되었습니다.');
                           }
                         } on FirebaseAuthException catch (e) {
+final error=SignOutError.fromCode(e.code);
                           if (context.mounted) {
+                          print(e.toString());
                             renderSnackBar(
                               context,
-                              text:
-                                  '계정 삭제 중 오류 발생: ${switch (e.toString()) {
-                                    'The email address is badly formatted.' => '이메일을 확인하세요',
-                                    _ => '기타 오류',
-                                  }}',
+                              text: error.toString(),
                             );
                           }
                         }
