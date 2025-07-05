@@ -41,20 +41,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // 데이터 로딩 수행
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
+      final userId = currentUser?.uid ?? '';
+      final email = currentUser?.email ?? '';
       debugPrint('이메일 인증 완료, 홈 화면으로 이동합니다., firebase 생성');
-      await FirebaseFirestore.instance
-          .collection(collectionUsers)
-          .doc(UserSession.userId)
-          .set(
-            UserModel(
-              userKey: currentUser?.uid ?? '',
-              // 실제 uid 사용
-              email: currentUser?.email ?? '',
-              membershipStatus: MembershipStatus.free,
-              paidAt: DateTime(2020),
-              agreedDate: DateTime.now(),
-            ).toMap(),
-          );
+      await getIt<FBase>().createUser(userId: userId, email: email);
 
       await getIt<ProspectListViewModel>().fetchData();
       await getIt<CustomerListViewModel>().refresh();

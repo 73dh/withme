@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
+import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/policy_model.dart';
@@ -17,6 +18,24 @@ class FBase {
         .collection(collectionUsers)
         .doc(UserSession.userId)
         .get();
+  }
+
+  Future<void> createUser({
+    required String userId,
+    required String email,
+  }) async {
+    final user = UserModel(
+      userKey: userId,
+      email: email,
+      membershipStatus: MembershipStatus.free,
+      paidAt: DateTime(2020),
+      agreedDate: DateTime.now(),
+    );
+
+    await FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(userId)
+        .set(user.toMap());
   }
 
   Future<void> deleteUserAccountAndData({

@@ -22,3 +22,5 @@ export 'package:withme/core/presentation/widget/rotating_dots.dart';
 export '../../../../core/presentation/components/free_limit_dialog.dart';
 export 'package:withme/core/presentation/components/animated_text.dart';
 export '../../../core/presentation/widget/item_container.dart';
+
+export '../../../../core/presentation/widget/export_and_and_send_email_with_excel.dart';

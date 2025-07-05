@@ -1,49 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/custom_text_form_field.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:withme/core/ui/text_style/text_styles.dart';
-
-import '../../../core/data/fire_base/user_session.dart';
-import '../../../core/di/setup.dart';
-import '../../../core/domain/error_handling/login_error.dart';
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/router/router.dart';
-import '../../../core/router/router_import.dart';
-import '../../home/customer_list/customer_list_view_model.dart';
-import '../../home/prospect_list/prospect_list_view_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/custom_text_form_field.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
+import 'package:withme/core/presentation/widget/reset_password.dart';
 import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/ui/text_style/text_styles.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/router/router_import.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/custom_text_form_field.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:withme/core/ui/text_style/text_styles.dart';
-
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/router/router_import.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/custom_text_form_field.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:withme/core/ui/text_style/text_styles.dart';
-
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/router/router_import.dart';
+import '../../../domain/domain_import.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -167,7 +129,41 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                height(30),
+                // height(30),
+                Row(
+                  children: [
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () async {
+                        await resetPassword(
+                          email: _emailController.text,
+                          onResult: (message) {
+                            if (!mounted) return;
+                            renderSnackBar(context, text: message);
+                          },
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.lock_reset,
+                            color: ColorStyles.menuButtonColor,
+                            size: 20,
+                          ),
+                          width(3),
+                          Text(
+                            '비밀번호 재설정',
+                            style: TextStyles.bold12.copyWith(
+                              color: ColorStyles.menuButtonColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
                 RenderFilledButton(
                   text: _isLoading ? '로그인 중...' : '로그인',
                   foregroundColor: Colors.white,

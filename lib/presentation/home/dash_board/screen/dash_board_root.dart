@@ -85,7 +85,10 @@ class _DashBoardRootState extends State<DashBoardRoot>
                       text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
                       buttonText: '회원탈퇴',
                       onConfirm: () async {
-                        final credentials = await showReauthDialog(context);
+                        final credentials = await showReauthDialog(
+                          context,
+                          email: viewModel.state.userInfo?.email ?? '',
+                        );
                         if (credentials == null) return; // 취소 시 종료
 
                         try {
@@ -96,13 +99,9 @@ class _DashBoardRootState extends State<DashBoardRoot>
                             renderSnackBar(context, text: '계정이 삭제되었습니다.');
                           }
                         } on FirebaseAuthException catch (e) {
-final error=SignOutError.fromCode(e.code);
+                          final error = SignOutError.fromCode(e.code);
                           if (context.mounted) {
-                          print(e.toString());
-                            renderSnackBar(
-                              context,
-                              text: error.toString(),
-                            );
+                            renderSnackBar(context, text: error.toString());
                           }
                         }
                       },

@@ -159,11 +159,15 @@ class DashBoardViewModel with ChangeNotifier {
     }
   }
 
-  Future<void> signOut(BuildContext context, Map<String,dynamic> credentials) async {
+  Future<void> signOut(
+    BuildContext context,
+    Map<String, dynamic> credentials,
+  ) async {
     await getIt<FBase>().deleteUserAccountAndData(
-        userId: UserSession.userId,
-        email: credentials['email']!,
-        password: credentials['password']!);
+      userId: UserSession.userId,
+      email: credentials['email']!,
+      password: credentials['password']!,
+    );
     final authChangeNotifier = getIt<AuthChangeNotifier>();
     authChangeNotifier.setLoggedIn(false); // ✅ 로그인 상태 변화 알림
     if (context.mounted) {
