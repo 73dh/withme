@@ -4,8 +4,9 @@ import '../../ui/text_style/text_styles.dart';
 
 class PartTitle extends StatelessWidget {
   final String text;
+  final double padding ;
 
-  const PartTitle({super.key, required this.text});
+  const PartTitle({super.key, required this.text, this.padding = 6});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class PartTitle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          padding:  EdgeInsets.symmetric(vertical: padding),
           child: Text(
             text,
             style: TextStyles.bold14.copyWith(fontStyle: FontStyle.italic),

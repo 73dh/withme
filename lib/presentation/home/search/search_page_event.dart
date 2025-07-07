@@ -1,7 +1,7 @@
 
-import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 
 import '../../../core/domain/core_domain_import.dart';
+import '../home_grand_import.dart';
 import 'enum/coming_birth.dart';
 import 'enum/upcoming_insurance_age.dart';
 
@@ -16,8 +16,6 @@ sealed class SearchPageEvent {
   factory SearchPageEvent.filterUpcomingInsuranceAge({
     required UpcomingInsuranceAge insuranceAge,
   }) = FilterUpcomingInsuranceAge;
-
-  factory SearchPageEvent.filterNoBirthCustomers() = FilterNoBirthCustomers;
 
   factory SearchPageEvent.selectContractMonth({
     required String selectedContractMonth,
@@ -55,8 +53,6 @@ class FilterUpcomingInsuranceAge implements SearchPageEvent {
 
   FilterUpcomingInsuranceAge({required this.insuranceAge});
 }
-
-class FilterNoBirthCustomers implements SearchPageEvent {}
 
 class SelectContractMonth implements SearchPageEvent {
   final String selectedContractMonth;

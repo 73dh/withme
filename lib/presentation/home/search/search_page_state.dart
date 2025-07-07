@@ -1,13 +1,10 @@
-import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
+import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
-import 'package:withme/presentation/home/search/enum/coming_birth.dart';
-import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
-import 'package:withme/presentation/home/search/enum/upcoming_insurance_age.dart';
 
 import '../../../domain/model/history_model.dart';
-import 'enum/search_option.dart';
+import '../home_grand_import.dart';
 
 class SearchPageState {
   final bool isLoadingAllData;
@@ -23,7 +20,11 @@ class SearchPageState {
   final InsuranceCompany insuranceCompany;
   final ProductCategory productCategory;
   final List<String> contractMonths;
+  // 추가
+  final List<String> productCategories;
+  final List<String> insuranceCompanies;
   final String selectedContractMonth;
+  final bool isSearchingByName;
 
   SearchPageState({
     this.isLoadingAllData = false,
@@ -34,12 +35,15 @@ class SearchPageState {
     this.filteredPolicies = const [],
     this.currentSearchOption,
     this.noContactMonth = NoContactMonth.threeMonth,
-    this.comingBirth = ComingBirth.today,
+    this.comingBirth = ComingBirth.noBirthInfo,
     this.upcomingInsuranceAge = UpcomingInsuranceAge.today,
     this.insuranceCompany = InsuranceCompany.all,
     this.productCategory = ProductCategory.all,
     this.contractMonths = const [],
-    this.selectedContractMonth='전계약월',
+    this.productCategories = const [],
+    this.insuranceCompanies = const [],
+    this.selectedContractMonth = '전계약월',
+    this.isSearchingByName = false,
   });
 
   SearchPageState copyWith({
@@ -56,7 +60,11 @@ class SearchPageState {
     InsuranceCompany? insuranceCompany,
     ProductCategory? productCategory,
     List<String>? contractMonths,
+    // 추가
+    List<String>? productCategories,
+    List<String>? insuranceCompanies,
     String? selectedContractMonth,
+    bool? isSearchingByName,
   }) {
     return SearchPageState(
       isLoadingAllData: isLoadingAllData ?? this.isLoadingAllData,
@@ -72,8 +80,12 @@ class SearchPageState {
       insuranceCompany: insuranceCompany ?? this.insuranceCompany,
       productCategory: productCategory ?? this.productCategory,
       contractMonths: contractMonths ?? this.contractMonths,
+     // 추가
+      productCategories: productCategories ?? this.productCategories,
+      insuranceCompanies: insuranceCompanies ?? this.insuranceCompanies,
       selectedContractMonth:
           selectedContractMonth ?? this.selectedContractMonth,
+      isSearchingByName: isSearchingByName ?? this.isSearchingByName,
     );
   }
 }

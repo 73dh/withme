@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
 import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_no_birth_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_policy_use_case.dart';
 import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case.dart';
@@ -17,16 +15,13 @@ import '../../../core/di/setup.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
+import '../../../domain/use_case/search/filter_policy_by_name_use_case.dart';
 import 'enum/coming_birth.dart';
 import 'enum/no_contact_month.dart';
 import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
-  // SearchPageViewModel() {
-  //   getAllData();
-  // }
-
   SearchPageState _state = SearchPageState();
 
   SearchPageState get state => _state;
@@ -39,8 +34,6 @@ class SearchPageViewModel with ChangeNotifier {
         _filterUpcomingInsuranceAge(insuranceAge: event.insuranceAge);
       case FilterNoRecentHistoryCustomers():
         _filterNoRecentHistoryCustomers(monthOption: event.month);
-      case FilterNoBirthCustomers():
-        _filterNoBirthCustomers();
       case SelectProductCategory():
         _selectProductCategory(productCategory: event.productCategory);
       case SelectInsuranceCompany():
@@ -57,12 +50,24 @@ class SearchPageViewModel with ChangeNotifier {
     }
   }
 
+  void resetSearchOption() {
+    _state = SearchPageState(
+      customers: _state.customers,
+      policies: _state.policies,
+      histories: _state.histories,
+      contractMonths: _state.contractMonths,
+      currentSearchOption: null,
+    );
+    notifyListeners();
+  }
+
   Future<void> getAllData() async {
     final userKey = UserSession.userId;
     if (userKey.isEmpty) {
       debugPrint('[SearchPageViewModel] userKey is empty. Aborting data load.');
       return;
     }
+
     _state = state.copyWith(isLoadingAllData: true);
     notifyListeners();
     final stopwatch = Stopwatch()..start();
@@ -72,37 +77,90 @@ class SearchPageViewModel with ChangeNotifier {
     );
     final customers = List<CustomerModel>.from(customersAllData);
 
-    // 병렬 처리로 성능 개선
-    final policiesFuture = compute<List<CustomerModel>, List<PolicyModel>>(
-      _extractPolicies,
-      customers,
-    );
-    final historiesFuture = compute<List<CustomerModel>, List<HistoryModel>>(
-      _extractHistories,
-      customers,
-    );
-    final contractMonthsFuture = compute<List<CustomerModel>, List<String>>(
-      _extractContractMonths,
-      customers,
-    );
+    // Step 1: 먼저 policies만 뽑음
+    final policies = await compute(_extractPolicies, customers);
 
+    // Step 2: 병렬 작업
     final results = await Future.wait([
-      policiesFuture,
-      historiesFuture,
-      contractMonthsFuture,
+      compute(_extractHistories, customers),
+      compute(_extractContractMonths, customers),
+      compute(_extractProductCategories, policies),
+      compute(_extractInsuranceCompanies, policies),
     ]);
 
     _state = state.copyWith(
       customers: customers,
-      policies: results[0] as List<PolicyModel>,
-      histories: results[1] as List<HistoryModel>,
-      contractMonths: results[2] as List<String>,
+      policies: policies,
+      histories: results[0] as List<HistoryModel>,
+      contractMonths: results[1] as List<String>,
+      productCategories: results[2] as List<String>,
+      insuranceCompanies: results[3] as List<String>,
       isLoadingAllData: false,
     );
 
     notifyListeners();
-    debugPrint('[getAllData take time(milliseconds]: ${stopwatch.elapsedMilliseconds}ms');
+    debugPrint(
+      '[getAllData time: ${stopwatch.elapsedMilliseconds}ms]\n'
+          'currentOption: ${state.currentSearchOption}',
+    );
   }
+
+  // Future<void> getAllData() async {
+  //   final userKey = UserSession.userId;
+  //   if (userKey.isEmpty) {
+  //     debugPrint('[SearchPageViewModel] userKey is empty. Aborting data load.');
+  //     return;
+  //   }
+  //   _state = state.copyWith(isLoadingAllData: true);
+  //   notifyListeners();
+  //   final stopwatch = Stopwatch()..start();
+  //
+  //   final customersAllData = await getIt<CustomerUseCase>().execute(
+  //     usecase: GetAllDataUseCase(userKey: UserSession.userId),
+  //   );
+  //   final customers = List<CustomerModel>.from(customersAllData);
+  //
+  //   // 병렬 처리로 성능 개선
+  //   final policiesFuture = compute<List<CustomerModel>, List<PolicyModel>>(
+  //     _extractPolicies,
+  //     customers,
+  //   );
+  //   final historiesFuture = compute<List<CustomerModel>, List<HistoryModel>>(
+  //     _extractHistories,
+  //     customers,
+  //   );
+  //   final contractMonthsFuture = compute<List<CustomerModel>, List<String>>(
+  //     _extractContractMonths,
+  //     customers,
+  //   );
+  //   final productCategoriesFuture = compute<List<PolicyModel>, List<String>>(_extractProductCategories, policies);
+  //   final insuranceCompaniesFuture = compute<List<PolicyModel>, List<String>>(_extractInsuranceCompanies, customers);
+  //
+  //
+  //   final results = await Future.wait([
+  //     policiesFuture,
+  //     historiesFuture,
+  //     contractMonthsFuture,
+  //     productCategoriesFuture,
+  //     insuranceCompaniesFuture,
+  //   ]);
+  //
+  //   _state = state.copyWith(
+  //     customers: customers,
+  //     policies: results[0] as List<PolicyModel>,
+  //     histories: results[1] as List<HistoryModel>,
+  //     contractMonths: results[2] as List<String>,
+  //     productCategories: results[3] as List<String>,
+  //     insuranceCompanies: results[4] as List<String>,
+  //     isLoadingAllData: false,
+  //   );
+  //
+  //   notifyListeners();
+  //   debugPrint(
+  //     '[getAllData take time(milliseconds]: ${stopwatch.elapsedMilliseconds}ms'
+  //     '\ncurrentOption: ${state.currentSearchOption}',
+  //   );
+  // }
 
   Future<void> _filterNoRecentHistoryCustomers({
     required NoContactMonth monthOption,
@@ -145,17 +203,6 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _filterNoBirthCustomers() async {
-    final filtered = await FilterNoBirthUseCase.call(state.customers);
-
-    _state = state.copyWith(
-      filteredCustomers: List.from(filtered), // ← 꼭 새 인스턴스로 만들어야 함
-      currentSearchOption: SearchOption.noBirth,
-    );
-
-    notifyListeners();
-  }
-
   void _selectContractMonth({required String selectedContractMonth}) {
     _state = state.copyWith(selectedContractMonth: selectedContractMonth);
     notifyListeners();
@@ -187,6 +234,24 @@ class SearchPageViewModel with ChangeNotifier {
     );
     notifyListeners();
   }
+
+  void filterPolicyByName(String keyword) {
+    final filtered = FilterPolicyByNameUseCase.call(
+      policies: state.policies,
+      keyword: keyword,
+    );
+
+    _state = state.copyWith(
+      filteredPolicies: filtered,
+      currentSearchOption: SearchOption.filterPolicy,
+    );
+    notifyListeners();
+  }
+
+  void toggleNameSearch(bool enabled) {
+    _state = state.copyWith(isSearchingByName: enabled);
+    notifyListeners();
+  }
 }
 
 // compute에 사용될 함수들
@@ -209,4 +274,27 @@ List<String> _extractContractMonths(List<CustomerModel> customers) {
           .toList();
   months.sort();
   return months;
+
+
+}
+
+List<String> _extractProductCategories(List<PolicyModel> policies) {
+  final categories = policies
+
+      .map((policy) => policy.productCategory)
+      .toSet()
+      .toList();
+
+  categories.sort((a, b) => a.toString().compareTo(b.toString()));
+  return categories;
+}
+
+List<String> _extractInsuranceCompanies(List<PolicyModel> policies) {
+  final companies = policies
+      .map((policy) => policy.insuranceCompany)
+      .toSet()
+      .toList();
+
+  companies.sort((a, b) => a.toString().compareTo(b.toString()));
+  return companies;
 }

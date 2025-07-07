@@ -12,7 +12,7 @@ Future<bool?> popupAddHistory(
   BuildContext context,
   List<HistoryModel> histories,
   CustomerModel prospect,
-  String initContent,
+  String? initContent,
 ) async {
   final MenuController menuController = MenuController();
   final TextEditingController textController = TextEditingController(

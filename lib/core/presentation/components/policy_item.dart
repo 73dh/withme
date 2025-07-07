@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
 import '../../../domain/model/policy_model.dart';
+import '../../domain/enum/policy_state.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
@@ -13,6 +14,9 @@ class PolicyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final notKeepPolicyState =
+        policy.policyState == PolicyState.cancelled.label ||
+        policy.policyState == PolicyState.lapsed.label;
     return ItemContainer(
       height: 240,
       child: Padding(
@@ -49,8 +53,6 @@ class PolicyItem extends StatelessWidget {
             // height(4),
             const DashedDivider(),
 
-
-
             /// 보험사 & 상품 정보
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,6 +69,7 @@ class PolicyItem extends StatelessWidget {
             ),
             // height(4),
             const DashedDivider(),
+
             /// 계약일 & 만기일
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,12 +86,22 @@ class PolicyItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    '보험료: ${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원 (${policy.paymentMethod})',
-                    style:
-                        policy.policyState == '해지'
-                            ? TextStyles.cancelStyle
-                            : TextStyles.bold,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        const TextSpan(text: '보험료: '),
+                        TextSpan(
+                          text:
+                              '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
+                          style:
+                              notKeepPolicyState
+                                  ? TextStyles.cancelStyle
+                                  : null,
+                        ),
+                        TextSpan(text: ' (${policy.paymentMethod})'),
+                      ],
+                      // style: TextStyles.bold16, // 기본 스타일 (없으면 null)
+                    ),
                   ),
                 ),
                 Container(
@@ -98,19 +111,13 @@ class PolicyItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color:
-                        policy.policyState == '해지'
-                            ? Colors.red.withOpacity(0.1)
+                        notKeepPolicyState
+                            ? Colors.red.withOpacity(0.3)
                             : Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     policy.policyState,
-                    style:
-                        policy.policyState == '해지'
-                            ? TextStyles.cancelStyle
-                            : TextStyles.caption.copyWith(
-                              color: Colors.green[700],
-                            ),
                   ),
                 ),
               ],
@@ -148,7 +155,7 @@ class PolicyItem extends StatelessWidget {
         width(4),
         sexIcon,
         width(6),
-        Text('$birth ($age세)', style: TextStyles.caption),
+        Text('$birth ($age세)', style: TextStyles.normal12),
       ],
     );
   }

@@ -6,10 +6,10 @@ enum NoContactMonth {
 
   @override
   String toString() => switch (this) {
-    NoContactMonth.oneMonth => '1개월',
-    NoContactMonth.threeMonth => '3개월',
-    NoContactMonth.sixMonth => '6개월',
-    NoContactMonth.nineMonth => '9개월',
+    NoContactMonth.oneMonth => '1개월 미관리',
+    NoContactMonth.threeMonth => '3개월 미관리',
+    NoContactMonth.sixMonth => '6개월 미관리',
+    NoContactMonth.nineMonth => '9개월 미관리',
   };
 
   int get toInt => switch (this) {

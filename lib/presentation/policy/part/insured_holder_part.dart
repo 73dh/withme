@@ -55,8 +55,8 @@ class InsuredHolderPart extends StatelessWidget {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    onChanged: onInsuredNameChanged,
-                    onSaved: (value) => insuredNameController.text = value!,
+                    // onChanged: onInsuredNameChanged,
+                    // onSaved: (value) => insuredNameController.text = value!,
 
                   ),
                 ),

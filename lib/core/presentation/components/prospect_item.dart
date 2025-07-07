@@ -111,7 +111,7 @@ class ProspectItem extends StatelessWidget {
         if (birthDate != null) InsuranceAgeWidget(birthDate: birthDate),
 
         if (customer.recommended.isNotEmpty) ...[
-         height(2),
+          height(2),
           Text(
             '소개자: ${customer.recommended}',
             style: TextStyles.normal12.copyWith(color: Colors.grey[700]),

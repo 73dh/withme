@@ -42,7 +42,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
   String _insuredSex = '';
   DateTime? _insuredBirth;
-  String _productCategory='상품종류';
+  String _productCategory = '상품종류';
   String _insuranceCompany = '보험사';
 
   String _paymentMethod = '';
@@ -118,8 +118,10 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     insuredNameController: _insuredNameController,
                     insuredSex: _insuredSex,
                     insuredBirth: _insuredBirth,
-                    onInsuredNameChanged: (value) {
-                      setState(() => _insuredNameController.text = value);
+                    onInsuredNameChanged: (_) {
+                      // setState(() {
+                        // _insuredNameController.text = value;
+                      // });
                     },
                     onManChanged:
                         (value) => setState(() => _insuredSex = value),
@@ -158,8 +160,8 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     onPremiumSingleTap: (value) {
                       setState(() => _paymentMethod = value);
                     },
-                    onProductNameTap: (value) {
-                      setState(() => _productNameController.text = value);
+                    onProductNameTap: (_) {
+                      // setState(() => _productNameController.text = value);
                     },
                     onInputPremiumTap: (value) {
                       setState(() => _premiumController.text = value);
@@ -192,7 +194,6 @@ class _PolicyScreenState extends State<PolicyScreen> {
   }
 
   void _tryValidation() async {
-
     if (_formKey.currentState!.validate()) {
       final name = _insuredNameController.text.trim();
       final nameRegex = RegExp(r'^[a-zA-Z가-힣]+$');
@@ -216,11 +217,11 @@ class _PolicyScreenState extends State<PolicyScreen> {
         renderSnackBar(context, text: '피보험자 생일을 확인하세요');
         return;
       }
-      if (_productCategory=='상품종류') {
+      if (_productCategory == '상품종류') {
         renderSnackBar(context, text: '상품종류를 선택하세요.');
         return;
       }
-      if ( _insuranceCompany=='보험사') {
+      if (_insuranceCompany == '보험사') {
         renderSnackBar(context, text: '보험사를 선택하세요.');
         return;
       }

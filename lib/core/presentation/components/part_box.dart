@@ -9,7 +9,7 @@ class PartBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(6),
+      padding:  EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: color ?? Colors.grey.shade100,
         border: Border.all(color: Colors.grey.shade500, width: 1.2),

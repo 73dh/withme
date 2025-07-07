@@ -90,7 +90,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
           _removeFabOverlayAndHide();
           _visibilityBlocked = true;
           // 잠시 딜레이 후 재진입 가능하도록 해제
-          Future.delayed(AppDurations.duration300, () {
+          Future.delayed(AppDurations.duration100, () {
             _visibilityBlocked = false;
           });
         } else {
@@ -156,52 +156,147 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   }
 
   Widget _prospectList(List<CustomerModel> prospects) {
+    final currentMonth = DateTime.now().month;
+    final currentMonthText = '${currentMonth}월의 등록고객';
+    final sortedProspects = prospects
+        .where((e) => e.registeredDate.month == currentMonth)
+        .toList()
+      ..sort((a, b) => a.registeredDate.year.compareTo(b.registeredDate.year));
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: List.generate(prospects.length, (index) {
-          final customer = prospects[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: GestureDetector(
-              onTap: () async {
-                _removeFabOverlayAndHide();
-                final result = await context.push(
-                  RoutePath.registration,
-                  extra: customer,
-                );
-                if (result == true) {
-                  await viewModel.fetchData(force: true);
-                  _fabCanShow = true;
-                  _insertFabOverlayIfAllowed();
-                }
-              },
-              child: ProspectItem(
-                userKey: UserSession.userId,
-                customer: customer,
-                onTap: (histories) async {
-                  _fabCanShow = false;
-                  _removeFabOverlay();
-                  setState(() {});
-
-                  final result = await popupAddHistory(
-                    context,
-                    histories,
-                    customer,
-                    HistoryContent.title.toString(),
-                  );
-
-                  if (!mounted) return;
-                  _fabCanShow = true;
-                  if (result == true) {
-                    _insertFabOverlayIfAllowed();
-                  }
-                },
-              ),
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 12.0, bottom: 8),
+            child: Text(
+              currentMonthText,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
-          );
-        }),
+          ),
+
+          /// 🔵 원형 이름 리스트 (헤더)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children:
+              sortedProspects
+                      .where((e) => e.registeredDate.month == currentMonth)
+                      .map((customer) {
+                        final displayName =
+                            customer.name.length > 4
+                                ? '${customer.name.substring(0, 4)}...'
+                                : customer.name;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Stack(
+                            children: [
+                              // 원형 아이콘
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: getSexIconColor(customer.sex),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  displayName,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+
+                              // 등록월 뱃지
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  width: 20,
+                                  height: 20,
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.orange,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${(customer.registeredDate.year % 100).toString().padLeft(2, '0')}',
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      })
+                      .toList(),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// 🧾 Prospect 목록
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(prospects.length, (index) {
+              final customer = prospects[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    _removeFabOverlayAndHide();
+                    final result = await context.push(
+                      RoutePath.registration,
+                      extra: customer,
+                    );
+                    if (result == true) {
+                      await viewModel.fetchData(force: true);
+                      _fabCanShow = true;
+                      _insertFabOverlayIfAllowed();
+                    }
+                  },
+                  child: ProspectItem(
+                    userKey: UserSession.userId,
+                    customer: customer,
+                    onTap: (histories) async {
+                      _fabCanShow = false;
+                      _removeFabOverlay();
+                      setState(() {});
+
+                      final result = await popupAddHistory(
+                        context,
+                        histories,
+                        customer,
+                        HistoryContent.title.toString(),
+                      );
+
+                      if (!mounted) return;
+                      _fabCanShow = true;
+                      if (result == true) {
+                        _insertFabOverlayIfAllowed();
+                      }
+                    },
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }

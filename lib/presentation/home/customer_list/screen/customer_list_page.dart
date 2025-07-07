@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
@@ -21,9 +22,8 @@ class CustomerListPage extends StatefulWidget {
 }
 
 class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
-
   final RouteObserver<PageRoute> _routeObserver =
-  getIt<RouteObserver<PageRoute>>();
+      getIt<RouteObserver<PageRoute>>();
 
   final viewModel = getIt<CustomerListViewModel>();
   String _searchText = '';
@@ -83,41 +83,61 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: AnimatedBuilder(
-        animation: viewModel,
-        builder: (context, _) {
-          return StreamBuilder(
-            stream: viewModel.cachedCustomers,
-            builder: (context, snapshot) {
-              final data = snapshot.data ?? [];
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!mounted) return;
-                if (_fabCanShow && !_fabOverlayInserted) {
-                  _insertFabOverlay();
+    return VisibilityDetector(
+      key: const Key('customer-list-visibility'),
+      onVisibilityChanged: (info) {
+        if (_visibilityBlocked) return;
+        if (info.visibleFraction < 0.9) {
+          debugPrint('[VisibilityDetector] 숨겨짐 감지, FAB 제거');
+          _removeFabOverlayAndHide();
+          _visibilityBlocked = true;
+          // 잠시 딜레이 후 재진입 가능하도록 해제
+          Future.delayed(AppDurations.duration100, () {
+            _visibilityBlocked = false;
+          });
+        } else {
+          debugPrint('[VisibilityDetector] 다시 보여짐 감지, FAB 삽입 시도');
+          _fabCanShow = true; // 👈 여기 추가!
+          _insertFabOverlayIfAllowed();
+        }
+      },
+
+      child: SafeArea(
+        child: AnimatedBuilder(
+          animation: viewModel,
+          builder: (context, _) {
+            return StreamBuilder(
+              stream: viewModel.cachedCustomers,
+              builder: (context, snapshot) {
+                final data = snapshot.data ?? [];
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  if (_fabCanShow && !_fabOverlayInserted) {
+                    _insertFabOverlay();
+                  }
+                });
+                if (snapshot.hasError) {
+                  log('StreamBuilder error: ${snapshot.error}');
                 }
-              });
-              if (snapshot.hasError) {
-                log('StreamBuilder error: ${snapshot.error}');
-              }
 
-              if (data.isEmpty) {
-                return const Center(child: AnimatedText(text: '고객정보 없음'));
-              }
+                if (data.isEmpty) {
+                  return const Center(child: AnimatedText(text: '고객정보 없음'));
+                }
 
-              List<CustomerModel> originalCustomers = snapshot.data!;
-              List<CustomerModel> customers =
-              originalCustomers
-                  .where((e) => e.name.contains(_searchText.trim()))
-                  .toList();
-              return Scaffold(
-                appBar: _appBar(customers),
-                body: _customerList(customers),
-              );
-            },
-          );
-
-        }),
+                List<CustomerModel> originalCustomers = snapshot.data!;
+                List<CustomerModel> customers =
+                    originalCustomers
+                        .where((e) => e.name.contains(_searchText.trim()))
+                        .toList();
+                return Scaffold(
+                  appBar: _appBar(customers),
+                  body: _customerList(customers),
+                );
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -140,7 +160,7 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
                     onTap: () async {
                       _removeFabOverlayAndHide();
                       if (context.mounted) {
-                     await   context.push(
+                        await context.push(
                           RoutePath.customer,
                           extra: customers[index],
                         );
@@ -229,7 +249,6 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
                           selectedSortStatus: viewModel.sortStatus,
                         ),
                       ),
-
                     ],
                   ),
                 ),

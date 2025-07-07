@@ -1,23 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/components/animated_text.dart';
-import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/router/router_path.dart';
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/domain/use_case/customer/update_searched_customers_use_case.dart';
-import 'package:withme/presentation/home/search/components/coming_birth_filter_button.dart';
-import 'package:withme/presentation/home/search/components/no_birth_filter_button.dart';
-import 'package:withme/presentation/home/search/components/no_contact_filter_button.dart';
-import 'package:withme/presentation/home/search/components/policy_filter_button.dart';
-import 'package:withme/presentation/home/search/components/upcoming_insurance_age_filter_button.dart';
-import 'package:withme/presentation/home/search/enum/search_option.dart';
-import 'package:withme/presentation/home/search/search_page_view_model.dart';
-import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/components/customer_item.dart';
+
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
+import '../../home_grand_import.dart';
+import '../filter/filter_box.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -30,7 +17,10 @@ class _SearchPageState extends State<SearchPage> {
   late final viewModel = getIt<SearchPageViewModel>();
 
   final userKey = FirebaseAuth.instance.currentUser?.uid;
-  bool _hasFetchedDataOnExpand = false;
+
+
+  bool _isSearchingByName = false;
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -38,28 +28,38 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (userKey == null) {
       return const Center(child: Text('로그인 정보가 없습니다.'));
     }
+
     return ListenableBuilder(
       listenable: viewModel,
       builder: (context, _) {
         return Scaffold(
-          appBar: _buildAppBar(),
+          appBar: CustomAppBar(viewModel: viewModel),
           body: Stack(
             children: [
-              if (viewModel.state.currentSearchOption ==
-                  SearchOption.filterPolicy)
-                _buildPolicyList(context)
-              else if (viewModel.state.currentSearchOption != null)
-                _buildCustomerList(context),
+              AnimatedSwitcher(
+                duration: AppDurations.duration300,
+                switchInCurve: Curves.easeIn,
+                switchOutCurve: Curves.easeOut,
+                child: _buildSearchResultView(viewModel),
+              ),
               AnimatedSwitcher(
                 duration: AppDurations.duration300,
                 child:
                     viewModel.state.currentSearchOption == null
                         ? Stack(
-                          key: const ValueKey('select_button_text'),
+                          key: ValueKey(
+                            'search_option-${viewModel.state.currentSearchOption}',
+                          ),
                           children: [
                             Positioned(
                               top: 200,
@@ -78,253 +78,52 @@ class _SearchPageState extends State<SearchPage> {
                         )
                         : const SizedBox.shrink(key: ValueKey('empty')),
               ),
-              _buildDraggableFilterSheet(),
+              DraggableFilterSheet(
+                isLoadingAllData: viewModel.state.isLoadingAllData,
+                onExpandFetch: () {
+                  viewModel.resetSearchOption();
+                  viewModel.getAllData();
+                },
+                buildFilterOptions:
+                    (scrollController) => FilterBox(
+                      controller: scrollController,
+                      viewModel: viewModel,
+                      isSearchingByName: _isSearchingByName,
+                      searchFocusNode: _searchFocusNode,
+                      onToggleSearch: () {
+                        setState(() {
+                          _isSearchingByName = !_isSearchingByName;
+                          viewModel.toggleNameSearch(_isSearchingByName);
+                        });
+                        if (!_isSearchingByName) {
+                          viewModel.resetSearchOption();
+                        }
+                      },
+                    ),
+              ),
             ],
           ),
         );
       },
     );
   }
+  Widget _buildSearchResultView(SearchPageViewModel viewModel) {
+    final key = ValueKey(viewModel.state.currentSearchOption);
 
-  AppBar _buildAppBar() {
-    final state = viewModel.state;
-    final currentOption = state.currentSearchOption;
-
-    final option = switch (currentOption) {
-      SearchOption.noRecentHistory => state.noContactMonth,
-      SearchOption.comingBirth => state.comingBirth,
-      SearchOption.upcomingInsuranceAge => state.upcomingInsuranceAge,
-      SearchOption.noBirth => '생년월일 정보없음',
-      _ => '',
-    };
-    final count = viewModel.state.filteredCustomers.length;
-    return AppBar(
-      title: option != '' ? Text('$option $count명') : const Text(''),
-    );
-  }
-
-  Widget _buildPolicyList(BuildContext context) {
-    final policies = viewModel.state.filteredPolicies;
-
-    if (policies.isEmpty) {
-      return Column(
-        children: [height(200), const AnimatedText(text: '조건에 맞는 계약이 없습니다.')],
+    if (viewModel.state.currentSearchOption == SearchOption.filterPolicy) {
+      return PolicyListView(
+        key: key,
+        policies: viewModel.state.filteredPolicies,
       );
+    } else if (viewModel.state.currentSearchOption != null) {
+      return CustomerListView(
+        key: key,
+        customers: viewModel.state.filteredCustomers,
+        viewModel: viewModel,
+        userKey: userKey ?? '',
+      );
+    } else {
+      return const SizedBox.shrink(); // fallback
     }
-
-    return ListView.builder(
-      itemCount: policies.length,
-      itemBuilder: (context, index) {
-        final policy = policies[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 8),
-          child: PolicyItem(policy: policy),
-        );
-      },
-    );
-  }
-
-  Widget _buildCustomerList(BuildContext context) {
-    final customers = viewModel.state.filteredCustomers;
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
-
-    // 고객 리스트 고유 key 생성 (고객 키를 join해서 고유값으로)
-    final customersKey = customers.map((e) => e.customerKey).join(',');
-
-    return AnimatedSwitcher(
-      duration: AppDurations.duration300,
-      switchInCurve: Curves.easeIn,
-      switchOutCurve: Curves.easeOut,
-      child:
-          customers.isEmpty
-              ? Center(
-                key: const ValueKey('empty'),
-                child: Column(
-                  children: [
-                    height(200),
-                    const AnimatedText(text: '조건에 맞는 고객이 없습니다.'),
-                  ],
-                ),
-              )
-              : ListView.builder(
-                key: ValueKey(
-                  'option-${viewModel.state.currentSearchOption}-$customersKey',
-                ),
-                padding: EdgeInsets.only(bottom: bottomPadding),
-                itemCount: customers.length,
-                itemBuilder: (context, index) {
-                  final customer = customers[index];
-                  final item =
-                      customer.policies.isEmpty
-                          ? _buildProspectItem(context, customer)
-                          : _buildCustomerItem(context, customer);
-
-                  return AnimatedSlide(
-                    key: ValueKey(customer.customerKey),
-                    offset: const Offset(0, 0.1),
-                    duration: Duration(milliseconds: 300 + index * 30),
-                    child: AnimatedOpacity(
-                      opacity: 1,
-                      duration: Duration(milliseconds: 300 + index * 30),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: item,
-                      ),
-                    ),
-                  );
-                },
-              ),
-    );
-  }
-
-  Widget _buildProspectItem(BuildContext context, CustomerModel customer) {
-    return GestureDetector(
-      onTap: () async {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
-        );
-
-        await Future.delayed(AppDurations.duration100);
-        if (context.mounted) {
-          await context.push(RoutePath.registration, extra: customer);
-        }
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-
-        // await viewModel.getAllData();
-        await UpdateSearchedCustomersUseCase.call(viewModel);
-      },
-      child: ProspectItem(
-        userKey: userKey!,
-        customer: customer,
-        onTap: (histories) => _handleAddHistory(context, histories, customer),
-      ),
-    );
-  }
-
-  Widget _buildCustomerItem(BuildContext context, dynamic customer) {
-    return GestureDetector(
-      onTap: () async {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
-        );
-
-        await Future.delayed(AppDurations.duration100);
-        if (context.mounted) {
-          await context.push(RoutePath.customer, extra: customer);
-        }
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-
-        // await viewModel.getAllData();
-        await UpdateSearchedCustomersUseCase.call(viewModel);
-      },
-      child: SearchCustomerItem(
-        userKey: userKey!,
-        customer: customer,
-        onTap: (histories) => _handleAddHistory(context, histories, customer),
-      ),
-    );
-  }
-
-  Widget _buildDraggableFilterSheet() {
-    return NotificationListener<DraggableScrollableNotification>(
-      onNotification: (notification) {
-        if (!_hasFetchedDataOnExpand && notification.extent > 0.2) {
-          _hasFetchedDataOnExpand = true;
-          viewModel.getAllData();
-        }
-        return true;
-      },
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.1,
-        minChildSize: 0.1,
-        maxChildSize: 0.51,
-        builder: (context, scrollController) {
-          return Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
-                ),
-                child: ListenableBuilder(
-                  listenable: viewModel,
-                  builder:
-                      (context, _) => _buildFilterOptions(scrollController),
-                ),
-              ),
-              if (viewModel.state.isLoadingAllData)
-                Positioned(
-                  top: 13,
-                  left: 20,
-                  child: Row(
-                    children: [
-                      const Text('Loading'),
-                      width(5),
-                      const MyCircularIndicator(size: 10),
-                    ],
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildFilterOptions(ScrollController controller) {
-    return ListView(
-      controller: controller,
-      children: [
-        _buildDragHandle(),
-        height(17),
-        NoContactFilterButton(viewModel: viewModel),
-        height(5),
-        ComingBirthFilterButton(viewModel: viewModel),
-        height(5),
-        UpcomingInsuranceAgeFilterButton(viewModel: viewModel),
-        height(5),
-        NoBirthFilterButton(viewModel: viewModel),
-        height(5),
-        const PartTitle(text: '계약조회'),
-        PartBox(child: PolicyFilterButton(viewModel: viewModel)),
-      ],
-    );
-  }
-
-  Widget _buildDragHandle() {
-    return Center(
-      child: Container(
-        width: 40,
-        height: 5,
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _handleAddHistory(
-    BuildContext context,
-    dynamic histories,
-    dynamic customer,
-  ) async {
-    await popupAddHistory(
-      context,
-      histories,
-      customer,
-      HistoryContent.title.toString(),
-    );
-    await UpdateSearchedCustomersUseCase.call(viewModel);
   }
 }

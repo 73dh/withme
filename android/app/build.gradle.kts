@@ -19,7 +19,8 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+//        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "11"
     }
 
     defaultConfig {
@@ -31,14 +32,29 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // ✅ Kotlin DSL 형식
+        resourceConfigurations.addAll(listOf("ko", "en"))
     }
 
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("debug")
         }
+//        release {
+//            // TODO: Add your own signing config for the release build.
+//            // Signing with the debug keys for now, so `flutter run --release` works.
+//            signingConfig = signingConfigs.getByName("debug")
+//            minifyEnabled true                // 코드 난독화 및 미사용 코드 제거
+//            shrinkResources true             // 미사용 리소스 제거
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//
+//        }
     }
 }
 

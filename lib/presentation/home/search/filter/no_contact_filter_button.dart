@@ -28,7 +28,7 @@ class NoContactFilterButton extends StatelessWidget {
             .toList();
 
     return RenderFilledButton(
-      text: '$noContactMonth 미관리',
+      text: '$noContactMonth',
       menuItems: menuItems,
       onMenuSelected: (selected) {
         viewModel.onEvent(

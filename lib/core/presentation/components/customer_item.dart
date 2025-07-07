@@ -36,7 +36,7 @@ class CustomerItem extends StatelessWidget {
           log(snapshot.error.toString());
         }
         if (!snapshot.hasData) {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         }
 
         List<PolicyModel> policies = snapshot.data;
@@ -68,8 +68,6 @@ class CustomerItem extends StatelessWidget {
           style: TextStyles.bold14,
         ),
         width(5),
-        // sexIcon(customer.sex),
-        // width(5),
         Text('${calculateAge(customer.birth ?? DateTime.now())}세/'),
         width(3),
         InsuranceAgeWidget(birthDate: customer.birth ?? DateTime.now()),
@@ -91,15 +89,21 @@ class CustomerItem extends StatelessWidget {
 
             return Row(
               children: [
-                Text(e.startDate?.formattedDate ?? '', style: style),
+                Text(e.startDate?.formattedDate ?? ''),
                 width(5),
-                Text(e.productCategory, style: style),
+                Text(e.productCategory),
                 width(5),
+
                 Text(
-                  '${numFormatter.format(int.tryParse(e.premium) ?? 0)} (${e.paymentMethod})',
+                  numFormatter.format(
+                    int.tryParse(e.premium.replaceAll(RegExp(r'[^0-9]'), '')) ??
+                        0,
+                  ),
                   style: style,
                   overflow: TextOverflow.ellipsis,
                 ),
+                width(5),
+                Text(' (${e.paymentMethod})', overflow: TextOverflow.ellipsis),
               ],
             );
           }).toList(),

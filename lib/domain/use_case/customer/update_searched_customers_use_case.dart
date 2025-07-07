@@ -20,7 +20,8 @@ class UpdateSearchedCustomersUseCase {
         SearchPageEvent.filterUpcomingInsuranceAge(
           insuranceAge: state.upcomingInsuranceAge,
         ),
-      SearchOption.noBirth => SearchPageEvent.filterNoBirthCustomers(),
+    // Todo: 삭제
+    //   SearchOption.noBirth => SearchPageEvent.filterNoBirthCustomers(),
       _ => null,
     };
 
