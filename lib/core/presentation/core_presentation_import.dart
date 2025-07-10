@@ -18,7 +18,7 @@ export '../../../core/presentation/widget/select_date.dart';
 export 'components/my_circular_indicator.dart';
 export 'components/sex_widget.dart';
 export 'package:flutter/material.dart';
-export 'package:withme/core/presentation/widget/rotating_dots.dart';
+export 'package:withme/core/presentation/components/rotating_dots.dart';
 export '../../../../core/presentation/components/free_limit_dialog.dart';
 export 'package:withme/core/presentation/components/animated_text.dart';
 export '../../../core/presentation/widget/item_container.dart';

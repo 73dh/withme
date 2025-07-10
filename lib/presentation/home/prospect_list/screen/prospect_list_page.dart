@@ -13,7 +13,60 @@ import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/router/router_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
+import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 import '../components/main_fab.dart';
+
+import 'dart:developer';
+
+import 'package:flutter/scheduler.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
+import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
+
+import '../../../../core/di/setup.dart';
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/router/router_import.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import '../components/main_fab.dart';
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/ui/const/duration.dart';
+import 'package:withme/domain/domain_import.dart';
+import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart';
+import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
+import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
+import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
+
+import '../../../../core/di/setup.dart';
+import '../../../../core/domain/sort_status.dart';
+import '../../../../core/router/router_import.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import 'dart:developer';
+
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/material.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
+import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
+import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
+
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/router/router_import.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -26,25 +79,27 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   final RouteObserver<PageRoute> _routeObserver =
       getIt<RouteObserver<PageRoute>>();
   final viewModel = getIt<ProspectListViewModel>();
+
   String? _searchText = '';
+  int? _selectedMonth = DateTime.now().month;
 
   OverlayEntry? _fabOverlayEntry;
   bool _fabExpanded = true;
   bool _fabVisibleLocal = false;
   bool _fabOverlayInserted = false;
   bool _fabCanShow = true;
-  bool _visibilityBlocked = false; // VisibilityDetector 중복 실행 방지용
+  bool _visibilityBlocked = false;
   void Function(void Function())? overlaySetState;
 
   @override
   void initState() {
     super.initState();
     viewModel.fetchData(force: true);
-    // 최초 진입 시 무조건 FAB 삽입 시도
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _fabCanShow = true;
       _insertFabOverlayIfAllowed();
+      _selectedMonth = DateTime.now().month;
     });
   }
 
@@ -60,23 +115,41 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   @override
   void dispose() {
     _routeObserver.unsubscribe(this);
-    _removeFabOverlay(); // clean up overlay
+    _removeFabOverlay();
     super.dispose();
   }
 
   @override
   void didPushNext() {
-    debugPrint('➡️ didPushNext - FAB 제거 호출됨');
     _fabCanShow = false;
     _removeFabOverlay();
   }
 
   @override
   void didPopNext() {
-    debugPrint('⬅️ didPopNext - FAB 재삽입 호출됨');
     _removeFabOverlay();
     _fabCanShow = true;
     viewModel.fetchData(force: true);
+  }
+
+  List<CustomerModel> _applyFilterAndSort(List<CustomerModel> customers) {
+    var filtered = customers.where((e) => e.policies.isEmpty).toList();
+
+    if (_searchText?.isNotEmpty ?? false) {
+      filtered = filtered.where((e) => e.name.contains(_searchText!)).toList();
+    }
+
+    if (_selectedMonth != null) {
+      filtered =
+          filtered
+              .where((e) => e.registeredDate.month == _selectedMonth)
+              .toList();
+    }
+
+    return ApplyCurrentSortUseCase(
+      isAscending: viewModel.sortStatus.isAscending,
+      currentSortType: viewModel.sortStatus.type,
+    ).call(filtered);
   }
 
   @override
@@ -86,16 +159,13 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
       onVisibilityChanged: (info) {
         if (_visibilityBlocked) return;
         if (info.visibleFraction < 0.9) {
-          debugPrint('[VisibilityDetector] 숨겨짐 감지, FAB 제거');
           _removeFabOverlayAndHide();
           _visibilityBlocked = true;
-          // 잠시 딜레이 후 재진입 가능하도록 해제
           Future.delayed(AppDurations.duration100, () {
             _visibilityBlocked = false;
           });
         } else {
-          debugPrint('[VisibilityDetector] 다시 보여짐 감지, FAB 삽입 시도');
-          _fabCanShow = true; // 👈 여기 추가!
+          _fabCanShow = true;
           _insertFabOverlayIfAllowed();
         }
       },
@@ -107,6 +177,8 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
               stream: viewModel.cachedProspects,
               builder: (context, snapshot) {
                 final data = snapshot.data ?? [];
+                final filteredProspects = _applyFilterAndSort(data);
+
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!mounted) return;
                   if (_fabCanShow && !_fabOverlayInserted) {
@@ -118,19 +190,62 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                   log('StreamBuilder error: ${snapshot.error}');
                 }
 
-                if (data.isEmpty) {
-                  return const Center(child: AnimatedText(text: '고객정보 없음'));
-                }
-
-                final filteredProspects =
-                    data
-                        .where((e) => e.name.contains(_searchText ?? ''))
-                        .toList();
-
                 return Scaffold(
                   backgroundColor: Colors.transparent,
-                  appBar: _appBar(filteredProspects.length),
-                  body: _prospectList(filteredProspects),
+                  appBar: AppBar(
+                    title: Text('Prospect ${filteredProspects.length}명'),
+                    actions: [
+                      AppBarSearchWidget(
+                        onSubmitted: (text) {
+                          setState(() {
+                            _searchText = text;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  body: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildMonthChips(data),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          itemCount: filteredProspects.length,
+                          itemBuilder: (context, index) {
+                            final customer = filteredProspects[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: ProspectItem(
+                                userKey: UserSession.userId,
+                                customer: customer,
+                                onTap: (histories) async {
+                                  _fabCanShow = false;
+                                  _removeFabOverlay();
+
+                                  final result = await popupAddHistory(
+                                    context,
+                                    histories,
+                                    customer,
+                                    HistoryContent.title.toString(),
+                                  );
+
+                                  if (!mounted) return;
+                                  _fabCanShow = true;
+                                  if (result == true) {
+                                    _insertFabOverlayIfAllowed();
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               },
             );
@@ -140,171 +255,45 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
     );
   }
 
-  AppBar _appBar(int count) {
-    return AppBar(
-      title: Text('Prospect $count명'),
-      actions: [
-        AppBarSearchWidget(
-          onSubmitted: (text) {
-            setState(() {
-              _searchText = text;
-            });
-          },
-        ),
-      ],
-    );
-  }
+  Widget _buildMonthChips(List<CustomerModel> customers) {
+    final months =
+        customers
+            .where((e) => e.policies.isEmpty)
+            .map((e) => e.registeredDate.month)
+            .toSet()
+            .toList()
+          ..sort();
 
-  Widget _prospectList(List<CustomerModel> prospects) {
-    final currentMonth = DateTime.now().month;
-    final currentMonthText = '${currentMonth}월의 등록고객';
-    final sortedProspects = prospects
-        .where((e) => e.registeredDate.month == currentMonth)
-        .toList()
-      ..sort((a, b) => a.registeredDate.year.compareTo(b.registeredDate.year));
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 12.0, bottom: 8),
-            child: Text(
-              currentMonthText,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          /// 🔵 원형 이름 리스트 (헤더)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children:
-              sortedProspects
-                      .where((e) => e.registeredDate.month == currentMonth)
-                      .map((customer) {
-                        final displayName =
-                            customer.name.length > 4
-                                ? '${customer.name.substring(0, 4)}...'
-                                : customer.name;
-
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Stack(
-                            children: [
-                              // 원형 아이콘
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: getSexIconColor(customer.sex),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  displayName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ),
-
-                              // 등록월 뱃지
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.orange,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${(customer.registeredDate.year % 100).toString().padLeft(2, '0')}',
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      })
-                      .toList(),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          /// 🧾 Prospect 목록
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(prospects.length, (index) {
-              final customer = prospects[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    _removeFabOverlayAndHide();
-                    final result = await context.push(
-                      RoutePath.registration,
-                      extra: customer,
-                    );
-                    if (result == true) {
-                      await viewModel.fetchData(force: true);
-                      _fabCanShow = true;
-                      _insertFabOverlayIfAllowed();
-                    }
-                  },
-                  child: ProspectItem(
-                    userKey: UserSession.userId,
-                    customer: customer,
-                    onTap: (histories) async {
-                      _fabCanShow = false;
-                      _removeFabOverlay();
-                      setState(() {});
-
-                      final result = await popupAddHistory(
-                        context,
-                        histories,
-                        customer,
-                        HistoryContent.title.toString(),
-                      );
-
-                      if (!mounted) return;
-                      _fabCanShow = true;
-                      if (result == true) {
-                        _insertFabOverlayIfAllowed();
-                      }
-                    },
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
+    return SizedBox(
+      height: 48,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemCount: months.length,
+        itemBuilder: (_, index) {
+          final month = months[index];
+          final selected = _selectedMonth == month;
+          return ChoiceChip(
+            label: Text('$month월'),
+            selected: selected,
+            onSelected: (isSelected) {
+              setState(() {
+                // ✅ 같은 월 다시 누르면 해제
+                if (_selectedMonth == month) {
+                  _selectedMonth = null;
+                } else {
+                  _selectedMonth = month;
+                }
+              });
+            },
+          );
+        },
       ),
     );
   }
 
   void _insertFabOverlayIfAllowed() {
-    debugPrint(
-      '[FAB] insert check: mounted=$mounted, inserted=$_fabOverlayInserted, canShow=$_fabCanShow',
-    );
     if (!_fabCanShow || _fabOverlayInserted || !mounted) return;
     _insertFabOverlay();
   }
@@ -317,7 +306,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-
       final overlay = Navigator.of(context).overlay;
       if (overlay == null) return;
 
@@ -346,22 +334,15 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                           fabVisibleLocal: _fabVisibleLocal,
                           overlaySetState: (_) => _toggleFabExpanded(),
                           overlaySetStateFold: (_) => _toggleFabExpanded(),
-                          onSortByName: () {
-                            viewModel.sortByName();
-                            overlaySetState?.call(() {});
-                          },
-                          onSortByBirth: () {
-                            viewModel.sortByBirth();
-                            overlaySetState?.call(() {});
-                          },
-                          onSortByInsuredDate: () {
-                            viewModel.sortByInsuranceAgeDate();
-                            overlaySetState?.call(() {});
-                          },
-                          onSortByManage: () {
-                            viewModel.sortByHistoryCount();
-                            overlaySetState?.call(() {});
-                          },
+
+                          // ✅ 조건 제거
+                          onSortByName: () => _sort(viewModel.sortByName),
+                          onSortByBirth: () => _sort(viewModel.sortByBirth),
+                          onSortByInsuredDate:
+                              () => _sort(viewModel.sortByInsuranceAgeDate),
+                          onSortByManage:
+                              () => _sort(viewModel.sortByHistoryCount),
+
                           selectedSortStatus: viewModel.sortStatus,
                         ),
                       ),
@@ -378,7 +359,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                                   context: context,
                                   viewModel: viewModel,
                                 );
-
                             if (isLimited) return;
 
                             overlaySetState?.call(() {
@@ -391,7 +371,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                               final result = await context.push(
                                 RoutePath.registration,
                               );
-
                               if (result == true) {
                                 _fabCanShow = true;
                                 await viewModel.fetchData(force: true);
@@ -428,15 +407,8 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   }
 
   void _removeFabOverlay() {
-    debugPrint('[FAB] 제거 시작');
-    if (_fabOverlayEntry != null) {
-      _fabOverlayEntry!.remove();
-      _fabOverlayEntry = null;
-
-      debugPrint('[FAB] 제거 완료');
-    } else {
-      debugPrint('[FAB] 제거 시도했으나 _fabOverlayEntry null');
-    }
+    _fabOverlayEntry?.remove();
+    _fabOverlayEntry = null;
     _fabOverlayInserted = false;
     _fabExpanded = false;
     _fabVisibleLocal = false;
@@ -452,5 +424,10 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
     overlaySetState?.call(() {
       _fabExpanded = !_fabExpanded;
     });
+  }
+
+  void _sort(Function() sortFn) {
+    sortFn();
+    overlaySetState?.call(() {});
   }
 }

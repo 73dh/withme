@@ -6,7 +6,7 @@ import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/presentation/widget/history_part_widget.dart';
 import '../../../core/presentation/widget/insurance_age_widget.dart';
-import '../../../core/presentation/widget/rotating_dots.dart';
+import '../../../core/presentation/components/rotating_dots.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
