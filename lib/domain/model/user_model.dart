@@ -8,6 +8,7 @@ class UserModel {
   final DateTime agreedDate;
   final MembershipStatus membershipStatus;
   final DateTime? paidAt; // 유료 결제일
+  final int prospectCycleDays; // ✅ 가망고객 관리주기
   final DocumentReference? documentReference;
 
   UserModel({
@@ -16,6 +17,7 @@ class UserModel {
     required this.agreedDate,
     required this.membershipStatus,
     this.paidAt,
+    this.prospectCycleDays = 60, // ✅ 기본값 60
     this.documentReference,
   });
 
@@ -29,6 +31,7 @@ class UserModel {
       paidAt: json[keyPaidAt] != null
           ? (json[keyPaidAt] as Timestamp).toDate()
           : null,
+      prospectCycleDays: (json['prospectCycleDays'] as int?) ?? 60, // ✅
       documentReference: json['documentReference'] as DocumentReference?,
     );
   }
@@ -47,6 +50,7 @@ class UserModel {
       paidAt: map[keyPaidAt] != null
           ? (map[keyPaidAt] as Timestamp).toDate()
           : null,
+      prospectCycleDays: (map['prospectCycleDays'] as int?) ?? 60, // ✅
       documentReference: documentReference,
     );
   }
@@ -63,6 +67,7 @@ class UserModel {
       keyAgreedDate: Timestamp.fromDate(agreedDate),
       keyMembershipStatus: membershipStatus.name,
       if (paidAt != null) keyPaidAt: Timestamp.fromDate(paidAt!),
+      'prospectCycleDays': prospectCycleDays, // ✅ 저장
     };
   }
 
@@ -89,4 +94,25 @@ class UserModel {
     if (paidAt == null) return null;
     return paidAt!.add(membershipStatus.validityDuration ?? Duration.zero);
   }
+
+  UserModel copyWith({
+    String? userKey,
+    String? email,
+    DateTime? agreedDate,
+    MembershipStatus? membershipStatus,
+    DateTime? paidAt,
+    int? prospectCycleDays,
+    DocumentReference? documentReference,
+  }) {
+    return UserModel(
+      userKey: userKey ?? this.userKey,
+      email: email ?? this.email,
+      agreedDate: agreedDate ?? this.agreedDate,
+      membershipStatus: membershipStatus ?? this.membershipStatus,
+      paidAt: paidAt ?? this.paidAt,
+      prospectCycleDays: prospectCycleDays ?? this.prospectCycleDays,
+      documentReference: documentReference ?? this.documentReference,
+    );
+  }
+
 }

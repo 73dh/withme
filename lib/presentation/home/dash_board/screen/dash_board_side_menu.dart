@@ -4,8 +4,11 @@ import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
+import '../../../../core/data/fire_base/user_session.dart';
+import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/model/user_model.dart';
 
@@ -93,6 +96,13 @@ class DashBoardSideMenu extends StatelessWidget {
                                     )
                                     : null,
                           ),
+
+                        buildMenuItem(
+                          icon: Icons.handyman,
+                          text: '가망고객 관리주기: ${getIt<UserSession>().managePeriodDays}일',
+                          onTap: () => showCycleEditDialog(context),
+                        ),
+                        height(15),
                       ],
                     ),
                     Row(

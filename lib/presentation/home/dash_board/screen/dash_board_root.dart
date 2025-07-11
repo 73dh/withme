@@ -80,6 +80,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
                     viewModel.logout(context);
                   },
                   onSignOutTap: () async {
+                    print('exit');
                     await showConfirmDialog(
                       context,
                       text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',

@@ -1,10 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:withme/core/data/fire_base/firestore_keys.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
+
+import '../../../domain/model/history_model.dart';
+import '../../di/setup.dart';
+import '../../ui/core_ui_import.dart';
+import '../components/orbiting_dots.dart';
+import '../core_presentation_import.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../domain/model/history_model.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../components/orbiting_dots.dart';
-import '../components/jumping_dots.dart';
 import '../core_presentation_import.dart';
 import '../components/blinking_dots.dart';
 
@@ -20,6 +29,7 @@ class HistoryPartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     if (histories.isEmpty) return const SizedBox.shrink();
 
     final int count = histories.length;
@@ -27,7 +37,17 @@ class HistoryPartWidget extends StatelessWidget {
     final previous = count >= 2 ? histories[count - 2] : null;
 
     final now = DateTime.now();
-    final isOld = now.difference(recent.contactDate).inDays >= 60;
+
+    // 🔽 여기서 getIt을 통해 UserSession의 관리 주기 사용
+    final managePeriod = getIt<UserSession>().managePeriodDays;
+
+    final isOld = now.difference(recent.contactDate).inDays >= managePeriod;
+
+    final bool noRecentFollowUp = histories
+        .where((h) => h != recent)
+        .every((h) => h.contactDate.isBefore(recent.contactDate.add(const Duration(days: 90))));
+
+    final showReminderAnimation = isOld && noRecentFollowUp;
 
     return GestureDetector(
       onTap: () => onTap(histories),
@@ -50,10 +70,9 @@ class HistoryPartWidget extends StatelessWidget {
                 _buildHistoryBox(
                   history: recent,
                   isRecent: true,
-                  showAnimatedDot: isOld,
                 ),
-                if (isOld) height(6),
-                if (isOld) const JumpingDots(), // 오래된 경우 점프 애니메이션 추가
+                if (showReminderAnimation) height(6),
+                if (showReminderAnimation) const OrbitingDots(),
               ],
             ),
           ),
@@ -65,7 +84,6 @@ class HistoryPartWidget extends StatelessWidget {
   Widget _buildHistoryBox({
     required HistoryModel history,
     required bool isRecent,
-    bool showAnimatedDot = false,
   }) {
     final TextStyle contentStyle = isRecent
         ? TextStyles.normal10.copyWith(fontWeight: FontWeight.w500)
@@ -84,21 +102,16 @@ class HistoryPartWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            if (showAnimatedDot)
-              const OrbitingDots(
-
-              )
-            else
-              Container(
-                width: 6,
-                height: 6,
-                margin: const EdgeInsets.only(right: 6),
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                ),
+            Container(
+              width: 6,
+              height: 6,
+              margin: const EdgeInsets.only(right: 6),
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
               ),
-            if (!showAnimatedDot) width(6),
+            ),
+            width(6),
             Text(history.contactDate.formattedDate, style: dateStyle),
           ],
         ),
@@ -112,5 +125,4 @@ class HistoryPartWidget extends StatelessWidget {
       ],
     );
   }
-
 }

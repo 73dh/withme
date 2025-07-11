@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
@@ -15,6 +16,7 @@ Future<void> diSetup() async {
 
   // data
   getIt.registerSingleton<FBase>(FBase());
+  getIt.registerSingleton<UserSession>(UserSession());
 
   // repository
   getIt.registerSingleton<CustomerRepository>(
