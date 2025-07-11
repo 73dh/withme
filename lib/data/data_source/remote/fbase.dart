@@ -38,17 +38,6 @@ class FBase {
         .set(user.toMap());
   }
 
-  Future<void> updateUserProspectCycleDays({
-    required String userKey,
-    required int newCycleDays,
-  }) async {
-    DocumentReference userRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey);
-
-    await userRef.update({keyProspectCycleDays: newCycleDays});
-  }
-
   Future<void> deleteUserAccountAndData({
     required String userId,
     required String email,

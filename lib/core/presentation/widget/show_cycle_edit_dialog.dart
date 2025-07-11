@@ -36,11 +36,11 @@ Future<void> showCycleEditDialog(BuildContext context) async {
               if (input != null && input > 0) {
                 final currentUser = userSession.currentUser;
 
-                if (currentUser?.documentReference != null) {
-                  // ✅ Firestore 업데이트
-                  await currentUser!.documentReference!.update({
-                    'prospectCycleDays': input,
-                  });
+                // if (currentUser?.documentReference != null) {
+                //   // ✅ Firestore 업데이트
+                //   await currentUser!.documentReference!.update({
+                //     'prospectCycleDays': input,
+                //   });
 
                   // ✅ UserSession + SharedPreferences 업데이트
                   userSession.updateManagePeriod(input);
@@ -48,7 +48,7 @@ Future<void> showCycleEditDialog(BuildContext context) async {
                   if (context.mounted) {
                     Navigator.of(context).pop();
                     renderSnackBar(context, text: '관리주기가 저장되었습니다');
-                  }
+                  // }
                 }
               } else {
                 renderSnackBar(context, text: '올바른 숫자를 입력해주세요');

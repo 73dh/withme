@@ -4,9 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../domain/model/user_model.dart';
 
-// class UserSession {
-//   static String get userId => FirebaseAuth.instance.currentUser?.uid??'';
-// }
 class UserSession extends ChangeNotifier {
   static final UserSession _instance = UserSession._internal();
 
@@ -25,14 +22,14 @@ class UserSession extends ChangeNotifier {
 
   /// Getter
   UserModel? get currentUser => _currentUser;
+
   int get managePeriodDays => _managePeriodDays;
 
   /// 사용자 모델 설정
-  void setUserModel(UserModel user) {
+
+  Future<void> setUserModel(UserModel user) async {
     _currentUser = user;
-    _managePeriodDays = user.prospectCycleDays ?? 60;
-    _saveManagePeriodToPrefs(_managePeriodDays); // 🟢 SharedPreferences 동기화
-    notifyListeners(); // ✅ 변경 알림
+    await loadManagePeriodFromPrefs(); // ✅ 캐시에서만 관리주기 로드
   }
 
   /// 관리 주기 수동 업데이트
@@ -64,28 +61,3 @@ class UserSession extends ChangeNotifier {
     _managePeriodDays = 60;
   }
 }
-
-// class UserSession {
-//   /// 현재 Firebase 사용자 ID (nullable-safe)
-//   static String get userId => FirebaseAuth.instance.currentUser?.uid ?? '';
-//
-//   /// 현재 사용자 모델 (앱 내부용)
-//   UserModel? _currentUser;
-//
-//   /// 저장된 관리 주기 (기본 60일, SharedPreferences or Firestore 기반)
-//   int managePeriodDays = 60;
-//
-//   /// 현재 사용자 모델 getter
-//   UserModel? get currentUser => _currentUser;
-//
-//   /// 사용자 모델 설정
-//   void setUserModel(UserModel user) {
-//     _currentUser = user;
-//     managePeriodDays = user.prospectCycleDays ?? 60;
-//   }
-//
-//   /// 관리 주기 설정
-//   void updateManagePeriod(int days) {
-//     managePeriodDays = days;
-//   }
-// }

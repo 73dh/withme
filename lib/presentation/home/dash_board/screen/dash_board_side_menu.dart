@@ -97,10 +97,15 @@ class DashBoardSideMenu extends StatelessWidget {
                                     : null,
                           ),
 
-                        buildMenuItem(
-                          icon: Icons.handyman,
-                          text: '가망고객 관리주기: ${getIt<UserSession>().managePeriodDays}일',
-                          onTap: () => showCycleEditDialog(context),
+                        AnimatedBuilder(
+                          animation: getIt<UserSession>(),
+                          builder:
+                              (context, _) => buildMenuItem(
+                                icon: Icons.handyman,
+                                text:
+                                    '가망고객 관리주기: ${getIt<UserSession>().managePeriodDays}일',
+                                onTap: () => showCycleEditDialog(context),
+                              ),
                         ),
                         height(15),
                       ],
@@ -147,6 +152,7 @@ class DashBoardSideMenu extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Row(
         children: [Icon(icon, color: iconColor), width(5), Text(text)],
       ),

@@ -74,65 +74,68 @@ class _DashBoardRootState extends State<DashBoardRoot>
                   animationController: _animationController,
                   onMenuTap: () => viewModel.toggleMenu(_animationController),
                 ),
-                DashBoardSideMenu(
-                  viewModel: viewModel,
-                  onLogOutTap: () {
-                    viewModel.logout(context);
-                  },
-                  onSignOutTap: () async {
-                    print('exit');
-                    await showConfirmDialog(
-                      context,
-                      text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
-                      buttonText: '회원탈퇴',
-                      onConfirm: () async {
-                        final credentials = await showReauthDialog(
-                          context,
-                          email: viewModel.state.userInfo?.email ?? '',
-                        );
-                        if (credentials == null) return; // 취소 시 종료
+                IgnorePointer(
+                  ignoring:viewModel.state.menuXPosition != 0, // 열려있을 때만 터치 활성화
+                  child: DashBoardSideMenu(
+                    viewModel: viewModel,
+                    onLogOutTap: () {
+                      viewModel.logout(context);
+                    },
+                    onSignOutTap: () async {
+                      print('exit');
+                      await showConfirmDialog(
+                        context,
+                        text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
+                        buttonText: '회원탈퇴',
+                        onConfirm: () async {
+                          final credentials = await showReauthDialog(
+                            context,
+                            email: viewModel.state.userInfo?.email ?? '',
+                          );
+                          if (credentials == null) return; // 취소 시 종료
 
-                        try {
-                          if (context.mounted) {
-                            await viewModel.signOut(context, credentials);
+                          try {
+                            if (context.mounted) {
+                              await viewModel.signOut(context, credentials);
+                            }
+                            if (context.mounted) {
+                              renderSnackBar(context, text: '계정이 삭제되었습니다.');
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            final error = SignOutError.fromCode(e.code);
+                            if (context.mounted) {
+                              renderSnackBar(context, text: error.toString());
+                            }
                           }
-                          if (context.mounted) {
-                            renderSnackBar(context, text: '계정이 삭제되었습니다.');
-                          }
-                        } on FirebaseAuthException catch (e) {
-                          final error = SignOutError.fromCode(e.code);
-                          if (context.mounted) {
-                            renderSnackBar(context, text: error.toString());
-                          }
-                        }
-                      },
-                    );
-                  },
-                  currentUser: viewModel.state.userInfo,
-                  onInquiryTap: () {
-                    showDialog(
-                      context: context,
-                      builder:
-                          (_) => AlertDialog(
-                            title: const Text('유료회원 문의'),
-                            content: const Text('문의 메일을 보내시겠습니까?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('취소'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  viewModel.sendInquiryEmail(context);
-                                  // viewModel.sendSMS(phoneNumber: '01086049173',message: '문의드립니다.');
-                                },
-                                child: const Text('확인'),
-                              ),
-                            ],
-                          ),
-                    );
-                  },
+                        },
+                      );
+                    },
+                    currentUser: viewModel.state.userInfo,
+                    onInquiryTap: () {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (_) => AlertDialog(
+                              title: const Text('유료회원 문의'),
+                              content: const Text('문의 메일을 보내시겠습니까?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('취소'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    viewModel.sendInquiryEmail(context);
+                                    // viewModel.sendSMS(phoneNumber: '01086049173',message: '문의드립니다.');
+                                  },
+                                  child: const Text('확인'),
+                                ),
+                              ],
+                            ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

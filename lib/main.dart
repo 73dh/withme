@@ -23,8 +23,8 @@ Future<void> initializeAuthState() async {
   final onboardingComplete = prefs.getBool('onboardingComplete') ?? false;
   authChangeNotifier.setNeedsOnboarding(!onboardingComplete);
 
-  // ✅ 관리주기 초기화 (기본 60)
-  final savedDays = prefs.getInt('prospectCycleDays') ?? 60;
+  // // ✅ 관리주기 초기화 (기본 60)
+  // final savedDays = prefs.getInt('prospectCycleDays') ?? 60;
 
 
 }
