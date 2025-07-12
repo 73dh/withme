@@ -22,8 +22,8 @@ class CustomerListPage extends StatefulWidget {
 }
 
 class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
-  final RouteObserver<PageRoute> _routeObserver =
-      getIt<RouteObserver<PageRoute>>();
+  // final RouteObserver<PageRoute> _routeObserver =
+  //     getIt<RouteObserver<PageRoute>>();
 
   final viewModel = getIt<CustomerListViewModel>();
   String _searchText = '';

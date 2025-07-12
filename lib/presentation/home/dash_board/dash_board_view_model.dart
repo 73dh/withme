@@ -23,23 +23,40 @@ class DashBoardViewModel with ChangeNotifier {
   }
 
   DashBoardState _state = DashBoardState();
+
   DashBoardState get state => _state;
 
   final _userSession = getIt<UserSession>();
 
   Future<void> _init() async {
     await _userSession.loadManagePeriodFromPrefs(); // 관리주기 로드
-    await loadData();
+
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+
+    if (firebaseUser != null && _userSession.currentUser == null) {
+      final snapshot = await getIt<FBase>().getUserInfo();
+      final user = UserModel.fromSnapshot(snapshot);
+      _userSession.setUserModel(user);
+    }
+
+    if (firebaseUser != null) {
+      await loadData();
+    }
   }
 
   Future<void> loadData() async {
     try {
       _state = state.copyWith(isLoading: true);
       notifyListeners();
-
-      final customersAllData = await getIt<CustomerUseCase>().execute(
-        usecase: GetAllDataUseCase(userKey: UserSession.userId),
-      ) as List<CustomerModel>;
+      if (UserSession.userId.isEmpty) {
+        log('UserSession.userId is empty');
+        throw Exception('User ID is not set');
+      }
+      final customersAllData =
+          await getIt<CustomerUseCase>().execute(
+                usecase: GetAllDataUseCase(userKey: UserSession.userId),
+              )
+              as List<CustomerModel>;
 
       final contractGrouped = <String, List<CustomerModel>>{};
       final prospectGrouped = <String, List<CustomerModel>>{};
@@ -47,7 +64,8 @@ class DashBoardViewModel with ChangeNotifier {
       for (var customer in customersAllData) {
         if (customer.policies.isEmpty) {
           final regDate = customer.registeredDate;
-          final regMonth = '${regDate.year}-${regDate.month.toString().padLeft(2, '0')}';
+          final regMonth =
+              '${regDate.year}-${regDate.month.toString().padLeft(2, '0')}';
           prospectGrouped.putIfAbsent(regMonth, () => []).add(customer);
           continue;
         }
@@ -55,13 +73,16 @@ class DashBoardViewModel with ChangeNotifier {
         for (var policy in customer.policies) {
           final startDate = policy.startDate;
           if (startDate == null) continue;
-          final contractMonth = '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}';
+          final contractMonth =
+              '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}';
           contractGrouped.putIfAbsent(contractMonth, () => []).add(customer);
         }
       }
 
       final monthlyGrouped = <String, Map<String, List<CustomerModel>>>{};
-      final allMonths = <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()..sort();
+      final allMonths =
+          <String>{...prospectGrouped.keys, ...contractGrouped.keys}.toList()
+            ..sort();
 
       for (var month in allMonths) {
         monthlyGrouped[month] = {
@@ -90,11 +111,9 @@ class DashBoardViewModel with ChangeNotifier {
 
     if (isOpening) {
       // 사용자 정보가 없다면 Firestore에서 가져와서 UserSession에 저장
-      if (_userSession.currentUser == null) {
-        final snapshot = await getIt<FBase>().getUserInfo();
-        final user = UserModel.fromSnapshot(snapshot);
-        _userSession.setUserModel(user);
-      }
+      final snapshot = await getIt<FBase>().getUserInfo();
+      final user = UserModel.fromSnapshot(snapshot);
+      _userSession.setUserModel(user);
 
       // 상태에 반영
       _state = state.copyWith(userInfo: _userSession.currentUser);
@@ -137,7 +156,10 @@ class DashBoardViewModel with ChangeNotifier {
     if (context.mounted) context.go(RoutePath.login);
   }
 
-  Future<void> signOut(BuildContext context, Map<String, dynamic> credentials) async {
+  Future<void> signOut(
+    BuildContext context,
+    Map<String, dynamic> credentials,
+  ) async {
     await getIt<FBase>().deleteUserAccountAndData(
       userId: UserSession.userId,
       email: credentials['email']!,
@@ -148,48 +170,47 @@ class DashBoardViewModel with ChangeNotifier {
     if (context.mounted) context.go(RoutePath.login);
   }
 
-  void sendSMS({required String phoneNumber, required String message}) async {
-    final Uri smsUri = Uri(scheme: 'sms', path: phoneNumber, queryParameters: {'body': message});
-    if (await canLaunchUrl(smsUri)) {
-      await launchUrl(smsUri, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint('문자 앱을 열 수 없습니다.');
-    }
-  }
-
   void sendInquiryEmail(BuildContext context) async {
     final email = _userSession.currentUser?.email ?? 'unknown@unknown.com';
 
     final Uri emailUri = Uri.parse(
       'mailto:kdaehee@gmail.com?subject=${Uri.encodeComponent("유료회원 문의")}'
-          '&body=${Uri.encodeComponent("안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.")}',
+      '&body=${Uri.encodeComponent("안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.")}',
     );
 
-    final bool launched = await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+    final bool launched = await launchUrl(
+      emailUri,
+      mode: LaunchMode.externalApplication,
+    );
 
     if (!launched && context.mounted) {
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('메일 앱 없음'),
-          content: const Text('메일 앱이 설치되어 있지 않거나 실행할 수 없습니다.\n앱스토어에서 메일 앱을 설치해 주세요.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Clipboard.setData(const ClipboardData(text: 'kdaehee@gmail.com'));
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('이메일 주소가 복사되었습니다.')),
-                );
-              },
-              child: const Text('이메일 복사'),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('메일 앱 없음'),
+              content: const Text(
+                '메일 앱이 설치되어 있지 않거나 실행할 수 없습니다.\n앱스토어에서 메일 앱을 설치해 주세요.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Clipboard.setData(
+                      const ClipboardData(text: 'kdaehee@gmail.com'),
+                    );
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('이메일 주소가 복사되었습니다.')),
+                    );
+                  },
+                  child: const Text('이메일 복사'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('확인'),
-            ),
-          ],
-        ),
       );
     }
   }

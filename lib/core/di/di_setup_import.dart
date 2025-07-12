@@ -9,7 +9,6 @@ export 'package:withme/domain/repository/policy_repository.dart';
 export 'package:withme/domain/use_case/customer_use_case.dart';
 export 'package:withme/domain/use_case/history_use_case.dart';
 export 'package:withme/presentation/policy/policy_view_model.dart';
-export 'package:withme/presentation/registration/registration_view_model.dart';
 
 export '../../domain/use_case/policy_use_case.dart';
 export '../../presentation/home/customer_list/customer_list_view_model.dart';

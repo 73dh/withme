@@ -9,14 +9,15 @@ import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/domain_import.dart';
 import '../components/edit_toggle_icon.dart';
 import '../registration_event.dart';
+import '../registration_view_model.dart';
 
-class CustomAppBar extends StatelessWidget {
+class RegistrationAppBar extends StatelessWidget {
   final bool isReadOnly;
   final void Function() onPressed;
   final RegistrationViewModel viewModel;
   final CustomerModel? customerModel;
 
-  const CustomAppBar({
+  const RegistrationAppBar({
     super.key,
     required this.isReadOnly,
     required this.onPressed,

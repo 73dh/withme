@@ -7,28 +7,30 @@ import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/presentation/registration/components/add_policy_button.dart';
-import 'package:withme/presentation/registration/part/confirm_box_part.dart';
-import 'package:withme/presentation/registration/part/custom_app_bar.dart';
-import 'package:withme/presentation/registration/part/customer_info_part.dart';
-import 'package:withme/presentation/registration/part/recommender_part.dart';
-import 'package:withme/presentation/registration/registration_event.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
+import '../components/add_policy_button.dart';
+import '../part/confirm_box_part.dart';
+import '../part/customer_info_part.dart';
+import '../part/recommender_part.dart';
+import '../part/registration_app_bar.dart';
+import '../registration_event.dart';
+import '../registration_view_model.dart';
 
-class RegistrationScreen extends StatefulWidget {
+class RegistrationBottomSheet extends StatefulWidget {
   final CustomerModel? customerModel;
+  final ScrollController? scrollController; // 추가
 
-  const RegistrationScreen({super.key, this.customerModel});
+  const RegistrationBottomSheet({super.key, this.customerModel,this.scrollController});
 
   @override
-  State<RegistrationScreen> createState() => _RegistrationScreenState();
+  State<RegistrationBottomSheet> createState() => _RegistrationBottomSheetState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
+class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _recommendedController = TextEditingController();
@@ -37,6 +39,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _registeredDateController = TextEditingController();
 
   final viewModel = getIt<RegistrationViewModel>();
+  ScrollController? _internalController;
+
+  ScrollController get _effectiveController => widget.scrollController ?? _internalController!;
+
 
   bool _isReadOnly = false;
   bool _isRecommended = false;
@@ -48,6 +54,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void initState() {
     super.initState();
     _initializeCustomer();
+    if (widget.scrollController == null) {
+      _internalController = ScrollController();
+    }
   }
 
   void _initializeCustomer() {
@@ -73,26 +82,41 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _recommendedController.dispose();
     _historyController.dispose();
     _birthController.dispose();
+    _internalController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(56),
-          child: CustomAppBar(
+      child:Column(
+        children: [
+          RegistrationAppBar(
             isReadOnly: _isReadOnly,
             onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
             viewModel: viewModel,
             customerModel: widget.customerModel,
           ),
-        ),
-        body: _buildForm(),
-        bottomSheet: !_isReadOnly ? _buildSubmitButton() : null,
+          _buildForm(),
+
+          if (!_isReadOnly) _buildSubmitButton(), // bottomSheet 대체
+        ],
       ),
+
+      // Scaffold(
+      //   resizeToAvoidBottomInset: true,
+      //   appBar: PreferredSize(
+      //     preferredSize: const Size.fromHeight(56),
+      //     child: CustomAppBar(
+      //       isReadOnly: _isReadOnly,
+      //       onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
+      //       viewModel: viewModel,
+      //       customerModel: widget.customerModel,
+      //     ),
+      //   ),
+      //   body: _buildForm(),
+      //   bottomSheet: !_isReadOnly ? _buildSubmitButton() : null,
+      // ),
     );
   }
 
@@ -105,6 +129,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           bottom: 40, // filledButton 기본 높이
         ),
         child: SingleChildScrollView(
+          controller: _effectiveController,
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [

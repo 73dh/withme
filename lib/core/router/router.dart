@@ -9,7 +9,7 @@ import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/presentation/auth/log_in/log_in_screen.dart';
 import 'package:withme/presentation/customer/screen/customer_screen.dart';
 import 'package:withme/presentation/home/home_screen.dart';
-import 'package:withme/presentation/registration/screen/registration_screen.dart';
+import 'package:withme/presentation/registration_sheet/sheet/registration_bottom_sheet.dart';
 import 'package:withme/presentation/splash/splash_screen.dart';
 
 import '../../domain/model/customer_model.dart';
@@ -85,7 +85,7 @@ final router = GoRouter(
       path: RoutePath.registration,
       pageBuilder:
           (context, state) => _fadePage(
-            child: RegistrationScreen(
+            child: RegistrationBottomSheet(
               customerModel: state.extra as CustomerModel?,
             ),
             state: state,

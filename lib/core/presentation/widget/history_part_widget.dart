@@ -72,7 +72,7 @@ class HistoryPartWidget extends StatelessWidget {
                   isRecent: true,
                 ),
                 if (showReminderAnimation) height(6),
-                if (showReminderAnimation) const OrbitingDots(),
+                if (showReminderAnimation) const BlinkingCursorIcon(),
               ],
             ),
           ),

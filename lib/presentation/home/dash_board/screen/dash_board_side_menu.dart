@@ -2,6 +2,8 @@ import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/free_count.dart';
 import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
+import 'package:withme/presentation/home/dash_board/components/build_icon_row.dart';
+import 'package:withme/presentation/home/dash_board/components/membership_expired_box.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
 import '../../../../core/data/fire_base/user_session.dart';
@@ -12,23 +14,39 @@ import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/model/user_model.dart';
 
+import 'package:withme/core/ui/const/duration.dart';
+import 'package:withme/core/ui/const/free_count.dart';
+import 'package:withme/core/ui/const/size.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
+import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
+
+import '../../../../core/data/fire_base/user_session.dart';
+import '../../../../core/di/setup.dart';
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/model/user_model.dart';
+import '../components/build_menu_item.dart';
+
 class DashBoardSideMenu extends StatelessWidget {
   final DashBoardViewModel viewModel;
   final void Function() onLogOutTap;
   final void Function() onSignOutTap;
-  final UserModel? currentUser;
   final void Function() onInquiryTap;
+  final void Function() onExcelMessageTap;
 
   DashBoardSideMenu({
+    // const 생성자로 변경 가능
     super.key,
     required this.viewModel,
     required this.onLogOutTap,
     required this.onSignOutTap,
-    required this.currentUser,
     required this.onInquiryTap,
+    required this.onExcelMessageTap,
   });
 
-  final iconColor = ColorStyles.dashBoardIconColor;
+  final Color iconColor = ColorStyles.dashBoardIconColor; // final로 변경
 
   @override
   Widget build(BuildContext context) {
@@ -55,75 +73,111 @@ class DashBoardSideMenu extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildIconRow(
-                          Icons.person,
-                          currentUser?.email ?? '로그인 정보 없음',
-                        ),
-                        height(15),
-                        buildIconRow(
-                          Icons.date_range,
-                          '가입일시: ${currentUser?.agreedDate.formattedDate ?? '-'}',
-                        ),
-                        const DashedDivider(height: 30),
-                        if (currentUser?.membershipStatus ==
-                            MembershipStatus.free)
-                          buildFreeUserInfo(),
+                        // UserSession의 변경을 감지하여 사용자 정보 영역을 업데이트
+                        ListenableBuilder(
+                          listenable: getIt<UserSession>(),
+                          // UserSession의 모든 변경을 수신
+                          builder: (context, _) {
+                            final currentUser =
+                                getIt<UserSession>().currentUser;
+                            final managePeriodDays =
+                                getIt<UserSession>().managePeriodDays;
 
-                        if (currentUser?.membershipStatus.isPaid == true &&
-                            currentUser?.isMembershipValid == false)
-                          buildMembershipExpiredBox(),
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: onLogOutTap,
+                                      child: const Icon(
+                                        Icons.power_settings_new,
+                                        color: Colors.redAccent,
+                                        weight: 60,
+                                      ),
+                                    ),
+                                    width(5),
+                                    Expanded(
+                                      child: Text(
+                                        currentUser?.email ?? '로그인 정보 없음',
+                                      ),
+                                    ),
+                                  ],
+                                ),
 
-                        buildMembershipStatusInfo(),
-                        buildPaymentHistory(),
-                        const DashedDivider(height: 30),
-                        buildMenuItem(
-                          icon: Icons.email_outlined,
-                          text: '유료회원 문의',
-                          onTap: onInquiryTap,
-                        ),
-                        height(15),
-                        if (currentUser?.membershipStatus.isPaid == true &&
-                            currentUser?.isMembershipValid == true)
-                          buildMenuItem(
-                            icon: Icons.save_alt_outlined,
-                            text: '데이터 내보내기 (Excel)',
-                            onTap:
-                                currentUser?.isMembershipValid == true
-                                    ? () => exportAndSendEmailWithExcel(
-                                      context,
-                                      viewModel.state.customers,
-                                      currentUser!.email,
-                                    )
-                                    : null,
-                          ),
+                                height(15),
+                                BuildIconRow(
+                                  icon: Icons.date_range,
+                                  text:
+                                      '가입일시: ${currentUser?.agreedDate.formattedDate ?? '-'}',
+                                ),
+                                const DashedDivider(height: 30),
 
-                        AnimatedBuilder(
-                          animation: getIt<UserSession>(),
-                          builder:
-                              (context, _) => buildMenuItem(
-                                icon: Icons.handyman,
-                                text:
-                                    '가망고객 관리주기: ${getIt<UserSession>().managePeriodDays}일',
-                                onTap: () => showCycleEditDialog(context),
-                              ),
+                                if (currentUser?.membershipStatus ==
+                                    MembershipStatus.free)
+                                  _buildFreeUserInfo(currentUser),
+
+                                // currentUser 전달
+                                if (currentUser?.membershipStatus.isPaid ==
+                                        true &&
+                                    currentUser?.isMembershipValid == false)
+                                  const MembershipExpiredBox(),
+
+                                // currentUser 전달
+                                _buildMembershipStatusInfo(currentUser),
+                                // currentUser 전달
+                                _buildPaymentHistory(currentUser),
+                                // currentUser 전달
+                                const DashedDivider(height: 30),
+
+                                BuildMenuItem(
+                                  icon: Icons.email_outlined,
+                                  text: '유료회원 문의',
+                                  onTap: onInquiryTap,
+                                ),
+                                height(10),
+                                BuildMenuItem(
+                                  icon: Icons.save_alt_outlined,
+                                  text: 'Excel 내보내기 (유료회원)',
+                                  isActivated: currentUser?.isMembershipValid,
+                                  onTap:
+                                      (currentUser?.membershipStatus.isPaid ==
+                                                  true &&
+                                              currentUser?.isMembershipValid ==
+                                                  true)
+                                          ? () => exportAndSendEmailWithExcel(
+                                            context,
+                                            viewModel.state.customers,
+                                            currentUser!.email,
+                                          )
+                                          : onExcelMessageTap,
+                                ),
+                                height(10),
+                                BuildMenuItem(
+                                  icon: Icons.handyman,
+                                  text: '가망고객 관리주기: $managePeriodDays일',
+                                  onTap:
+                                      () => showCycleEditDialog(
+                                        context,
+                                        currentCycle: managePeriodDays,
+                                        onUpdate: (newDays) {
+                                          getIt<UserSession>()
+                                              .updateManagePeriod(newDays);
+                                        },
+                                      ),
+                                ),
+                                height(15),
+                              ],
+                            );
+                          },
                         ),
-                        height(15),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildMenuItem(
-                          icon: Icons.exit_to_app,
-                          text: 'Logout',
-                          onTap: onLogOutTap,
-                        ),
-                        buildMenuItem(
-                          icon: Icons.layers_clear_outlined,
-                          text: '회원탈퇴',
-                          onTap: onSignOutTap,
-                        ),
-                      ],
+
+                    BuildMenuItem(
+                      icon: Icons.layers_clear_outlined,
+                      text: '회원탈퇴',
+                      onTap: onSignOutTap,
                     ),
                   ],
                 ),
@@ -135,36 +189,16 @@ class DashBoardSideMenu extends StatelessWidget {
     );
   }
 
-  Widget buildIconRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: iconColor),
-        width(5),
-        Expanded(child: Text(text)),
-      ],
-    );
-  }
 
-  Widget buildMenuItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Row(
-        children: [Icon(icon, color: iconColor), width(5), Text(text)],
-      ),
-    );
-  }
 
-  Widget buildFreeUserInfo() {
+  // 이제 currentUser를 인자로 받도록 변경
+  Widget _buildFreeUserInfo(UserModel? currentUser) {
+    if (currentUser == null) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '사용가능 고객정보: ${freeCount - viewModel.state.customers.length} 건',
+          '추가등록 가능 고객수: ${freeCount - viewModel.state.customers.length} 명',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         height(10),
@@ -172,31 +206,8 @@ class DashBoardSideMenu extends StatelessWidget {
     );
   }
 
-  Widget buildMembershipExpiredBox() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.shade300),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.warning, color: Colors.red),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '유료회원 서비스가 만료되어 고객 추가 등록이 불가합니다.\n멤버십을 갱신해주세요.',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildMembershipStatusInfo() {
+  // 이제 currentUser를 인자로 받도록 변경
+  Widget _buildMembershipStatusInfo(UserModel? currentUser) {
     final status = currentUser?.membershipStatus;
     if (status == null) return const SizedBox.shrink();
 
@@ -207,6 +218,7 @@ class DashBoardSideMenu extends StatelessWidget {
         Text(status.toString()),
         if (status != MembershipStatus.free) ...[
           width(8),
+          // currentUser가 null이 아님을 확인했으므로 ! 사용 가능
           currentUser!.isMembershipValid
               ? Text(
                 '(만료일: ${currentUser!.membershipExpiresAt?.formattedDate ?? '-'})',
@@ -221,7 +233,8 @@ class DashBoardSideMenu extends StatelessWidget {
     );
   }
 
-  Widget buildPaymentHistory() {
+  // 이제 currentUser를 인자로 받도록 변경
+  Widget _buildPaymentHistory(UserModel? currentUser) {
     if (currentUser?.membershipStatus.isPaid != true) {
       return const SizedBox.shrink();
     }
@@ -232,9 +245,9 @@ class DashBoardSideMenu extends StatelessWidget {
     return Column(
       children: [
         height(15),
-        buildIconRow(
-          Icons.date_range,
-          '직전결제일: ${hasPaid ? paidAt!.formattedDate : '이력 없음'}',
+        BuildIconRow(
+          icon: Icons.date_range,
+          text: '직전결제일: ${hasPaid ? paidAt.formattedDate : '이력 없음'}',
         ),
       ],
     );

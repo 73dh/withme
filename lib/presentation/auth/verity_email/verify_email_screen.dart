@@ -61,9 +61,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('이메일 인증을 완료해주세요', style: TextStyles.bold16),
+            const Text('이메일 인증을 완료해주세요', style: TextStyles.bold16),
             const SizedBox(height: 12),
-            Text(
+            const Text(
               '회원가입 시 입력한 이메일 주소로 인증 메일을 보냈습니다.',
               style: TextStyles.normal14,
             ),
@@ -73,7 +73,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               style: TextStyles.bold14.copyWith(color: Theme.of(context).primaryColor),
             ),
             const SizedBox(height: 24),
-            Text(
+            const Text(
               '이메일의 링크를 클릭한 후 아래 버튼을 눌러주세요.',
               style: TextStyles.normal14,
             ),

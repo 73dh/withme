@@ -1,38 +1,40 @@
-import 'dart:math';
+import 'package:flutter/material.dart';
 
 import '../core_presentation_import.dart';
 
-class OrbitingDots extends StatefulWidget {
-  final int dotCount;
-  final double radius;
-  final double dotSize;
-  final Duration speed;
-  final Color color;
+class BlinkingCursorIcon extends StatefulWidget {
+  final IconData icon; // 깜빡일 아이콘 (예: Icons.edit, Icons.text_fields)
+  final double size; // 아이콘 크기
+  final Color color; // 아이콘 색상
+  final Duration blinkSpeed; // 깜빡이는 속도
 
-  const OrbitingDots({
+  const BlinkingCursorIcon({
     super.key,
-    this.dotCount = 5,
-    this.radius = 5,
-    this.dotSize = 3,
-    this.speed = const Duration(seconds: 5),
-    this.color = Colors.redAccent,
+    this.icon = Icons.edit_note_rounded, // 기본값은 '편집' 아이콘
+    this.size = 25.0,
+    this.color = Colors.blueAccent,
+    this.blinkSpeed = const Duration(milliseconds: 700), // 0.7초마다 깜빡임
   });
 
   @override
-  State<OrbitingDots> createState() => _OrbitingDotsState();
+  State<BlinkingCursorIcon> createState() => _BlinkingCursorIconState();
 }
 
-class _OrbitingDotsState extends State<OrbitingDots>
+class _BlinkingCursorIconState extends State<BlinkingCursorIcon>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.speed,
-    )..repeat();
+    _controller = AnimationController(vsync: this, duration: widget.blinkSpeed)
+      ..repeat(reverse: true); // 나타났다 사라졌다 반복 (reverse: true 중요)
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.2,
+      end: 1.0,
+    ).animate(_controller);
   }
 
   @override
@@ -43,38 +45,10 @@ class _OrbitingDotsState extends State<OrbitingDots>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.radius * 2 + widget.dotSize,
-      height: widget.radius * 2 + widget.dotSize,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (_, __) {
-          final double baseAngle = _controller.value * 2 * pi;
-
-          return Stack(
-            children: List.generate(widget.dotCount, (i) {
-              final angle = baseAngle + (i * 2 * pi / widget.dotCount);
-              final offset = Offset(
-                widget.radius * cos(angle),
-                widget.radius * sin(angle),
-              );
-
-              return Positioned(
-                left: widget.radius + offset.dx,
-                top: widget.radius + offset.dy,
-                child: Container(
-                  width: widget.dotSize,
-                  height: widget.dotSize,
-                  decoration: BoxDecoration(
-                    color: widget.color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              );
-            }),
-          );
-        },
-      ),
+    return FadeTransition(
+      opacity: _opacityAnimation,
+      child: Icon(widget.icon, size: widget.size, color: widget.color),
     );
   }
 }
+

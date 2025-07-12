@@ -1,72 +1,23 @@
-import 'dart:developer';
-
-import 'package:flutter/scheduler.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
-
-import '../../../../core/di/setup.dart';
-import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/router/router_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
-import '../components/main_fab.dart';
-
-import 'dart:developer';
-
-import 'package:flutter/scheduler.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
-
-import '../../../../core/di/setup.dart';
-import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/router/router_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/main_fab.dart';
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/domain_import.dart';
-import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart';
 import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
 import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
 
 import '../../../../core/di/setup.dart';
-import '../../../../core/domain/sort_status.dart';
-import '../../../../core/router/router_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import 'dart:developer';
-
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/material.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
-import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
-
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/router/router_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
+import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
+import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
+import '../components/main_fab.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -88,6 +39,7 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   bool _fabVisibleLocal = false;
   bool _fabOverlayInserted = false;
   bool _fabCanShow = true;
+  bool _isRegistering = false; // 클래스 내 상태 변수
   bool _visibilityBlocked = false;
   void Function(void Function())? overlaySetState;
 
@@ -219,26 +171,83 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                               padding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
                               ),
-                              child: ProspectItem(
-                                userKey: UserSession.userId,
-                                customer: customer,
-                                onTap: (histories) async {
-                                  _fabCanShow = false;
-                                  _removeFabOverlay();
+                              child: GestureDetector(
+                                // bottomsheet 생성
+                                onTap: () async {
+                                  _removeFabOverlayAndHide();
 
-                                  final result = await popupAddHistory(
-                                    context,
-                                    histories,
-                                    customer,
-                                    HistoryContent.title.toString(),
+                                  final result = await showModalBottomSheet(
+                                    context: context,
+                                    useRootNavigator: true,
+                                    // ★ 중요!
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
+                                    ),
+                                    builder: (modalContext) {
+                                      return DraggableScrollableSheet(
+                                        expand: false,
+                                        initialChildSize: 0.66,
+                                        maxChildSize: 0.95,
+                                        minChildSize: 0.4,
+                                        builder: (context, scrollController) {
+                                          return Container(
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                    top: Radius.circular(16),
+                                                  ),
+                                            ),
+                                            child: RegistrationBottomSheet(
+                                              customerModel: customer,
+                                              scrollController:
+                                                  scrollController,
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
                                   );
 
-                                  if (!mounted) return;
                                   _fabCanShow = true;
-                                  if (result == true) {
-                                    _insertFabOverlayIfAllowed();
-                                  }
+                                  await viewModel.fetchData(
+                                    force: true,
+                                  ); // 등록/수정 후 리스트 갱신
+                                  _insertFabOverlayIfAllowed();
                                 },
+                                // onTap: ()async{
+                                //   _removeFabOverlayAndHide();
+                                //   if(context.mounted){
+                                //     await context.push(RoutePath.registration,extra: customer);
+                                //   }
+                                //   _fabCanShow = true;
+                                //   _insertFabOverlayIfAllowed();
+                                // },
+                                child: ProspectItem(
+                                  userKey: UserSession.userId,
+                                  customer: customer,
+                                  onTap: (histories) async {
+                                    _fabCanShow = false;
+                                    _removeFabOverlay();
+
+                                    final result = await popupAddHistory(
+                                      context,
+                                      histories,
+                                      customer,
+                                      HistoryContent.title.toString(),
+                                    );
+
+                                    if (!mounted) return;
+                                    _fabCanShow = true;
+                                    if (result == true) {
+                                      _insertFabOverlayIfAllowed();
+                                    }
+                                  },
+                                ),
                               ),
                             );
                           },
@@ -294,7 +303,8 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
   }
 
   void _insertFabOverlayIfAllowed() {
-    if (!_fabCanShow || _fabOverlayInserted || !mounted) return;
+    if (!_fabCanShow || _fabOverlayInserted || !mounted || _isRegistering)
+      return;
     _insertFabOverlay();
   }
 
@@ -335,7 +345,6 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                           overlaySetState: (_) => _toggleFabExpanded(),
                           overlaySetStateFold: (_) => _toggleFabExpanded(),
 
-                          // ✅ 조건 제거
                           onSortByName: () => _sort(viewModel.sortByName),
                           onSortByBirth: () => _sort(viewModel.sortByBirth),
                           onSortByInsuredDate:
@@ -353,7 +362,8 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                         child: MainFab(
                           fabVisibleLocal: _fabVisibleLocal,
                           onPressed: () async {
-                            if (!mounted) return;
+                            if (_isRegistering || !mounted) return;
+                            // if (!mounted) return;
                             final isLimited =
                                 await FreeLimitDialog.checkAndShow(
                                   context: context,
@@ -361,21 +371,73 @@ class _ProspectListPageState extends State<ProspectListPage> with RouteAware {
                                 );
                             if (isLimited) return;
 
+                            // 🚫 FAB 다시 뜨지 않게 차단
+                            _fabCanShow = false;
+                            _isRegistering = true;
+
                             overlaySetState?.call(() {
                               _fabExpanded = false;
                               _fabVisibleLocal = false;
                             });
 
+                            await Future.delayed(AppDurations.duration50);
                             _removeFabOverlay();
-                            if (context.mounted) {
-                              final result = await context.push(
-                                RoutePath.registration,
-                              );
-                              if (result == true) {
-                                _fabCanShow = true;
-                                await viewModel.fetchData(force: true);
-                              }
+
+                            if (!context.mounted) return;
+
+                            // modalsheet로 변경
+                            final result = await showModalBottomSheet(
+                              context: context,
+                              useRootNavigator: true,
+                              // ★ root navigator 꼭 켜기
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
+                              ),
+                              builder: (modalContext) {
+                                return DraggableScrollableSheet(
+                                  expand: false,
+                                  initialChildSize: 0.66,
+                                  maxChildSize: 0.95,
+                                  minChildSize: 0.4,
+                                  builder: (context, scrollController) {
+                                    return Container(
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(16),
+                                        ),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        controller: scrollController,
+                                        child: const RegistrationBottomSheet(),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+
+                            _isRegistering = false;
+
+                            if (!mounted) return;
+
+                            // ✅ 모달 종료 후만 다시 FAB 띄우기
+                            _fabCanShow = true;
+
+                            // final result = await context.push(
+                            //   RoutePath.registration,
+                            // );
+
+                            if (result == true) {
+                              // _fabCanShow = true;
+                              await viewModel.fetchData(force: true);
                             }
+
+                            _insertFabOverlayIfAllowed();
                           },
                         ),
                       ),

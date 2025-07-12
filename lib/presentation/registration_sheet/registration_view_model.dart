@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/domain/use_case/customer/delete_customer_use_case.dart';
 import 'package:withme/domain/use_case/customer/update_customer_use_case.dart';
-import 'package:withme/presentation/registration/registration_event.dart';
+import 'package:withme/presentation/registration_sheet/registration_event.dart';
 
 import '../../core/data/fire_base/user_session.dart';
 import '../../core/di/setup.dart';

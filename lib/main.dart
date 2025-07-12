@@ -25,12 +25,4 @@ Future<void> initializeAuthState() async {
 
   // // ✅ 관리주기 초기화 (기본 60)
   // final savedDays = prefs.getInt('prospectCycleDays') ?? 60;
-
-
 }
-
-// void initializeAuthState() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   final onboardingComplete = prefs.getBool('onboardingComplete') ?? false;
-//   authChangeNotifier.setNeedsOnboarding(!onboardingComplete);
-// }

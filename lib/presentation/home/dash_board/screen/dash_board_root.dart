@@ -7,6 +7,7 @@ import 'package:withme/core/domain/error_handling/signout_error.dart';
 import 'package:withme/core/presentation/components/animated_text.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
+import 'package:withme/core/presentation/widget/show_inquiry_confirm_dialog.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/domain/model/user_model.dart';
@@ -74,68 +75,13 @@ class _DashBoardRootState extends State<DashBoardRoot>
                   animationController: _animationController,
                   onMenuTap: () => viewModel.toggleMenu(_animationController),
                 ),
-                IgnorePointer(
-                  ignoring:viewModel.state.menuXPosition != 0, // 열려있을 때만 터치 활성화
-                  child: DashBoardSideMenu(
-                    viewModel: viewModel,
-                    onLogOutTap: () {
-                      viewModel.logout(context);
-                    },
-                    onSignOutTap: () async {
-                      print('exit');
-                      await showConfirmDialog(
-                        context,
-                        text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
-                        buttonText: '회원탈퇴',
-                        onConfirm: () async {
-                          final credentials = await showReauthDialog(
-                            context,
-                            email: viewModel.state.userInfo?.email ?? '',
-                          );
-                          if (credentials == null) return; // 취소 시 종료
-
-                          try {
-                            if (context.mounted) {
-                              await viewModel.signOut(context, credentials);
-                            }
-                            if (context.mounted) {
-                              renderSnackBar(context, text: '계정이 삭제되었습니다.');
-                            }
-                          } on FirebaseAuthException catch (e) {
-                            final error = SignOutError.fromCode(e.code);
-                            if (context.mounted) {
-                              renderSnackBar(context, text: error.toString());
-                            }
-                          }
-                        },
-                      );
-                    },
-                    currentUser: viewModel.state.userInfo,
-                    onInquiryTap: () {
-                      showDialog(
-                        context: context,
-                        builder:
-                            (_) => AlertDialog(
-                              title: const Text('유료회원 문의'),
-                              content: const Text('문의 메일을 보내시겠습니까?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('취소'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    viewModel.sendInquiryEmail(context);
-                                    // viewModel.sendSMS(phoneNumber: '01086049173',message: '문의드립니다.');
-                                  },
-                                  child: const Text('확인'),
-                                ),
-                              ],
-                            ),
-                      );
-                    },
-                  ),
+                DashBoardSideMenu(
+                  viewModel: viewModel,
+                  onLogOutTap: _onLogOutTap,
+                  onSignOutTap: _onSignOutTap,
+                  // currentUser: viewModel.state.userInfo,
+                  onInquiryTap: _onInquiryTap,
+                  onExcelMessageTap: _onExcelMessageTap,
                 ),
               ],
             ),
@@ -143,5 +89,60 @@ class _DashBoardRootState extends State<DashBoardRoot>
         },
       ),
     );
+  }
+
+  void _onLogOutTap() async {
+    bool? result = await showInquiryConfirmDialog(
+      context,
+      title: 'Logout',
+      content: 'Logout 하겠습니까?',
+    );
+    if (result == true && mounted) {
+      viewModel.logout(context);
+    }
+  }
+
+  void _onSignOutTap() async {
+    await showConfirmDialog(
+      context,
+      text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
+      buttonText: '회원탈퇴',
+      onConfirm: () async {
+        final credentials = await showReauthDialog(
+          context,
+          email: viewModel.state.userInfo?.email ?? '',
+        );
+        if (credentials == null) return; // 취소 시 종료
+
+        try {
+          if (mounted) {
+            await viewModel.signOut(context, credentials);
+          }
+          if (mounted) {
+            renderSnackBar(context, text: '계정이 삭제되었습니다.');
+          }
+        } on FirebaseAuthException catch (e) {
+          final error = SignOutError.fromCode(e.code);
+          if (mounted) {
+            renderSnackBar(context, text: error.toString());
+          }
+        }
+      },
+    );
+  }
+
+  void _onInquiryTap() async {
+    bool? result = await showInquiryConfirmDialog(
+      context,
+      title: '유료회원 문의',
+      content: '문의 메일을 보내시겠습니까?',
+    );
+    if (result == true && mounted) {
+      viewModel.sendInquiryEmail(context);
+    }
+  }
+
+  void _onExcelMessageTap() {
+    showInquiryConfirmDialog(title: '유료회원용', content: '유료회원 문의 바랍니다.', context);
   }
 }

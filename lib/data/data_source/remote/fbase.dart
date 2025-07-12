@@ -14,9 +14,14 @@ import '../../../domain/model/user_model.dart';
 class FBase {
   // User
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid??'';
+    if (userId.isEmpty) {
+      throw Exception('FirebaseAuth returned empty userId');
+    }
+
     return await FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc(UserSession.userId)
+        .doc(userId) // ✅ 직접 가져온 userId 사용
         .get();
   }
 
