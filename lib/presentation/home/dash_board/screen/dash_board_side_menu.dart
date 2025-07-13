@@ -1,23 +1,8 @@
-import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/free_count.dart';
 import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/dash_board/components/build_icon_row.dart';
 import 'package:withme/presentation/home/dash_board/components/membership_expired_box.dart';
-import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
-
-import '../../../../core/data/fire_base/user_session.dart';
-import '../../../../core/di/setup.dart';
-import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/model/user_model.dart';
-
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/core/ui/const/free_count.dart';
-import 'package:withme/core/ui/const/size.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
 import '../../../../core/data/fire_base/user_session.dart';
@@ -35,15 +20,16 @@ class DashBoardSideMenu extends StatelessWidget {
   final void Function() onSignOutTap;
   final void Function() onInquiryTap;
   final void Function() onExcelMessageTap;
+  final void Function() onInfoTap;
 
   DashBoardSideMenu({
-    // const 생성자로 변경 가능
     super.key,
     required this.viewModel,
     required this.onLogOutTap,
     required this.onSignOutTap,
     required this.onInquiryTap,
     required this.onExcelMessageTap,
+    required this.onInfoTap,
   });
 
   final Color iconColor = ColorStyles.dashBoardIconColor; // final로 변경
@@ -173,7 +159,13 @@ class DashBoardSideMenu extends StatelessWidget {
                         ),
                       ],
                     ),
-
+                    Spacer(),
+                    BuildMenuItem(
+                      icon: Icons.info_outline,
+                      text: 'App소개',
+                      onTap: onInfoTap,
+                    ),
+                    height(10),
                     BuildMenuItem(
                       icon: Icons.layers_clear_outlined,
                       text: '회원탈퇴',
@@ -188,8 +180,6 @@ class DashBoardSideMenu extends StatelessWidget {
       ),
     );
   }
-
-
 
   // 이제 currentUser를 인자로 받도록 변경
   Widget _buildFreeUserInfo(UserModel? currentUser) {

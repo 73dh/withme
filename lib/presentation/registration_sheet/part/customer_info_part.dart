@@ -19,6 +19,11 @@ class CustomerInfoPart extends StatelessWidget {
   final void Function(DateTime) onBirthSetPressed;
   final void Function(DateTime) onRegisteredDatePressed;
 
+  // 🔽 소개자 관련 필드 추가
+  final bool isRecommended;
+  final TextEditingController recommendedController;
+  final void Function(bool) onRecommendedChanged;
+
   const CustomerInfoPart({
     super.key,
     required this.isReadOnly,
@@ -31,16 +36,22 @@ class CustomerInfoPart extends StatelessWidget {
     required this.onBirthInitPressed,
     required this.onBirthSetPressed,
     required this.onRegisteredDatePressed,
+
+    required this.isRecommended,
+    required this.recommendedController,
+    required this.onRecommendedChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Adjusted height as the recommended field is now inline
     return ItemContainer(
-      height: 258,
+      height: 310, // Fixed height for a more consistent layout
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             /// 이름 & 성별
             Row(
@@ -52,12 +63,11 @@ class CustomerInfoPart extends StatelessWidget {
                     nameController: nameController,
                   ),
                 ),
-                // width(10),
+                // width(10), // You had this commented out, keeping it that way
                 SexSelector(
                   sex: sex,
                   isReadOnly: isReadOnly,
-                  onChanged:
-                      isReadOnly ? null : (sex) => onSexChanged(sex),
+                  onChanged: isReadOnly ? null : (sex) => onSexChanged(sex),
                 ),
               ],
             ),
@@ -72,7 +82,9 @@ class CustomerInfoPart extends StatelessWidget {
                   isReadOnly
                       ? null
                       : () async {
-                        final date = await selectDate(context);
+                        final date = await selectDate(
+                          context,
+                        ); // Assuming selectDate is available
                         if (date != null) {
                           onBirthSetPressed(date);
                         }
@@ -90,11 +102,63 @@ class CustomerInfoPart extends StatelessWidget {
                   isReadOnly
                       ? null
                       : () async {
-                        final date = await selectDate(context);
+                        final date = await selectDate(
+                          context,
+                        ); // Assuming selectDate is available
                         if (date != null) {
                           onRegisteredDatePressed(date);
                         }
                       },
+            ),
+            height(12), // Add some spacing before the new row
+            /// 소개 여부 & 소개자 이름 (New Layout)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Distribute space
+              children: [
+                const Text('소개 여부'),
+                Switch(
+                  value: isRecommended,
+                  onChanged: isReadOnly ? null : onRecommendedChanged,
+                ),
+                // Spacer pushes the next widget to the right
+                // If you want a fixed space, use width() instead of Spacer()
+                const Spacer(),
+                if (isRecommended) // Conditionally show the TextFormField
+                  Expanded(
+                    // Allow TextFormField to take available horizontal space
+                    child: TextFormField(
+                      controller: recommendedController,
+                      textAlign: TextAlign.end,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+
+                        errorText:
+                            isRecommended &&
+                                    (recommendedController.text.trim().isEmpty)
+                                ? '소개자 이름을 입력하세요'
+                                : null,
+                        errorStyle: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
+                        // Style the error text
+                        isDense: true,
+                        // Make the input field more compact
+                        contentPadding:
+                            EdgeInsets
+                                .zero, // Reduce internal padding if needed
+                      ),
+                      enabled: !isReadOnly,
+                      onChanged: (value) {},
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

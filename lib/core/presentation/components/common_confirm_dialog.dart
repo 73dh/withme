@@ -4,13 +4,15 @@ import '../core_presentation_import.dart'; // MyCircularIndicator 위치에 맞�
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
-  final String buttonText;
+  final String confirmButtonText;
+  final String cancelButtonText;
   final Future<void> Function() onConfirm;
 
   const CommonConfirmDialog({
     super.key,
     required this.text,
-   required this.buttonText,
+    required this.confirmButtonText,
+    required this.cancelButtonText,
     required this.onConfirm,
   });
 
@@ -42,17 +44,25 @@ class CommonConfirmDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Cancel Button: Only pops the dialog itself with 'false'
+                    FilledButton(
+                      onPressed: () {
+                        if (context.mounted) {
+                          Navigator.of(context).pop(false);
+                        }
+                      },
+                      child: Text(cancelButtonText),
+                    ),
+                    width(10),
+                    // Confirm Button: Executes onConfirm, then pops the dialog with 'true'
                     FilledButton(
                       onPressed: () async {
                         await onConfirm();
-
                         if (context.mounted) {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          }
+                          Navigator.of(context).pop(true);
                         }
                       },
-                      child:  Text(buttonText),
+                      child: Text(confirmButtonText),
                     ),
                   ],
                 ),

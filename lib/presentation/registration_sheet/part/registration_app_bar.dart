@@ -7,11 +7,13 @@ import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/domain_import.dart';
+import '../components/add_policy_button.dart';
 import '../components/edit_toggle_icon.dart';
 import '../registration_event.dart';
 import '../registration_view_model.dart';
 
-class RegistrationAppBar extends StatelessWidget {
+class RegistrationAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   final bool isReadOnly;
   final void Function() onPressed;
   final RegistrationViewModel viewModel;
@@ -28,36 +30,69 @@ class RegistrationAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       elevation: 0,
+      backgroundColor: Colors.white,
+      title: const Text(
+        '가망고객정보',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black, // 필요시 ColorStyles.textColor 등 사용
+        ),
+      ),
       actions: [
-        EditToggleIcon(isReadOnly: isReadOnly, onPressed: onPressed),
-        if (isReadOnly)
-          IconButton(
-            icon: Image.asset(IconsPath.deleteIcon, width: 25),
-            onPressed: () async {
-              await showConfirmDialog(
-                context,
-                text: '가망고객을 삭제하시겠습니까?',
-                onConfirm: () async {
-                  // 삭제 처리
-                  await viewModel.onEvent(
-                    RegistrationEvent.deleteCustomer(
-                      userKey: UserSession.userId,
-                      customerKey: customerModel!.customerKey,
-                    ),
-                  );
-                  // 캐시 초기화 및 재로드
-                  final prospectViewModel = getIt<ProspectListViewModel>();
-                  prospectViewModel.clearCache(); // 캐시 클리어
-                  await prospectViewModel.fetchData(force: true); // 강제 새로고침
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            EditToggleIcon(isReadOnly: isReadOnly, onPressed: onPressed),
+            width(5),
+            GestureDetector(
+              onTap: () async {
+                if (customerModel == null) {
+                  debugPrint('CustomerModel is null, cannot delete.');
+                  return;
+                }
+
+                final bool? confirmed = await showConfirmDialog(
+                  context,
+                  text: '가망고객을 삭제하시겠습니까?',
+                  onConfirm: () async {
+                    await viewModel.onEvent(
+                      RegistrationEvent.deleteCustomer(
+                        userKey: UserSession.userId,
+                        customerKey: customerModel!.customerKey,
+                      ),
+                    );
+                    final prospectViewModel = getIt<ProspectListViewModel>();
+                    prospectViewModel.clearCache();
+                    await prospectViewModel.fetchData(force: true);
+                  },
+                );
+
+                if (context.mounted && confirmed == true) {
+                  context.pop();
+                }
+              },
+              child: Image.asset(IconsPath.deleteIcon, width: 22),
+            ),
+
+            width(10),
+            if (customerModel != null)
+              AddPolicyButton(
+                customerModel: customerModel!,
+                onRegistered: () async {
+                  await getIt<CustomerListViewModel>().refresh();
                 },
-              );
-              if (context.mounted) {
-                context.pop();
-              }
-            },
-          ),
+              ),
+            const SizedBox(width: 8),
+          ],
+        ),
       ],
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+

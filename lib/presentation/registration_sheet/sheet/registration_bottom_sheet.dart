@@ -24,10 +24,15 @@ class RegistrationBottomSheet extends StatefulWidget {
   final CustomerModel? customerModel;
   final ScrollController? scrollController; // 추가
 
-  const RegistrationBottomSheet({super.key, this.customerModel,this.scrollController});
+  const RegistrationBottomSheet({
+    super.key,
+    this.customerModel,
+    this.scrollController,
+  });
 
   @override
-  State<RegistrationBottomSheet> createState() => _RegistrationBottomSheetState();
+  State<RegistrationBottomSheet> createState() =>
+      _RegistrationBottomSheetState();
 }
 
 class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
@@ -41,8 +46,8 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   final viewModel = getIt<RegistrationViewModel>();
   ScrollController? _internalController;
 
-  ScrollController get _effectiveController => widget.scrollController ?? _internalController!;
-
+  ScrollController get _effectiveController =>
+      widget.scrollController ?? _internalController!;
 
   bool _isReadOnly = false;
   bool _isRecommended = false;
@@ -89,7 +94,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child:Column(
+      child: Column(
         children: [
           RegistrationAppBar(
             isReadOnly: _isReadOnly,
@@ -102,21 +107,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           if (!_isReadOnly) _buildSubmitButton(), // bottomSheet 대체
         ],
       ),
-
-      // Scaffold(
-      //   resizeToAvoidBottomInset: true,
-      //   appBar: PreferredSize(
-      //     preferredSize: const Size.fromHeight(56),
-      //     child: CustomAppBar(
-      //       isReadOnly: _isReadOnly,
-      //       onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
-      //       viewModel: viewModel,
-      //       customerModel: widget.customerModel,
-      //     ),
-      //   ),
-      //   body: _buildForm(),
-      //   bottomSheet: !_isReadOnly ? _buildSubmitButton() : null,
-      // ),
     );
   }
 
@@ -126,31 +116,12 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       child: AnimatedPadding(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.only(
-          bottom: 40, // filledButton 기본 높이
+          bottom: 20, // filledButton 기본 높이
         ),
         child: SingleChildScrollView(
           controller: _effectiveController,
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const TitleWidget(title: '고객 정보'),
-              height(20),
-              const PartTitle(text: '가망고객'),
-              _buildCustomerInfoPart(),
-              height(15),
-              const PartTitle(text: '소개자'),
-              _buildRecommenderPart(),
-              height(20),
-              if (_isReadOnly)
-                AddPolicyButton(
-                  customerModel: widget.customerModel!,
-                  onRegistered: () async {
-                    await getIt<CustomerListViewModel>()
-                        .refresh(); // ✅ 등록 후 리스트 재갱신
-                  },
-                ),
-            ],
-          ),
+          child: _buildCustomerInfoPart(),
         ),
       ),
     );
@@ -177,27 +148,66 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       registeredDateController: _registeredDateController,
       sex: _sex,
       birth: _birth,
-      onSexChanged: (value) => setState(() => _sex = value),
       birthController: _birthController,
-      onBirthInitPressed:
-          () async => setState(() {
-            _birth = null;
-            _birthController.clear();
-          }),
+      onSexChanged: (value) => setState(() => _sex = value),
+      onBirthInitPressed: () async {
+        setState(() {
+          _birth = null;
+          _birthController.clear();
+        });
+      },
       onBirthSetPressed: (date) async {
         setState(() {
           _birth = date;
           _birthController.text = date.toString();
         });
       },
-
       onRegisteredDatePressed: (date) async {
         setState(() {
           _registeredDateController.text = date.formattedDate;
         });
       },
+
+      // 🔽 Recommender 관련 추가
+      isRecommended: _isRecommended,
+      recommendedController: _recommendedController,
+      onRecommendedChanged: (val) {
+        setState(() {
+          _isRecommended = val;
+          if (!val) _recommendedController.clear();
+        });
+      },
     );
   }
+
+  // Widget _buildCustomerInfoPart() {
+  //   return CustomerInfoPart(
+  //     isReadOnly: _isReadOnly,
+  //     nameController: _nameController,
+  //     registeredDateController: _registeredDateController,
+  //     sex: _sex,
+  //     birth: _birth,
+  //     onSexChanged: (value) => setState(() => _sex = value),
+  //     birthController: _birthController,
+  //     onBirthInitPressed:
+  //         () async => setState(() {
+  //           _birth = null;
+  //           _birthController.clear();
+  //         }),
+  //     onBirthSetPressed: (date) async {
+  //       setState(() {
+  //         _birth = date;
+  //         _birthController.text = date.toString();
+  //       });
+  //     },
+  //
+  //     onRegisteredDatePressed: (date) async {
+  //       setState(() {
+  //         _registeredDateController.text = date.formattedDate;
+  //       });
+  //     },
+  //   );
+  // }
 
   Widget _buildSubmitButton() {
     return RenderFilledButton(
@@ -270,7 +280,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       renderSnackBar(context, text: '소개자 이름을 입력 하세요');
       return false;
     }
-    if (_isRecommended&& !nameRegex.hasMatch(recommenderName)) {
+    if (_isRecommended && !nameRegex.hasMatch(recommenderName)) {
       renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
       return false;
     }

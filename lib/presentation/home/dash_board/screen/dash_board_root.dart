@@ -5,10 +5,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/domain/error_handling/signout_error.dart';
 import 'package:withme/core/presentation/components/animated_text.dart';
+import 'package:withme/core/presentation/components/common_confirm_dialog.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
+import 'package:withme/core/presentation/widget/show_histories.dart';
 import 'package:withme/core/presentation/widget/show_inquiry_confirm_dialog.dart';
 import 'package:withme/core/ui/const/duration.dart';
+import 'package:withme/core/ui/const/info_text.dart';
 import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/domain/model/user_model.dart';
 import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
@@ -82,6 +85,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
                   // currentUser: viewModel.state.userInfo,
                   onInquiryTap: _onInquiryTap,
                   onExcelMessageTap: _onExcelMessageTap,
+                  onInfoTap: _onInfoTap,
                 ),
               ],
             ),
@@ -106,7 +110,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
     await showConfirmDialog(
       context,
       text: '계정 및 데이터가 모두 삭제됩니다.\n탈퇴 후에는 복구할 수 없습니다.',
-      buttonText: '회원탈퇴',
+      confirmButtonText: '회원탈퇴',
       onConfirm: () async {
         final credentials = await showReauthDialog(
           context,
@@ -144,5 +148,50 @@ class _DashBoardRootState extends State<DashBoardRoot>
 
   void _onExcelMessageTap() {
     showInquiryConfirmDialog(title: '유료회원용', content: '유료회원 문의 바랍니다.', context);
+  }
+
+  void _onInfoTap() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // CommonConfirmDialog와 동일한 투명 배경
+          child: Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100, // CommonConfirmDialog와 동일한 배경색
+                  border: Border.all(color: Colors.grey.shade500, width: 1.2),
+                  borderRadius: BorderRadius.circular(
+                    10,
+                  ), // CommonConfirmDialog와 동일한 둥근 모서리
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // 내용에 따라 높이 조절
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20.0,
+                        left: 12,
+                        right: 12,
+                      ),
+                      child: Column(
+                        // 제목과 내용을 세로로 배치하기 위한 Column
+                        mainAxisSize: MainAxisSize.min,
+                        children: [styledInfoText],
+                      ),
+                    ),
+
+                    height(10), // 하단 여백
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

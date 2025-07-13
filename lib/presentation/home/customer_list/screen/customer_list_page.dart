@@ -236,7 +236,7 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
                           fabExpanded: _fabExpanded,
                           fabVisibleLocal: _fabVisibleLocal,
                           overlaySetState: (_) => _toggleFabExpanded(),
-                          overlaySetStateFold: (_) => _toggleFabExpanded(),
+                          // overlaySetStateFold: (_) => _toggleFabExpanded(),
                           onSortByName: () {
                             viewModel.sortByName();
                             overlaySetState?.call(() {});

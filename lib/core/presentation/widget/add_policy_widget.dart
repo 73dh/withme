@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/icon/const.dart';
 
+import '../../ui/core_ui_import.dart';
+
+
 class AddPolicyWidget extends StatefulWidget {
   final void Function() onTap;
   final double size;
 
-  const AddPolicyWidget({super.key, required this.onTap, this.size = 50});
+  const AddPolicyWidget({super.key, required this.onTap, this.size = 35});
 
   @override
   State<AddPolicyWidget> createState() => _AddPolicyWidgetState();
@@ -14,26 +17,36 @@ class AddPolicyWidget extends StatefulWidget {
 
 class _AddPolicyWidgetState extends State<AddPolicyWidget>
     with SingleTickerProviderStateMixin {
-  AnimationController? _animationController;
-
-  late Animation<Color?> _colorAnimation;
+  late final AnimationController _animationController;
+  late final Animation<Color?> _colorAnimation;
+  late final Animation<double> _scaleAnimation;
 
   @override
   void initState() {
+    super.initState();
+
     _animationController = AnimationController(
       vsync: this,
-      duration: AppDurations.durationThreeSec,
+      duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
     _colorAnimation = ColorTween(
-      begin: Colors.red,
-      end: Colors.blue,
-    ).animate(_animationController!);
-    super.initState();
+      begin:ColorStyles.activeSwitchColor,
+      end: ColorStyles.activeSearchButtonColor,
+    ).animate(_animationController);
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.95,
+      end: 1.1,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
   void dispose() {
-    _animationController?.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -45,7 +58,7 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
         GestureDetector(
           onTap: widget.onTap,
           child: AnimatedBuilder(
-            animation: _colorAnimation,
+            animation: _animationController,
             builder: (context, child) {
               return Container(
                 width: widget.size,
@@ -53,18 +66,21 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
                 decoration: BoxDecoration(
                   color: _colorAnimation.value,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    const BoxShadow(
+                  boxShadow: const [
+                    BoxShadow(
                       color: Colors.black26,
                       blurRadius: 10,
                       offset: Offset(0, 4),
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.description,
-                  color: Colors.white,
-                  size: 28,
+                child: Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: const Icon(
+                    Icons.description,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
               );
             },
@@ -74,3 +90,4 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
     );
   }
 }
+

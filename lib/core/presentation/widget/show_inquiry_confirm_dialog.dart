@@ -4,6 +4,7 @@ Future<bool?> showInquiryConfirmDialog(
   BuildContext context, {
   required String title,
   required String content,
+      bool? isShowButton=true,
 }) {
   return showDialog<bool?>(
     // showDialog의 반환 타입을 명시적으로 bool?로 지정
@@ -25,6 +26,7 @@ Future<bool?> showInquiryConfirmDialog(
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min, // 내용에 따라 높이 조절
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
@@ -44,12 +46,13 @@ Future<bool?> showInquiryConfirmDialog(
                             fontSize: 18,
                           ),
                         ),
-                        height(10), // 제목과 내용 사이 간격
-                        Text(content, textAlign: TextAlign.center),
+                        height(15), // 제목과 내용 사이 간격
+                        Text(content,),
                       ],
                     ),
                   ),
-                  height(20), // 내용과 버튼 사이 간격
+                  if(isShowButton==true)   height(20), // 내용과 버튼 사이 간격
+                  if(isShowButton==true)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center, // 버튼들을 중앙에 정렬
                     children: [

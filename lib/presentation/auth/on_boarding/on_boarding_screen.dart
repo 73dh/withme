@@ -1,21 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/router/router_path.dart';
-import 'package:withme/core/ui/const/free_count.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
-import 'package:withme/core/utils/generate_user_key.dart';
 
-import '../../../core/data/fire_base/firestore_keys.dart';
-import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/di_setup_import.dart';
 import '../../../core/di/setup.dart';
-import '../../../core/domain/enum/membership_status.dart';
 import '../../../core/router/router.dart';
-import '../../../domain/model/user_model.dart';
+import '../../../core/ui/const/info_text.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -72,14 +66,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height(10),
             const Text('withMe에 오신 것을 환영합니다!', style: TextStyles.bold20),
             height(40),
-            const Text(
-              '이 앱은 가망고객을 발굴한 후\n고객을 손쉽게 체계적으로 관리할수 있도록\n만들었습니다.'
-              '\n\n생일, 상령일, 미관리 고객등을 선별해 볼수도 있으며\n계약자의 경우 계약내용까지 관리가 가능합니다.'
-              '\n\n또한, Dashboard에서는 현재 관리중인 가망고객이나 계약자의 통계를 확인할 수 있습니다.'
-              '\n\n${freeCount}명 고객까지는 무료로 사용이 가능하며, \n이상의 고객을 관리하기 위해서는 유료 서비스를 신청하시기 바랍니다.'
-              '\n\n\n\n 문의: kdaehee@gmail.com',
-              style: TextStyles.normal14,
-            ),
+            styledInfoText,
+            // const Text(infoText, style: TextStyles.normal14),
             height(40),
             ElevatedButton(
               onPressed: _isLoading ? null : _completeOnboarding,
