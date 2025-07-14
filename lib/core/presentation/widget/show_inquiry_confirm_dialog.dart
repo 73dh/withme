@@ -26,7 +26,7 @@ Future<bool?> showInquiryConfirmDialog(
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min, // 내용에 따라 높이 조절
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center, // ✅ 중앙 정렬
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
@@ -47,7 +47,7 @@ Future<bool?> showInquiryConfirmDialog(
                           ),
                         ),
                         height(15), // 제목과 내용 사이 간격
-                        Text(content,),
+                        Text(content,textAlign: TextAlign.center, ),
                       ],
                     ),
                   ),

@@ -66,7 +66,6 @@ class ProspectItem extends StatelessWidget {
                       sex: customer.sex,
                       backgroundImagePath: 'assets/icons/pool_person.png',
                     ),
-                    // CircleItem(number: histories.length, sex: customer.sex),
                   ],
                 ),
                 width(20),
@@ -76,6 +75,7 @@ class ProspectItem extends StatelessWidget {
                   child: HistoryPartWidget(
                     histories: histories,
                     onTap: (histories) => onTap(histories),
+                    sex: customer.sex,
                   ),
                 ),
               ],

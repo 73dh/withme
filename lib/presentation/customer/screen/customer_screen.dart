@@ -28,11 +28,7 @@ class CustomerScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const TitleWidget(title: 'Customer Info'),
-              height(20),
-              PartTitle(
-                text: '고객 정보 (등록일: ${customer.registeredDate.formattedDate})',
-              ),
+              height(10),
               CustomerInfo(customer: customer, viewModel: viewModel),
               height(15),
               const PartTitle(text: '보험계약 정보'),
@@ -76,6 +72,23 @@ class CustomerScreen extends StatelessWidget {
 
   AppBar _appBar(BuildContext context) {
     return AppBar(
+      centerTitle: true,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            customer.name,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '(${customer.registeredDate.formattedDate})',
+            style: const TextStyle(fontSize: 18, color: Colors.black45),
+          ),
+        ],
+      ),
       actions: [
         Padding(
           padding: const EdgeInsets.all(8.0),

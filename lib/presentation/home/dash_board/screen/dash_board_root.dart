@@ -82,7 +82,6 @@ class _DashBoardRootState extends State<DashBoardRoot>
                   viewModel: viewModel,
                   onLogOutTap: _onLogOutTap,
                   onSignOutTap: _onSignOutTap,
-                  // currentUser: viewModel.state.userInfo,
                   onInquiryTap: _onInquiryTap,
                   onExcelMessageTap: _onExcelMessageTap,
                   onInfoTap: _onInfoTap,
@@ -99,7 +98,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
     bool? result = await showInquiryConfirmDialog(
       context,
       title: 'Logout',
-      content: 'Logout 하겠습니까?',
+      content: 'Logout 하시겠습니까?',
     );
     if (result == true && mounted) {
       viewModel.logout(context);

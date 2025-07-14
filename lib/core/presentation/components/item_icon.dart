@@ -39,7 +39,6 @@ class ItemIcon extends StatelessWidget {
         children: [
           // 좌측 하단 아이콘
           Positioned(
-
             bottom: 1,
             left: 1,
             child: ClipOval(
@@ -48,7 +47,7 @@ class ItemIcon extends StatelessWidget {
                 width: iconSize,
                 height: iconSize,
                 fit: BoxFit.cover,
-                color: getSexIconColor(sex),
+                color: getSexIconColor(sex).withOpacity(0.5), // 🎯 투명도 조절
               ),
             ),
           ),

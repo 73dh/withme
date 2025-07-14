@@ -45,6 +45,9 @@ class RegistrationAppBar extends StatelessWidget
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            GestureDetector(onTap: (){
+              
+            }, child: Icon(Icons.directions_run)),
             EditToggleIcon(isReadOnly: isReadOnly, onPressed: onPressed),
             width(5),
             GestureDetector(

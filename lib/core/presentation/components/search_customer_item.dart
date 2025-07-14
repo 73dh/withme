@@ -92,7 +92,7 @@ class SearchCustomerItem extends StatelessWidget {
                             List<HistoryModel> histories = snapshot.data!;
                             return HistoryPartWidget(
                               histories: histories,
-                              onTap: (histories) => onTap(histories),
+                              onTap: (histories) => onTap(histories),sex: customer.sex,
                             );
                           },
                         ),

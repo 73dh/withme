@@ -5,15 +5,15 @@ import '../core_presentation_import.dart';
 class BlinkingCursorIcon extends StatefulWidget {
   final IconData icon; // 깜빡일 아이콘 (예: Icons.edit, Icons.text_fields)
   final double size; // 아이콘 크기
-  final Color color; // 아이콘 색상
   final Duration blinkSpeed; // 깜빡이는 속도
+  final String sex;
 
   const BlinkingCursorIcon({
     super.key,
     this.icon = Icons.edit_note_rounded, // 기본값은 '편집' 아이콘
     this.size = 25.0,
-    this.color = Colors.blueAccent,
     this.blinkSpeed = const Duration(milliseconds: 700), // 0.7초마다 깜빡임
+    required this.sex,
   });
 
   @override
@@ -47,7 +47,7 @@ class _BlinkingCursorIconState extends State<BlinkingCursorIcon>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _opacityAnimation,
-      child: Icon(widget.icon, size: widget.size, color: widget.color),
+      child: Icon(widget.icon, size: widget.size, color:widget.sex=='남'? Colors.blueAccent:Colors.redAccent),
     );
   }
 }

@@ -20,11 +20,13 @@ import '../components/blinking_dots.dart';
 class HistoryPartWidget extends StatelessWidget {
   final List<HistoryModel> histories;
   final void Function(List<HistoryModel> histories) onTap;
+  final String sex;
 
   const HistoryPartWidget({
     super.key,
     required this.histories,
     required this.onTap,
+    required this.sex,
   });
 
   @override
@@ -72,7 +74,7 @@ class HistoryPartWidget extends StatelessWidget {
                   isRecent: true,
                 ),
                 if (showReminderAnimation) height(6),
-                if (showReminderAnimation) const BlinkingCursorIcon(),
+                if (showReminderAnimation)  BlinkingCursorIcon(sex: sex,),
               ],
             ),
           ),
