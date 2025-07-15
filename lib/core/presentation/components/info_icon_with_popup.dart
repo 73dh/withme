@@ -26,14 +26,14 @@ class _InfoIconWithPopupState extends State<InfoIconWithPopup> {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: Colors.grey[100],
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               widget.message,
-              style: const TextStyle(color: Colors.black87, fontSize: 13),
+              style: const TextStyle(color: Colors.black87, fontSize: 10),
             ),
           ),
         ),
@@ -70,7 +70,7 @@ class _InfoIconWithPopupState extends State<InfoIconWithPopup> {
         onTap: _toggleOverlay,
         child: Icon(
           Icons.info_outline,
-          size: 20,
+          size: 15,
           color: widget.color,
         ),
       ),

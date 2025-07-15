@@ -31,7 +31,6 @@ class HistoryPartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     if (histories.isEmpty) return const SizedBox.shrink();
 
     final int count = histories.length;
@@ -47,16 +46,21 @@ class HistoryPartWidget extends StatelessWidget {
 
     final bool noRecentFollowUp = histories
         .where((h) => h != recent)
-        .every((h) => h.contactDate.isBefore(recent.contactDate.add(const Duration(days: 90))));
+        .every(
+          (h) => h.contactDate.isBefore(
+            recent.contactDate.add(const Duration(days: 90)),
+          ),
+        );
 
     final showReminderAnimation = isOld && noRecentFollowUp;
 
     return GestureDetector(
       onTap: () => onTap(histories),
       child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, animation) =>
-            ScaleTransition(scale: animation, child: child),
+        duration: AppDurations.duration300,
+        transitionBuilder:
+            (child, animation) =>
+                ScaleTransition(scale: animation, child: child),
         child: Align(
           key: ValueKey(histories.length),
           alignment: Alignment.topRight,
@@ -69,12 +73,9 @@ class HistoryPartWidget extends StatelessWidget {
                 if (previous != null)
                   _buildHistoryBox(history: previous, isRecent: false),
                 if (previous != null) height(6),
-                _buildHistoryBox(
-                  history: recent,
-                  isRecent: true,
-                ),
+                _buildHistoryBox(history: recent, isRecent: true),
                 if (showReminderAnimation) height(6),
-                if (showReminderAnimation)  BlinkingCursorIcon(sex: sex,),
+                if (showReminderAnimation) BlinkingCursorIcon(sex: sex),
               ],
             ),
           ),
@@ -87,15 +88,23 @@ class HistoryPartWidget extends StatelessWidget {
     required HistoryModel history,
     required bool isRecent,
   }) {
-    final TextStyle contentStyle = isRecent
-        ? TextStyles.normal10.copyWith(fontWeight: FontWeight.w500)
-        : TextStyles.normal9.copyWith(color: Colors.grey[700]);
+    final TextStyle contentStyle =
+        isRecent
+            ? TextStyles.normal10.copyWith(fontWeight: FontWeight.w500)
+            : TextStyles.normal9.copyWith(color: Colors.grey[700]);
 
-    final TextStyle dateStyle = isRecent
-        ? TextStyles.normal9.copyWith(color: Colors.grey[700])
-        : TextStyles.normal8.copyWith(color: Colors.grey[600]);
+    final TextStyle dateStyle =
+        isRecent
+            ? TextStyles.normal9.copyWith(color: Colors.grey[700])
+            : TextStyles.normal8.copyWith(color: Colors.grey[600]);
 
-    final Color dotColor = isRecent ? Colors.blueAccent : Colors.grey;
+    final Color dotColor =
+        isRecent
+            ? switch (sex) {
+              '남' => Colors.blueAccent,
+              _ => Colors.redAccent,
+            }
+            : Colors.grey;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -105,9 +114,9 @@ class HistoryPartWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              width: 6,
-              height: 6,
-              margin: const EdgeInsets.only(right: 6),
+              width: 5,
+              height: 5,
+              margin: const EdgeInsets.only(right: 2),
               decoration: BoxDecoration(
                 color: dotColor,
                 shape: BoxShape.circle,

@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/policy_state.dart';
 import 'package:withme/core/presentation/components/item_icon.dart';
+import 'package:withme/core/presentation/components/orbiting_dots.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 
+import '../../../domain/model/history_model.dart';
+import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 
 import '../../ui/color/color_style.dart';
@@ -19,6 +22,7 @@ import '../../utils/shortened_text.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../../presentation/home/customer_list/customer_list_view_model.dart';
+import '../widget/history_part_widget.dart';
 import '../widget/insurance_age_widget.dart';
 
 class CustomerItem extends StatelessWidget {
@@ -41,24 +45,51 @@ class CustomerItem extends StatelessWidget {
 
         List<PolicyModel> policies = snapshot.data;
         return ItemContainer(
-          child: Row(
+          child: Stack(
             children: [
-              ItemIcon(
-                number: policies.length,
-                sex: customer.sex,
-                backgroundImagePath: 'assets/icons/folder.png',
+              Row(
+                children: [
+                  ItemIcon(
+                    number: policies.length,
+                    sex: customer.sex,
+                    backgroundImagePath: 'assets/icons/folder.png',
+                  ),
+                  width(20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [_namePart(), _policyPart(policies)],
+                  ),
+                  const Spacer(),
+                ],
               ),
-              width(20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [_namePart(), _policyPart(policies)],
-              ),
+              if (_isInactive(customer.histories))
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: BlinkingCursorIcon(sex: customer.sex, size: 20),
+                ),
             ],
           ),
         );
+
       },
     );
   }
+  bool _isInactive(List<HistoryModel> histories) {
+    if (histories.isEmpty) return true;
+
+    final recent = histories
+        .map((h) => h.contactDate) // History의 date 필드를 기준으로
+        .whereType<DateTime>() // null 방지
+        .fold<DateTime?>(null, (prev, curr) => prev == null || curr.isAfter(prev) ? curr : prev);
+
+    if (recent == null) return true;
+
+    final managePeriod = getIt<UserSession>().managePeriodDays;
+    final now = DateTime.now();
+    return now.difference(recent).inDays >= managePeriod;
+  }
+
 
   Widget _namePart() {
     return Row(

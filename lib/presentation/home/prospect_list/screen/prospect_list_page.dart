@@ -59,8 +59,6 @@ class _ProspectListPageState extends State<ProspectListPage>
   String? _searchText = '';
   bool _showInactiveOnly = false;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -214,65 +212,79 @@ class _ProspectListPageState extends State<ProspectListPage>
                   body: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: _showInactiveOnly
-                              ? ColorStyles.activeSwitchColor
-                              : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                          vertical: 8,
                         ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () {
-                            setState(() {
-                              _showInactiveOnly = !_showInactiveOnly;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _showInactiveOnly
-                                      ? Icons.check_box
-                                      : Icons.check_box_outline_blank,
-                                  color: _showInactiveOnly ? Colors.white : Colors.black54,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${getIt<UserSession>().managePeriodDays}일 미관리',
-                                  style: TextStyle(
-                                    color:
-                                    _showInactiveOnly ? Colors.white : Colors.black87,
-                                    fontWeight: _showInactiveOnly
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color:
+                                    _showInactiveOnly
+                                        ? ColorStyles.activeSearchButtonColor
+                                        : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: () {
+                                  setState(() {
+                                    _showInactiveOnly = !_showInactiveOnly;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _showInactiveOnly
+                                            ? Icons.check_box
+                                            : Icons.check_box_outline_blank,
+                                        color:
+                                            _showInactiveOnly
+                                                ? Colors.black38
+                                                : Colors.black54,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${getIt<UserSession>().managePeriodDays}일 미관리',
+                                        style: TextStyle(
+                                          color:
+                                              _showInactiveOnly
+                                                  ? Colors.black87
+                                                  : Colors.black87,
+                                          fontWeight:
+                                              _showInactiveOnly
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+                            width(3),
+                            InfoIconWithPopup(
+                              message:
+                                  '마지막 연락일 기준 ${getIt<UserSession>().managePeriodDays}일 이상 경과 고객'
+                                  '\n기준일은 설정(가망고객관리주기)에서 변경',
+                              color:Colors.black45
+
+                            ),
+                          ],
                         ),
                       ),
-                     width(3),
-                      InfoIconWithPopup(
-                      message: '마지막 연락일 기준 ${getIt<UserSession>().managePeriodDays}일 이상 경과 고객'
-                          '\n날짜는 설정(가망고객관리주기)에서 변경',
-                      color: _showInactiveOnly ? Colors.blueAccent : Colors.black45,
-                      ),
-                    ],
-                  ),
-                ),
 
-
-                      const SizedBox(height: 8),
+                    height(5),
                       Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
