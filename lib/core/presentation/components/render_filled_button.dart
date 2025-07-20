@@ -48,7 +48,7 @@ class RenderFilledButton extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: 6,
-        vertical: 14,
+        vertical: 10,
       ), // 최소 패딩 조정
     );
 
@@ -63,8 +63,8 @@ class RenderFilledButton extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: SizedBox(
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
                 child: PopupMenuButton<dynamic>(
                   itemBuilder: (context) => menuItems!,
                   onSelected: onMenuSelected,

@@ -68,7 +68,8 @@ class DashBoardSideMenu extends StatelessWidget {
                                 getIt<UserSession>().currentUser;
                             final managePeriodDays =
                                 getIt<UserSession>().managePeriodDays;
-
+                            final urgentThresholdDays =
+                                getIt<UserSession>().urgentThresholdDays;
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -121,7 +122,7 @@ class DashBoardSideMenu extends StatelessWidget {
                                   text: '유료회원 문의',
                                   onTap: onInquiryTap,
                                 ),
-                                height(10),
+                                height(15),
                                 BuildMenuItem(
                                   icon: Icons.save_alt_outlined,
                                   text: 'Excel 내보내기 (유료회원)',
@@ -138,10 +139,10 @@ class DashBoardSideMenu extends StatelessWidget {
                                           )
                                           : onExcelMessageTap,
                                 ),
-                                height(10),
+                                height(15),
                                 BuildMenuItem(
-                                  icon: Icons.handyman,
-                                  text: '가망고객 관리주기: $managePeriodDays일',
+                                  icon: Icons.person,
+                                  text: '고객 관리 주기: $managePeriodDays일',
                                   onTap:
                                       () => showCycleEditDialog(
                                         context,
@@ -151,6 +152,20 @@ class DashBoardSideMenu extends StatelessWidget {
                                               .updateManagePeriod(newDays);
                                         },
                                       ),
+                                ),
+                                height(15),
+                                BuildMenuItem(
+                                  icon: Icons.alarm_add_outlined,
+                                  text: '상령일 도래 알림: $urgentThresholdDays일',
+                                  onTap:
+                                      () => showCycleEditDialog(
+                                    context,
+                                    currentCycle: managePeriodDays,
+                                    onUpdate: (newDays) {
+                                      getIt<UserSession>()
+                                          .updateUrgentThresholdDays(newDays);
+                                    },
+                                  ),
                                 ),
                                 height(15),
                               ],
@@ -165,7 +180,7 @@ class DashBoardSideMenu extends StatelessWidget {
                       text: 'App소개',
                       onTap: onInfoTap,
                     ),
-                    height(10),
+                    height(15),
                     BuildMenuItem(
                       icon: Icons.layers_clear_outlined,
                       text: '회원탈퇴',

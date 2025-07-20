@@ -64,13 +64,13 @@ class DashBoardPage extends StatelessWidget {
                       contract: processedData.contract,
                     ),
                     height(5),
-                    const PartTitle(text: '보험사 종류'),
+                    const PartTitle(text: '보험사'),
                     InsuranceCompanySummaryTable(
                       cellWidth: cellWidth,
                       customers: customers,
                     ),
                     height(5),
-                    const PartTitle(text: '판매상품 종류'),
+                    const PartTitle(text: '판매상품'),
                     ProductCategorySummaryTable(
                       cellWidth: cellWidth,
                       customers: customers,

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 
 import '../../../domain/model/user_model.dart';
 import '../../data/fire_base/user_session.dart';
@@ -113,11 +114,11 @@ Future<void> showCycleEditDialog(
 
                               if (dialogContext.mounted) {
                                 Navigator.of(dialogContext).pop(); // 다이얼로그 닫기
-                                renderSnackBar(dialogContext, text: '관리주기가 저장되었습니다.');
+                                showOverlaySnackBar(context, '관리주기가 저장되었습니다.');
                               }
                             } else {
                               // 입력이 유효하지 않을 경우 다이얼로그를 닫지 않고 경고만 표시
-                              renderSnackBar(dialogContext, text: '올바른 숫자를 입력해주세요 (1일 이상).');
+                              showOverlaySnackBar(context, '올바른 숫자를 입력해주세요 (1일 이상).');
                             }
                           },
                           style: FilledButton.styleFrom(

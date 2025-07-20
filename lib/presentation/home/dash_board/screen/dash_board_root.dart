@@ -10,6 +10,7 @@ import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/widget/show_histories.dart';
 import 'package:withme/core/presentation/widget/show_inquiry_confirm_dialog.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/info_text.dart';
 import 'package:withme/core/ui/const/size.dart';
@@ -122,12 +123,12 @@ class _DashBoardRootState extends State<DashBoardRoot>
             await viewModel.signOut(context, credentials);
           }
           if (mounted) {
-            renderSnackBar(context, text: '계정이 삭제되었습니다.');
+            showOverlaySnackBar(context, '계정이 삭제되었습니다.');
           }
         } on FirebaseAuthException catch (e) {
           final error = SignOutError.fromCode(e.code);
           if (mounted) {
-            renderSnackBar(context, text: error.toString());
+            showOverlaySnackBar(context,  error.toString());
           }
         }
       },

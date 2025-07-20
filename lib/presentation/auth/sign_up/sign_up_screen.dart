@@ -8,6 +8,7 @@ import 'package:withme/core/presentation/components/render_filled_button.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
 import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../core/router/router_import.dart';
@@ -44,7 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _signUp() async {
     if (!_isChecked) {
-      renderSnackBar(context, text: '회원가입 동의를 선택해주세요.');
+      showOverlaySnackBar(context, '회원가입 동의를 선택해주세요.');
       return;
     }
 
@@ -86,7 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _showErrorMessage(String message) {
-    if (mounted) renderSnackBar(context, text: message);
+    if (mounted) showOverlaySnackBar(context, message);
   }
 
   @override

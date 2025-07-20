@@ -3,6 +3,7 @@ import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/item_icon.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
+import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/calculate_age.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/shortened_text.dart';
@@ -64,7 +65,7 @@ class ProspectItem extends StatelessWidget {
                     ItemIcon(
                       number: histories.length,
                       sex: customer.sex,
-                      backgroundImagePath: 'assets/icons/pool_person.png',
+                      backgroundImagePath:IconsPath.prospectPerson,
                     ),
                   ],
                 ),

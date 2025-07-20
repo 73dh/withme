@@ -32,6 +32,7 @@ class UserSession extends ChangeNotifier {
   // 초기화 메서드: SharedPreferences에서 관리 주기를 로드합니다.
   Future<void> _init() async {
     await loadManagePeriodFromPrefs();
+    await loadUrgentThresholdFromPrefs(); // 추가
   }
 
   /// Firebase 현재 로그인된 사용자의 UID를 반환합니다.
@@ -96,6 +97,27 @@ class UserSession extends ChangeNotifier {
     // 만약 이 값도 제거하고 싶다면 아래 라인을 추가하세요:
     // SharedPreferences.getInstance().then((prefs) => prefs.remove('managePeriodDays'));
     notifyListeners(); // 모든 리스너에게 상태 초기화를 알립니다.
+  }
+
+  int _urgentThresholdDays = 90;
+
+  int get urgentThresholdDays => _urgentThresholdDays;
+
+  void updateUrgentThresholdDays(int days) {
+    _urgentThresholdDays = days;
+    _saveUrgentThresholdToPrefs(days);
+    notifyListeners();
+  }
+
+  Future<void> _saveUrgentThresholdToPrefs(int days) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('urgentThresholdDays', days);
+  }
+
+  Future<void> loadUrgentThresholdFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _urgentThresholdDays = prefs.getInt('urgentThresholdDays') ?? 90;
+    notifyListeners();
   }
 }
 

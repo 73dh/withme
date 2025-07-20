@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
+import 'package:withme/core/utils/show_history_util.dart';
 
 import '../../../domain/model/history_model.dart';
 import '../../di/setup.dart';
@@ -33,27 +34,10 @@ class HistoryPartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (histories.isEmpty) return const SizedBox.shrink();
 
-    final int count = histories.length;
-    final recent = histories[count - 1];
-    final previous = count >= 2 ? histories[count - 2] : null;
-
-    final now = DateTime.now();
-
-    // 🔽 여기서 getIt을 통해 UserSession의 관리 주기 사용
-    final managePeriod = getIt<UserSession>().managePeriodDays;
-
-    final isOld = now.difference(recent.contactDate).inDays >= managePeriod;
-
-    final bool noRecentFollowUp = histories
-        .where((h) => h != recent)
-        .every(
-          (h) => h.contactDate.isBefore(
-            recent.contactDate.add(const Duration(days: 90)),
-          ),
-        );
-
-    final showReminderAnimation = isOld && noRecentFollowUp;
-
+    final result = showHistoryUtil(histories);
+    final recent = result.recent;
+    final previous = result.previous;
+    final showReminderAnimation = result.showReminder;
     return GestureDetector(
       onTap: () => onTap(histories),
       child: AnimatedSwitcher(
@@ -66,17 +50,19 @@ class HistoryPartWidget extends StatelessWidget {
           alignment: Alignment.topRight,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 240),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (previous != null)
-                  _buildHistoryBox(history: previous, isRecent: false),
-                if (previous != null) height(6),
-                _buildHistoryBox(history: recent, isRecent: true),
-                if (showReminderAnimation) height(6),
-                if (showReminderAnimation) BlinkingCursorIcon(sex: sex),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (previous != null)
+                    _buildHistoryBox(history: previous, isRecent: false),
+                  if (previous != null) height(5),
+                  _buildHistoryBox(history: recent, isRecent: true),
+                  if (showReminderAnimation) height(5),
+                  if (showReminderAnimation) BlinkingCursorIcon(sex: sex),
+                ],
+              ),
             ),
           ),
         ),

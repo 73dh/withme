@@ -3,6 +3,11 @@ import 'package:withme/domain/model/policy_model.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
 import 'history_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:withme/domain/model/policy_model.dart';
+
+import '../../core/data/fire_base/firestore_keys.dart';
+import 'history_model.dart';
 
 class CustomerModel {
   final String userKey;
@@ -15,6 +20,7 @@ class CustomerModel {
   final DateTime registeredDate;
   final List<HistoryModel> histories;
   final DocumentReference? documentReference;
+  final String memo; // ✅ 메모 필드 추가
 
   CustomerModel({
     required this.userKey,
@@ -22,11 +28,12 @@ class CustomerModel {
     required this.name,
     required this.sex,
     required this.birth,
-     this.policies=const [],
+    this.policies = const [],
     required this.recommended,
     required this.registeredDate,
     required this.histories,
     required this.documentReference,
+    required this.memo, // ✅ 기본값 공백
   });
 
   factory CustomerModel.fromJson(Map<String, dynamic> json) {
@@ -47,6 +54,7 @@ class CustomerModel {
               .map((e) => HistoryModel.fromJson(e as Map<String, dynamic>))
               .toList(),
       documentReference: json[keyDocumentRef] as DocumentReference?,
+      memo: json[keyCustomerMemo] as String? ?? '', // ✅ 메모 로딩
     );
   }
 
@@ -63,13 +71,12 @@ class CustomerModel {
                : null,
        policies = List.from(map[keyIsPolicy] ?? []),
        recommended = map[keyRecommendByWho] ?? '',
-       registeredDate =
-           (map[keyRegisteredDate] as Timestamp).toDate()
-             ,
+       registeredDate = (map[keyRegisteredDate] as Timestamp).toDate(),
        histories =
            (map[keyCustomerHistory] as List<dynamic>? ?? [])
                .map((e) => HistoryModel.fromMap(e as Map<String, dynamic>))
-               .toList();
+               .toList(),
+       memo = map[keyCustomerMemo] ?? ''; // ✅ 메모 로딩
 
   CustomerModel.fromSnapshot(DocumentSnapshot snapshot)
     : this.fromMap(
@@ -86,7 +93,7 @@ class CustomerModel {
     required DateTime registeredDate,
     String? recommender,
     DateTime? birth,
-
+    required String memo, // ✅ 추가
   }) {
     final map = <String, dynamic>{};
     map[keyUserKey] = userKey;
@@ -96,17 +103,19 @@ class CustomerModel {
     map[keyCustomerBirth] = birth ?? '';
     map[keyRegisteredDate] = registeredDate;
     map[keyRecommendByWho] = recommender ?? '';
+    map[keyCustomerMemo] = memo ?? ''; // ✅ 저장
     return map;
   }
 
   @override
   String toString() {
-    return 'CustomerModel{userKey: $userKey, customerKey: $customerKey, name: $name, sex: $sex, birth: $birth, policies: $policies, recommended: $recommended, registeredDate: $registeredDate, histories: $histories, documentReference: $documentReference}';
+    return 'CustomerModel{userKey: $userKey, customerKey: $customerKey, name: $name, sex: $sex, birth: $birth, policies: $policies, recommended: $recommended, registeredDate: $registeredDate, histories: $histories, documentReference: $documentReference, memo: $memo}';
   }
 
   CustomerModel copyWith({
     List<PolicyModel>? policies,
     List<HistoryModel>? histories,
+    String? memo, // ✅ copyWith도 반영
   }) {
     return CustomerModel(
       userKey: userKey,
@@ -119,6 +128,7 @@ class CustomerModel {
       registeredDate: registeredDate,
       histories: histories ?? this.histories,
       documentReference: documentReference,
+      memo: memo ?? this.memo,
     );
   }
 }

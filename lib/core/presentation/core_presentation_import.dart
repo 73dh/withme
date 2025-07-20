@@ -13,7 +13,6 @@ export 'package:withme/core/presentation/widget/show_confirm_dialog.dart';
 export '../../../core/presentation/components/custom_text_form_field.dart';
 export '../../../core/presentation/components/render_filled_button.dart';
 export '../../../core/presentation/core_presentation_import.dart';
-export '../../../core/presentation/widget/render_snack_bar.dart';
 export '../../../core/presentation/widget/select_date.dart';
 export 'components/my_circular_indicator.dart';
 export 'components/sex_widget.dart';

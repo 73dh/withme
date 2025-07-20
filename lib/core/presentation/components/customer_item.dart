@@ -5,6 +5,7 @@ import 'package:withme/core/domain/enum/policy_state.dart';
 import 'package:withme/core/presentation/components/item_icon.dart';
 import 'package:withme/core/presentation/components/orbiting_dots.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
+import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 
@@ -52,7 +53,7 @@ class CustomerItem extends StatelessWidget {
                   ItemIcon(
                     number: policies.length,
                     sex: customer.sex,
-                    backgroundImagePath: 'assets/icons/folder.png',
+                    backgroundImagePath:IconsPath.folderIcon,
                   ),
                   width(20),
                   Column(

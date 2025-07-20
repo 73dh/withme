@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
@@ -23,11 +24,13 @@ import '../registration_view_model.dart';
 class RegistrationBottomSheet extends StatefulWidget {
   final CustomerModel? customerModel;
   final ScrollController? scrollController; // 추가
+  final BuildContext? outerContext; // 추가
 
   const RegistrationBottomSheet({
     super.key,
     this.customerModel,
     this.scrollController,
+    this.outerContext, // 추가
   });
 
   @override
@@ -41,6 +44,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   final _recommendedController = TextEditingController();
   final _historyController = TextEditingController(text: '신규등록');
   final _birthController = TextEditingController();
+  final _memoController = TextEditingController();
   final _registeredDateController = TextEditingController();
 
   final viewModel = getIt<RegistrationViewModel>();
@@ -54,6 +58,8 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   DateTime? _birth;
   String? _sex;
   bool _isRegistering = false;
+
+
 
   @override
   void initState() {
@@ -74,6 +80,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       _birth = customer.birth;
       _birthController.text = customer.birth.toString();
       _registeredDateController.text = customer.registeredDate.formattedDate;
+      _memoController.text = customer.memo;
       if (customer.recommended.isNotEmpty) {
         _isRecommended = true;
         _recommendedController.text = customer.recommended;
@@ -88,17 +95,26 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     _historyController.dispose();
     _birthController.dispose();
     _internalController?.dispose();
+    _memoController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isInactive = _isInactive(widget.customerModel?.histories ?? []);
     return SafeArea(
       child: Column(
         children: [
           RegistrationAppBar(
             isReadOnly: _isReadOnly,
             onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
+            onTap:(){
+              onTap();
+              setState(() {
+                isInactive=!isInactive;
+              });
+            } ,
+            isInactive: isInactive,
             viewModel: viewModel,
             customerModel: widget.customerModel,
           ),
@@ -110,13 +126,41 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     );
   }
 
+  void onTap () {
+    popupAddHistory(
+      context,
+      widget.customerModel?.histories ?? [],
+      widget.customerModel!,
+      HistoryContent.title.toString(),
+    );
+
+  }
+
+  bool _isInactive(List<HistoryModel> histories) {
+    if (histories.isEmpty) return true;
+
+    final recent = histories
+        .map((h) => h.contactDate) // History의 date 필드를 기준으로
+        .whereType<DateTime>() // null 방지
+        .fold<DateTime?>(
+      null,
+          (prev, curr) => prev == null || curr.isAfter(prev) ? curr : prev,
+    );
+
+    if (recent == null) return true;
+
+    final managePeriod = getIt<UserSession>().managePeriodDays;
+    final now = DateTime.now();
+    return now.difference(recent).inDays >= managePeriod;
+  }
+
   Widget _buildForm() {
     return Form(
       key: _formKey,
       child: AnimatedPadding(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.only(
-          bottom: 20, // filledButton 기본 높이
+          bottom: 10, // filledButton 기본 높이
         ),
         child: SingleChildScrollView(
           controller: _effectiveController,
@@ -124,20 +168,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           child: _buildCustomerInfoPart(),
         ),
       ),
-    );
-  }
-
-  Widget _buildRecommenderPart() {
-    return RecommenderPart(
-      isReadOnly: _isReadOnly,
-      isRecommended: _isRecommended,
-      recommendedController: _recommendedController,
-      onChanged: (val) {
-        setState(() {
-          _isRecommended = val;
-          if (!val) _recommendedController.clear();
-        });
-      },
     );
   }
 
@@ -177,37 +207,9 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           if (!val) _recommendedController.clear();
         });
       },
+      memoController: _memoController,
     );
   }
-
-  // Widget _buildCustomerInfoPart() {
-  //   return CustomerInfoPart(
-  //     isReadOnly: _isReadOnly,
-  //     nameController: _nameController,
-  //     registeredDateController: _registeredDateController,
-  //     sex: _sex,
-  //     birth: _birth,
-  //     onSexChanged: (value) => setState(() => _sex = value),
-  //     birthController: _birthController,
-  //     onBirthInitPressed:
-  //         () async => setState(() {
-  //           _birth = null;
-  //           _birthController.clear();
-  //         }),
-  //     onBirthSetPressed: (date) async {
-  //       setState(() {
-  //         _birth = date;
-  //         _birthController.text = date.toString();
-  //       });
-  //     },
-  //
-  //     onRegisteredDatePressed: (date) async {
-  //       setState(() {
-  //         _registeredDateController.text = date.formattedDate;
-  //       });
-  //     },
-  //   );
-  // }
 
   Widget _buildSubmitButton() {
     return RenderFilledButton(
@@ -265,23 +267,23 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     final recommenderName = _recommendedController.text.trim();
     final nameRegex = RegExp(r'^[a-zA-Z가-힣]+$');
     if (name.isEmpty) {
-      renderSnackBar(context, text: '고객 이름을 입력 하세요');
+      showOverlaySnackBar(context, '고객 이름을 입력하세요');
       return false;
     }
     if (!nameRegex.hasMatch(name)) {
-      renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
+      showOverlaySnackBar(context, '이름은 한글 또는 영문만 입력 가능합니다');
       return false;
     }
     if (_sex == null) {
-      renderSnackBar(context, text: '성별을 선택 하세요');
+      showOverlaySnackBar(context, '성별을 선택 하세요');
       return false;
     }
     if (_isRecommended && recommenderName.isEmpty) {
-      renderSnackBar(context, text: '소개자 이름을 입력 하세요');
+      showOverlaySnackBar(context, '소개자 이름을 입력 하세요');
       return false;
     }
     if (_isRecommended && !nameRegex.hasMatch(recommenderName)) {
-      renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
+      showOverlaySnackBar(context, '이름은 한글 또는 영문만 입력 가능합니다');
       return false;
     }
 
@@ -307,6 +309,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
         registeredDate: DateFormat(
           'yy/MM/dd',
         ).parseStrict(_registeredDateController.text),
+        memo: _memoController.text.trim(),
       );
 
       if (widget.customerModel == null) {
@@ -337,7 +340,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     } catch (e, st) {
       debugPrint('submitForm error: $e');
       if (mounted) {
-        renderSnackBar(context, text: '등록에 실패했습니다. 다시 시도해주세요.');
+        showOverlaySnackBar(context,  '등록에 실패했습니다. 다시 시도해주세요.');
       }
       return false;
     }

@@ -1,3 +1,5 @@
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
+
 import '../../../domain/model/policy_model.dart';
 import '../../../presentation/customer/customer_view_model.dart';
 import '../../domain/enum/policy_state.dart';
@@ -62,7 +64,7 @@ Future<void> showEditPolicyDialog({
               );
               final premium = int.tryParse(premiumText);
               if (premium == null) {
-                renderSnackBar(context, text: '올바른 보험료를 입력하세요');
+                showOverlaySnackBar(context, '올바른 보험료를 입력하세요');
                 return;
               }
 

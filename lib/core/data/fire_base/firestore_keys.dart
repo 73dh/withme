@@ -12,6 +12,7 @@ const String keyIsPolicy = 'is_policy';
 const String keyRecommendByWho = 'recommendByWho';
 const String keyRegisteredDate = 'registeredDate';
 const String keyCustomerHistory = 'histories';
+const String keyCustomerMemo = 'memo';
 const String keyDocumentRef = 'documentRef';
 
 // Policy

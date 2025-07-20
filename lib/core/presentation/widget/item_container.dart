@@ -26,7 +26,7 @@ class ItemContainer extends StatelessWidget {
       ),
 
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8),
         child: child,
       ),
     );

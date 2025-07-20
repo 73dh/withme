@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:withme/core/presentation/widget/reset_password.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/ui/text_style/text_styles.dart';
 
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showErrorMessage(String message) {
-    if (mounted) renderSnackBar(context, text: message);
+    if (mounted) showOverlaySnackBar(context, message);
   }
 
   @override
@@ -139,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           email: _emailController.text,
                           onResult: (message) {
                             if (!mounted) return;
-                            renderSnackBar(context, text: message);
+                            showOverlaySnackBar(context, message);
                           },
                         );
                       },

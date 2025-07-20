@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 
 import '../../../domain/domain_import.dart';
 
@@ -30,7 +31,7 @@ Future<void> exportAndSendEmailWithExcel(
         await Permission.storage
             .request(); // WRITE_EXTERNAL_STORAGE는 maxSdkVersion:28이므로 여기선 storage
     if (!status.isGranted && context.mounted) {
-      renderSnackBar(context, text: '저장 권한이 필요합니다.');
+      showOverlaySnackBar(context, '저장 권한이 필요합니다.');
       return;
     }
   }

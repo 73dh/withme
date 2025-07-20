@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import 'package:withme/domain/model/policy_model.dart';
@@ -198,59 +199,59 @@ class _PolicyScreenState extends State<PolicyScreen> {
       final name = _insuredNameController.text.trim();
       final nameRegex = RegExp(r'^[a-zA-Z가-힣]+$');
       if (_policyHolderBirth == null) {
-        renderSnackBar(context, text: '계약자 생일을 확인하세요');
+        showOverlaySnackBar(context, '계약자 생일을 확인하세요');
         return;
       }
       if (name.isEmpty) {
-        renderSnackBar(context, text: '피보험자 이름을 입력하세요');
+        showOverlaySnackBar(context, '피보험자 이름을 입력하세요');
         return;
       }
       if (!nameRegex.hasMatch(name)) {
-        renderSnackBar(context, text: '이름은 한글 또는 영문만 입력 가능합니다');
+        showOverlaySnackBar(context, '이름은 한글 또는 영문만 입력 가능합니다');
         return;
       }
       if (_insuredSex == '') {
-        renderSnackBar(context, text: '피보험자 성별을 확인하세요');
+        showOverlaySnackBar(context, '피보험자 성별을 확인하세요');
         return;
       }
       if (_insuredBirth == null) {
-        renderSnackBar(context, text: '피보험자 생일을 확인하세요');
+        showOverlaySnackBar(context, '피보험자 생일을 확인하세요');
         return;
       }
       if (_productCategory == '상품종류') {
-        renderSnackBar(context, text: '상품종류를 선택하세요.');
+        showOverlaySnackBar(context, '상품종류를 선택하세요.');
         return;
       }
       if (_insuranceCompany == '보험사') {
-        renderSnackBar(context, text: '보험사를 선택하세요.');
+        showOverlaySnackBar(context, '보험사를 선택하세요.');
         return;
       }
       if (_productNameController.text.trim().isEmpty) {
-        renderSnackBar(context, text: '상품명을 입력하세요.');
+        showOverlaySnackBar(context, '상품명을 입력하세요.');
         return;
       }
       if (_paymentMethod.isEmpty) {
-        renderSnackBar(context, text: '납입방법을 선택하세요.');
+        showOverlaySnackBar(context, '납입방법을 선택하세요.');
         return;
       }
       if (_premiumController.text.trim().isEmpty) {
-        renderSnackBar(context, text: '보험료를 입력하세요.');
+        showOverlaySnackBar(context, '보험료를 입력하세요.');
         return;
       }
 
       if (_startDate == null) {
-        renderSnackBar(context, text: '계약일을 확인하세요');
+        showOverlaySnackBar(context, '계약일을 확인하세요');
         return;
       }
       if (_endDate == null) {
-        renderSnackBar(context, text: '보장 종료일을 확인하세요');
+        showOverlaySnackBar(context, '보장 종료일을 확인하세요');
 
         return;
       }
       if (_startDate != null &&
           _endDate != null &&
           _startDate!.isAfter(_endDate!)) {
-        renderSnackBar(context, text: '시작일이 종료일보다 늦습니다.');
+        showOverlaySnackBar(context, '시작일이 종료일보다 늦습니다.');
         return;
       }
       setState(() => _isCompleted = true);
@@ -313,7 +314,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
       onChecked: (bool result) async {
         if (result == true) {
           if (widget.customer.customerKey.isEmpty) {
-            renderSnackBar(context, text: '고객 정보 오류');
+            showOverlaySnackBar(context, '고객 정보 오류');
             return;
           }
 

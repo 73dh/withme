@@ -1,3 +1,5 @@
+import '../../data/fire_base/user_session.dart';
+import '../../di/setup.dart';
 import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
 import '../core_presentation_import.dart'; // width 함수
@@ -9,14 +11,16 @@ class InsuranceAgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userSession=getIt<UserSession>();
+    final insuranceChangeDate=getInsuranceAgeChangeDate(birthDate);
     final int difference =
-        getInsuranceAgeChangeDate(birthDate).difference(DateTime.now()).inDays;
-    final bool isUrgent = difference <= 90;
+        insuranceChangeDate.difference(DateTime.now()).inDays;
+    final bool isUrgent = difference <= userSession.urgentThresholdDays;
 
     return Row(
       children: [
         Text(
-          '상령일: ${getInsuranceAgeChangeDate(birthDate).formattedDate}',
+          '상령일: ${insuranceChangeDate.formattedDate}',
           style: TextStyles.normal12,
         ),
         width(6),
