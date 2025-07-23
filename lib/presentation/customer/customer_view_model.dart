@@ -7,6 +7,7 @@ import '../../domain/model/history_model.dart';
 import '../../domain/model/policy_model.dart';
 import '../../domain/use_case/history/get_histories_use_case.dart';
 import '../../domain/use_case/history_use_case.dart';
+import '../../domain/use_case/policy/delete_policy_use_case.dart';
 import '../../domain/use_case/policy/get_policies_use_case.dart';
 import '../../domain/use_case/policy/update_policy_use_case.dart';
 import '../../domain/use_case/policy_use_case.dart';
@@ -30,6 +31,15 @@ class CustomerViewModel with ChangeNotifier {
       log('[CustomerViewModel] Policy updated: ${policy.policyKey}');
     } catch (e) {
       log('[CustomerViewModel] Failed to update policy: $e');
+    }
+  }
+
+  Future<void> deletePolicy({required String customerKey, required String policyKey}) async {
+    try {
+      await getIt<PolicyUseCase>().execute(usecase: DeletePolicyUseCase(customerKey: customerKey, policyKey: policyKey));
+      log('[CustomerViewModel] Policy deleted: $policyKey');
+    } catch (e) {
+      log('[CustomerViewModel] Failed to delete policy: $e');
     }
   }
 }

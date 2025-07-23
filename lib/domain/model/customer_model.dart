@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/domain/model/policy_model.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
+import '../../core/data/fire_base/user_session.dart';
+import '../../core/di/setup.dart';
+import '../../core/utils/days_until_insurance_age.dart';
 import 'history_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:withme/domain/model/policy_model.dart';
@@ -129,6 +132,29 @@ class CustomerModel {
       histories: histories ?? this.histories,
       documentReference: documentReference,
       memo: memo ?? this.memo,
+    );
+  }
+}
+
+extension CustomerInsuranceInfo on CustomerModel {
+  ({int? difference, DateTime? insuranceChangeDate, bool isUrgent})
+  get insuranceInfo {
+    final birthDate = birth;
+    final userSession = getIt<UserSession>();
+
+    if (birthDate == null) {
+      return (difference: null, insuranceChangeDate: null, isUrgent: false);
+    }
+
+    final insuranceChangeDate = getInsuranceAgeChangeDate(birthDate);
+    final difference = insuranceChangeDate.difference(DateTime.now()).inDays;
+    final isUrgent =
+        difference >= 0 && difference <= userSession.urgentThresholdDays;
+
+    return (
+      difference: difference,
+      insuranceChangeDate: insuranceChangeDate,
+      isUrgent: isUrgent,
     );
   }
 }

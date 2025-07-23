@@ -11,8 +11,10 @@ import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../../domain/model/customer_model.dart';
+import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 import '../../ui/text_style/text_styles.dart';
+import '../../utils/core_utils_import.dart';
 import '../widget/insurance_age_widget.dart';
 import 'width_height.dart';
 
@@ -32,8 +34,16 @@ class ProspectItem extends StatelessWidget {
   Widget build(BuildContext context) {
     List<HistoryModel> histories = customer.histories;
     histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
+
+    DateTime? birthDate = customer.birth?.toLocal();
+
+    final info = customer.insuranceInfo;
+    final difference = info.difference;
+    final isUrgent = info.isUrgent;
+    final insuranceChangeDate = info.insuranceChangeDate;
+
     return IntrinsicHeight(
-      child: StreamBuilder(
+      child: StreamBuilder<List<HistoryModel>>(
         stream: getIt<HistoryUseCase>().call(
           usecase: GetHistoriesUseCase(
             userKey: userKey,
@@ -51,6 +61,7 @@ class ProspectItem extends StatelessWidget {
           histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
 
           return ItemContainer(
+            backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -65,12 +76,12 @@ class ProspectItem extends StatelessWidget {
                     ItemIcon(
                       number: histories.length,
                       sex: customer.sex,
-                      backgroundImagePath:IconsPath.prospectPerson,
+                      backgroundImagePath:customer.sex=='남'?IconsPath.manIcon: IconsPath.womanIcon,
                     ),
                   ],
                 ),
                 width(20),
-                _namePart(),
+                _namePart(birthDate, difference, isUrgent, insuranceChangeDate),
                 const Spacer(),
                 Expanded(
                   child: HistoryPartWidget(
@@ -87,9 +98,12 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _namePart() {
-    DateTime? birthDate = customer.birth?.toLocal();
-
+  Widget _namePart(
+    DateTime? birthDate,
+    int? difference,
+    bool isUrgent,
+    DateTime? insuranceChangeDate,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -109,7 +123,12 @@ class ProspectItem extends StatelessWidget {
           ],
         ),
         height(6),
-        if (birthDate != null) InsuranceAgeWidget(birthDate: birthDate),
+        if (birthDate != null && difference != null && insuranceChangeDate != null)
+          InsuranceAgeWidget(
+            difference: difference,
+            isUrgent: isUrgent,
+            insuranceChangeDate: insuranceChangeDate,
+          ),
 
         if (customer.recommended.isNotEmpty) ...[
           height(2),

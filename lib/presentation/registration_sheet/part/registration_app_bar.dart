@@ -22,7 +22,7 @@ class RegistrationAppBar extends StatelessWidget
   final bool isReadOnly;
   final void Function() onPressed;
   final void Function() onTap;
-  final bool isInactive;
+  final bool isNeedNewHistory;
   final RegistrationViewModel viewModel;
   final CustomerModel? customerModel;
 
@@ -31,7 +31,7 @@ class RegistrationAppBar extends StatelessWidget
     required this.isReadOnly,
     required this.onPressed,
     required this.onTap,
-    required this.isInactive,
+    required this.isNeedNewHistory,
     required this.viewModel,
     required this.customerModel,
   });
@@ -42,38 +42,29 @@ class RegistrationAppBar extends StatelessWidget
       automaticallyImplyLeading: false,
       elevation: 0,
       backgroundColor: Colors.white,
-      title: const Text(
-        'Info',
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+      title: Image.asset(
+        customerModel?.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,
+        fit: BoxFit.cover,
+        color: getSexIconColor(customerModel?.sex).withOpacity(0.6),
       ),
+
       actions: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
               onTap: onTap,
-              child: StatefulBuilder(
-                builder: (
-                  BuildContext context,
-                  void Function(void Function()) setState,
-                ) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (isInactive)
-                        BlinkingCursorIcon(
-                          sex: customerModel?.sex ?? '',
-                          size: 30,
-                        ),
-                      if (!isInactive)
-                        Icon(Icons.menu),
-                    ],
-                  );
-                },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isNeedNewHistory)
+                    BlinkingCursorIcon(
+                      key: ValueKey(isNeedNewHistory), // 상태가 바뀌면 강제로 새로 빌드됨
+                      sex: customerModel?.sex ?? '',
+                      size: 30,
+                    ),
+                  if (!isNeedNewHistory) const Icon(Icons.menu),
+                ],
               ),
             ),
 

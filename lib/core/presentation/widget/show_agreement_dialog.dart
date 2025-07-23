@@ -2,7 +2,7 @@ import '../core_presentation_import.dart';
 
 void showAgreementDialog(
   BuildContext context, {
-  required void Function() onPressed,
+  required void Function()? onPressed,
 }) {
   showDialog(
     context: context,

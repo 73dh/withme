@@ -7,6 +7,7 @@ abstract interface class TextStyles {
   static const normal12 = TextStyle(fontSize: 12);
   static const normal13 = TextStyle(fontSize: 13);
   static const normal14 = TextStyle(fontSize: 14);
+  static const bold8 = TextStyle(fontWeight: FontWeight.bold, fontSize: 8);
   static const bold12 = TextStyle(fontWeight: FontWeight.bold, fontSize: 12);
   static const bold14 = TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
   static const bold16 = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);

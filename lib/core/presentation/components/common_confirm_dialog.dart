@@ -45,6 +45,7 @@ class CommonConfirmDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Cancel Button: Only pops the dialog itself with 'false'
+                 if(cancelButtonText.isNotEmpty)
                     FilledButton(
                       onPressed: () {
                         if (context.mounted) {

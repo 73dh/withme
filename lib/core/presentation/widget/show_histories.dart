@@ -4,9 +4,12 @@ import 'package:withme/core/presentation/components/custom_text_form_field.dart'
 import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/widget/history_button.dart';
 import 'package:withme/core/presentation/widget/select_history_menu.dart';
+import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/history_model.dart';
+
+import '../../domain/core_domain_import.dart';
 
 class CommonDialog {
   final MenuController menuController;
@@ -14,10 +17,11 @@ class CommonDialog {
   final scrollController = ScrollController();
 
   CommonDialog({required this.menuController, required this.textController});
+
   Future<String?> showHistories(
-      BuildContext context,
-      List<HistoryModel> histories,
-      ) async {
+    BuildContext context,
+    List<HistoryModel> histories,
+  ) async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
@@ -43,7 +47,9 @@ class CommonDialog {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.08),
@@ -64,14 +70,22 @@ class CommonDialog {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
+                      Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: Colors.grey.shade200,
+                      ),
                       if (histories.isNotEmpty)
                         Flexible(
                           child: ListView.separated(
                             controller: scrollController,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                             itemCount: histories.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            separatorBuilder:
+                                (_, __) => const SizedBox(height: 8),
                             itemBuilder: (_, index) {
                               final e = histories[index];
                               return Column(
@@ -126,104 +140,7 @@ class CommonDialog {
         );
       },
     );
-
-
-}
-
-  // Future<String?> showHistories(
-  //   BuildContext context,
-  //   List<HistoryModel> histories,
-  // ) async {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     if (scrollController.hasClients) {
-  //       scrollController.jumpTo(scrollController.position.maxScrollExtent);
-  //     }
-  //   });
-  //   return await showModalBottomSheet<String>(
-  //     context: Overlay.of(context).context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.transparent,
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return AnimatedPadding(
-  //             duration: AppDurations.duration100,
-  //             padding: EdgeInsets.only(
-  //               bottom: MediaQuery.of(context).viewInsets.bottom,
-  //             ),
-  //             child: Container(
-  //               constraints: BoxConstraints(
-  //                 maxHeight: MediaQuery.of(context).size.height * 0.5,
-  //               ),
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white,
-  //                 borderRadius: const BorderRadius.vertical(
-  //                   top: Radius.circular(16),
-  //                 ),
-  //                 boxShadow: [
-  //                   BoxShadow(
-  //                     color: Colors.black.withOpacity(0.1), // 연한 검정색
-  //                     blurRadius: 12, // 퍼짐 정도
-  //                     offset: const Offset(0, -4), // 위쪽에서 퍼지도록 설정
-  //                   ),
-  //                 ],
-  //               ),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   const SizedBox(height: 16),
-  //                   const Text(
-  //                     '관리이력',
-  //                     style: TextStyle(
-  //                       fontWeight: FontWeight.bold,
-  //                       fontSize: 16,
-  //                     ),
-  //                   ),
-  //                   const SizedBox(height: 8),
-  //                   Flexible(
-  //                     child: ListView.builder(
-  //                       controller: scrollController,
-  //                       padding: const EdgeInsets.symmetric(horizontal: 16),
-  //                       shrinkWrap: true,
-  //                       itemCount: histories.length,
-  //                       itemBuilder: (_, index) {
-  //                         final e = histories[index];
-  //                         return Padding(
-  //                           padding: const EdgeInsets.symmetric(vertical: 4.0),
-  //                           child: Row(
-  //                             crossAxisAlignment: CrossAxisAlignment.start,
-  //                             children: [
-  //                               Text(
-  //                                 '${e.contactDate.formattedDate}: ',
-  //                                 style: const TextStyle(
-  //                                   fontWeight: FontWeight.bold,
-  //                                 ),
-  //                               ),
-  //                               Expanded(child: Text(e.content)),
-  //                             ],
-  //                           ),
-  //                         );
-  //                       },
-  //                     ),
-  //                   ),
-  //                   const SizedBox(height: 10),
-  //                   Padding(
-  //                     padding: const EdgeInsets.symmetric(horizontal: 16),
-  //                     child: _inputArea(
-  //                       context,
-  //                       setState,
-  //                     ), // <- 여기에 TextField 들어 있음
-  //                   ),
-  //                   const SizedBox(height: 20),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
+  }
 
   Widget _inputArea(BuildContext context, StateSetter setState) {
     final showTextField = textController.text.isEmpty;
@@ -236,7 +153,14 @@ class CommonDialog {
         if (showTextField) _buildTextField(setState) else const Spacer(),
         width(5),
         FilledButton(
-          onPressed: () => context.pop(textController.text),
+          onPressed: () {
+            final input = textController.text.trim();
+            if (input.isEmpty || input == HistoryContent.title.toString()) {
+              showOverlaySnackBar(context, '내용을 입력해 주세요');
+              return; // ✅ 닫지 않고 종료
+            }
+            context.pop(input); // ✅ 유효한 경우만 닫기
+          },
           child: const Text('추가'),
         ),
       ],

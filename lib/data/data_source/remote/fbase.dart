@@ -21,7 +21,7 @@ class FBase {
 
     return await FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc(userId) // ✅ 직접 가져온 userId 사용
+        .doc(userId)
         .get();
   }
 
@@ -275,6 +275,22 @@ class FBase {
       await policyRef.update(policy.toJson());
     } catch (e) {
       log('Error updating policy: $e');
+    }
+  }
+
+  Future<void> deletePolicy({
+    required String customerKey,
+  required String policyKey,
+  })async{
+    try{
+    DocumentReference policyRef = FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(UserSession.userId)
+        .collection(collectionCustomer)
+        .doc(customerKey) .collection(collectionPolicies)
+        .doc(policyKey);
+    await policyRef.delete();}catch(e){
+      log('Error deleting policy: $e');
     }
   }
 }

@@ -4,8 +4,9 @@ import '../core_presentation_import.dart';
 class ItemContainer extends StatelessWidget {
   final Widget child;
   final double? height;
+  final Color? backgroundColor;
 
-  const ItemContainer({super.key, required this.child, this.height=88});
+  const ItemContainer({super.key, required this.child, this.height=88, this.backgroundColor});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class ItemContainer extends StatelessWidget {
       width: double.infinity,
       height: height,
       decoration: BoxDecoration(
-        color: ColorStyles.customerItemColor,
+        color:backgroundColor?? ColorStyles.customerItemColor,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(

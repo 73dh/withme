@@ -1,47 +1,20 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/ui/const/duration.dart';
+import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
 import 'package:withme/domain/domain_import.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
 import 'package:withme/presentation/home/prospect_list/components/fab_oevelay_manager_mixin.dart';
 import 'package:withme/presentation/home/prospect_list/components/inactive_and_urgent_filter_bar.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/components/info_icon_with_popup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
-import '../components/main_fab.dart';
-
-import 'dart:async';
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/domain/domain_import.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/fab_oevelay_manager_mixin.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
-
-import '../../../../core/di/setup.dart';
-import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
-import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
-import '../components/main_fab.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -205,9 +178,7 @@ class _ProspectListPageState extends State<ProspectListPage>
                       AppBarSearchWidget(
                         onSubmitted: (text) {
                           viewModel.updateFilter(searchText: text);
-                          // setState(() {
-                          //   _searchText = text;
-                          // });
+
                         },
                       ),
                     ],
@@ -248,46 +219,55 @@ class _ProspectListPageState extends State<ProspectListPage>
                               child: GestureDetector(
                                 onTap: () async {
                                   setFabCanBeShown(false);
-                                  await showModalBottomSheet(
-                                    context: context,
-                                    useRootNavigator: true,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(16),
-                                      ),
-                                    ),
-                                    builder: (modalContext) {
-                                      return DraggableScrollableSheet(
-                                        expand: false,
-                                        initialChildSize: 0.57,
-                                        maxChildSize: 0.57,
-                                        minChildSize: 0.4,
-                                        builder: (context, scrollController) {
-                                          return ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                  top: Radius.circular(10),
-                                                ),
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                              ),
-                                              child: RegistrationBottomSheet(
-                                                customerModel: customer,
-                                                scrollController:
-                                                    scrollController,
-                                                outerContext: this.context,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
+                           final result=     await  showBottomSheetWithDraggable(context: context, child: RegistrationBottomSheet(
+                                    customerModel: customer,
+                                    // scrollController:
+                                    // scrollController,
+                                    outerContext: this.context,
+                                  ));
+                                  // await showModalBottomSheet(
+                                  //   context: context,
+                                  //   useRootNavigator: true,
+                                  //   isScrollControlled: true,
+                                  //   backgroundColor: Colors.transparent,
+                                  //   shape: const RoundedRectangleBorder(
+                                  //     borderRadius: BorderRadius.vertical(
+                                  //       top: Radius.circular(16),
+                                  //     ),
+                                  //   ),
+                                  //   builder: (modalContext) {
+                                  //     return DraggableScrollableSheet(
+                                  //       expand: false,
+                                  //       initialChildSize: 0.57,
+                                  //       maxChildSize: 0.57,
+                                  //       minChildSize: 0.4,
+                                  //       builder: (context, scrollController) {
+                                  //         return ClipRRect(
+                                  //           borderRadius:
+                                  //               const BorderRadius.vertical(
+                                  //                 top: Radius.circular(10),
+                                  //               ),
+                                  //           child: Container(
+                                  //             decoration: const BoxDecoration(
+                                  //               color: Colors.white,
+                                  //             ),
+                                  //             child: RegistrationBottomSheet(
+                                  //               customerModel: customer,
+                                  //               scrollController:
+                                  //                   scrollController,
+                                  //               outerContext: this.context,
+                                  //             ),
+                                  //           ),
+                                  //         );
+                                  //       },
+                                  //     );
+                                  //   },
+                                  // );
                                   setFabCanBeShown(true);
+                                  if(result==true){
+
                                   await viewModel.fetchData(force: true);
+                                  }
                                 },
                                 child: ProspectItem(
                                   userKey: UserSession.userId,
@@ -300,6 +280,7 @@ class _ProspectListPageState extends State<ProspectListPage>
                                       customer,
                                       HistoryContent.title.toString(),
                                     );
+
                                     if (!mounted) return;
                                     setFabCanBeShown(true);
                                   },

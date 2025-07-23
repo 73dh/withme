@@ -7,7 +7,7 @@ Future<bool?> showConfirmDialog(
       required String text,
       String? confirmButtonText,
       String? cancelButtonText,
-      required Future<void> Function() onConfirm,
+      required Future<void> Function()? onConfirm,
     }) {
   return showDialog<bool>(
     context: context,
@@ -16,7 +16,7 @@ Future<bool?> showConfirmDialog(
       text: text,
       confirmButtonText: confirmButtonText ?? '확인',
       cancelButtonText: cancelButtonText ?? '취소',
-      onConfirm: onConfirm,
+      onConfirm: onConfirm??()async{},
     ),
   );
 }

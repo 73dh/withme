@@ -42,4 +42,9 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
   Future<void> updatePolicy({required String customerKey, required PolicyModel policy})async {
   return await fBase.updatePolicy(customerKey: customerKey, policy: policy);
   }
+
+  @override
+  Future<void> deletePolicy({required String customerKey, required String policyKey})async {
+  return await fBase.deletePolicy(customerKey: customerKey, policyKey: policyKey);
+  }
 }

@@ -1,12 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/widget/item_container.dart';
+import 'package:withme/domain/model/customer_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/presentation/widget/history_part_widget.dart';
-import '../../../core/presentation/widget/insurance_age_widget.dart';
-import '../../../core/presentation/components/rotating_dots.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
@@ -17,10 +13,17 @@ class CustomerInfo extends StatelessWidget {
   final CustomerModel customer;
   final CustomerViewModel viewModel;
 
+  final bool isUrgent;
+  final int? difference;
+  final DateTime? insuranceChangeDate;
+
   const CustomerInfo({
     super.key,
     required this.customer,
     required this.viewModel,
+    required this.isUrgent,
+    required this.difference,
+    required this.insuranceChangeDate,
   });
 
   @override
@@ -28,27 +31,31 @@ class CustomerInfo extends StatelessWidget {
     final birthDate = customer.birth;
 
     return ItemContainer(
-      height: 95,
+      height: 100,
+      backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           /// 왼쪽 고객 정보
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// 이름 + 성별 아이콘
-              Row(
-                children: [
-                  Text(
-                    shortenedNameText(customer.name),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Row(
+                  children: [
+                    Text(
+                      shortenedNameText(customer.name),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  width(6),
-                  sexIcon(customer.sex),
-                ],
+                    width(6),
+                    sexIcon(customer.sex),
+                  ],
+                ),
               ),
               height(6),
 
@@ -67,8 +74,16 @@ class CustomerInfo extends StatelessWidget {
               ),
               height(4),
 
-              /// 상령일
-              if (birthDate != null) InsuranceAgeWidget(birthDate: birthDate),
+              /// 상령일 (D-xxx)
+              if (birthDate != null &&
+                  difference != null &&
+                  difference! >= 0 &&
+                  insuranceChangeDate != null)
+                InsuranceAgeWidget(
+                  difference: difference!,
+                  isUrgent: isUrgent,
+                  insuranceChangeDate: insuranceChangeDate!,
+                ),
 
               /// 소개자
               if (customer.recommended.isNotEmpty) ...[
@@ -81,33 +96,32 @@ class CustomerInfo extends StatelessWidget {
             ],
           ),
 
-          /// 오른쪽 이력 표시
-          Expanded(
-            child: StreamBuilder<List<HistoryModel>>(
-              stream: viewModel.getHistories(
-                UserSession.userId,
-                customer.customerKey,
-              ),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const MyCircularIndicator();
-                }
-                final histories = snapshot.data!;
-                return HistoryPartWidget(
-                  histories: histories,
-                  onTap: (histories) {
-                    popupAddHistory(
-                      context,
-                      histories,
-                      customer,
-                      HistoryContent.title.toString(),
-                    );
+          const Spacer(),
 
-                  },
-                  sex: customer.sex,
-                );
-              },
+          /// 오른쪽 이력 표시
+          StreamBuilder<List<HistoryModel>>(
+            stream: viewModel.getHistories(
+              UserSession.userId,
+              customer.customerKey,
             ),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const MyCircularIndicator();
+              }
+              final histories = snapshot.data!;
+              return HistoryPartWidget(
+                histories: histories,
+                onTap: (histories) async {
+                  await popupAddHistory(
+                    context,
+                    histories,
+                    customer,
+                    HistoryContent.title.toString(),
+                  );
+                },
+                sex: customer.sex,
+              );
+            },
           ),
         ],
       ),

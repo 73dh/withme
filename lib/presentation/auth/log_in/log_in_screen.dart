@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:withme/core/presentation/widget/reset_password.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/color/color_style.dart';
+import 'package:withme/core/ui/const/info_text.dart';
 import 'package:withme/core/ui/text_style/text_styles.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
@@ -74,13 +75,25 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } on FirebaseAuthException catch (e) {
       final error = LoginError.fromCode(e.code);
-
+      if (error == LoginError.userDisabled && mounted) {
+        _showDisabledAccountDialog(context);
+        return;
+      }
       _showErrorMessage(error.toString());
-    } catch (e) {
-      _showErrorMessage(LoginError.unknownError.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showDisabledAccountDialog(BuildContext context) {
+    showConfirmDialog(
+      context,
+      text:
+          '이 계정은 사용 중지되었습니다.'
+          '\n관리자에게 문의해 주세요.\n\n[문의] $adminEmail',
+      cancelButtonText: '',
+      onConfirm: null,
+    );
   }
 
   void _showErrorMessage(String message) {

@@ -1,15 +1,7 @@
 import '../../presentation/core_presentation_import.dart';
 import 'free_count.dart';
 
-// const String infoText =
-//     '이 앱은 가망고객을 발굴한 후,'
-//     '\n고객을 손쉽게 체계적으로 관리할수 있습니다.'
-//     '\n\n관리주기를 설정하여 고객관리를 놓치는 일이 없도록 하였으며,'
-//     '\n\n생일, 상령일, 미관리 고객등을 선별해 볼수도 있고, 계약자의 경우 계약내용까지 관리가 가능하도록 하였습니다.'
-//     '\n\n무료회원은 $freeCount명까지 사용이 가능하며, \n이상의 고객을 등록하여 관리하기 위해서는 유료회원 가입후 사용이 가능합니다.'
-//     '\n\nDashboard 화면에서는 현재 관리중인 가망고객이나 계약자의 통계를 확인할 수 있으며,'
-//     '\n\n유료회원의 경우에는 등록되어 있는 고객의 정보를 Excel로 받을수 있도록 하였습니다.'
-//     '\n\n\n문의: kdaehee@gmail.com';
+const String adminEmail='kdaehee@gmail.com';
 
 final Widget styledInfoText = Column(
   crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +36,7 @@ final Widget styledInfoText = Column(
           TextSpan(
             text: '유료회원의 경우에는 등록되어 있는 고객의 정보를 Excel로 받을수 있도록 하였습니다.\n\n\n',
           ),
-          TextSpan(text: '문의: kdaehee@gmail.com'),
+          TextSpan(text: '문의: $adminEmail'),
         ],
       ),
     ),

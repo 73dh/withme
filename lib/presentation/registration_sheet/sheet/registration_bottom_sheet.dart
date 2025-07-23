@@ -13,6 +13,7 @@ import '../../../core/di/setup.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
+import '../../../core/utils/is_need_new_history.dart';
 import '../components/add_policy_button.dart';
 import '../part/confirm_box_part.dart';
 import '../part/customer_info_part.dart';
@@ -58,13 +59,13 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   DateTime? _birth;
   String? _sex;
   bool _isRegistering = false;
-
-
+  bool _isNeedNewHistory = false;
 
   @override
   void initState() {
     super.initState();
     _initializeCustomer();
+    _isNeedNewHistory = isNeedNewHistory(widget.customerModel?.histories ?? []);
     if (widget.scrollController == null) {
       _internalController = ScrollController();
     }
@@ -101,20 +102,21 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    bool isInactive = _isInactive(widget.customerModel?.histories ?? []);
     return SafeArea(
       child: Column(
         children: [
           RegistrationAppBar(
             isReadOnly: _isReadOnly,
             onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
-            onTap:(){
-              onTap();
-              setState(() {
-                isInactive=!isInactive;
-              });
-            } ,
-            isInactive: isInactive,
+            onTap: () async {
+              await onAddHistory();
+              if (isNeedNewHistory(widget.customerModel?.histories ?? [])) {
+                setState(() {
+                  _isNeedNewHistory = !_isNeedNewHistory;
+                });
+              }
+            },
+            isNeedNewHistory: _isNeedNewHistory,
             viewModel: viewModel,
             customerModel: widget.customerModel,
           ),
@@ -126,32 +128,28 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     );
   }
 
-  void onTap () {
-    popupAddHistory(
+  Future<void> onAddHistory() async {
+    final newHistory = await popupAddHistory(
       context,
       widget.customerModel?.histories ?? [],
       widget.customerModel!,
       HistoryContent.title.toString(),
     );
+    if (newHistory != null) {
+      setState(() {
+        final histories = widget.customerModel!.histories;
+        histories.add(newHistory);
 
-  }
+        // 🔽 연락일 기준으로 최신 순 정렬
+        histories.sort((a, b) {
+          final aDate = a.contactDate ?? DateTime(1970);
+          final bDate = b.contactDate ?? DateTime(1970);
+          return bDate.compareTo(aDate); // 최신 날짜가 앞에 오도록
+        });
 
-  bool _isInactive(List<HistoryModel> histories) {
-    if (histories.isEmpty) return true;
-
-    final recent = histories
-        .map((h) => h.contactDate) // History의 date 필드를 기준으로
-        .whereType<DateTime>() // null 방지
-        .fold<DateTime?>(
-      null,
-          (prev, curr) => prev == null || curr.isAfter(prev) ? curr : prev,
-    );
-
-    if (recent == null) return true;
-
-    final managePeriod = getIt<UserSession>().managePeriodDays;
-    final now = DateTime.now();
-    return now.difference(recent).inDays >= managePeriod;
+        _isNeedNewHistory = isNeedNewHistory(histories);
+      });
+    }
   }
 
   Widget _buildForm() {
@@ -340,7 +338,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     } catch (e, st) {
       debugPrint('submitForm error: $e');
       if (mounted) {
-        showOverlaySnackBar(context,  '등록에 실패했습니다. 다시 시도해주세요.');
+        showOverlaySnackBar(context, '등록에 실패했습니다. 다시 시도해주세요.');
       }
       return false;
     }

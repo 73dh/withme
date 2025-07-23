@@ -16,4 +16,5 @@ abstract interface class PolicyRepository implements Repository {
 
 
   Future<void> updatePolicy({required String customerKey, required PolicyModel policy});
+Future<void> deletePolicy({required String customerKey, required String policyKey});
 }

@@ -1,13 +1,13 @@
 import 'dart:developer';
-import 'package:flutter/material.dart';
+
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
+import 'package:withme/core/router/router_path.dart';
+
 import '../../../../../core/di/setup.dart';
-import '../../../../core/presentation/components/animated_text.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
@@ -22,9 +22,6 @@ class CustomerListPage extends StatefulWidget {
 }
 
 class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
-  // final RouteObserver<PageRoute> _routeObserver =
-  //     getIt<RouteObserver<PageRoute>>();
-
   final viewModel = getIt<CustomerListViewModel>();
   String _searchText = '';
 

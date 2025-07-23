@@ -5,12 +5,15 @@ import 'package:withme/core/domain/core_domain_import.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/use_case/history/add_history_use_case.dart';
+import 'package:withme/presentation/customer/screen/customer_screen.dart';
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/presentation/widget/show_bottom_sheet_with_draggable.dart';
 import '../../../../core/router/router_import.dart';
 import '../../../../domain/model/history_model.dart';
 import '../../../../domain/use_case/customer/update_searched_customers_use_case.dart';
+import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
 import '../search_page_view_model.dart';
 
 class CustomerListView extends StatelessWidget {
@@ -83,21 +86,19 @@ class CustomerListView extends StatelessWidget {
   Widget _buildProspectItem(BuildContext context, CustomerModel customer) {
     return GestureDetector(
       onTap: () async {
-        showDialog(
+        final result = await showBottomSheetWithDraggable(
           context: context,
-          barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          child: RegistrationBottomSheet(
+            customerModel: customer,
+            scrollController: null, // optional, scrollController는 내부에서 다룸
+            outerContext: context,
+          ),
         );
 
-        await Future.delayed(AppDurations.duration100);
-        if (context.mounted) {
-          await context.push(RoutePath.registration, extra: customer);
+        // ✅ 수정된 경우만 리스트 갱신
+        if (result == true) {
+          await UpdateSearchedCustomersUseCase.call(viewModel);
         }
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-
-        await UpdateSearchedCustomersUseCase.call(viewModel);
       },
       child: ProspectItem(
         userKey: userKey,
@@ -116,21 +117,10 @@ class CustomerListView extends StatelessWidget {
   Widget _buildCustomerItem(BuildContext context, CustomerModel customer) {
     return GestureDetector(
       onTap: () async {
-        showDialog(
+        await showBottomSheetWithDraggable(
           context: context,
-          barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          child: CustomerScreen(customer: customer),
         );
-
-        await Future.delayed(AppDurations.duration100);
-        if (context.mounted) {
-          await context.push(RoutePath.customer, extra: customer);
-        }
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-
-        await UpdateSearchedCustomersUseCase.call(viewModel);
       },
       child: SearchCustomerItem(
         userKey: userKey,

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/ui/const/info_text.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
 
@@ -174,7 +175,7 @@ class DashBoardViewModel with ChangeNotifier {
     final email = _userSession.currentUser?.email ?? 'unknown@unknown.com';
 
     final Uri emailUri = Uri.parse(
-      'mailto:kdaehee@gmail.com?subject=${Uri.encodeComponent("유료회원 문의")}'
+      'mailto:$adminEmail?subject=${Uri.encodeComponent("유료회원 문의")}'
       '&body=${Uri.encodeComponent("안녕하세요,\n\n유저 이메일: $email\n\n유료회원 가입에 대해 문의드립니다.")}',
     );
 
@@ -196,7 +197,7 @@ class DashBoardViewModel with ChangeNotifier {
                 TextButton(
                   onPressed: () {
                     Clipboard.setData(
-                      const ClipboardData(text: 'kdaehee@gmail.com'),
+                      const ClipboardData(text: adminEmail),
                     );
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(

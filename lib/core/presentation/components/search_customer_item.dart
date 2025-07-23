@@ -10,6 +10,7 @@ import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
+import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 import '../../ui/color/color_style.dart';
 import '../../ui/text_style/text_styles.dart';
@@ -110,10 +111,38 @@ class SearchCustomerItem extends StatelessWidget {
   }
 
   Widget _namePart() {
-    int difference =
-        getInsuranceAgeChangeDate(
-          customer.birth ?? DateTime.now(),
-        ).difference(DateTime.now()).inDays;
+    final birthDate = customer.birth;
+    if (birthDate == null) return const SizedBox.shrink();
+
+    final insuranceChangeDate = getInsuranceAgeChangeDate(birthDate);
+    final int difference = insuranceChangeDate.difference(DateTime.now()).inDays;
+
+    // 지난 상령일은 표시하지 않음
+    if (difference < 0) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(shortenedNameText(customer.name), style: TextStyles.bold14),
+              width(5),
+              Text(
+                '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
+                style: TextStyles.normal12,
+              ),
+            ],
+          ),
+          if (customer.recommended.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text('소개자: ${customer.recommended}', style: TextStyles.normal12),
+            ),
+        ],
+      );
+    }
+
+    final isUrgent = difference <= getIt<UserSession>().urgentThresholdDays;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,25 +150,56 @@ class SearchCustomerItem extends StatelessWidget {
           children: [
             Text(shortenedNameText(customer.name), style: TextStyles.bold14),
             width(5),
-            // sexIcon(customer.sex),
-            // width(5),
             Text(
-              '${customer.birth?.formattedBirth} (${calculateAge(customer.birth ?? DateTime.now())}세)',
+              '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
+              style: TextStyles.normal12,
             ),
-            width(3),
           ],
         ),
-        InsuranceAgeWidget(birthDate: customer.birth ?? DateTime.now()),
-        // Text(
-        //   '상령일: ${getInsuranceAgeChangeDate(customer.birth ?? DateTime.now()).formattedDate}',
-        //   style: TextStyle(
-        //     color: difference <= 90 ? Colors.red : Colors.black87,
-        //   ),
-        // ),
-        if (customer.recommended != '') Text(customer.recommended),
+
+        // ✅ 상령일 위젯 (미래 상령일만 표시)
+        InsuranceAgeWidget(
+          difference: difference,
+          isUrgent: isUrgent,
+          insuranceChangeDate: insuranceChangeDate,
+        ),
+
+        if (customer.recommended.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text('소개자: ${customer.recommended}', style: TextStyles.normal12),
+          ),
       ],
     );
   }
+
+
+  // Widget _namePart() {
+  //   int difference =
+  //       getInsuranceAgeChangeDate(
+  //         customer.birth ?? DateTime.now(),
+  //       ).difference(DateTime.now()).inDays;
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Text(shortenedNameText(customer.name), style: TextStyles.bold14),
+  //           width(5),
+  //           // sexIcon(customer.sex),
+  //           // width(5),
+  //           Text(
+  //             '${customer.birth?.formattedBirth} (${calculateAge(customer.birth ?? DateTime.now())}세)',
+  //           ),
+  //           width(3),
+  //         ],
+  //       ),
+  //       InsuranceAgeWidget(birthDate: customer.birth ?? DateTime.now()),
+  //
+  //       if (customer.recommended != '') Text(customer.recommended),
+  //     ],
+  //   );
+  // }
 
   Widget _policyPart(List<PolicyModel> policies) {
     return Column(

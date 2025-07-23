@@ -1,11 +1,12 @@
 import '../core_domain_import.dart';
 
-enum LoginError  {
+enum LoginError {
   userNotFound,
   invalidEmail,
   wrongPassword,
   invalidCredential,
   tooManyRequests,
+  userDisabled,
   unknownError;
 
   static LoginError fromCode(String code) {
@@ -20,10 +21,13 @@ enum LoginError  {
         return LoginError.invalidCredential;
       case 'too-many-requests':
         return LoginError.tooManyRequests;
+      case 'user-disabled': // 👈 여기 추가
+        return LoginError.userDisabled;
       default:
         return LoginError.unknownError;
     }
   }
+
   @override
   String toString() {
     return switch (this) {
@@ -32,6 +36,7 @@ enum LoginError  {
       LoginError.wrongPassword => '비밀번호가 일치하지 않습니다.',
       LoginError.invalidCredential => '사용자 정보가 없습니다.',
       LoginError.tooManyRequests => '잠시 후 다시 시도해 주세요.',
+      LoginError.userDisabled => '계정이 사용 중지되었습니다.',
       LoginError.unknownError => '알수 없는 에러입니다.',
     };
   }

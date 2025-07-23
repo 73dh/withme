@@ -33,7 +33,9 @@ class HistoryPartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (histories.isEmpty) return const SizedBox.shrink();
-
+    // 최신 이력이 아래로 오도록 정렬
+    // final sortedHistories = [...histories]
+    //   ..sort((a, b) => a.contactDate.compareTo(b.contactDate));
     final result = showHistoryUtil(histories);
     final recent = result.recent;
     final previous = result.previous;
@@ -45,23 +47,27 @@ class HistoryPartWidget extends StatelessWidget {
         transitionBuilder:
             (child, animation) =>
                 ScaleTransition(scale: animation, child: child),
-        child: Align(
-          key: ValueKey(histories.length),
-          alignment: Alignment.topRight,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 240),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (previous != null)
-                    _buildHistoryBox(history: previous, isRecent: false),
-                  if (previous != null) height(5),
-                  _buildHistoryBox(history: recent, isRecent: true),
-                  if (showReminderAnimation) height(5),
-                  if (showReminderAnimation) BlinkingCursorIcon(sex: sex),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Align(
+            key: ValueKey(histories.length),
+            alignment: Alignment.topRight,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 240),
+              child: SingleChildScrollView(
+                reverse: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (previous != null)
+                      _buildHistoryBox(history: previous, isRecent: false),
+                    if (previous != null) height(5),
+                    _buildHistoryBox(history: recent!, isRecent: true),
+                    if (showReminderAnimation) height(5),
+                    if (showReminderAnimation) BlinkingCursorIcon(sex: sex),
+                  ],
+                ),
               ),
             ),
           ),

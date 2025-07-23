@@ -58,6 +58,11 @@ android {
     }
 }
 
+//dependencies {
+//    implementation("com.google.firebase:firebase-analytics-ktx")
+//    // 다른 Firebase SDK 추가 가능 (예: Crashlytics, Auth 등)
+//}
+
 flutter {
     source = "../.."
 }

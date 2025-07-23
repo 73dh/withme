@@ -8,6 +8,7 @@ import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
+import 'package:withme/core/utils/is_need_new_history.dart';
 
 import '../../../domain/model/history_model.dart';
 import '../../data/fire_base/user_session.dart';
@@ -34,6 +35,13 @@ class CustomerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<CustomerListViewModel>();
+    final birthDate = customer.birth;
+
+    final info = customer.insuranceInfo;
+    final difference = info.difference;
+    final isUrgent = info.isUrgent;
+    final insuranceChangeDate = info.insuranceChangeDate;
+
     return StreamBuilder(
       stream: viewModel.getPolicies(customerKey: customer.customerKey),
       builder: (context, snapshot) {
@@ -44,8 +52,9 @@ class CustomerItem extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        List<PolicyModel> policies = snapshot.data;
+        List<PolicyModel> policies = snapshot.data!;
         return ItemContainer(
+          backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
           child: Stack(
             children: [
               Row(
@@ -53,46 +62,58 @@ class CustomerItem extends StatelessWidget {
                   ItemIcon(
                     number: policies.length,
                     sex: customer.sex,
-                    backgroundImagePath:IconsPath.folderIcon,
+                    backgroundImagePath: IconsPath.folderIcon,
                   ),
                   width(20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [_namePart(), _policyPart(policies)],
+                    children: [
+                      _namePart(
+                        birthDate,
+                        difference,
+                        isUrgent,
+                        insuranceChangeDate,
+                      ),
+                      _policyPart(policies),
+                    ],
                   ),
                   const Spacer(),
                 ],
               ),
-              if (_isInactive(customer.histories))
+              if (isNeedNewHistory(customer.histories))
                 Positioned(
                   top: 0,
                   right: 0,
-                  child: BlinkingCursorIcon(sex: customer.sex, size: 20),
+                  child: BlinkingCursorIcon(sex: customer.sex, size: 30),
                 ),
             ],
           ),
         );
-
       },
     );
   }
-  bool _isInactive(List<HistoryModel> histories) {
-    if (histories.isEmpty) return true;
 
-    final recent = histories
-        .map((h) => h.contactDate) // History의 date 필드를 기준으로
-        .whereType<DateTime>() // null 방지
-        .fold<DateTime?>(null, (prev, curr) => prev == null || curr.isAfter(prev) ? curr : prev);
+  Widget _namePart(
+    DateTime? birthDate,
+    int? difference,
+    bool isUrgent,
+    DateTime? insuranceChangeDate,
+  ) {
+    if (birthDate == null) {
+      return Row(
+        children: [
+          Text(
+            shortenedNameText(customer.name, length: 6),
+            style: TextStyles.bold14,
+          ),
+          width(5),
+          const Text('정보 없음'),
+          width(3),
+          Text(customer.recommended.isNotEmpty ? customer.recommended : ''),
+        ],
+      );
+    }
 
-    if (recent == null) return true;
-
-    final managePeriod = getIt<UserSession>().managePeriodDays;
-    final now = DateTime.now();
-    return now.difference(recent).inDays >= managePeriod;
-  }
-
-
-  Widget _namePart() {
     return Row(
       children: [
         Text(
@@ -100,10 +121,18 @@ class CustomerItem extends StatelessWidget {
           style: TextStyles.bold14,
         ),
         width(5),
-        Text('${calculateAge(customer.birth ?? DateTime.now())}세/'),
+        Text('${calculateAge(birthDate)}세/'),
         width(3),
-        InsuranceAgeWidget(birthDate: customer.birth ?? DateTime.now()),
-        Text(customer.recommended != '' ? customer.recommended : ''),
+        if (difference != null &&
+            difference >= 0 &&
+            insuranceChangeDate != null)
+          InsuranceAgeWidget(
+            difference: difference,
+            isUrgent: isUrgent,
+            insuranceChangeDate: insuranceChangeDate,
+          ),
+        if (difference == null || difference < 0) const SizedBox.shrink(),
+        Text(customer.recommended.isNotEmpty ? customer.recommended : ''),
       ],
     );
   }
@@ -113,12 +142,13 @@ class CustomerItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children:
           policies.map((e) {
-            final style =
+            final isCancelled =
                 e.policyState == PolicyState.cancelled.label ||
-                        e.policyState == PolicyState.lapsed.label
-                    ? TextStyles.cancelStyle
-                    : null;
+                e.policyState == PolicyState.lapsed.label;
 
+            final premiumText = numFormatter.format(
+              int.tryParse(e.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
+            );
             return Row(
               children: [
                 Text(e.startDate?.formattedDate ?? ''),
@@ -127,12 +157,14 @@ class CustomerItem extends StatelessWidget {
                 width(5),
 
                 Text(
-                  numFormatter.format(
-                    int.tryParse(e.premium.replaceAll(RegExp(r'[^0-9]'), '')) ??
-                        0,
+                  premiumText,
+                  style: TextStyle(
+                    color: isCancelled ? Colors.red : null,
+                    fontWeight: isCancelled ? FontWeight.bold : null,
+                    decoration: isCancelled ? TextDecoration.lineThrough : null,
+                    decorationColor: isCancelled ? Colors.red : null,
+                    decorationThickness: isCancelled ? 2 : null,
                   ),
-                  style: style,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 width(5),
                 Text(' (${e.paymentMethod})', overflow: TextOverflow.ellipsis),

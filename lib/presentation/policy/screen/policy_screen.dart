@@ -143,13 +143,11 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     onCategoryTap: (value) {
                       setState(() {
                         _productCategory = value.toString();
-                        // context.pop();
                       });
                     },
                     onCompanyTap: (value) {
                       setState(() {
                         _insuranceCompany = value.toString();
-                        // context.pop();
                       });
                     },
                     productNameController: _productNameController,
@@ -162,7 +160,6 @@ class _PolicyScreenState extends State<PolicyScreen> {
                       setState(() => _paymentMethod = value);
                     },
                     onProductNameTap: (_) {
-                      // setState(() => _productNameController.text = value);
                     },
                     onInputPremiumTap: (value) {
                       setState(() => _premiumController.text = value);

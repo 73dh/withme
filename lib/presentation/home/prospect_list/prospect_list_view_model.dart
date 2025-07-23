@@ -35,7 +35,6 @@ class ProspectListViewModel with ChangeNotifier {
     notifyListeners(); // 캐시 초기화 시에도 항상 알림
   }
 
-
   /// ✅ 외부에서 필터 상태 업데이트
   void updateFilter({
     bool? inactiveOnly,
@@ -48,6 +47,7 @@ class ProspectListViewModel with ChangeNotifier {
 
     _applyFilterAndSort();
   }
+
   Future<void> fetchData({bool force = false}) async {
     final usecase =
         force
@@ -92,17 +92,18 @@ class ProspectListViewModel with ChangeNotifier {
     if (_inactiveOnly) {
       final threshold = getIt<UserSession>().managePeriodDays;
 
-      filtered = filtered.where((e) {
-        final latestDate = e.histories
-            .map((h) => h.contactDate)
-            .fold<DateTime?>(null, (prev, date) {
-          if (prev == null) return date;
-          return date.isAfter(prev) ? date : prev;
-        });
+      filtered =
+          filtered.where((e) {
+            final latestDate = e.histories
+                .map((h) => h.contactDate)
+                .fold<DateTime?>(null, (prev, date) {
+                  if (prev == null) return date;
+                  return date.isAfter(prev) ? date : prev;
+                });
 
-        if (latestDate == null) return true;
-        return latestDate.add(Duration(days: threshold)).isBefore(now);
-      }).toList();
+            if (latestDate == null) return true;
+            return latestDate.add(Duration(days: threshold)).isBefore(now);
+          }).toList();
     }
 
     // ⏰ 상령일 임박 필터
@@ -115,7 +116,8 @@ class ProspectListViewModel with ChangeNotifier {
 
         final insuranceAgeChangeDate = getInsuranceAgeChangeDate(birth);
         final diff = insuranceAgeChangeDate.difference(now).inDays;
-        return diff <= urgentDays;
+
+        return diff >= 0 && diff <= urgentDays;
       }).toList();
     }
 
@@ -174,6 +176,4 @@ class ProspectListViewModel with ChangeNotifier {
   void sortByInsuranceAgeDate() => _sort(SortType.insuredDate);
 
   void sortByHistoryCount() => _sort(SortType.manage);
-
-
 }
