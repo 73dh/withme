@@ -134,7 +134,10 @@ class _ProspectListPageState extends State<ProspectListPage>
           },
         );
       },
-    );
+    ).then((_) {
+      // ✅ RegistrationBottomSheet 완전히 닫힌 뒤 FAB 복원
+      setFabCanBeShown(true);
+    });
 
     setIsProcessActive(false);
 
@@ -178,7 +181,6 @@ class _ProspectListPageState extends State<ProspectListPage>
                       AppBarSearchWidget(
                         onSubmitted: (text) {
                           viewModel.updateFilter(searchText: text);
-
                         },
                       ),
                     ],
@@ -219,54 +221,23 @@ class _ProspectListPageState extends State<ProspectListPage>
                               child: GestureDetector(
                                 onTap: () async {
                                   setFabCanBeShown(false);
-                           final result=     await  showBottomSheetWithDraggable(context: context, child: RegistrationBottomSheet(
-                                    customerModel: customer,
-                                    // scrollController:
-                                    // scrollController,
-                                    outerContext: this.context,
-                                  ));
-                                  // await showModalBottomSheet(
-                                  //   context: context,
-                                  //   useRootNavigator: true,
-                                  //   isScrollControlled: true,
-                                  //   backgroundColor: Colors.transparent,
-                                  //   shape: const RoundedRectangleBorder(
-                                  //     borderRadius: BorderRadius.vertical(
-                                  //       top: Radius.circular(16),
-                                  //     ),
-                                  //   ),
-                                  //   builder: (modalContext) {
-                                  //     return DraggableScrollableSheet(
-                                  //       expand: false,
-                                  //       initialChildSize: 0.57,
-                                  //       maxChildSize: 0.57,
-                                  //       minChildSize: 0.4,
-                                  //       builder: (context, scrollController) {
-                                  //         return ClipRRect(
-                                  //           borderRadius:
-                                  //               const BorderRadius.vertical(
-                                  //                 top: Radius.circular(10),
-                                  //               ),
-                                  //           child: Container(
-                                  //             decoration: const BoxDecoration(
-                                  //               color: Colors.white,
-                                  //             ),
-                                  //             child: RegistrationBottomSheet(
-                                  //               customerModel: customer,
-                                  //               scrollController:
-                                  //                   scrollController,
-                                  //               outerContext: this.context,
-                                  //             ),
-                                  //           ),
-                                  //         );
-                                  //       },
-                                  //     );
-                                  //   },
-                                  // );
-                                  setFabCanBeShown(true);
-                                  if(result==true){
+                                  final result = await showBottomSheetWithDraggable(
+                                    context: context,
+                                    child: RegistrationBottomSheet(
+                                      customerModel: customer,
+                                      outerContext: context,
+                                    ),
+                                  ).then((_) {
+                                    // ✅ RegistrationBottomSheet 완전히 닫힌 뒤 FAB 복원
+                                    setFabCanBeShown(true);
+                                  });
 
-                                  await viewModel.fetchData(force: true);
+                                  if (!mounted) return;
+                                  if (result == true) {
+                                    await viewModel.fetchData(force: true);
+                                    setState(() {
+
+                                    });
                                   }
                                 },
                                 child: ProspectItem(

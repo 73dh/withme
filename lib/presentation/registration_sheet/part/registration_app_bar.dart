@@ -116,24 +116,6 @@ class RegistrationAppBar extends StatelessWidget
     );
   }
 
-  // bool _isInactive(List<HistoryModel> histories) {
-  //   if (histories.isEmpty) return true;
-  //
-  //   final recent = histories
-  //       .map((h) => h.contactDate) // History의 date 필드를 기준으로
-  //       .whereType<DateTime>() // null 방지
-  //       .fold<DateTime?>(
-  //         null,
-  //         (prev, curr) => prev == null || curr.isAfter(prev) ? curr : prev,
-  //       );
-  //
-  //   if (recent == null) return true;
-  //
-  //   final managePeriod = getIt<UserSession>().managePeriodDays;
-  //   final now = DateTime.now();
-  //   return now.difference(recent).inDays >= managePeriod;
-  // }
-
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

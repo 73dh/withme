@@ -24,7 +24,7 @@ class AddPolicyButton extends StatelessWidget {
           extra: customerModel,
         );
         if (result == true) {
-          onRegistered?.call(); // ✅ 등록 성공 시 콜백 실행
+          onRegistered?.call();
         }
       },
     );
