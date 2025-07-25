@@ -2,8 +2,14 @@ import '../core_presentation_import.dart';
 
 Future<bool?> showBottomSheetWithDraggable({
   required BuildContext context,
-  required Widget child,
+   Widget Function(ScrollController)? builder,
+   Widget? child,
 }) {
+
+  assert(
+  (child != null) ^ (builder != null),
+  'Either child or builder must be provided, but not both.',
+  );
   return showModalBottomSheet<bool>(
     context: context,
     useRootNavigator: true,
@@ -25,7 +31,9 @@ Future<bool?> showBottomSheetWithDraggable({
             ),
             child: Container(
               decoration: const BoxDecoration(color: Colors.white),
-              child: child,
+              child: builder != null
+                  ? builder(scrollController)
+                  : child,
             ),
           );
         },

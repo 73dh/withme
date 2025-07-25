@@ -25,6 +25,7 @@ class RegistrationAppBar extends StatelessWidget
   final bool isNeedNewHistory;
   final RegistrationViewModel viewModel;
   final CustomerModel? customerModel;
+  final void Function(bool result)? isSuccess;
 
   const RegistrationAppBar({
     super.key,
@@ -33,7 +34,7 @@ class RegistrationAppBar extends StatelessWidget
     required this.onTap,
     required this.isNeedNewHistory,
     required this.viewModel,
-    required this.customerModel,
+    required this.customerModel, required this.isSuccess,
   });
 
   @override
@@ -105,9 +106,15 @@ class RegistrationAppBar extends StatelessWidget
             if (customerModel != null)
               AddPolicyButton(
                 customerModel: customerModel!,
-                onRegistered: () async {
-                  await getIt<CustomerListViewModel>().refresh();
+                onRegistered: (bool result) async {
+                  if (result) {
+                    await getIt<CustomerListViewModel>().refresh();
+                  } else {
+                    debugPrint('등록 취소 또는 실패');
+                    isSuccess?.call(result);
+                  }
                 },
+
               ),
             const SizedBox(width: 8),
           ],

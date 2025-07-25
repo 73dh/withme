@@ -12,7 +12,6 @@ import 'package:withme/presentation/home/prospect_list/components/inactive_and_u
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../domain/domain_import.dart';
 import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
 
@@ -30,9 +29,10 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
-  String? _searchText = '';
+  final String _searchText = '';
   bool _showInactiveOnly = false; // 관리일 경과 필터
   bool _showUrgentOnly = false; // 상령일 필터
+
 
   @override
   void initState() {
@@ -58,8 +58,8 @@ class _ProspectListPageState extends State<ProspectListPage>
   List<CustomerModel> _applyFilterAndSort(List<CustomerModel> customers) {
     var filtered = customers.where((e) => e.policies.isEmpty).toList();
 
-    if (_searchText?.isNotEmpty ?? false) {
-      filtered = filtered.where((e) => e.name.contains(_searchText!)).toList();
+    if (_searchText.isNotEmpty) {
+      filtered = filtered.where((e) => e.name.contains(_searchText)).toList();
     }
 
     if (_showInactiveOnly) {
@@ -102,40 +102,15 @@ class _ProspectListPageState extends State<ProspectListPage>
 
     if (!context.mounted) return;
 
-    final result = await showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (modalContext) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.57,
-          maxChildSize: 0.95,
-          minChildSize: 0.4,
-          builder: (context, scrollController) {
-            return ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
-              child: Container(
-                decoration: const BoxDecoration(color: Colors.white),
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: RegistrationBottomSheet(
-                    scrollController: scrollController,
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+    final safeContext = context;
+    final result = await showBottomSheetWithDraggable(
+      context: safeContext,
+      builder:
+          (scrollController) => SingleChildScrollView(
+            controller: scrollController,
+            child: RegistrationBottomSheet(scrollController: scrollController),
+          ),
     ).then((_) {
-      // ✅ RegistrationBottomSheet 완전히 닫힌 뒤 FAB 복원
       setFabCanBeShown(true);
     });
 
@@ -221,24 +196,24 @@ class _ProspectListPageState extends State<ProspectListPage>
                               child: GestureDetector(
                                 onTap: () async {
                                   setFabCanBeShown(false);
-                                  final result = await showBottomSheetWithDraggable(
+
+                                 await showBottomSheetWithDraggable(
                                     context: context,
                                     child: RegistrationBottomSheet(
                                       customerModel: customer,
                                       outerContext: context,
+                                      isSuccess: (bool result) {
+                                        print('등록 결과: $result');
+                                        // 성공 여부에 따라 추가 처리 가능
+                                      },
                                     ),
                                   ).then((_) {
+
                                     // ✅ RegistrationBottomSheet 완전히 닫힌 뒤 FAB 복원
                                     setFabCanBeShown(true);
                                   });
-
                                   if (!mounted) return;
-                                  if (result == true) {
-                                    await viewModel.fetchData(force: true);
-                                    setState(() {
-
-                                    });
-                                  }
+                                  await viewModel.fetchData(force: true);
                                 },
                                 child: ProspectItem(
                                   userKey: UserSession.userId,
