@@ -8,6 +8,7 @@ import 'package:withme/core/presentation/components/customer_item.dart';
 import 'package:withme/core/router/router_path.dart';
 
 import '../../../../../core/di/setup.dart';
+import '../../../../core/data/fire_base/user_session.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
@@ -32,6 +33,8 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
   bool _fabCanShow = true;
   bool _visibilityBlocked = false; // VisibilityDetector 중복 실행 방지용
   void Function(void Function())? overlaySetState;
+// 관리일경과 확인변수
+  bool _showInactiveOnly = false;
 
   @override
   void initState() {
@@ -78,6 +81,39 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
     viewModel.refresh(); // 중요
   }
 
+  List<CustomerModel> _applyFilters(List<CustomerModel> original) {
+    final managePeriodDays = getIt<UserSession>().managePeriodDays;
+    final now = DateTime.now();
+
+    return original.where((customer) {
+      // 🔍 이름 검색
+      if (!_matchesSearchText(customer)) return false;
+
+      // 🔍 관리일 경과 필터
+      if (_showInactiveOnly) {
+        final latest = customer.histories
+            .map((h) => h.contactDate)
+            .fold<DateTime?>(null, (prev, date) {
+          if (prev == null) return date;
+          return date.isAfter(prev) ? date : prev;
+        });
+
+        if (latest == null) return true;
+
+        return latest.add(Duration(days: managePeriodDays)).isBefore(now);
+      }
+
+      return true;
+    }).toList();
+  }
+
+  bool _matchesSearchText(CustomerModel customer) {
+    return customer.name.contains(_searchText.trim());
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
@@ -122,10 +158,14 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
                 }
 
                 List<CustomerModel> originalCustomers = snapshot.data!;
-                List<CustomerModel> customers =
-                    originalCustomers
-                        .where((e) => e.name.contains(_searchText.trim()))
-                        .toList();
+                // List<CustomerModel> customers =
+                //     originalCustomers
+                //         .where((e) => e.name.contains(_searchText.trim()))
+                //         .toList();
+
+                // 관리일 경과 필터 로직함수
+                List<CustomerModel> customers = _applyFilters(originalCustomers);
+
                 return Scaffold(
                   appBar: _appBar(customers),
                   body: _customerList(customers),
@@ -145,6 +185,16 @@ class _CustomerListPageState extends State<CustomerListPage> with RouteAware {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SwitchListTile(
+              title: const Text('관리일 경과만 보기'),
+              value: _showInactiveOnly,
+              onChanged: (val) {
+                setState(() {
+                  _showInactiveOnly = val;
+                });
+              },
+            ),
+
             ListView.builder(
               primary: false,
               shrinkWrap: true,
