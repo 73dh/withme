@@ -26,13 +26,14 @@ class RegistrationBottomSheet extends StatefulWidget {
   final CustomerModel? customerModel;
   final ScrollController? scrollController; // 추가
   final BuildContext? outerContext; // 추가
-  final void Function(bool result)? isSuccess;
+  // final void Function(bool result)? isSuccess;
 
   const RegistrationBottomSheet({
     super.key,
     this.customerModel,
     this.scrollController,
-    this.outerContext, this.isSuccess, // 추가
+    this.outerContext,
+    // this.isSuccess, // 추가
   });
 
   @override
@@ -104,30 +105,37 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: [
-          RegistrationAppBar(
-            isReadOnly: _isReadOnly,
-            onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
-            onTap: () async {
-              await onAddHistory();
-              if (isNeedNewHistory(widget.customerModel?.histories ?? [])) {
-                setState(() {
-                  _isNeedNewHistory = !_isNeedNewHistory;
-                });
-              }
-            },
-            isNeedNewHistory: _isNeedNewHistory,
-            viewModel: viewModel,
-            customerModel: widget.customerModel,
-            isSuccess: widget.isSuccess,
-
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              RegistrationAppBar(
+                isReadOnly: _isReadOnly,
+                onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
+                onTap: () async {
+                  await onAddHistory();
+                  if (isNeedNewHistory(widget.customerModel?.histories ?? [])) {
+                    setState(() {
+                      _isNeedNewHistory = !_isNeedNewHistory;
+                    });
+                  }
+                },
+                isNeedNewHistory: _isNeedNewHistory,
+                viewModel: viewModel,
+                customerModel: widget.customerModel,
+                // isSuccess: widget.isSuccess,
+              ),
+          
+              _buildForm(),
+          
+              if (!_isReadOnly) _buildSubmitButton(), // bottomSheet 대체
+            ],
           ),
-
-          _buildForm(),
-
-          if (!_isReadOnly) _buildSubmitButton(), // bottomSheet 대체
-        ],
+        ),
       ),
     );
   }
@@ -217,9 +225,9 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     return RenderFilledButton(
       text: widget.customerModel == null ? '등록' : '수정',
       foregroundColor: ColorStyles.activeButtonColor,
-      onPressed: () {
+      onPressed: () async {
         if (_tryValidation()) {
-          showModalBottomSheet(
+          await showModalBottomSheet(
             context: context,
             isScrollControlled: true,
             builder:
@@ -242,6 +250,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
                             setModalState(() => _isRegistering = true);
                             final success = await _submitForm();
                             setModalState(() => _isRegistering = false);
+
                             if (modalContext.mounted) {
                               Navigator.of(modalContext).pop();
                             }

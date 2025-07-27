@@ -22,9 +22,9 @@ Color getSexBackgroundColor(String? sex) {
 Color getSexIconColor(String? sex) {
   switch (sex) {
     case '남':
-      return Colors.blueAccent; // 연한 파란색
+      return ColorStyles.manColor; // 연한 파란색
     case '여':
-      return Colors.redAccent; // 연한 분홍색
+      return ColorStyles.womanColor; // 연한 분홍색
     default:
       return ColorStyles.customerItemColor; // 기본 색
   }

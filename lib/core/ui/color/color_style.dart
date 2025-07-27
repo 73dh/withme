@@ -18,4 +18,6 @@ abstract interface class ColorStyles{
   static Color activeSwitchColor=Colors.deepPurple.shade300;
   static Color isUrgentColor=Colors.deepPurple.shade50;
   static Color badgeColor=Colors.deepPurple.shade300;
+  static Color manColor=Colors.blueAccent;
+  static Color womanColor=Colors.redAccent.shade200;
 }

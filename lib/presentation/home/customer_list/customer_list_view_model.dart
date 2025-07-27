@@ -3,25 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/setup.dart';
-import 'package:withme/domain/use_case/customer/get_edited_all_use_case.dart';
 import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/domain/use_case/policy_use_case.dart';
 import 'package:withme/presentation/home/customer_list/customer_list_state.dart';
 
 import '../../../core/domain/sort_status.dart';
-import '../../../core/ui/core_ui_import.dart';
+import '../../../core/presentation/fab/fab_oevelay_manager_mixin.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 
-class CustomerListViewModel with ChangeNotifier {
+class CustomerListViewModel
+    with ChangeNotifier
+    implements FabViewModelInterface {
   CustomerListState _state = CustomerListState();
 
   CustomerListState get state => _state;
 
   SortStatus _sortStatus = SortStatus(SortType.name, true);
 
+  @override
   SortStatus get sortStatus => _sortStatus;
-
 
   final BehaviorSubject<List<CustomerModel>> _cachedCustomers =
       BehaviorSubject.seeded([]);
@@ -32,6 +33,12 @@ class CustomerListViewModel with ChangeNotifier {
     if (_state.hasLoadedOnce) return;
     await _fetchData();
     _state = state.copyWith(hasLoadedOnce: true);
+    notifyListeners();
+  }
+
+  @override
+  Future<void> fetchData({bool force = false}) async {
+    await _fetchData();
     notifyListeners();
   }
 
@@ -46,6 +53,7 @@ class CustomerListViewModel with ChangeNotifier {
         userKey: FirebaseAuth.instance.currentUser?.uid ?? '',
       ),
     );
+
     final policyCustomers =
         allCustomers.where((e) => e.policies.isNotEmpty).toList();
 
@@ -54,14 +62,13 @@ class CustomerListViewModel with ChangeNotifier {
       currentSortType: _sortStatus.type,
     ).call(policyCustomers);
 
-    // _cachedCustomers.add(policyCustomers);
     _cachedCustomers.add(List<CustomerModel>.from(sorted));
   }
 
   void _sort(SortType type) {
     final currentList = _cachedCustomers.valueOrNull ?? [];
     bool ascending =
-    (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
+        (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
 
     _sortStatus = SortStatus(type, ascending);
 
@@ -74,12 +81,35 @@ class CustomerListViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  @override
   void sortByName() => _sort(SortType.name);
 
+  @override
   void sortByBirth() => _sort(SortType.birth);
 
+  @override
+  void sortByInsuranceAgeDate() => _sort(SortType.insuredDate);
 
+  @override
+  void sortByHistoryCount() => _sort(SortType.manage);
 
+  int get inactiveCount {
+    final managePeriodDays = getIt<UserSession>().managePeriodDays;
+    final now = DateTime.now();
+
+    final customers = _cachedCustomers.valueOrNull ?? [];
+
+    return customers.where((c) {
+      final latest = c.histories
+          .map((h) => h.contactDate)
+          .fold<DateTime?>(
+            null,
+            (prev, date) => prev == null || date.isAfter(prev) ? date : prev,
+          );
+      if (latest == null) return true;
+      return latest.add(Duration(days: managePeriodDays)).isBefore(now);
+    }).length;
+  }
 
   @override
   void dispose() {

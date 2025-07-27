@@ -44,7 +44,6 @@ class CustomTextFormField extends StatelessWidget {
     final baseBorder = const OutlineInputBorder(borderSide: BorderSide.none);
 
     return TextFormField(
-
       controller: controller,
       readOnly: readOnly,
       cursorColor: Colors.black87,
@@ -56,7 +55,7 @@ class CustomTextFormField extends StatelessWidget {
       keyboardType: inputType,
       onEditingComplete: onCompleted,
       decoration: InputDecoration(
-        contentPadding:  EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
         hintText: hintText,
         hintStyle: TextStyles.hintStyle,
         labelText: labelText,

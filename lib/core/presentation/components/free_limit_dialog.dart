@@ -38,7 +38,9 @@ class FreeLimitDialog {
               text:
                   '무료 회원은 최대 $limitCount건까지만 등록할 수 있습니다.\n'
                   '이메일 문의 후 제한을 해제하세요.',
-              onConfirm: () async => context.pop(),
+              cancelButtonText: '',
+              onConfirm:null,
+                  // () async => context.pop(),
             );
           }
           return true;

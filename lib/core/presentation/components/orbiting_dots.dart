@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
 
 class BlinkingCursorIcon extends StatefulWidget {
@@ -10,8 +11,8 @@ class BlinkingCursorIcon extends StatefulWidget {
 
   const BlinkingCursorIcon({
     super.key,
-    this.icon = Icons.edit_note_rounded, // 기본값은 '편집' 아이콘
-    this.size = 25.0,
+    this.icon = Icons.edit_calendar_outlined, // 기본값은 '편집' 아이콘
+    this.size = 23.0,
     this.blinkSpeed = const Duration(milliseconds: 700), // 0.7초마다 깜빡임
     required this.sex,
   });
@@ -47,8 +48,11 @@ class _BlinkingCursorIconState extends State<BlinkingCursorIcon>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _opacityAnimation,
-      child: Icon(widget.icon, size: widget.size, color:widget.sex=='남'? Colors.blueAccent:Colors.redAccent),
+      child: Icon(
+        widget.icon,
+        size: widget.size,
+        color: widget.sex == '남' ? ColorStyles.manColor: ColorStyles.womanColor,
+      ),
     );
   }
 }
-

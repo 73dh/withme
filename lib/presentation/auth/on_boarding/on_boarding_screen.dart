@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
+import 'package:withme/core/presentation/widget/show_cycle_edit_dialog.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 
@@ -50,6 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       setState(() {
         _isLoading = false;
       });
+
       context.go(RoutePath.home);
     }
   }

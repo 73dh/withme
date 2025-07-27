@@ -3,36 +3,50 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/fab/animated_fab_container.dart';
+import 'package:withme/core/presentation/fab/main_fab.dart';
+import 'package:withme/core/presentation/fab/small_fab.dart';
 import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
+import 'package:withme/core/ui/const/position.dart';
 
-import '../prospect_list_view_model.dart';
+import '../../../presentation/registration_sheet/sheet/registration_bottom_sheet.dart';
+import '../../di/setup.dart';
+import '../../domain/sort_status.dart';
+import '../components/free_limit_dialog.dart';
+import '../widget/show_bottom_sheet_with_draggable.dart';
 
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/presentation/home/prospect_list/components/animated_fab_container.dart';
-import 'package:withme/presentation/home/prospect_list/components/main_fab.dart';
-import 'package:withme/presentation/home/prospect_list/components/small_fab.dart';
-import '../prospect_list_view_model.dart';
 
-mixin FabOverlayManagerMixin<T extends StatefulWidget> on State<T>
-implements RouteAware {
+abstract class FabViewModelInterface {
+  void fetchData({bool force});
+
+  void sortByName();
+
+  void sortByBirth();
+
+  void sortByInsuranceAgeDate();
+
+  void sortByHistoryCount();
+
+  SortStatus get sortStatus;
+}
+
+mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelInterface> on State<T> implements RouteAware {
   OverlayEntry? _fabOverlayEntry;
   bool _fabExpanded = false;
   bool _fabVisibleInOverlay = false;
   bool _fabOverlayIsInserted = false;
   bool _fabCanBeShown = true;
   bool _isProcessActive = false;
+  bool _isRouteTransitioning = false; // 추가: 화면전환 중 상태
   void Function(void Function())? _overlaySetState;
+  double smallFabBottomPosition = FabPosition.firstFabBottomPosition;
 
-  ProspectListViewModel get viewModel;
+  VM get viewModel;
 
-  Future<void> onMainFabPressedLogic();
   void onSortActionLogic(Function() sortFn);
 
   void setOverlaySetState(void Function(void Function())? setter) {
@@ -47,6 +61,15 @@ implements RouteAware {
     _overlaySetState = null;
   }
 
+    @protected
+  Widget buildMainFab() {
+    return MainFab(
+      fabVisibleLocal: _fabVisibleInOverlay,
+      onPressed: () async {
+        await onMainFabPressedLogic(getIt<ProspectListViewModel>());
+      },
+    );
+  }
   @override
   void initState() {
     super.initState();
@@ -65,24 +88,42 @@ implements RouteAware {
 
   @override
   void didPushNext() {
+    // 화면 전환 시작
+    _isRouteTransitioning = true;
     _fabCanBeShown = false;
     _removeFabOverlay();
   }
 
   @override
   void didPopNext() {
+    // 화면 복귀 시작
+    _isRouteTransitioning = true;
     _removeFabOverlay();
-    _fabCanBeShown = true;
-    viewModel.fetchData(force: true);
-    _insertFabOverlayIfAllowed();
+
+    // 다음 프레임에 화면 전환 완료 처리
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _isRouteTransitioning = false;
+
+      if (!_isProcessActive) {
+        _fabCanBeShown = true;
+        _insertFabOverlayIfAllowed();
+      }
+
+      viewModel.fetchData(force: true);
+    });
   }
 
   void setFabCanBeShown(bool canShow) {
+    if (_fabCanBeShown == canShow) return;
+
     _fabCanBeShown = canShow;
-    if (!canShow) {
-      _removeFabOverlay();
-    } else {
+    callOverlaySetState();
+
+    if (_fabCanBeShown) {
       _insertFabOverlayIfAllowed();
+    } else {
+      _removeFabOverlay();
     }
   }
 
@@ -90,12 +131,13 @@ implements RouteAware {
     _isProcessActive = active;
     if (active) {
       _removeFabOverlay();
-    } else {
+    } else if (!_isRouteTransitioning) {
+      // 화면 전환 중 아닐 때만 삽입
       _insertFabOverlayIfAllowed();
     }
   }
 
-  void handleVisibilityChange(VisibilityInfo info) {
+    void handleVisibilityChange(VisibilityInfo info) {
     if (_isProcessActive) return;
     if (info.visibleFraction < 0.9) {
       setFabCanBeShown(false);
@@ -104,15 +146,37 @@ implements RouteAware {
     }
   }
 
-  void _insertFabOverlayIfAllowed() {
-    if (!_fabCanBeShown || _fabOverlayIsInserted || !mounted || _isProcessActive) {
-      return;
-    }
-    _insertFabOverlay();
+  Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
+    if (!mounted) return;
+
+    final isLimited = await FreeLimitDialog.checkAndShow(
+      context: context,
+      viewModel: viewModel,
+    );
+    if (isLimited) return;
+
+    setIsProcessActive(true);
+    setFabCanBeShown(false);
+
+    if (!context.mounted) return;
+
+    await showBottomSheetWithDraggable(
+      context: context,
+      builder: (scrollController) => SingleChildScrollView(
+        controller: scrollController,
+        child: RegistrationBottomSheet(scrollController: scrollController),
+      ),
+    );
+
+    setIsProcessActive(false);
+    await viewModel.fetchData(force: true);
+
+    setFabCanBeShown(true);
   }
 
-  void _insertFabOverlay() {
-    if (_fabOverlayIsInserted) return;
+  void _insertFabOverlayIfAllowed() {
+    if (!_fabCanBeShown || _fabOverlayIsInserted || !mounted || _isProcessActive || _isRouteTransitioning) return;
+
     _removeFabOverlay();
 
     _fabExpanded = false;
@@ -142,30 +206,23 @@ implements RouteAware {
                       AnimatedFabContainer(
                         fabVisibleLocal: _fabVisibleInOverlay,
                         rightPosition: 16,
-                        bottomPosition: 132,
+                        bottomPosition: smallFabBottomPosition,
                         child: SmallFab(
                           fabExpanded: _fabExpanded,
                           fabVisibleLocal: _fabVisibleInOverlay,
                           overlaySetState: (_) => _toggleFabExpanded(),
                           onSortByName: () => onSortActionLogic(viewModel.sortByName),
                           onSortByBirth: () => onSortActionLogic(viewModel.sortByBirth),
-                          onSortByInsuredDate: () =>
-                              onSortActionLogic(viewModel.sortByInsuranceAgeDate),
-                          onSortByManage: () =>
-                              onSortActionLogic(viewModel.sortByHistoryCount),
+                          onSortByInsuredDate: () => onSortActionLogic(viewModel.sortByInsuranceAgeDate),
+                          onSortByManage: () => onSortActionLogic(viewModel.sortByHistoryCount),
                           selectedSortStatus: viewModel.sortStatus,
                         ),
                       ),
                       AnimatedFabContainer(
                         fabVisibleLocal: _fabVisibleInOverlay,
                         rightPosition: 16,
-                        bottomPosition: 66,
-                        child: MainFab(
-                          fabVisibleLocal: _fabVisibleInOverlay,
-                          onPressed: () async {
-                            await onMainFabPressedLogic();
-                          },
-                        ),
+                        bottomPosition: FabPosition.secondFabBottomPosition,
+                        child: buildMainFab(),
                       ),
                     ],
                   ),
@@ -180,26 +237,25 @@ implements RouteAware {
       overlay.insert(_fabOverlayEntry!);
       _fabOverlayIsInserted = true;
 
-      Future.delayed(AppDurations.duration100, () {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown) return;
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown) return;
-          _overlaySetState?.call(() {
-            _fabVisibleInOverlay = true;
-            _fabExpanded = false;
-          });
+        _overlaySetState?.call(() {
+          _fabVisibleInOverlay = true;
+          _fabExpanded = false;
         });
       });
     });
   }
 
   void _removeFabOverlay() {
-    _fabOverlayEntry?.remove();
-    _fabOverlayEntry = null;
-    _fabOverlayIsInserted = false;
-    _fabExpanded = false;
-    _fabVisibleInOverlay = false;
-    _overlaySetState = null;
+    if (_fabOverlayEntry != null) {
+      _fabOverlayEntry!.remove();
+      _fabOverlayEntry = null;
+      _fabOverlayIsInserted = false;
+      _fabExpanded = false;
+      _fabVisibleInOverlay = false;
+      _overlaySetState = null;
+    }
   }
 
   void _toggleFabExpanded() {
@@ -210,7 +266,11 @@ implements RouteAware {
 }
 
 //
-// mixin FabOverlayManagerMixin<T extends StatefulWidget> on State<T>
+// mixin FabOverlayManagerMixin<
+//   T extends StatefulWidget,
+//   VM extends FabViewModelInterface
+// >
+//     on State<T>
 //     implements RouteAware {
 //   OverlayEntry? _fabOverlayEntry;
 //   bool _fabExpanded = false;
@@ -219,10 +279,10 @@ implements RouteAware {
 //   bool _fabCanBeShown = true;
 //   bool _isProcessActive = false;
 //   void Function(void Function())? _overlaySetState;
+//   double smallFabBottomPosition = FabPosition.firstFabBottomPosition;
 //
-//   ProspectListViewModel get viewModel;
+//   VM get viewModel;
 //
-//   Future<void> onMainFabPressedLogic();
 //   void onSortActionLogic(Function() sortFn);
 //
 //   void setOverlaySetState(void Function(void Function())? setter) {
@@ -237,7 +297,16 @@ implements RouteAware {
 //     _overlaySetState = null;
 //   }
 //
-//   // --- 믹스인 라이프사이클 메서드 ---
+//   @protected
+//   Widget buildMainFab() {
+//     return MainFab(
+//       fabVisibleLocal: _fabVisibleInOverlay,
+//       onPressed: () async {
+//         await onMainFabPressedLogic(getIt<ProspectListViewModel>());
+//       },
+//     );
+//   }
+//
 //   @override
 //   void initState() {
 //     super.initState();
@@ -254,7 +323,6 @@ implements RouteAware {
 //     super.dispose();
 //   }
 //
-//   // --- RouteAware 콜백 (믹스인에서 처리) ---
 //   @override
 //   void didPushNext() {
 //     _fabCanBeShown = false;
@@ -264,24 +332,28 @@ implements RouteAware {
 //   @override
 //   void didPopNext() {
 //     _removeFabOverlay();
-//     _fabCanBeShown = true;
+//
+//     if (!_isProcessActive) {
+//       _fabCanBeShown = true;
+//       _insertFabOverlayIfAllowed();
+//     }
+//
 //     viewModel.fetchData(force: true);
-//     _insertFabOverlayIfAllowed();
 //   }
 //
-//   // --- 메인 페이지에서 FAB를 제어하기 위한 공개 메서드 ---
-//
 //   void setFabCanBeShown(bool canShow) {
+//     if (_fabCanBeShown == canShow) return;
+//
 //     _fabCanBeShown = canShow;
-//     if (!canShow) {
-//       _removeFabOverlay();
-//     } else {
+//     callOverlaySetState();
+//
+//     if (_fabCanBeShown) {
 //       _insertFabOverlayIfAllowed();
+//     } else {
+//       _removeFabOverlay();
 //     }
 //   }
 //
-//   /// 모달 시트 표시와 같은 긴 작업이 진행 중임을 믹스인에 알립니다.
-//   /// 이 플래그가 [true]이면 FAB를 숨기고, [false]가 되면 다시 표시를 시도합니다.
 //   void setIsProcessActive(bool active) {
 //     _isProcessActive = active;
 //     if (active) {
@@ -291,11 +363,8 @@ implements RouteAware {
 //     }
 //   }
 //
-//   /// [VisibilityDetector]를 통해 위젯의 가시성 변경을 처리합니다.
-//   /// 페이지가 가려지면 FAB를 숨기고, 다시 보이면 표시합니다.
 //   void handleVisibilityChange(VisibilityInfo info) {
 //     if (_isProcessActive) return;
-//
 //     if (info.visibleFraction < 0.9) {
 //       setFabCanBeShown(false);
 //     } else {
@@ -303,29 +372,47 @@ implements RouteAware {
 //     }
 //   }
 //
-//   // --- FAB 오버레이 관리를 위한 내부 메서드 ---
+//   Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
+//     if (!mounted) return;
 //
-//   /// 모든 조건이 충족될 경우에만 FAB 오버레이 삽입을 시도합니다.
+//     final isLimited = await FreeLimitDialog.checkAndShow(
+//       context: context,
+//       viewModel: viewModel,
+//     );
+//     if (isLimited) return;
+//
+//     setIsProcessActive(true);
+//     setFabCanBeShown(false);
+//
+//     if (!context.mounted) return;
+//
+//     await showBottomSheetWithDraggable(
+//       context: context,
+//       builder:
+//           (scrollController) => SingleChildScrollView(
+//             controller: scrollController,
+//             child: RegistrationBottomSheet(scrollController: scrollController),
+//           ),
+//     );
+//
+//     setIsProcessActive(false);
+//     await viewModel.fetchData(force: true);
+//
+//     setFabCanBeShown(true);
+//   }
+//
 //   void _insertFabOverlayIfAllowed() {
 //     if (!_fabCanBeShown ||
 //         _fabOverlayIsInserted ||
 //         !mounted ||
-//         _isProcessActive) {
+//         _isProcessActive)
 //       return;
-//     }
-//     _insertFabOverlay();
-//   }
 //
-//   /// 실제로 FAB 오버레이를 [Navigator]의 오버레이에 삽입합니다.
-//   void _insertFabOverlay() {
-//     if (_fabOverlayIsInserted) return;
 //     _removeFabOverlay();
 //
-//     // 새로운 삽입을 위해 FAB의 내부 상태를 초기화합니다.
 //     _fabExpanded = false;
 //     _fabVisibleInOverlay = false;
 //
-//     // 위젯 트리가 완전히 빌드된 후 오버레이 작업을 수행하도록 스케줄링합니다.
 //     SchedulerBinding.instance.addPostFrameCallback((_) {
 //       if (!mounted) return;
 //       final overlay = Navigator.of(context).overlay;
@@ -350,12 +437,11 @@ implements RouteAware {
 //                       AnimatedFabContainer(
 //                         fabVisibleLocal: _fabVisibleInOverlay,
 //                         rightPosition: 16,
-//                         bottomPosition: 132,
+//                         bottomPosition: smallFabBottomPosition,
 //                         child: SmallFab(
 //                           fabExpanded: _fabExpanded,
 //                           fabVisibleLocal: _fabVisibleInOverlay,
 //                           overlaySetState: (_) => _toggleFabExpanded(),
-//                           // overlaySetStateFold: (_) => _toggleFabExpanded(),
 //                           onSortByName:
 //                               () => onSortActionLogic(viewModel.sortByName),
 //                           onSortByBirth:
@@ -371,18 +457,11 @@ implements RouteAware {
 //                           selectedSortStatus: viewModel.sortStatus,
 //                         ),
 //                       ),
-//                       // MainFab (새 고객 추가)
 //                       AnimatedFabContainer(
 //                         fabVisibleLocal: _fabVisibleInOverlay,
 //                         rightPosition: 16,
-//                         bottomPosition: 66,
-//                         child: MainFab(
-//                           fabVisibleLocal: _fabVisibleInOverlay,
-//
-//                           onPressed: () async {
-//                             await onMainFabPressedLogic();
-//                           },
-//                         ),
+//                         bottomPosition: FabPosition.secondFabBottomPosition,
+//                         child: buildMainFab(),
 //                       ),
 //                     ],
 //                   ),
@@ -397,33 +476,29 @@ implements RouteAware {
 //       overlay.insert(_fabOverlayEntry!);
 //       _fabOverlayIsInserted = true;
 //
-//       // FAB가 화면에 부드럽게 나타나도록 애니메이션 지연을 줍니다.
-//       Future.delayed(AppDurations.duration100, () {
+//       // 즉시 상태 업데이트 (딜레이 제거)
+//       SchedulerBinding.instance.addPostFrameCallback((_) {
 //         if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown)
-//           return; // 유효성 재검사
-//         SchedulerBinding.instance.addPostFrameCallback((_) {
-//           if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown)
-//             return; // 유효성 재검사
-//           _overlaySetState?.call(() {
-//             _fabVisibleInOverlay = true;
-//             _fabExpanded = false;
-//           });
+//           return;
+//         _overlaySetState?.call(() {
+//           _fabVisibleInOverlay = true;
+//           _fabExpanded = false;
 //         });
 //       });
 //     });
 //   }
 //
-//   /// FAB 오버레이를 화면에서 제거합니다.
 //   void _removeFabOverlay() {
-//     _fabOverlayEntry?.remove();
-//     _fabOverlayEntry = null;
-//     _fabOverlayIsInserted = false;
-//     _fabExpanded = false;
-//     _fabVisibleInOverlay = false;
-//     _overlaySetState = null;
+//     if (_fabOverlayEntry != null) {
+//       _fabOverlayEntry!.remove();
+//       _fabOverlayEntry = null;
+//       _fabOverlayIsInserted = false;
+//       _fabExpanded = false;
+//       _fabVisibleInOverlay = false;
+//       _overlaySetState = null;
+//     }
 //   }
 //
-//   /// 서브 FAB의 확장/축소 상태를 토글합니다.
 //   void _toggleFabExpanded() {
 //     _overlaySetState?.call(() {
 //       _fabExpanded = !_fabExpanded;

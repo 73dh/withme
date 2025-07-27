@@ -23,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index % 4;
-
     });
   }
 
@@ -34,8 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
       curve: Curves.easeIn,
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -53,24 +50,42 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
 
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-        selectedFontSize: 0,
-        unselectedFontSize: 0,
-        items:
-            HomeMenu.values.map((menu) {
-              return BottomNavigationBarItem(
-                icon: Image.asset(
-                  menu.iconPath,
-                  width: AppSizes.bottomNavIconSize,
-                  height: AppSizes.bottomNavIconSize,
-                  color:
-                      menu.index == _currentIndex ? Colors.black87 : Colors.grey,
-                ),
-                label: '',
-              );
-            }).toList(),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+          ),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onItemTapped,
+            selectedFontSize: 0,
+            unselectedFontSize: 0,
+            items:
+                HomeMenu.values.map((menu) {
+                  return BottomNavigationBarItem(
+                    icon: Image.asset(
+                      menu.iconPath,
+                      width: AppSizes.bottomNavIconSize,
+                      height: AppSizes.bottomNavIconSize,
+                      color:
+                          menu.index == _currentIndex
+                              ? Colors.black87
+                              : Colors.grey,
+                    ),
+                    label: '',
+                  );
+                }).toList(),
+          ),
+        ),
       ),
     );
   }

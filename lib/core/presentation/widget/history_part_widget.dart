@@ -33,9 +33,6 @@ class HistoryPartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (histories.isEmpty) return const SizedBox.shrink();
-    // 최신 이력이 아래로 오도록 정렬
-    // final sortedHistories = [...histories]
-    //   ..sort((a, b) => a.contactDate.compareTo(b.contactDate));
     final result = showHistoryUtil(histories);
     final recent = result.recent;
     final previous = result.previous;
@@ -93,8 +90,8 @@ class HistoryPartWidget extends StatelessWidget {
     final Color dotColor =
         isRecent
             ? switch (sex) {
-              '남' => Colors.blueAccent,
-              _ => Colors.redAccent,
+              '남' => ColorStyles.manColor,
+              _ => ColorStyles.womanColor,
             }
             : Colors.grey;
 

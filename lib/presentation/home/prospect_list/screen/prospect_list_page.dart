@@ -1,13 +1,16 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
 import 'package:withme/domain/domain_import.dart';
-import 'package:withme/presentation/home/prospect_list/components/fab_oevelay_manager_mixin.dart';
-import 'package:withme/presentation/home/prospect_list/components/inactive_and_urgent_filter_bar.dart';
+import 'package:withme/core/presentation/fab/fab_oevelay_manager_mixin.dart';
+import 'package:withme/core/presentation/widget/inactive_and_urgent_filter_bar.dart';
+import 'package:withme/presentation/home/home_grand_import.dart';
+import 'package:withme/presentation/home/prospect_list/components/prospect_list_app_bar.dart';
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
@@ -23,27 +26,66 @@ class ProspectListPage extends StatefulWidget {
 }
 
 class _ProspectListPageState extends State<ProspectListPage>
-    with RouteAware, FabOverlayManagerMixin<ProspectListPage> {
+    with
+        RouteAware,
+        FabOverlayManagerMixin<ProspectListPage, ProspectListViewModel> {
   final RouteObserver<PageRoute> _routeObserver =
       getIt<RouteObserver<PageRoute>>();
+
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
-  final String _searchText = '';
-  bool _showInactiveOnly = false; // 관리일 경과 필터
-  bool _showUrgentOnly = false; // 상령일 필터
-
+  bool _showInactiveOnly = false;
+  bool _showUrgentOnly = false;
+  bool? _lastIsSuccess;
+  bool _hasCheckedAgreement = false; // ✅ 여기에 추가
 
   @override
   void initState() {
     super.initState();
+
     viewModel.fetchData(force: true);
+    _initPopup();
+  }
+
+  void _initPopup() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_hasCheckedAgreement) return;
+      _hasCheckedAgreement = true;
+
+      final userSession = getIt<UserSession>();
+      await userSession.loadAgreementCheckFromPrefs();
+
+      // SharedPreferences에서 3가지 값 로드 (UserSession 내부 메서드가 이미 구현되어 있으니 바로 getter 사용)
+      final managePeriod = userSession.managePeriodDays;
+      final urgentThreshold = userSession.urgentThresholdDays;
+      final targetCount = userSession.targetProspectCount;
+
+      if (userSession.isFirstLogin && mounted) {
+        await showConfirmDialog(
+          context,
+          text:
+              '현재 설정\n\n'
+              '고객 관리주기: $managePeriod일\n'
+              '상령일 알림: $urgentThreshold일\n'
+              '목표 고객수: $targetCount명\n\n'
+              '설정⚙️ 에서 수정 가능합니다.',
+          onConfirm: () async {
+            await userSession.markAgreementSeen();
+            if (mounted) {
+              Navigator.of(context).maybePop();
+            }
+          },
+          cancelButtonText: '',
+        );
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final ModalRoute? modalRoute = ModalRoute.of(context);
+    final modalRoute = ModalRoute.of(context);
     if (modalRoute is PageRoute) {
       _routeObserver.subscribe(this, modalRoute);
     }
@@ -53,74 +95,6 @@ class _ProspectListPageState extends State<ProspectListPage>
   void dispose() {
     _routeObserver.unsubscribe(this);
     super.dispose();
-  }
-
-  List<CustomerModel> _applyFilterAndSort(List<CustomerModel> customers) {
-    var filtered = customers.where((e) => e.policies.isEmpty).toList();
-
-    if (_searchText.isNotEmpty) {
-      filtered = filtered.where((e) => e.name.contains(_searchText)).toList();
-    }
-
-    if (_showInactiveOnly) {
-      final today = DateTime.now();
-      final managePeriodDays = getIt<UserSession>().managePeriodDays;
-
-      filtered =
-          filtered.where((e) {
-            final latestHistoryDate = e.histories
-                .map((h) => h.contactDate)
-                .fold<DateTime?>(null, (prev, date) {
-                  if (prev == null) return date;
-                  return date.isAfter(prev) ? date : prev;
-                });
-
-            if (latestHistoryDate == null) return true;
-            return latestHistoryDate
-                .add(Duration(days: managePeriodDays))
-                .isBefore(today);
-          }).toList();
-    }
-
-    return ApplyCurrentSortUseCase(
-      isAscending: viewModel.sortStatus.isAscending,
-      currentSortType: viewModel.sortStatus.type,
-    ).call(filtered);
-  }
-
-  @override
-  Future<void> onMainFabPressedLogic() async {
-    if (!mounted) return;
-
-    final isLimited = await FreeLimitDialog.checkAndShow(
-      context: context,
-      viewModel: viewModel,
-    );
-    if (isLimited) return;
-
-    setIsProcessActive(true);
-
-    if (!context.mounted) return;
-
-    final safeContext = context;
-    final result = await showBottomSheetWithDraggable(
-      context: safeContext,
-      builder:
-          (scrollController) => SingleChildScrollView(
-            controller: scrollController,
-            child: RegistrationBottomSheet(scrollController: scrollController),
-          ),
-    ).then((_) {
-      setFabCanBeShown(true);
-    });
-
-    setIsProcessActive(false);
-
-    if (!mounted) return;
-
-    if (result == true) {
-      await viewModel.fetchData(force: true);
-    }
   }
 
   @override
@@ -141,25 +115,16 @@ class _ProspectListPageState extends State<ProspectListPage>
             return StreamBuilder<List<CustomerModel>>(
               stream: viewModel.cachedProspects,
               builder: (context, snapshot) {
-                final data = snapshot.data ?? [];
-                final filteredProspects = _applyFilterAndSort(data);
-
-                if (snapshot.hasError) {
-                  log('StreamBuilder error: ${snapshot.error}');
-                }
+                final filteredList = snapshot.data ?? [];
 
                 return Scaffold(
+                  resizeToAvoidBottomInset: true,
                   backgroundColor: Colors.transparent,
-                  appBar: AppBar(
-                    title: Text('Prospect ${filteredProspects.length}명'),
-                    actions: [
-                      AppBarSearchWidget(
-                        onSubmitted: (text) {
-                          viewModel.updateFilter(searchText: text);
-                        },
-                      ),
-                    ],
+                  appBar: ProspectListAppBar(
+                    viewModel: viewModel,
+                    customers: filteredList,
                   ),
+
                   body: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -168,27 +133,23 @@ class _ProspectListPageState extends State<ProspectListPage>
                         showUrgentOnly: _showUrgentOnly,
                         onInactiveToggle: (val) {
                           setState(() => _showInactiveOnly = val);
-                          getIt<ProspectListViewModel>().updateFilter(
-                            inactiveOnly: val,
-                          );
+                          viewModel.updateFilter(inactiveOnly: val);
                         },
                         onUrgentToggle: (val) {
                           setState(() => _showUrgentOnly = val);
-                          getIt<ProspectListViewModel>().updateFilter(
-                            urgentOnly: val,
-                          );
+                          viewModel.updateFilter(urgentOnly: val);
                         },
+                        inactiveCount: viewModel.inactiveCount,
+                        urgentCount: viewModel.urgentCount,
                       ),
-
-                      const SizedBox(height: 5),
-
-                      // ▶ 리스트 뷰
+                     height(5),
                       Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          itemCount: filteredProspects.length,
+                          itemCount: filteredList.length,
                           itemBuilder: (context, index) {
-                            final customer = filteredProspects[index];
+                            final customer = filteredList[index];
+
                             return Padding(
                               padding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
@@ -196,23 +157,23 @@ class _ProspectListPageState extends State<ProspectListPage>
                               child: GestureDetector(
                                 onTap: () async {
                                   setFabCanBeShown(false);
+                                  _lastIsSuccess = null;
 
-                                 await showBottomSheetWithDraggable(
-                                    context: context,
-                                    child: RegistrationBottomSheet(
-                                      customerModel: customer,
-                                      outerContext: context,
-                                      isSuccess: (bool result) {
-                                        print('등록 결과: $result');
-                                        // 성공 여부에 따라 추가 처리 가능
-                                      },
-                                    ),
-                                  ).then((_) {
+                                  final result =
+                                      await showBottomSheetWithDraggable(
+                                        context: context,
+                                        child: RegistrationBottomSheet(
+                                          customerModel: customer,
+                                          outerContext: context,
+                                        ),
+                                      );
 
-                                    // ✅ RegistrationBottomSheet 완전히 닫힌 뒤 FAB 복원
+                                  if (_lastIsSuccess == null &&
+                                      result == null) {
+                                    _lastIsSuccess = true;
                                     setFabCanBeShown(true);
-                                  });
-                                  if (!mounted) return;
+                                  }
+
                                   await viewModel.fetchData(force: true);
                                 },
                                 child: ProspectItem(
@@ -226,9 +187,7 @@ class _ProspectListPageState extends State<ProspectListPage>
                                       customer,
                                       HistoryContent.title.toString(),
                                     );
-
-                                    if (!mounted) return;
-                                    setFabCanBeShown(true);
+                                    if (mounted) setFabCanBeShown(true);
                                   },
                                 ),
                               ),

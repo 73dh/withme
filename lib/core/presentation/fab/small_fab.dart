@@ -1,10 +1,10 @@
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../core/domain/sort_status.dart';
+import '../core_presentation_import.dart';
+import '../../ui/core_ui_import.dart';
+import '../../domain/sort_status.dart';
 
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../core/domain/sort_status.dart';
+import '../core_presentation_import.dart';
+import '../../ui/core_ui_import.dart';
+import '../../domain/sort_status.dart';
 import 'package:flutter/material.dart'; // 필수 import 확인
 
 import 'package:flutter/material.dart';

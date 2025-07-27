@@ -20,11 +20,12 @@ import 'package:withme/core/presentation/core_presentation_import.dart';
 
 Future<void> showCycleEditDialog(
   BuildContext context, {
-  required int currentCycle, // 현재 주기를 인자로 받도록 변경
+  required String title,
+  required int initNumber, // 현재 주기를 인자로 받도록 변경
   required ValueChanged<int> onUpdate, // 업데이트 콜백 추가
 }) async {
   final controller = TextEditingController(
-    text: currentCycle.toString(), // 현재 주기를 초기값으로 설정
+    text: initNumber.toString(), // 현재 주기를 초기값으로 설정
   );
 
   await showDialog(
@@ -59,9 +60,8 @@ Future<void> showCycleEditDialog(
                         // 제목과 내용을 세로로 배치하기 위한 Column
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            // 제목은 고정 텍스트
-                            '가망고객 관리주기 설정',
+                          Text(
+                            title,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -73,8 +73,8 @@ Future<void> showCycleEditDialog(
                             controller: controller,
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
-                              labelText: '일 수 (예: 60)',
-                              hintText: '1일 이상의 숫자를 입력하세요',
+                              labelText: '(예: 60)',
+                              hintText: '1 이상의 숫자를 입력하세요',
                               // 힌트 텍스트 추가
                               border: OutlineInputBorder(),
                               isDense: true,
@@ -120,13 +120,12 @@ Future<void> showCycleEditDialog(
 
                               if (dialogContext.mounted) {
                                 Navigator.of(dialogContext).pop(); // 다이얼로그 닫기
-                                showOverlaySnackBar(context, '관리주기가 저장되었습니다.');
+                                showOverlaySnackBar(context, '설정이 저장되었습니다.');
                               }
                             } else {
-                              // 입력이 유효하지 않을 경우 다이얼로그를 닫지 않고 경고만 표시
                               showOverlaySnackBar(
                                 context,
-                                '올바른 숫자를 입력해주세요 (1일 이상).',
+                                '올바른 숫자를 입력해주세요 (1 이상).',
                               );
                             }
                           },

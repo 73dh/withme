@@ -15,6 +15,7 @@ import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 
 import '../../ui/color/color_style.dart';
+import '../../utils/show_history_util.dart';
 import '../core_presentation_import.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../../utils/calculate_age.dart';
@@ -53,6 +54,7 @@ class CustomerItem extends StatelessWidget {
         }
 
         List<PolicyModel> policies = snapshot.data!;
+        final showReminder = showHistoryUtil(customer.histories).showReminder;
         return ItemContainer(
           backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
           child: Stack(
@@ -80,11 +82,11 @@ class CustomerItem extends StatelessWidget {
                   const Spacer(),
                 ],
               ),
-              if (isNeedNewHistory(customer.histories))
+              if (showReminder)
                 Positioned(
                   top: 0,
                   right: 0,
-                  child: BlinkingCursorIcon(sex: customer.sex, size: 30),
+                  child: BlinkingCursorIcon(sex: customer.sex, size: 25),
                 ),
             ],
           ),
@@ -155,7 +157,6 @@ class CustomerItem extends StatelessWidget {
                 width(5),
                 Text(e.productCategory),
                 width(5),
-
                 Text(
                   premiumText,
                   style: TextStyle(
@@ -174,3 +175,151 @@ class CustomerItem extends StatelessWidget {
     );
   }
 }
+
+// class CustomerItem extends StatelessWidget {
+//   final CustomerModel customer;
+//
+//   const CustomerItem({super.key, required this.customer});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final viewModel = getIt<CustomerListViewModel>();
+//     final birthDate = customer.birth;
+//
+//     final info = customer.insuranceInfo;
+//     final difference = info.difference;
+//     final isUrgent = info.isUrgent;
+//     final insuranceChangeDate = info.insuranceChangeDate;
+//
+//     return StreamBuilder(
+//       stream: viewModel.getPolicies(customerKey: customer.customerKey),
+//       builder: (context, snapshot) {
+//         if (snapshot.hasError) {
+//           log(snapshot.error.toString());
+//         }
+//         if (!snapshot.hasData) {
+//           return const SizedBox.shrink();
+//         }
+//
+//         List<PolicyModel> policies = snapshot.data!;
+//         return ItemContainer(
+//           backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
+//           child: Stack(
+//             children: [
+//               Row(
+//                 children: [
+//                   ItemIcon(
+//                     number: policies.length,
+//                     sex: customer.sex,
+//                     backgroundImagePath: IconsPath.folderIcon,
+//                   ),
+//                   width(20),
+//                   Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       _namePart(
+//                         birthDate,
+//                         difference,
+//                         isUrgent,
+//                         insuranceChangeDate,
+//                       ),
+//                       _policyPart(policies),
+//                     ],
+//                   ),
+//                   const Spacer(),
+//                 ],
+//               ),
+//               if (isNeedNewHistory(customer.histories))
+//                 Positioned(
+//                   top: 0,
+//                   right: 0,
+//                   child: BlinkingCursorIcon(sex: customer.sex, size: 30),
+//                 ),
+//             ],
+//           ),
+//         );
+//       },
+//     );
+//   }
+//
+//   Widget _namePart(
+//     DateTime? birthDate,
+//     int? difference,
+//     bool isUrgent,
+//     DateTime? insuranceChangeDate,
+//   ) {
+//     if (birthDate == null) {
+//       return Row(
+//         children: [
+//           Text(
+//             shortenedNameText(customer.name, length: 6),
+//             style: TextStyles.bold14,
+//           ),
+//           width(5),
+//           const Text('정보 없음'),
+//           width(3),
+//           Text(customer.recommended.isNotEmpty ? customer.recommended : ''),
+//         ],
+//       );
+//     }
+//
+//     return Row(
+//       children: [
+//         Text(
+//           shortenedNameText(customer.name, length: 6),
+//           style: TextStyles.bold14,
+//         ),
+//         width(5),
+//         Text('${calculateAge(birthDate)}세/'),
+//         width(3),
+//         if (difference != null &&
+//             difference >= 0 &&
+//             insuranceChangeDate != null)
+//           InsuranceAgeWidget(
+//             difference: difference,
+//             isUrgent: isUrgent,
+//             insuranceChangeDate: insuranceChangeDate,
+//           ),
+//         if (difference == null || difference < 0) const SizedBox.shrink(),
+//         Text(customer.recommended.isNotEmpty ? customer.recommended : ''),
+//       ],
+//     );
+//   }
+//
+//   Widget _policyPart(List<PolicyModel> policies) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children:
+//           policies.map((e) {
+//             final isCancelled =
+//                 e.policyState == PolicyState.cancelled.label ||
+//                 e.policyState == PolicyState.lapsed.label;
+//
+//             final premiumText = numFormatter.format(
+//               int.tryParse(e.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
+//             );
+//             return Row(
+//               children: [
+//                 Text(e.startDate?.formattedDate ?? ''),
+//                 width(5),
+//                 Text(e.productCategory),
+//                 width(5),
+//
+//                 Text(
+//                   premiumText,
+//                   style: TextStyle(
+//                     color: isCancelled ? Colors.red : null,
+//                     fontWeight: isCancelled ? FontWeight.bold : null,
+//                     decoration: isCancelled ? TextDecoration.lineThrough : null,
+//                     decorationColor: isCancelled ? Colors.red : null,
+//                     decorationThickness: isCancelled ? 2 : null,
+//                   ),
+//                 ),
+//                 width(5),
+//                 Text(' (${e.paymentMethod})', overflow: TextOverflow.ellipsis),
+//               ],
+//             );
+//           }).toList(),
+//     );
+//   }
+// }

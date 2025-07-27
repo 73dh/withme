@@ -1,5 +1,5 @@
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
+import '../core_presentation_import.dart';
+import '../../ui/core_ui_import.dart';
 
 class AnimatedFabContainer extends StatefulWidget {
   final bool fabVisibleLocal;

@@ -70,6 +70,8 @@ class DashBoardSideMenu extends StatelessWidget {
                                 getIt<UserSession>().managePeriodDays;
                             final urgentThresholdDays =
                                 getIt<UserSession>().urgentThresholdDays;
+                            final targetProspectCount =
+                                getIt<UserSession>().targetProspectCount;
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -141,12 +143,13 @@ class DashBoardSideMenu extends StatelessWidget {
                                 ),
                                 height(15),
                                 BuildMenuItem(
-                                  icon: Icons.person,
+                                  icon: Icons.add_call,
                                   text: '고객 관리 주기: $managePeriodDays일',
                                   onTap:
                                       () => showCycleEditDialog(
                                         context,
-                                        currentCycle: managePeriodDays,
+                                        title: '고객 관리 주기',
+                                        initNumber: managePeriodDays,
                                         onUpdate: (newDays) {
                                           getIt<UserSession>()
                                               .updateManagePeriod(newDays);
@@ -160,10 +163,26 @@ class DashBoardSideMenu extends StatelessWidget {
                                   onTap:
                                       () => showCycleEditDialog(
                                     context,
-                                    currentCycle: managePeriodDays,
+                                    title:'상령일 알림 기준일' ,
+                                    initNumber: urgentThresholdDays,
                                     onUpdate: (newDays) {
                                       getIt<UserSession>()
                                           .updateUrgentThresholdDays(newDays);
+                                    },
+                                  ),
+                                ),
+                                height(15),
+                                BuildMenuItem(
+                                  icon: Icons.person,
+                                  text: '가망고객 목표: $targetProspectCount명',
+                                  onTap:
+                                      () => showCycleEditDialog(
+                                    context,
+                                    title: '가망고객 목표',
+                                    initNumber: targetProspectCount,
+                                    onUpdate: (newCount) {
+                                      getIt<UserSession>()
+                                          .updateTargetProspectCount(newCount);
                                     },
                                   ),
                                 ),
@@ -223,7 +242,6 @@ class DashBoardSideMenu extends StatelessWidget {
         Text(status.toString()),
         if (status != MembershipStatus.free) ...[
           width(8),
-          // currentUser가 null이 아님을 확인했으므로 ! 사용 가능
           currentUser!.isMembershipValid
               ? Text(
                 '(만료일: ${currentUser!.membershipExpiresAt?.formattedDate ?? '-'})',

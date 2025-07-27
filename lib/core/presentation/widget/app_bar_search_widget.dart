@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/ui/const/duration.dart';
 
+
+
 class AppBarSearchWidget extends StatefulWidget {
   final void Function(String) onSubmitted;
 
@@ -19,13 +21,13 @@ class _AppBarSearchWidgetState extends State<AppBarSearchWidget> {
     return Row(
       children: [
         if (_isSearching)
-          SizedBox(
-            width: 120,
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 100),
             child: TextField(
               controller: _searchController,
               autofocus: true,
               decoration: const InputDecoration(
-                hintText: '이름입력',
+                hintText: '이름',
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 10),

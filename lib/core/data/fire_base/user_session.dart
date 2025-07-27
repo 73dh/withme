@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:withme/core/ui/const/shared_pref_value.dart';
 
 import '../../../domain/model/user_model.dart';
 
@@ -16,92 +17,93 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../domain/model/user_model.dart'; // UserModel 경로 확인 필요
 
+// core/data/fire_base/user_session.dart
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../domain/model/user_model.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../domain/model/user_model.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../domain/model/user_model.dart';
+
 class UserSession extends ChangeNotifier {
-  // 싱글톤 인스턴스: 앱 전체에서 단 하나의 UserSession 인스턴스만 존재합니다.
+  // 싱글톤 인스턴스
   static final UserSession _instance = UserSession._internal();
 
-  factory UserSession() {
-    return _instance;
-  }
+  factory UserSession() => _instance;
 
-  // 내부 생성자: _init 메서드를 호출하여 초기 설정을 수행합니다.
   UserSession._internal() {
     _init();
   }
 
-  // 초기화 메서드: SharedPreferences에서 관리 주기를 로드합니다.
+  // SharedPreferences 키 상수
+  static const String _agreementSeenKey = 'hasAgreed'; //최초 동의여부
+  static const String _managePeriodKey = 'managePeriodDays'; // 관리주기
+  static const String _urgentThresholdKey = 'urgentThresholdDays'; //상령일
+  static const String _targetProspectCountKey = 'targetProspectCount'; // 목표고객수
+
+  /// 초기화 메서드
   Future<void> _init() async {
     await loadManagePeriodFromPrefs();
-    await loadUrgentThresholdFromPrefs(); // 추가
+    await loadUrgentThresholdFromPrefs();
+    await loadAgreementCheckFromPrefs();
+    await loadTargetProspectCountFromPrefs();
   }
 
-  /// Firebase 현재 로그인된 사용자의 UID를 반환합니다.
-  /// 사용자가 로그인되어 있지 않으면 빈 문자열을 반환합니다.
+  // 현재 Firebase 로그인 유저 UID
   static String get userId => FirebaseAuth.instance.currentUser?.uid ?? '';
 
-  /// 현재 로그인된 사용자 모델을 저장하는 내부 변수입니다.
+  // 현재 로그인된 사용자 모델
   static UserModel? _currentUser;
 
-  /// [currentUser] 게터: 현재 로그인된 [UserModel]을 반환합니다.
   UserModel? get currentUser => _currentUser;
 
-  /// 가망 고객 관리 주기 (일 단위). SharedPreferences에서 관리됩니다.
-  /// 기본값은 60일입니다.
-  int _managePeriodDays = 60;
-
-  /// [managePeriodDays] 게터: 현재 설정된 관리 주기를 반환합니다.
-  int get managePeriodDays => _managePeriodDays;
-
-  /// 사용자 모델을 설정합니다.
-  /// 이 메서드는 사용자가 로그인하거나, 앱 시작 시 사용자 세션을 복원할 때 호출됩니다.
   Future<void> setUserModel(UserModel user) async {
     _currentUser = user;
-    // 사용자 모델이 설정될 때 관리 주기를 다시 로드하여 최신 상태를 유지할 수 있습니다.
-    // 하지만 _init에서 이미 로드하고 있으므로, 여기서는 필수는 아닐 수 있습니다.
-    // await loadManagePeriodFromPrefs(); // 필요에 따라 주석 해제
-    notifyListeners(); // currentUser가 변경되었음을 알립니다.
+    notifyListeners();
   }
 
-  /// 가망 고객 관리 주기를 [days] 값으로 업데이트하고,
-  /// SharedPreferences에 저장하며, UI에 변경을 알립니다.
-  void updateManagePeriod(int days) {
-    _managePeriodDays = days; // 내부 상태 업데이트
-    _saveManagePeriodToPrefs(days); // SharedPreferences에 저장
+  // 가망고객 관리 주기 (일)
+  int _managePeriodDays = SharedPrefValue.managePeriodDays;
 
+  int get managePeriodDays => _managePeriodDays;
 
-    notifyListeners(); // 이 클래스를 구독하는 모든 리스너에게 변경 사항을 알립니다.
-  }
-
-  /// SharedPreferences에서 가망 고객 관리 주기를 로드합니다.
-  /// 로드된 값은 [_managePeriodDays]에 저장되고 UI에 반영됩니다.
-  Future<void> loadManagePeriodFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    // 저장된 값이 없으면 기본값인 60일을 사용합니다.
-    _managePeriodDays = prefs.getInt('managePeriodDays') ?? 60;
-    notifyListeners(); // 관리 주기가 로드되었음을 알립니다.
-  }
-
-  /// 현재 [days] 값을 SharedPreferences에 저장합니다.
-  /// 이 메서드는 [updateManagePeriod] 내부에서 호출됩니다.
-  Future<void> _saveManagePeriodToPrefs(int days) async {
-    debugPrint('SharedPreferences: Saving managePeriodDays = $days');
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('managePeriodDays', days);
-  }
-
-  /// 사용자 세션 정보를 모두 초기화합니다.
-  /// (예: 로그아웃 시 호출)
-  void clear() {
-    _currentUser = null; // 사용자 모델 초기화
-    // SharedPreferences에 저장된 관리 주기 값은 유지됩니다.
-    // 만약 이 값도 제거하고 싶다면 아래 라인을 추가하세요:
-    // SharedPreferences.getInstance().then((prefs) => prefs.remove('managePeriodDays'));
-    notifyListeners(); // 모든 리스너에게 상태 초기화를 알립니다.
-  }
-
-  int _urgentThresholdDays = 90;
+  // 상령일 도래일
+  int _urgentThresholdDays = SharedPrefValue.urgentThresholdDays;
 
   int get urgentThresholdDays => _urgentThresholdDays;
+
+  // 목표고객수
+  int _targetProspectCount = SharedPrefValue.targetProspectCount;
+
+  int get targetProspectCount => _targetProspectCount;
+
+  // 관리주기
+  void updateManagePeriod(int days) {
+    _managePeriodDays = days;
+    _saveManagePeriodToPrefs(days);
+    notifyListeners();
+  }
+
+  Future<void> _saveManagePeriodToPrefs(int days) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_managePeriodKey, days);
+  }
+
+  Future<void> loadManagePeriodFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _managePeriodDays =
+        prefs.getInt(_managePeriodKey) ?? SharedPrefValue.managePeriodDays;
+    notifyListeners();
+  }
 
   void updateUrgentThresholdDays(int days) {
     _urgentThresholdDays = days;
@@ -111,13 +113,74 @@ class UserSession extends ChangeNotifier {
 
   Future<void> _saveUrgentThresholdToPrefs(int days) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('urgentThresholdDays', days);
+    await prefs.setInt(_urgentThresholdKey, days);
   }
 
   Future<void> loadUrgentThresholdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    _urgentThresholdDays = prefs.getInt('urgentThresholdDays') ?? 90;
+    _urgentThresholdDays =
+        prefs.getInt(_urgentThresholdKey) ??
+        SharedPrefValue.urgentThresholdDays;
     notifyListeners();
   }
-}
 
+  // 목표고객수 관리
+  void updateTargetProspectCount(int count) {
+    _targetProspectCount = count;
+    _saveTargetProspectCountToPrefs(count);
+    notifyListeners();
+  }
+
+  Future<void> _saveTargetProspectCountToPrefs(int count) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_targetProspectCountKey, count);
+  }
+
+  Future<void> loadTargetProspectCountFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _targetProspectCount =
+        prefs.getInt(_targetProspectCountKey) ??
+        SharedPrefValue.targetProspectCount;
+    notifyListeners();
+  }
+
+  // 동의 여부 관련
+  bool _hasAgreed = false;
+
+  bool get hasAgreed => _hasAgreed;
+
+  // 최초 로그인 판단 변수
+  bool _isFirstLogin = false;
+
+  bool get isFirstLogin => _isFirstLogin;
+
+  /// 최초 로그인인지 SharedPreferences에서 확인
+  Future<void> loadAgreementCheckFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _hasAgreed = prefs.getBool(_agreementSeenKey) ?? false;
+    _isFirstLogin = !_hasAgreed;
+    notifyListeners();
+  }
+
+  /// 동의 완료 시 SharedPreferences에 저장
+  Future<void> markAgreementSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_agreementSeenKey, true);
+    _hasAgreed = true;
+    _isFirstLogin = false;
+    notifyListeners();
+  }
+
+  // 로그아웃 등 세션 초기화
+  void clear() {
+    _currentUser = null;
+    _hasAgreed = false;
+    _isFirstLogin = false;
+    notifyListeners();
+  }
+
+  Future<void> clearAgreement() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_agreementSeenKey);
+  }
+}

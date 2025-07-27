@@ -11,7 +11,7 @@ import '../../../core/ui/text_style/text_styles.dart';
 
 class PolicyConfirmBox extends StatelessWidget {
   final Map<String, dynamic> policyMap;
-  final void Function(bool) onChecked;
+  final void Function() onChecked;
 
   const PolicyConfirmBox({
     super.key,
@@ -27,9 +27,7 @@ class PolicyConfirmBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final policyHolderName = policyMap[keyPolicyHolder];
     final policyHolderSex = policyMap[keyPolicyHolderSex];
-    final policyHolderBirth = _toDateFormatted(
-      policyMap[keyPolicyHolderBirth],
-    );
+    final policyHolderBirth = _toDateFormatted(policyMap[keyPolicyHolderBirth]);
     final String insuredName = policyMap[keyInsured];
     final String insuredSex = policyMap[keyInsuredSex];
     final String insuredBirth = _toDateFormatted(policyMap[keyInsuredBirth]);
@@ -65,22 +63,22 @@ class PolicyConfirmBox extends StatelessWidget {
                 text: '상품종류: ',
                 text2: '$productCategory ($insuranceCompany)',
               ),
-              ConfirmBoxText(text: '상품명: ', text2: '$productName'),
+              ConfirmBoxText(text: '상품명: ', text2: productName),
               ConfirmBoxText(
                 text: '보험료: ',
                 text2: '$premiumController원 ($paymentMethod)',
               ),
               Row(
                 children: [
-                  ConfirmBoxText(text: '계약일: ', text2: '$startDate'),
+                  ConfirmBoxText(text: '계약일: ', text2: startDate),
                   width(10),
-                  ConfirmBoxText(text: '만기일: ', text2: '$endDate'),
+                  ConfirmBoxText(text: '만기일: ', text2: endDate),
                 ],
               ),
               height(20),
               RenderFilledButton(
                 onPressed: () {
-                  onChecked(true);
+                  onChecked();
                   context.pop();
                   context.pop();
                 },

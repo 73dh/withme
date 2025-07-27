@@ -5,7 +5,9 @@ import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/ui/const/info_text.dart';
 import 'package:withme/core/ui/text_style/text_styles.dart';
 
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../core/router/router_import.dart';
 import '../../../domain/domain_import.dart';
 
@@ -69,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
         debugPrint('로그인 성공, uid: ${user.uid}');
         authChangeNotifier.setLoggedIn(true); // 로그인 상태 갱신
         if (!mounted) return;
+
         context.go(RoutePath.splash);
       } else {
         _showErrorMessage('이메일 인증을 완료해주세요.');
@@ -143,7 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                // height(30),
                 Row(
                   children: [
                     const Spacer(),

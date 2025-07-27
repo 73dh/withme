@@ -19,24 +19,28 @@ Future<bool?> showBottomSheetWithDraggable({
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     builder: (modalContext) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.57,
-        maxChildSize: 0.57,
-        minChildSize: 0.4,
-        builder: (context, scrollController) {
-          return ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(10),
-            ),
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white),
-              child: builder != null
-                  ? builder(scrollController)
-                  : child,
-            ),
-          );
-        },
+      final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+      return Padding(
+        padding: EdgeInsets.only(bottom: bottomPadding),
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.57,
+          maxChildSize: 0.57,
+          minChildSize: 0.4,
+          builder: (context, scrollController) {
+            return ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(10),
+              ),
+              child: Container(
+                decoration: const BoxDecoration(color: Colors.white),
+                child: builder != null
+                    ? builder(scrollController)
+                    : child,
+              ),
+            );
+          },
+        ),
       );
     },
   );

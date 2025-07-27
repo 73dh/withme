@@ -31,7 +31,7 @@ class CustomerInfo extends StatelessWidget {
     final birthDate = customer.birth;
 
     return ItemContainer(
-      height: 100,
+      height:customer.recommended.isEmpty? 100:120,
       backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

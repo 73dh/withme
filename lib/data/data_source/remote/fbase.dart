@@ -29,19 +29,28 @@ class FBase {
     required String userId,
     required String email,
   }) async {
-    final user = UserModel(
-      userKey: userId,
-      email: email,
-      membershipStatus: MembershipStatus.free,
-      paidAt: DateTime(2020),
-      agreedDate: DateTime.now(),
-    );
-
-    await FirebaseFirestore.instance
+    final docRef = FirebaseFirestore.instance
         .collection(collectionUsers)
-        .doc(userId)
-        .set(user.toMap());
+        .doc(userId);
+
+    final snapshot = await docRef.get();
+
+    if (!snapshot.exists) {
+      final user = UserModel(
+        userKey: userId,
+        email: email,
+        membershipStatus: MembershipStatus.free,
+        paidAt: DateTime(2020),
+        agreedDate: DateTime.now(),
+      );
+
+      await docRef.set(user.toMap());
+      debugPrint('✅ 새 사용자 생성 완료');
+    } else {
+      debugPrint('ℹ️ 사용자 이미 존재함. 생성 생략');
+    }
   }
+
 
   Future<void> deleteUserAccountAndData({
     required String userId,

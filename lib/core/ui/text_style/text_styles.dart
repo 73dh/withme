@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../color/color_style.dart';
+
 abstract interface class TextStyles {
   static const normal8 = TextStyle(fontSize: 8);
   static const normal9 = TextStyle(fontSize: 9);
@@ -33,6 +35,16 @@ abstract interface class TextStyles {
     fontWeight: FontWeight.w600,
     decoration: TextDecoration.lineThrough,
   );
+  static final homeTopTextStyle = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.deepPurple.shade300,
+  );
 
-
+static const progressBarRightText=  const TextStyle(
+  fontSize: 10,
+  color: Colors.deepOrangeAccent,
+  fontWeight: FontWeight.w500,
+  fontStyle: FontStyle.italic,
+  );
 }
