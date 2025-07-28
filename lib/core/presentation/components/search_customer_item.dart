@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/item_icon.dart';
+import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
@@ -57,7 +57,7 @@ class SearchCustomerItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ItemIcon(
+                ProspectItemIcon(
                   number: policies.length,
                   sex: customer.sex,
                   backgroundImagePath: 'assets/icons/folder.png',

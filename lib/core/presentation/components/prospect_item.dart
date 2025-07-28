@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/item_icon.dart';
+import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
@@ -73,7 +73,7 @@ class ProspectItem extends StatelessWidget {
                       style: TextStyles.normal12,
                     ),
                     height(5),
-                    ItemIcon(
+                    ProspectItemIcon(
                       number: histories.length,
                       sex: customer.sex,
                       backgroundImagePath:customer.sex=='남'?IconsPath.manIcon: IconsPath.womanIcon,
