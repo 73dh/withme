@@ -57,7 +57,7 @@ class CustomerItem extends StatelessWidget {
         List<PolicyModel> policies = snapshot.data!;
         final showReminder = showHistoryUtil(customer.histories).showReminder;
         return ItemContainer(
-          height: 99,
+          // height: 99,
           backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
           child: Stack(
             children: [
@@ -140,11 +140,11 @@ class CustomerItem extends StatelessWidget {
   }
 
   Widget _policyPart(List<PolicyModel> policies) {
-    final bool showPrev = policies.length > 2;
+    final bool showPrev = policies.length > 1;
 
-    // 가장 최근 2개
+    // 가장 최근 1개
     final List<PolicyModel> recentPolicies =
-    showPrev ? policies.reversed.take(2).toList().reversed.toList() : policies;
+    showPrev ? policies.reversed.take(1).toList().reversed.toList() : policies;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -33,6 +33,7 @@ class AnimatedProgressBar extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(height / 3),
       child: Container(
+        padding: EdgeInsets.zero,
         width: totalWidth,
         height: height,
         color: backgroundColor,

@@ -1,14 +1,20 @@
+import '../../../../core/presentation/components/blinking_toggle_icon.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 
 class CustomerListAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int count;
   final ValueChanged<String> onSearch;
+  final bool filterBarExpanded;
+  final VoidCallback onToggleFilterBar;
+
 
   const CustomerListAppBar({
     super.key,
     required this.count,
     required this.onSearch,
+    required this.filterBarExpanded,
+    required this.onToggleFilterBar,
   });
 
   @override
@@ -22,6 +28,11 @@ class CustomerListAppBar extends StatelessWidget implements PreferredSizeWidget 
           _buildIconStack(),
           const SizedBox(width: 10),
           Text('$count명', style: TextStyles.homeTopTextStyle),
+          width(5),
+          BlinkingToggleIcon(
+            expanded: filterBarExpanded,
+            onTap: onToggleFilterBar,
+          ),
         ],
       ),
       actions: [

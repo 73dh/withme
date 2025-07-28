@@ -22,7 +22,7 @@ class _AppBarSearchWidgetState extends State<AppBarSearchWidget> {
       children: [
         if (_isSearching)
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 100),
+            constraints: BoxConstraints(maxWidth: 50),
             child: TextField(
               controller: _searchController,
               autofocus: true,

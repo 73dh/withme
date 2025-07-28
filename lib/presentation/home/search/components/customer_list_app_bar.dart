@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomerListAppBar extends StatelessWidget implements PreferredSizeWidget {
   final SearchPageViewModel viewModel;
 
-  const CustomAppBar({
+  const CustomerListAppBar({
     super.key,
     required this.viewModel,
   });

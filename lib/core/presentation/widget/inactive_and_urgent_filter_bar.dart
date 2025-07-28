@@ -52,8 +52,8 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
           // Info 아이콘
           InfoIconWithPopup(
             message: [
-              '관리기간: $manageDays일',
-              if (showUrgentOnly != null) '상령일: $urgentDays일',
+              '관리기간: $manageDays일\n',
+              if (showUrgentOnly != null) '상령일: $urgentDays일\n',
               '설정에서 변경 가능',
             ].join(', '),
             color: Colors.grey,

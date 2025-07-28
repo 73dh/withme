@@ -1,5 +1,5 @@
 
-export 'package:withme/presentation/home/search/components/custom_app_bar.dart';
+export 'package:withme/presentation/home/search/components/customer_list_app_bar.dart';
 export 'package:withme/presentation/home/search/components/customer_list_view.dart';
 export 'package:withme/presentation/home/search/components/draggable_filter_sheet.dart';
 export 'package:withme/presentation/home/search/components/policy_list_view.dart';

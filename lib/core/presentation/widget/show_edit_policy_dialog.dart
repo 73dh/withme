@@ -44,7 +44,7 @@ Future<void> showEditPolicyDialog({
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  height(16),
                   TextFormField(
                     controller: premiumController,
                     keyboardType: TextInputType.number,
@@ -53,7 +53,7 @@ Future<void> showEditPolicyDialog({
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  height(16),
                   DropdownButtonFormField<PolicyState>(
                     value: selectedState,
                     decoration: const InputDecoration(
@@ -70,7 +70,7 @@ Future<void> showEditPolicyDialog({
                       if (value != null) selectedState = value;
                     },
                   ),
-                  const SizedBox(height: 24),
+                  height(24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -87,7 +87,7 @@ Future<void> showEditPolicyDialog({
                         ),
                         child: const Text('취소'),
                       ),
-                      const SizedBox(width: 10),
+                      height(10),
                       FilledButton(
                         onPressed: () async {
                           final premiumText = premiumController.text.trim().replaceAll(',', '');
@@ -134,7 +134,7 @@ Future<void> showEditPolicyDialog({
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  height(10),
                 ],
               ),
             ),

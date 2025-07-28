@@ -61,7 +61,7 @@ class CommonDialog {
                   child: Column(
                     mainAxisSize: MainAxisSize.min, // 최소 크기 유지
                     children: [
-                      const SizedBox(height: 12),
+                      height(12),
                       const Text(
                         '관리 이력',
                         style: TextStyle(
@@ -69,7 +69,7 @@ class CommonDialog {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      height(12),
                       Divider(
                         height: 1,
                         thickness: 1,
@@ -84,8 +84,7 @@ class CommonDialog {
                               vertical: 12,
                             ),
                             itemCount: histories.length,
-                            separatorBuilder:
-                                (_, __) => const SizedBox(height: 8),
+                            separatorBuilder: (_, __) => height(8),
                             itemBuilder: (_, index) {
                               final e = histories[index];
                               return Column(
@@ -99,7 +98,7 @@ class CommonDialog {
                                       color: Colors.grey,
                                     ),
                                   ),
-                                  const SizedBox(height: 2),
+                                  height(2),
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(10),
@@ -125,12 +124,12 @@ class CommonDialog {
                             style: TextStyle(color: Colors.grey),
                           ),
                         ),
-                      const SizedBox(height: 10),
+                      height(10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: _inputArea(context, setState),
                       ),
-                      const SizedBox(height: 20),
+                      height(20),
                     ],
                   ),
                 ),

@@ -4,6 +4,7 @@ import 'package:withme/core/di/setup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../home_grand_import.dart';
+import '../components/policy_list_app_bar.dart';
 import '../filter/filter_box.dart';
 
 class SearchPage extends StatefulWidget {
@@ -17,7 +18,6 @@ class _SearchPageState extends State<SearchPage> {
   late final viewModel = getIt<SearchPageViewModel>();
 
   final userKey = FirebaseAuth.instance.currentUser?.uid;
-
 
   bool _isSearchingByName = false;
   final FocusNode _searchFocusNode = FocusNode();
@@ -43,7 +43,12 @@ class _SearchPageState extends State<SearchPage> {
       listenable: viewModel,
       builder: (context, _) {
         return Scaffold(
-          appBar: CustomAppBar(viewModel: viewModel),
+          appBar:
+              viewModel.state.currentSearchOption == SearchOption.filterPolicy
+                  ? PolicyListAppBar(
+                    count: viewModel.state.filteredPolicies.length,
+                  )
+                  : CustomerListAppBar(viewModel: viewModel),
           body: Stack(
             children: [
               AnimatedSwitcher(
@@ -107,13 +112,21 @@ class _SearchPageState extends State<SearchPage> {
       },
     );
   }
+
   Widget _buildSearchResultView(SearchPageViewModel viewModel) {
     final key = ValueKey(viewModel.state.currentSearchOption);
 
     if (viewModel.state.currentSearchOption == SearchOption.filterPolicy) {
-      return PolicyListView(
-        key: key,
-        policies: viewModel.state.filteredPolicies,
+      return Column(
+
+        children: [
+          Expanded(
+            child: PolicyListView(
+              key: key,
+              policies: viewModel.state.filteredPolicies,
+            ),
+          ),
+        ],
       );
     } else if (viewModel.state.currentSearchOption != null) {
       return CustomerListView(

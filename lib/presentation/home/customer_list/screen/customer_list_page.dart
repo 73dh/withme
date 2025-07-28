@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
+import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
+import 'package:withme/core/presentation/widget/size_transition_filter_bar.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/const/position.dart';
 
@@ -15,7 +17,6 @@ import '../../../../domain/domain_import.dart';
 import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 import '../components/customer_list_app_bar.dart';
 
-
 class CustomerListPage extends StatefulWidget {
   const CustomerListPage({super.key});
 
@@ -26,20 +27,50 @@ class CustomerListPage extends StatefulWidget {
 class _CustomerListPageState extends State<CustomerListPage>
     with
         RouteAware,
-        FabOverlayManagerMixin<CustomerListPage, CustomerListViewModel> {
+        FabOverlayManagerMixin<CustomerListPage, CustomerListViewModel>,
+        SingleTickerProviderStateMixin,
+        FilterBarAnimationMixin {
   final RouteObserver<PageRoute> _routeObserver =
       getIt<RouteObserver<PageRoute>>();
   @override
   final CustomerListViewModel viewModel = getIt<CustomerListViewModel>();
 
+  // // 필터바 접힘 상태
+  // bool _filterBarExpanded = false;
+  // late final AnimationController _controller;
+  // late final Animation<double> _heightFactor;
+
   String _searchText = '';
   bool _showInactiveOnly = false;
 
+  void _toggleFilterBar() => toggleFilterBarAnimation();
+
+  // void _toggleFilterBar() {
+  //   setState(() {
+  //     _filterBarExpanded = !_filterBarExpanded;
+  //     if (_filterBarExpanded) {
+  //       _controller.forward();
+  //     } else {
+  //       _controller.reverse();
+  //     }
+  //   });
+  // }
+
   @override
   void initState() {
+    super.initState();
     smallFabBottomPosition = FabPosition.secondFabBottomPosition;
     viewModel.fetchData(force: true);
-    super.initState();
+    initFilterBarAnimation(vsync: this);
+    // _controller = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(milliseconds: 300),
+    //   value: 0.0, // 접힌 상태로 시작 (0.0)
+    // );
+    // _heightFactor = CurvedAnimation(
+    //   parent: _controller,
+    //   curve: Curves.easeInOut,
+    // );
   }
 
   @override
@@ -89,15 +120,21 @@ class _CustomerListPageState extends State<CustomerListPage>
                     appBar: CustomerListAppBar(
                       count: filtered.length,
                       onSearch: (text) => setState(() => _searchText = text),
+                      filterBarExpanded: filterBarExpanded,
+                      onToggleFilterBar: _toggleFilterBar,
                     ),
                     body: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        InactiveAndUrgentFilterBar(
-                          showInactiveOnly: _showInactiveOnly,
-                          onInactiveToggle:
-                              (val) => setState(() => _showInactiveOnly = val),
-                          inactiveCount: viewModel.inactiveCount,
+                        SizeTransitionFilterBar(
+                          heightFactor: heightFactor,
+                          child: InactiveAndUrgentFilterBar(
+                            showInactiveOnly: _showInactiveOnly,
+                            onInactiveToggle:
+                                (val) =>
+                                    setState(() => _showInactiveOnly = val),
+                            inactiveCount: viewModel.inactiveCount,
+                          ),
                         ),
                         const SizedBox(height: 5),
                         _CustomerListView(

@@ -4,6 +4,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
+import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
+import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
+import 'package:withme/core/presentation/widget/size_transition_filter_bar.dart';
+import 'package:withme/domain/domain_import.dart';
+import 'package:withme/core/presentation/fab/fab_oevelay_manager_mixin.dart';
+import 'package:withme/core/presentation/widget/inactive_and_urgent_filter_bar.dart';
+import 'package:withme/presentation/home/home_grand_import.dart';
+import 'package:withme/presentation/home/prospect_list/components/prospect_list_app_bar.dart';
+
+import '../../../../core/di/setup.dart';
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
+import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
+
+import 'dart:async';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
 import 'package:withme/domain/domain_import.dart';
@@ -17,6 +39,23 @@ import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
+import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
+import 'package:withme/core/presentation/fab/fab_oevelay_manager_mixin.dart';
+import 'package:withme/core/presentation/widget/inactive_and_urgent_filter_bar.dart';
+import 'package:withme/domain/domain_import.dart';
+import 'package:withme/presentation/home/prospect_list/components/prospect_list_app_bar.dart';
+import 'package:withme/presentation/registration_sheet/sheet/registration_bottom_sheet.dart';
+
+import '../../../../core/di/setup.dart';
+import '../../../../core/domain/core_domain_import.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -28,7 +67,9 @@ class ProspectListPage extends StatefulWidget {
 class _ProspectListPageState extends State<ProspectListPage>
     with
         RouteAware,
-        FabOverlayManagerMixin<ProspectListPage, ProspectListViewModel> {
+        FabOverlayManagerMixin<ProspectListPage, ProspectListViewModel>,
+        SingleTickerProviderStateMixin,
+        FilterBarAnimationMixin {
   final RouteObserver<PageRoute> _routeObserver =
       getIt<RouteObserver<PageRoute>>();
 
@@ -38,7 +79,13 @@ class _ProspectListPageState extends State<ProspectListPage>
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
   bool? _lastIsSuccess;
-  bool _hasCheckedAgreement = false; // ✅ 여기에 추가
+  bool _hasCheckedAgreement = false;
+
+  // // 필터바 접힘 상태
+  // bool _filterBarExpanded = false;
+  //
+  // late final AnimationController _controller;
+  // late final Animation<double> _heightFactor;
 
   @override
   void initState() {
@@ -46,6 +93,18 @@ class _ProspectListPageState extends State<ProspectListPage>
 
     viewModel.fetchData(force: true);
     _initPopup();
+    initFilterBarAnimation(vsync: this);
+
+    // _controller = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(milliseconds: 300),
+    //   value: 0.0, // 접힌 상태로 시작 (0.0)
+    // );
+    //
+    // _heightFactor = CurvedAnimation(
+    //   parent: _controller,
+    //   curve: Curves.easeInOut,
+    // );
   }
 
   void _initPopup() {
@@ -56,7 +115,6 @@ class _ProspectListPageState extends State<ProspectListPage>
       final userSession = getIt<UserSession>();
       await userSession.loadAgreementCheckFromPrefs();
 
-      // SharedPreferences에서 3가지 값 로드 (UserSession 내부 메서드가 이미 구현되어 있으니 바로 getter 사용)
       final managePeriod = userSession.managePeriodDays;
       final urgentThreshold = userSession.urgentThresholdDays;
       final targetCount = userSession.targetProspectCount;
@@ -94,8 +152,22 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   void dispose() {
     _routeObserver.unsubscribe(this);
+    disposeFilterBarAnimation();
     super.dispose();
   }
+
+  void _toggleFilterBar() => toggleFilterBarAnimation();
+
+  // void _toggleFilterBar() {
+  //   setState(() {
+  //     _filterBarExpanded = !_filterBarExpanded;
+  //     if (_filterBarExpanded) {
+  //       _controller.forward();
+  //     } else {
+  //       _controller.reverse();
+  //     }
+  //   });
+  // }
 
   @override
   void onSortActionLogic(Function() sortFn) {
@@ -123,26 +195,30 @@ class _ProspectListPageState extends State<ProspectListPage>
                   appBar: ProspectListAppBar(
                     viewModel: viewModel,
                     customers: filteredList,
+                    filterBarExpanded: filterBarExpanded,
+                    onToggleFilterBar: _toggleFilterBar,
                   ),
-
                   body: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InactiveAndUrgentFilterBar(
-                        showInactiveOnly: _showInactiveOnly,
-                        showUrgentOnly: _showUrgentOnly,
-                        onInactiveToggle: (val) {
-                          setState(() => _showInactiveOnly = val);
-                          viewModel.updateFilter(inactiveOnly: val);
-                        },
-                        onUrgentToggle: (val) {
-                          setState(() => _showUrgentOnly = val);
-                          viewModel.updateFilter(urgentOnly: val);
-                        },
-                        inactiveCount: viewModel.inactiveCount,
-                        urgentCount: viewModel.urgentCount,
+                      SizeTransitionFilterBar(
+                        heightFactor: heightFactor,
+                        child: InactiveAndUrgentFilterBar(
+                          showInactiveOnly: _showInactiveOnly,
+                          showUrgentOnly: _showUrgentOnly,
+                          onInactiveToggle: (val) {
+                            setState(() => _showInactiveOnly = val);
+                            viewModel.updateFilter(inactiveOnly: val);
+                          },
+                          onUrgentToggle: (val) {
+                            setState(() => _showUrgentOnly = val);
+                            viewModel.updateFilter(urgentOnly: val);
+                          },
+                          inactiveCount: viewModel.inactiveCount,
+                          urgentCount: viewModel.urgentCount,
+                        ),
                       ),
-                     height(5),
+                      height(5),
                       Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
