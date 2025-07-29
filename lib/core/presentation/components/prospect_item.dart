@@ -15,6 +15,7 @@ import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../../utils/core_utils_import.dart';
+import '../../utils/is_birthday_within_7days.dart';
 import '../widget/insurance_age_widget.dart';
 import 'width_height.dart';
 
@@ -116,10 +117,28 @@ class ProspectItem extends StatelessWidget {
             ),
             width(6),
             if (birthDate != null)
-              Text(
-                '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
-                style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
-              ),
+              Row(
+                children: [
+                  Text(
+                    '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
+                    style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+                  ),
+                  if (isBirthdayWithin7Days(birthDate)) ...[
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.cake_rounded,
+                      color: Colors.pinkAccent,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      '(D-${getBirthdayCountdown(birthDate)})',
+                      style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
+                    ),
+                  ],
+                ],
+              )
+,
           ],
         ),
         height(6),
@@ -140,4 +159,6 @@ class ProspectItem extends StatelessWidget {
       ],
     );
   }
+
+
 }

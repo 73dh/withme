@@ -15,6 +15,7 @@ import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 
 import '../../ui/color/color_style.dart';
+import '../../utils/is_birthday_within_7days.dart';
 import '../../utils/show_history_util.dart';
 import '../core_presentation_import.dart';
 import '../../ui/text_style/text_styles.dart';
@@ -31,8 +32,9 @@ import 'customer_item_icon.dart';
 
 class CustomerItem extends StatelessWidget {
   final CustomerModel customer;
+  final void Function(List<HistoryModel> histories) onTap;
 
-  const CustomerItem({super.key, required this.customer});
+  const CustomerItem({super.key, required this.customer, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +57,7 @@ class CustomerItem extends StatelessWidget {
         }
 
         List<PolicyModel> policies = snapshot.data!;
-        final showReminder = showHistoryUtil(customer.histories).showReminder;
         return ItemContainer(
-          // height: 99,
           backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
           child: Stack(
             children: [
@@ -67,29 +67,38 @@ class CustomerItem extends StatelessWidget {
                     customer: customer,
                   ),
                   width(20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _namePart(
-                        birthDate,
-                        difference,
-                        isUrgent,
-                        insuranceChangeDate,
-                      ),
-                      _policyPart(policies),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _namePart(
+                          birthDate,
+                          difference,
+                          isUrgent,
+                          insuranceChangeDate,
+                        ),
+                        _policyPart(policies),
+                      ],
+                    ),
                   ),
-                  const Spacer(),
                 ],
               ),
-              if (showReminder)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: BlinkingCursorIcon(sex: customer.sex, size: 25),
+              Positioned.fill(
+                child: HistoryPartWidget(
+                  histories: customer.histories,
+                  onTap: (histories) => onTap(histories),
+                  sex: customer.sex,
                 ),
+              ),
+              // if (showReminder)
+              //   Positioned(
+              //     top: 0,
+              //     right: 0,
+              //     child: BlinkingCursorIcon(sex: customer.sex, size: 25),
+              //   ),
             ],
           ),
+
         );
       },
     );
@@ -133,8 +142,21 @@ class CustomerItem extends StatelessWidget {
             isUrgent: isUrgent,
             insuranceChangeDate: insuranceChangeDate,
           ),
+        if (isBirthdayWithin7Days(birthDate)) ...[
+          const SizedBox(width: 4),
+          const Icon(
+            Icons.cake_rounded,
+            color: Colors.pinkAccent,
+            size: 16,
+          ),
+          const SizedBox(width: 2),
+          Text(
+            '(D-${getBirthdayCountdown(birthDate)})',
+            style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
+          ),
+        ],
         if (difference == null || difference < 0) const SizedBox.shrink(),
-        Text(customer.recommended.isNotEmpty ? customer.recommended : ''),
+        Flexible(child: Text(customer.recommended.isNotEmpty ? customer.recommended : '')),
       ],
     );
   }

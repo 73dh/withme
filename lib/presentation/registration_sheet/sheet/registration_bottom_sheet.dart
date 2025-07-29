@@ -167,17 +167,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   Widget _buildForm() {
     return Form(
       key: _formKey,
-      child: AnimatedPadding(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.only(
-          bottom: 10, // filledButton 기본 높이
-        ),
-        child: SingleChildScrollView(
-          controller: _effectiveController,
-          padding: const EdgeInsets.all(8.0),
-          child: _buildCustomerInfoPart(),
-        ),
-      ),
+      child: _buildCustomerInfoPart(),
     );
   }
 

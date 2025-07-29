@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/domain/core_domain_import.dart';
+import 'package:withme/core/presentation/components/customer_item.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/use_case/history/add_history_use_case.dart';
@@ -122,17 +123,26 @@ class CustomerListView extends StatelessWidget {
           child: CustomerScreen(customer: customer),
         );
       },
-      child: SearchCustomerItem(
-        userKey: userKey,
-        customer: customer,
-        onTap:
-            (histories) => _handleAddHistory(
-              context,
-              histories,
-              customer,
-              HistoryContent.title.toString(),
-            ),
-      ),
+      child:
+      CustomerItem(customer: customer,   onTap: (histories) async {
+        await popupAddHistory(
+          context,
+          histories,
+          customer,
+          HistoryContent.title.toString(),
+        );
+      },)
+      // SearchCustomerItem(
+      //   userKey: userKey,
+      //   customer: customer,
+      //   onTap:
+      //       (histories) => _handleAddHistory(
+      //         context,
+      //         histories,
+      //         customer,
+      //         HistoryContent.title.toString(),
+      //       ),
+      // ),
     );
   }
 

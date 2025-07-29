@@ -9,6 +9,7 @@ import 'package:withme/core/ui/const/position.dart';
 
 import '../../../../../core/di/setup.dart';
 import '../../../../core/data/fire_base/user_session.dart';
+import '../../../../core/domain/enum/history_content.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/fab/fab_oevelay_manager_mixin.dart';
 import '../../../../core/presentation/widget/inactive_and_urgent_filter_bar.dart';
@@ -137,17 +138,20 @@ class _CustomerListPageState extends State<CustomerListPage>
                           ),
                         ),
                         const SizedBox(height: 5),
-                        _CustomerListView(
-                          customers: filtered,
-                          onTap: (customer) async {
-                            setFabCanBeShown(false);
-                            await context.push(
-                              RoutePath.customer,
-                              extra: customer,
-                            );
-                            setFabCanBeShown(true);
-                            await viewModel.fetchData(force: true);
-                          },
+                        Expanded(
+                          child: _CustomerListView(
+                            customers: filtered,
+                            onTap: (customer) async {
+                              setFabCanBeShown(false);
+                              await context.push(
+                                RoutePath.customer,
+                                extra: customer,
+                              );
+                              setFabCanBeShown(true);
+                              await viewModel.fetchData(force: true);
+                            },
+                            viewModel: viewModel,
+                          ),
                         ),
                       ],
                     ),
@@ -194,26 +198,45 @@ class _CustomerListPageState extends State<CustomerListPage>
 class _CustomerListView extends StatelessWidget {
   final List<CustomerModel> customers;
   final void Function(CustomerModel) onTap;
+  final CustomerListViewModel viewModel;
 
-  const _CustomerListView({required this.customers, required this.onTap});
+  const _CustomerListView({required this.customers, required this.onTap, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemCount: customers.length,
-        itemBuilder: (context, index) {
-          final customer = customers[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: GestureDetector(
-              onTap: () => onTap(customer),
-              child: CustomerItem(customer: customer),
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      itemCount: customers.length,
+      itemBuilder: (context, index) {
+        final customer = customers[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: GestureDetector(
+            onTap: () => onTap(customer),
+            child: CustomerItem(customer: customer,   onTap: (histories) async {
+              final newHistory = await popupAddHistory(
+                context,
+                customer.histories,
+                customer,
+                HistoryContent.title.toString(),
+              );
+
+              if (newHistory != null) {
+                final updatedHistories = [...customer.histories, newHistory];
+                final updatedCustomer = customer.copyWith(histories: updatedHistories);
+                viewModel.updateCustomerInList(updatedCustomer);
+              }
+              // await popupAddHistory(
+              //   context,
+              //   histories,
+              //   customer,
+              //   HistoryContent.title.toString(),
+              // );
+
+            },),
+          ),
+        );
+      },
     );
   }
 }
