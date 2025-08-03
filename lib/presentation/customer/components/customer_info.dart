@@ -113,10 +113,10 @@ class CustomerInfo extends StatelessWidget {
                 histories: histories,
                 onTap: (histories) async {
                   await popupAddHistory(
-                    context,
-                    histories,
-                    customer,
-                    HistoryContent.title.toString(),
+              context:       context,
+            histories:         histories,
+             customer:        customer,
+              initContent:       HistoryContent.title.toString(),
                   );
                 },
                 sex: customer.sex,

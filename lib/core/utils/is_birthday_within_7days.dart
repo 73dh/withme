@@ -1,5 +1,5 @@
 bool isBirthdayWithin7Days(DateTime birthDate) {
-  final now = DateTime.now();
+  final now = getTodayDateOnly();
   final thisYearBirthday = DateTime(now.year, birthDate.month, birthDate.day);
   final difference = thisYearBirthday.difference(now).inDays;
 
@@ -14,7 +14,7 @@ bool isBirthdayWithin7Days(DateTime birthDate) {
 }
 
 int getBirthdayCountdown(DateTime birthDate) {
-  final now = DateTime.now();
+  final now = getTodayDateOnly();
   final thisYearBirthday = DateTime(now.year, birthDate.month, birthDate.day);
   int days = thisYearBirthday.difference(now).inDays;
 
@@ -24,4 +24,9 @@ int getBirthdayCountdown(DateTime birthDate) {
   }
 
   return days;
+}
+
+DateTime getTodayDateOnly() {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day); // 시간 제거
 }

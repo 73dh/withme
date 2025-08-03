@@ -105,8 +105,13 @@ class CustomerScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: AddPolicyWidget(
-            onTap: () {
-              context.push(RoutePath.policy, extra: customer);
+            onTap: ()async {
+              final updated = await context.push<bool>(RoutePath.policy, extra: customer);
+              if (updated == true) {
+                // 수정된 경우에만 showBottomSheet 닫으면서 true 반환
+                if (context.mounted) Navigator.pop(context, true);
+              }
+              // context.push(RoutePath.policy, extra: customer);
             },
             size: 40,
           ),
@@ -115,95 +120,3 @@ class CustomerScreen extends StatelessWidget {
     );
   }
 }
-
-//
-// class CustomerScreen extends StatelessWidget {
-//   final CustomerModel customer;
-//
-//   const CustomerScreen({super.key, required this.customer});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final viewModel = getIt<CustomerViewModel>();
-//     return SafeArea(
-//       child: Scaffold(
-//         appBar: _appBar(context),
-//         body: Padding(
-//           padding: const EdgeInsets.all(8.0),
-//           child: Column(
-//             children: [
-//               height(10),
-//               CustomerInfo(customer: customer, viewModel: viewModel),
-//               height(15),
-//               const PartTitle(text: '보험계약 정보'),
-//               Expanded(
-//                 child: StreamBuilder<List<PolicyModel>>(
-//                   stream: viewModel.getPolicies(customer.customerKey),
-//                   builder: (context, snapshot) {
-//                     if (snapshot.hasError) {
-//                       log(snapshot.error.toString());
-//                     }
-//                     if (!snapshot.hasData) {
-//                       return const MyCircularIndicator();
-//                     }
-//                     final policies = snapshot.data!;
-//                     return ListView.builder(
-//                       itemCount: policies.length,
-//                       itemBuilder:
-//                           (context, index) => Padding(
-//                             padding: const EdgeInsets.only(bottom: 10),
-//                             child: GestureDetector(
-//                               onTap: () async {
-//                                 await showEditPolicyDialog(
-//                                   context: context,
-//                                   policy: policies[index],
-//                                   viewModel: viewModel,
-//                                 );
-//                               },
-//                               child: PolicyItem(policy: policies[index]),
-//                             ),
-//                           ),
-//                     );
-//                   },
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   AppBar _appBar(BuildContext context) {
-//     return AppBar(
-//       centerTitle: true,
-//       title: Row(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         mainAxisSize: MainAxisSize.min,
-//         crossAxisAlignment: CrossAxisAlignment.end,
-//         children: [
-//           Text(
-//             customer.name,
-//             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-//           ),
-//           const SizedBox(width: 8),
-//           Text(
-//             '(${customer.registeredDate.formattedDate})',
-//             style: const TextStyle(fontSize: 18, color: Colors.black45),
-//           ),
-//         ],
-//       ),
-//       actions: [
-//         Padding(
-//           padding: const EdgeInsets.all(8.0),
-//           child: AddPolicyWidget(
-//             onTap: () {
-//               context.push(RoutePath.policy, extra: customer);
-//             },
-//             size: 40,
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }

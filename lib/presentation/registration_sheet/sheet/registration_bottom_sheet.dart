@@ -2,38 +2,37 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/domain/model/history_model.dart';
+import 'package:withme/domain/model/todo_model.dart';
 
 import '../../../core/di/setup.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/presentation/fab/fab_oevelay_manager_mixin.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/is_need_new_history.dart';
-import '../components/add_policy_button.dart';
 import '../part/confirm_box_part.dart';
 import '../part/customer_info_part.dart';
-import '../part/recommender_part.dart';
 import '../part/registration_app_bar.dart';
 import '../registration_event.dart';
 import '../registration_view_model.dart';
 
 class RegistrationBottomSheet extends StatefulWidget {
   final CustomerModel? customerModel;
-  final ScrollController? scrollController; // 추가
-  final BuildContext? outerContext; // 추가
-  // final void Function(bool result)? isSuccess;
+  final ScrollController? scrollController;
+  final BuildContext? outerContext;
+  final void Function(bool)? onFabVisibilityChanged; // FAB강제 숨김 기능 추가
 
   const RegistrationBottomSheet({
     super.key,
     this.customerModel,
     this.scrollController,
     this.outerContext,
-    // this.isSuccess, // 추가
+    this.onFabVisibilityChanged, // 추가
   });
 
   @override
@@ -75,7 +74,9 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
 
   void _initializeCustomer() {
     final customer = widget.customerModel;
-    _registeredDateController.text = DateTime.now().formattedDate;
+    _registeredDateController.text = DateTime
+        .now()
+        .formattedDate;
     if (customer != null) {
       _isReadOnly = true;
       _nameController.text = customer.name;
@@ -105,36 +106,39 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: AnimatedPadding(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              RegistrationAppBar(
-                isReadOnly: _isReadOnly,
-                onPressed: () => setState(() => _isReadOnly = !_isReadOnly),
-                onTap: () async {
-                  await onAddHistory();
-                  if (isNeedNewHistory(widget.customerModel?.histories ?? [])) {
-                    setState(() {
-                      _isNeedNewHistory = !_isNeedNewHistory;
-                    });
-                  }
-                },
-                isNeedNewHistory: _isNeedNewHistory,
-                viewModel: viewModel,
-                customerModel: widget.customerModel,
-                // isSuccess: widget.isSuccess,
-              ),
-          
-              _buildForm(),
-          
-              if (!_isReadOnly) _buildSubmitButton(), // bottomSheet 대체
-            ],
-          ),
+      child: SingleChildScrollView(
+        controller: _effectiveController,
+        physics: const ClampingScrollPhysics(),
+        child: Column(
+          children: [
+            RegistrationAppBar(
+              isReadOnly: _isReadOnly,
+              onPressed: () {
+                setState(() {
+                  _isReadOnly = !_isReadOnly;
+                });
+
+                final fabMixin =
+                context.findAncestorStateOfType<FabOverlayManagerMixin>();
+                if (fabMixin != null) {
+                  fabMixin.setFabCanBeShown(false);
+                }
+              },
+              onTap: () async {
+                await onAddHistory();
+                if (isNeedNewHistory(widget.customerModel?.histories ?? [])) {
+                  setState(() {
+                    _isNeedNewHistory = !_isNeedNewHistory;
+                  });
+                }
+              },
+              isNeedNewHistory: _isNeedNewHistory,
+              viewModel: viewModel,
+              customerModel: widget.customerModel,
+            ),
+            _buildForm(),
+            if (!_isReadOnly) _buildSubmitButton(),
+          ],
         ),
       ),
     );
@@ -142,33 +146,27 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
 
   Future<void> onAddHistory() async {
     final newHistory = await popupAddHistory(
-      context,
-      widget.customerModel?.histories ?? [],
-      widget.customerModel!,
-      HistoryContent.title.toString(),
+      context: context,
+      histories: widget.customerModel?.histories ?? [],
+      customer: widget.customerModel!,
+      initContent: HistoryContent.title.toString(),
     );
     if (newHistory != null) {
       setState(() {
         final histories = widget.customerModel!.histories;
         histories.add(newHistory);
-
-        // 🔽 연락일 기준으로 최신 순 정렬
         histories.sort((a, b) {
           final aDate = a.contactDate ?? DateTime(1970);
           final bDate = b.contactDate ?? DateTime(1970);
-          return bDate.compareTo(aDate); // 최신 날짜가 앞에 오도록
+          return bDate.compareTo(aDate);
         });
-
         _isNeedNewHistory = isNeedNewHistory(histories);
       });
     }
   }
 
   Widget _buildForm() {
-    return Form(
-      key: _formKey,
-      child: _buildCustomerInfoPart(),
-    );
+    return Form(key: _formKey, child: _buildCustomerInfoPart());
   }
 
   Widget _buildCustomerInfoPart() {
@@ -197,8 +195,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           _registeredDateController.text = date.formattedDate;
         });
       },
-
-      // 🔽 Recommender 관련 추가
       isRecommended: _isRecommended,
       recommendedController: _recommendedController,
       onRecommendedChanged: (val) {
@@ -221,9 +217,11 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
             context: context,
             isScrollControlled: true,
             builder:
-                (modalContext) => StatefulBuilder(
+                (modalContext) =>
+                StatefulBuilder(
                   builder:
-                      (context, setModalState) => Padding(
+                      (context, setModalState) =>
+                      Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 16,
                           horizontal: 20,
@@ -240,7 +238,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
                             setModalState(() => _isRegistering = true);
                             final success = await _submitForm();
                             setModalState(() => _isRegistering = false);
-
                             if (modalContext.mounted) {
                               Navigator.of(modalContext).pop();
                             }
@@ -250,7 +247,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
                               }
                             }
                           },
-
                           sex: _sex,
                           birth: _birth,
                         ),
@@ -287,7 +283,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       showOverlaySnackBar(context, '이름은 한글 또는 영문만 입력 가능합니다');
       return false;
     }
-
     if (isValid) {
       _formKey.currentState!.save();
       return true;
@@ -301,7 +296,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       final customerMap = CustomerModel.toMapForCreateCustomer(
         userKey: currentUser?.uid ?? '',
         customerKey:
-            widget.customerModel?.customerKey ??
+        widget.customerModel?.customerKey ??
             generateCustomerKey('${currentUser?.email}'),
         name: _nameController.text,
         sex: _sex!,
@@ -320,12 +315,16 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           ).parseStrict(_registeredDateController.text),
           content: _historyController.text,
         );
+        Map<String,dynamic> todoMap ={};
+
+
 
         await viewModel.onEvent(
           RegistrationEvent.registerCustomer(
-            userKey: currentUser!.uid,
-            customerData: customerMap,
-            historyData: historyMap,
+              userKey: currentUser!.uid,
+              customerData: customerMap,
+              historyData: historyMap,
+              todoData:todoMap,
           ),
         );
       } else {
@@ -336,7 +335,6 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           ),
         );
       }
-
       return true;
     } catch (e, st) {
       debugPrint('submitForm error: $e');

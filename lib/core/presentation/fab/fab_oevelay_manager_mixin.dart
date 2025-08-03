@@ -34,7 +34,12 @@ abstract class FabViewModelInterface {
   SortStatus get sortStatus;
 }
 
-mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelInterface> on State<T> implements RouteAware {
+mixin FabOverlayManagerMixin<
+  T extends StatefulWidget,
+  VM extends FabViewModelInterface
+>
+    on State<T>
+    implements RouteAware {
   OverlayEntry? _fabOverlayEntry;
   bool _fabExpanded = false;
   bool _fabVisibleInOverlay = false;
@@ -61,7 +66,7 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
     _overlaySetState = null;
   }
 
-    @protected
+  @protected
   Widget buildMainFab() {
     return MainFab(
       fabVisibleLocal: _fabVisibleInOverlay,
@@ -70,6 +75,7 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
       },
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -137,13 +143,11 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
     }
   }
 
-    void handleVisibilityChange(VisibilityInfo info) {
+  void handleVisibilityChange(VisibilityInfo info) {
     if (_isProcessActive) return;
     if (info.visibleFraction < 0.9) {
       setFabCanBeShown(false);
-    } else {
-      setFabCanBeShown(true);
-    }
+    } 
   }
 
   Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
@@ -162,20 +166,32 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
 
     await showBottomSheetWithDraggable(
       context: context,
-      builder: (scrollController) => SingleChildScrollView(
-        controller: scrollController,
-        child: RegistrationBottomSheet(scrollController: scrollController),
-      ),
+      builder:
+          (scrollController) => SingleChildScrollView(
+            controller: scrollController,
+            child: RegistrationBottomSheet(scrollController: scrollController),
+          ),
+      onClosed: () async {
+        debugPrint('[FabOverlayManagerMixin] BottomSheet closed');
+        setIsProcessActive(false);
+        await viewModel.fetchData(force: true);
+
+        // ✅ FAB는 반드시 bottomSheet 애니메이션 종료 후 등장하도록 약간 지연
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (!mounted) return;
+          setFabCanBeShown(true);
+        });
+      },
     );
-
-    setIsProcessActive(false);
-    await viewModel.fetchData(force: true);
-
-    setFabCanBeShown(true);
   }
 
   void _insertFabOverlayIfAllowed() {
-    if (!_fabCanBeShown || _fabOverlayIsInserted || !mounted || _isProcessActive || _isRouteTransitioning) return;
+    if (!_fabCanBeShown ||
+        _fabOverlayIsInserted ||
+        !mounted ||
+        _isProcessActive ||
+        _isRouteTransitioning)
+      return;
 
     _removeFabOverlay();
 
@@ -211,10 +227,18 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
                           fabExpanded: _fabExpanded,
                           fabVisibleLocal: _fabVisibleInOverlay,
                           overlaySetState: (_) => _toggleFabExpanded(),
-                          onSortByName: () => onSortActionLogic(viewModel.sortByName),
-                          onSortByBirth: () => onSortActionLogic(viewModel.sortByBirth),
-                          onSortByInsuredDate: () => onSortActionLogic(viewModel.sortByInsuranceAgeDate),
-                          onSortByManage: () => onSortActionLogic(viewModel.sortByHistoryCount),
+                          onSortByName:
+                              () => onSortActionLogic(viewModel.sortByName),
+                          onSortByBirth:
+                              () => onSortActionLogic(viewModel.sortByBirth),
+                          onSortByInsuredDate:
+                              () => onSortActionLogic(
+                                viewModel.sortByInsuranceAgeDate,
+                              ),
+                          onSortByManage:
+                              () => onSortActionLogic(
+                                viewModel.sortByHistoryCount,
+                              ),
                           selectedSortStatus: viewModel.sortStatus,
                         ),
                       ),
@@ -238,7 +262,8 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
       _fabOverlayIsInserted = true;
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown) return;
+        if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown)
+          return;
         _overlaySetState?.call(() {
           _fabVisibleInOverlay = true;
           _fabExpanded = false;
@@ -264,244 +289,3 @@ mixin FabOverlayManagerMixin<T extends StatefulWidget, VM extends FabViewModelIn
     });
   }
 }
-
-//
-// mixin FabOverlayManagerMixin<
-//   T extends StatefulWidget,
-//   VM extends FabViewModelInterface
-// >
-//     on State<T>
-//     implements RouteAware {
-//   OverlayEntry? _fabOverlayEntry;
-//   bool _fabExpanded = false;
-//   bool _fabVisibleInOverlay = false;
-//   bool _fabOverlayIsInserted = false;
-//   bool _fabCanBeShown = true;
-//   bool _isProcessActive = false;
-//   void Function(void Function())? _overlaySetState;
-//   double smallFabBottomPosition = FabPosition.firstFabBottomPosition;
-//
-//   VM get viewModel;
-//
-//   void onSortActionLogic(Function() sortFn);
-//
-//   void setOverlaySetState(void Function(void Function())? setter) {
-//     _overlaySetState = setter;
-//   }
-//
-//   void callOverlaySetState() {
-//     _overlaySetState?.call(() {});
-//   }
-//
-//   void clearOverlaySetState() {
-//     _overlaySetState = null;
-//   }
-//
-//   @protected
-//   Widget buildMainFab() {
-//     return MainFab(
-//       fabVisibleLocal: _fabVisibleInOverlay,
-//       onPressed: () async {
-//         await onMainFabPressedLogic(getIt<ProspectListViewModel>());
-//       },
-//     );
-//   }
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       if (!mounted) return;
-//       _fabCanBeShown = true;
-//       _insertFabOverlayIfAllowed();
-//     });
-//   }
-//
-//   @override
-//   void dispose() {
-//     _removeFabOverlay();
-//     super.dispose();
-//   }
-//
-//   @override
-//   void didPushNext() {
-//     _fabCanBeShown = false;
-//     _removeFabOverlay();
-//   }
-//
-//   @override
-//   void didPopNext() {
-//     _removeFabOverlay();
-//
-//     if (!_isProcessActive) {
-//       _fabCanBeShown = true;
-//       _insertFabOverlayIfAllowed();
-//     }
-//
-//     viewModel.fetchData(force: true);
-//   }
-//
-//   void setFabCanBeShown(bool canShow) {
-//     if (_fabCanBeShown == canShow) return;
-//
-//     _fabCanBeShown = canShow;
-//     callOverlaySetState();
-//
-//     if (_fabCanBeShown) {
-//       _insertFabOverlayIfAllowed();
-//     } else {
-//       _removeFabOverlay();
-//     }
-//   }
-//
-//   void setIsProcessActive(bool active) {
-//     _isProcessActive = active;
-//     if (active) {
-//       _removeFabOverlay();
-//     } else {
-//       _insertFabOverlayIfAllowed();
-//     }
-//   }
-//
-//   void handleVisibilityChange(VisibilityInfo info) {
-//     if (_isProcessActive) return;
-//     if (info.visibleFraction < 0.9) {
-//       setFabCanBeShown(false);
-//     } else {
-//       setFabCanBeShown(true);
-//     }
-//   }
-//
-//   Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
-//     if (!mounted) return;
-//
-//     final isLimited = await FreeLimitDialog.checkAndShow(
-//       context: context,
-//       viewModel: viewModel,
-//     );
-//     if (isLimited) return;
-//
-//     setIsProcessActive(true);
-//     setFabCanBeShown(false);
-//
-//     if (!context.mounted) return;
-//
-//     await showBottomSheetWithDraggable(
-//       context: context,
-//       builder:
-//           (scrollController) => SingleChildScrollView(
-//             controller: scrollController,
-//             child: RegistrationBottomSheet(scrollController: scrollController),
-//           ),
-//     );
-//
-//     setIsProcessActive(false);
-//     await viewModel.fetchData(force: true);
-//
-//     setFabCanBeShown(true);
-//   }
-//
-//   void _insertFabOverlayIfAllowed() {
-//     if (!_fabCanBeShown ||
-//         _fabOverlayIsInserted ||
-//         !mounted ||
-//         _isProcessActive)
-//       return;
-//
-//     _removeFabOverlay();
-//
-//     _fabExpanded = false;
-//     _fabVisibleInOverlay = false;
-//
-//     SchedulerBinding.instance.addPostFrameCallback((_) {
-//       if (!mounted) return;
-//       final overlay = Navigator.of(context).overlay;
-//       if (overlay == null) return;
-//
-//       OverlayEntry? localEntry;
-//       localEntry = OverlayEntry(
-//         builder: (overlayContext) {
-//           _overlaySetState = null;
-//           return StatefulBuilder(
-//             builder: (innerContext, setState) {
-//               _overlaySetState = (fn) {
-//                 if (!mounted || localEntry != _fabOverlayEntry) return;
-//                 setState(fn);
-//               };
-//
-//               return Positioned.fill(
-//                 child: IgnorePointer(
-//                   ignoring: !_fabVisibleInOverlay,
-//                   child: Stack(
-//                     children: [
-//                       AnimatedFabContainer(
-//                         fabVisibleLocal: _fabVisibleInOverlay,
-//                         rightPosition: 16,
-//                         bottomPosition: smallFabBottomPosition,
-//                         child: SmallFab(
-//                           fabExpanded: _fabExpanded,
-//                           fabVisibleLocal: _fabVisibleInOverlay,
-//                           overlaySetState: (_) => _toggleFabExpanded(),
-//                           onSortByName:
-//                               () => onSortActionLogic(viewModel.sortByName),
-//                           onSortByBirth:
-//                               () => onSortActionLogic(viewModel.sortByBirth),
-//                           onSortByInsuredDate:
-//                               () => onSortActionLogic(
-//                                 viewModel.sortByInsuranceAgeDate,
-//                               ),
-//                           onSortByManage:
-//                               () => onSortActionLogic(
-//                                 viewModel.sortByHistoryCount,
-//                               ),
-//                           selectedSortStatus: viewModel.sortStatus,
-//                         ),
-//                       ),
-//                       AnimatedFabContainer(
-//                         fabVisibleLocal: _fabVisibleInOverlay,
-//                         rightPosition: 16,
-//                         bottomPosition: FabPosition.secondFabBottomPosition,
-//                         child: buildMainFab(),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               );
-//             },
-//           );
-//         },
-//       );
-//
-//       _fabOverlayEntry = localEntry;
-//       overlay.insert(_fabOverlayEntry!);
-//       _fabOverlayIsInserted = true;
-//
-//       // 즉시 상태 업데이트 (딜레이 제거)
-//       SchedulerBinding.instance.addPostFrameCallback((_) {
-//         if (!mounted || _fabOverlayEntry != localEntry || !_fabCanBeShown)
-//           return;
-//         _overlaySetState?.call(() {
-//           _fabVisibleInOverlay = true;
-//           _fabExpanded = false;
-//         });
-//       });
-//     });
-//   }
-//
-//   void _removeFabOverlay() {
-//     if (_fabOverlayEntry != null) {
-//       _fabOverlayEntry!.remove();
-//       _fabOverlayEntry = null;
-//       _fabOverlayIsInserted = false;
-//       _fabExpanded = false;
-//       _fabVisibleInOverlay = false;
-//       _overlaySetState = null;
-//     }
-//   }
-//
-//   void _toggleFabExpanded() {
-//     _overlaySetState?.call(() {
-//       _fabExpanded = !_fabExpanded;
-//     });
-//   }
-// }

@@ -131,6 +131,7 @@ class ProspectItem extends StatelessWidget {
                       size: 16,
                     ),
                     const SizedBox(width: 2),
+
                     Text(
                       '(D-${getBirthdayCountdown(birthDate)})',
                       style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),

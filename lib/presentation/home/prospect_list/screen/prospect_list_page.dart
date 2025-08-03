@@ -35,7 +35,6 @@ class _ProspectListPageState extends State<ProspectListPage>
 
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
-  bool? _lastIsSuccess;
   bool _hasCheckedAgreement = false;
 
   @override
@@ -161,36 +160,43 @@ class _ProspectListPageState extends State<ProspectListPage>
                               ),
                               child: GestureDetector(
                                 onTap: () async {
+                                  // 1. 무조건 FAB 숨김
                                   setFabCanBeShown(false);
-                                  _lastIsSuccess = null;
 
-                                  final result =
-                                      await showBottomSheetWithDraggable(
-                                        context: context,
-                                        child: RegistrationBottomSheet(
-                                          customerModel: customer,
-                                          outerContext: context,
-                                        ),
+                                  // 2. bottomSheet 닫힐 때까지 대기
+                                  await showBottomSheetWithDraggable(
+                                    context: context,
+                                    builder:
+                                        (scrollController) =>
+                                            RegistrationBottomSheet(
+                                              customerModel: customer,
+                                              scrollController:
+                                                  scrollController,
+                                              outerContext: context,
+                                            ),
+                                    onClosed: () async {
+                                      setIsProcessActive(false);
+                                      await viewModel.fetchData(force: true);
+                                      await Future.delayed(
+                                        const Duration(milliseconds: 200),
                                       );
-
-                                  if (_lastIsSuccess == null &&
-                                      result == null) {
-                                    _lastIsSuccess = true;
-                                    setFabCanBeShown(true);
-                                  }
-
-                                  await viewModel.fetchData(force: true);
+                                      if (!mounted) return;
+                                      setFabCanBeShown(true);
+                                    },
+                                  );
                                 },
+
                                 child: ProspectItem(
                                   userKey: UserSession.userId,
                                   customer: customer,
                                   onTap: (histories) async {
                                     setFabCanBeShown(false);
                                     await popupAddHistory(
-                                      context,
-                                      histories,
-                                      customer,
-                                      HistoryContent.title.toString(),
+                                      context: context,
+                                      histories: histories,
+                                      customer: customer,
+                                      initContent:
+                                          HistoryContent.title.toString(),
                                     );
                                     if (mounted) setFabCanBeShown(true);
                                   },

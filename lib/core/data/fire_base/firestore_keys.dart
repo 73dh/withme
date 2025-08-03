@@ -12,6 +12,7 @@ const String keyIsPolicy = 'is_policy';
 const String keyRecommendByWho = 'recommendByWho';
 const String keyRegisteredDate = 'registeredDate';
 const String keyCustomerHistory = 'histories';
+const String keyCustomerTodo = 'todos';
 const String keyCustomerMemo = 'memo';
 const String keyDocumentRef = 'documentRef';
 
@@ -39,6 +40,10 @@ const String keyPolicyState='policyState';
 // History
 const String keyContactDate='contact_date';
 const String keyContent='content';
+
+// TodoList
+const String keyTodoDate='todo_date';
+const String keyTodoContent='todo_content';
 
 // User
 const String keyUserKey='userKey';

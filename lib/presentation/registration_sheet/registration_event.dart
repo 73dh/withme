@@ -3,6 +3,7 @@ sealed class RegistrationEvent {
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
+    required Map<String,dynamic> todoData,
   }) = RegisterCustomer;
 
   factory RegistrationEvent.updateCustomer({
@@ -18,11 +19,13 @@ class RegisterCustomer implements RegistrationEvent {
   final String userKey;
   final Map<String, dynamic> customerData;
   final Map<String, dynamic> historyData;
+  final Map<String,dynamic> todoData;
 
   RegisterCustomer({
     required this.userKey,
     required this.customerData,
     required this.historyData,
+    required this.todoData,
   });
 }
 

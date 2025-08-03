@@ -90,12 +90,6 @@ class CustomerItem extends StatelessWidget {
                   sex: customer.sex,
                 ),
               ),
-              // if (showReminder)
-              //   Positioned(
-              //     top: 0,
-              //     right: 0,
-              //     child: BlinkingCursorIcon(sex: customer.sex, size: 25),
-              //   ),
             ],
           ),
 

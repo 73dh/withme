@@ -105,62 +105,7 @@ class SearchPageViewModel with ChangeNotifier {
     );
   }
 
-  // Future<void> getAllData() async {
-  //   final userKey = UserSession.userId;
-  //   if (userKey.isEmpty) {
-  //     debugPrint('[SearchPageViewModel] userKey is empty. Aborting data load.');
-  //     return;
-  //   }
-  //   _state = state.copyWith(isLoadingAllData: true);
-  //   notifyListeners();
-  //   final stopwatch = Stopwatch()..start();
-  //
-  //   final customersAllData = await getIt<CustomerUseCase>().execute(
-  //     usecase: GetAllDataUseCase(userKey: UserSession.userId),
-  //   );
-  //   final customers = List<CustomerModel>.from(customersAllData);
-  //
-  //   // 병렬 처리로 성능 개선
-  //   final policiesFuture = compute<List<CustomerModel>, List<PolicyModel>>(
-  //     _extractPolicies,
-  //     customers,
-  //   );
-  //   final historiesFuture = compute<List<CustomerModel>, List<HistoryModel>>(
-  //     _extractHistories,
-  //     customers,
-  //   );
-  //   final contractMonthsFuture = compute<List<CustomerModel>, List<String>>(
-  //     _extractContractMonths,
-  //     customers,
-  //   );
-  //   final productCategoriesFuture = compute<List<PolicyModel>, List<String>>(_extractProductCategories, policies);
-  //   final insuranceCompaniesFuture = compute<List<PolicyModel>, List<String>>(_extractInsuranceCompanies, customers);
-  //
-  //
-  //   final results = await Future.wait([
-  //     policiesFuture,
-  //     historiesFuture,
-  //     contractMonthsFuture,
-  //     productCategoriesFuture,
-  //     insuranceCompaniesFuture,
-  //   ]);
-  //
-  //   _state = state.copyWith(
-  //     customers: customers,
-  //     policies: results[0] as List<PolicyModel>,
-  //     histories: results[1] as List<HistoryModel>,
-  //     contractMonths: results[2] as List<String>,
-  //     productCategories: results[3] as List<String>,
-  //     insuranceCompanies: results[4] as List<String>,
-  //     isLoadingAllData: false,
-  //   );
-  //
-  //   notifyListeners();
-  //   debugPrint(
-  //     '[getAllData take time(milliseconds]: ${stopwatch.elapsedMilliseconds}ms'
-  //     '\ncurrentOption: ${state.currentSearchOption}',
-  //   );
-  // }
+
 
   Future<void> _filterNoRecentHistoryCustomers({
     required NoContactMonth monthOption,

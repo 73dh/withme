@@ -1,11 +1,10 @@
-import 'package:go_router/go_router.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
 import 'package:withme/core/presentation/widget/size_transition_filter_bar.dart';
-import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/const/position.dart';
+import 'package:withme/presentation/customer/screen/customer_screen.dart';
 
 import '../../../../../core/di/setup.dart';
 import '../../../../core/data/fire_base/user_session.dart';
@@ -13,7 +12,7 @@ import '../../../../core/domain/enum/history_content.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/fab/fab_oevelay_manager_mixin.dart';
 import '../../../../core/presentation/widget/inactive_and_urgent_filter_bar.dart';
-import '../../../../core/ui/core_ui_import.dart';
+import '../../../../core/presentation/widget/show_bottom_sheet_with_draggable.dart';
 import '../../../../domain/domain_import.dart';
 import '../../../../domain/use_case/customer/apply_current_sort_use_case.dart';
 import '../components/customer_list_app_bar.dart';
@@ -36,26 +35,10 @@ class _CustomerListPageState extends State<CustomerListPage>
   @override
   final CustomerListViewModel viewModel = getIt<CustomerListViewModel>();
 
-  // // 필터바 접힘 상태
-  // bool _filterBarExpanded = false;
-  // late final AnimationController _controller;
-  // late final Animation<double> _heightFactor;
-
   String _searchText = '';
   bool _showInactiveOnly = false;
 
   void _toggleFilterBar() => toggleFilterBarAnimation();
-
-  // void _toggleFilterBar() {
-  //   setState(() {
-  //     _filterBarExpanded = !_filterBarExpanded;
-  //     if (_filterBarExpanded) {
-  //       _controller.forward();
-  //     } else {
-  //       _controller.reverse();
-  //     }
-  //   });
-  // }
 
   @override
   void initState() {
@@ -63,15 +46,6 @@ class _CustomerListPageState extends State<CustomerListPage>
     smallFabBottomPosition = FabPosition.secondFabBottomPosition;
     viewModel.fetchData(force: true);
     initFilterBarAnimation(vsync: this);
-    // _controller = AnimationController(
-    //   vsync: this,
-    //   duration: const Duration(milliseconds: 300),
-    //   value: 0.0, // 접힌 상태로 시작 (0.0)
-    // );
-    // _heightFactor = CurvedAnimation(
-    //   parent: _controller,
-    //   curve: Curves.easeInOut,
-    // );
   }
 
   @override
@@ -143,12 +117,21 @@ class _CustomerListPageState extends State<CustomerListPage>
                             customers: filtered,
                             onTap: (customer) async {
                               setFabCanBeShown(false);
-                              await context.push(
-                                RoutePath.customer,
-                                extra: customer,
+                              await showBottomSheetWithDraggable(
+                                context: context,
+                                builder:
+                                    (scrollController) =>
+                                        CustomerScreen(customer: customer),
+                                onClosed: () async {
+                                  setIsProcessActive(false);
+                                  await viewModel.fetchData(force: true);
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 200),
+                                  );
+                                  if (!mounted) return;
+                                  setFabCanBeShown(true);
+                                },
                               );
-                              setFabCanBeShown(true);
-                              await viewModel.fetchData(force: true);
                             },
                             viewModel: viewModel,
                           ),
@@ -200,7 +183,11 @@ class _CustomerListView extends StatelessWidget {
   final void Function(CustomerModel) onTap;
   final CustomerListViewModel viewModel;
 
-  const _CustomerListView({required this.customers, required this.onTap, required this.viewModel});
+  const _CustomerListView({
+    required this.customers,
+    required this.onTap,
+    required this.viewModel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -213,27 +200,25 @@ class _CustomerListView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: GestureDetector(
             onTap: () => onTap(customer),
-            child: CustomerItem(customer: customer,   onTap: (histories) async {
-              final newHistory = await popupAddHistory(
-                context,
-                customer.histories,
-                customer,
-                HistoryContent.title.toString(),
-              );
+            child: CustomerItem(
+              customer: customer,
+              onTap: (histories) async {
+                final newHistory = await popupAddHistory(
+                  context: context,
+                  histories: customer.histories,
+                  customer: customer,
+                  initContent: HistoryContent.title.toString(),
+                );
 
-              if (newHistory != null) {
-                final updatedHistories = [...customer.histories, newHistory];
-                final updatedCustomer = customer.copyWith(histories: updatedHistories);
-                viewModel.updateCustomerInList(updatedCustomer);
-              }
-              // await popupAddHistory(
-              //   context,
-              //   histories,
-              //   customer,
-              //   HistoryContent.title.toString(),
-              // );
-
-            },),
+                if (newHistory != null) {
+                  final updatedHistories = [...customer.histories, newHistory];
+                  final updatedCustomer = customer.copyWith(
+                    histories: updatedHistories,
+                  );
+                  viewModel.updateCustomerInList(updatedCustomer);
+                }
+              },
+            ),
           ),
         );
       },

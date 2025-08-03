@@ -5,7 +5,6 @@ import 'package:withme/core/di/setup.dart';
 
 import 'app.dart';
 import 'core/data/fire_base/firebase_options.dart';
-import 'core/data/fire_base/user_session.dart';
 import 'core/router/router.dart';
 
 void main() async {
