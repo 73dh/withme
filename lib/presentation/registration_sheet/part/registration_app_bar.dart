@@ -28,7 +28,7 @@ class RegistrationAppBar extends StatelessWidget
   final VoidCallback onTap;
   final bool isNeedNewHistory;
   final RegistrationViewModel viewModel;
-  final CustomerModel? customerModel;
+  final CustomerModel? customer;
 
   const RegistrationAppBar({
     super.key,
@@ -37,11 +37,12 @@ class RegistrationAppBar extends StatelessWidget
     required this.onTap,
     required this.isNeedNewHistory,
     required this.viewModel,
-    required this.customerModel,
+    required this.customer,
   });
 
   @override
   Widget build(BuildContext context) {
+    print('customer: $customer');
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
@@ -52,16 +53,15 @@ class RegistrationAppBar extends StatelessWidget
   }
 
   Widget _buildTitle() {
-    if (customerModel == null) return const Text('New');
+    if (customer == null) return const Text('New');
     final iconPath =
-        customerModel!.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
-    final color = getSexIconColor(customerModel!.sex).withOpacity(0.6);
-
+        customer?.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
+    final color = getSexIconColor(customer?.sex).withOpacity(0.6);
     return Image.asset(iconPath, fit: BoxFit.cover, color: color);
   }
 
   Widget _buildActions(BuildContext context) {
-    if (customerModel == null) return const SizedBox.shrink();
+    if (customer == null) return const SizedBox.shrink();
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -80,24 +80,21 @@ class RegistrationAppBar extends StatelessWidget
   }
 
   Widget _buildTodoList(BuildContext context) {
-    final List<TodoModel> todoList = [
-      TodoModel(dueDate: DateTime.now(), content: '집에 전화하기집에 전화하기집에 전화하기'), TodoModel(dueDate: DateTime.now(), content: '밥먹으러 가기')
-    ];
-
+    final List<TodoModel> todoList = customer?.todos ?? [];
     todoList.sort((a, b) => a.dueDate.compareTo(b.dueDate));
     final TodoModel? nearestTodo = todoList.isNotEmpty ? todoList.first : null;
 
     return Row(
-      mainAxisSize: MainAxisSize.min, // ✅ 핵심: Row가 필요한 만큼만 차지하게
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (nearestTodo != null)
           Row(
-            mainAxisSize: MainAxisSize.min, // ✅ 내부 Row도 최소한의 너비로
+            mainAxisSize: MainAxisSize.min,
             children: [
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 120), // ✅ 폭 제한
+                constraints: const BoxConstraints(maxWidth: 120),
                 child: Text(
-                  '${nearestTodo.content}',
+                  nearestTodo.content,
                   style: const TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -105,133 +102,150 @@ class RegistrationAppBar extends StatelessWidget
               PopupMenuButton<String>(
                 tooltip: '할 일 목록',
                 icon: const Icon(Icons.expand_more),
-                itemBuilder: (context) => [
-                  ...todoList.map((todo) => PopupMenuItem<String>(
-                    enabled: false, // 기본 선택 비활성화 (버튼 제스처로만 처리)
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 할 일 텍스트
-                        Text(
-                          '${todo.dueDate.formattedDate} ${todo.content}',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 8),
+                onSelected: (value) async {
+                  if (value == 'add') {
+                    final newTodo = await showAddTodoDialog(context);
+                    if (newTodo != null) {
+                      final todoData = TodoModel.toMapForCreateTodo(
+                        content: newTodo.content,
+                        dueDate: newTodo.dueDate,
+                      );
 
-                        // 버튼 Row
-                        Row(
+                      await viewModel.onEvent(
+                        RegistrationEvent.addTodo(
+                          userKey: UserSession.userId,
+                          customerKey: customer?.customerKey ?? '',
+                          todoData: todoData,
+                        ),
+                      );
+                    }
+                  }
+                },
+                itemBuilder: (context) {
+                  final List<PopupMenuEntry<String>> items = [];
+
+                  for (int i = 0; i < todoList.length; i++) {
+                    final todo = todoList[i];
+                    items.add(
+                      PopupMenuItem<String>(
+                        enabled: false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Material(
-                              color: Colors.transparent, // 배경 없애기
-                              child: InkWell(
-                                onTap: () {
-                                  print('tap');
-                                  // 실행 로직
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0), // 터치 범위 넓히기
+                            Text(
+                              '${todo.dueDate.formattedDate} ${todo.content}',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      // await viewModel.onEvent(
+                                      //   RegistrationEvent.addTodo(
+                                      //     userKey: UserSession.userId,
+                                      //     customerKey: customerModel!.customerKey,
+                                      //     todoData:
+                                      //   ),
+                                      // );
+                                      // await viewModel.fetchCustomer(); // 갱신
+                                      // Navigator.pop(context);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.check_circle_outline,
+                                            size: 18,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text('완료, 관리이력 추가'),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                GestureDetector(
+                                  onTap: () async {
+                                    // await viewModel.onEvent(
+                                    //   RegistrationEvent.deleteTodo(
+                                    //     userKey: UserSession.userId,
+                                    //     customerKey: customerModel!.customerKey,
+                                    //     todoKey: todo.todoKey!,
+                                    //   ),
+                                    // );
+                                    // await viewModel.fetchCustomer(); // 갱신
+                                    // Navigator.pop(context);
+                                  },
                                   child: Row(
                                     children: const [
-                                      Icon(Icons.check_circle_outline, size: 18),
+                                      Icon(
+                                        Icons.delete_outline,
+                                        size: 18,
+                                        color: Colors.red,
+                                      ),
                                       SizedBox(width: 6),
-                                      Text('완료, 관리이력 추가'),
+                                      Text(
+                                        '할 일 삭제',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
                                     ],
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            const SizedBox(width: 16),
-                            GestureDetector(
-                              onTap: () {
-                                // 삭제 로직 연결 (viewModel 등에서 삭제)
-                                // 예: viewModel.removeTodo(todo);
-                                Navigator.pop(context);
-                              },
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.delete_outline, size: 18, color: Colors.red),
-                                  SizedBox(width: 6),
-                                  Text('할 일 삭제', style: TextStyle(color: Colors.red)),
-                                ],
-                              ),
-                            ),
+                            if (i != todoList.length - 1)
+                              const PopupMenuDivider(),
                           ],
                         ),
-                        const PopupMenuDivider(),
-                      ],
+                      ),
+                    );
+                  }
+
+                  items.add(
+                    PopupMenuItem<String>(
+                      value: 'add',
+                      child: Row(
+                        children: const [
+                          Icon(Icons.add, size: 18),
+                          SizedBox(width: 6),
+                          Text('할 일 추가'),
+                        ],
+                      ),
                     ),
-                  )),
+                  );
 
-
-                  PopupMenuItem<String>(
-                    value: 'add',
-                    child: Row(
-                      children: const [
-                        Icon(Icons.add, size: 18),
-                        SizedBox(width: 6),
-                        Text('할 일 추가'),
-                      ],
-                    ),
-                    onTap: () {
-                      Future.delayed(const Duration(milliseconds: 200), () {
-                        showAddTodoDialog(context);
-                      });
-                    },
-                  ),
-                ],
-              )
-,
-
-              // PopupMenuButton<String>(
-              //   tooltip: '할 일 목록',
-              //   icon: const Icon(Icons.expand_more),
-              //   itemBuilder:
-              //       (context) => [
-              //         ...todoList.map(
-              //           (todo) => PopupMenuItem<String>(
-              //             value: todo.content,
-              //             child: GestureDetector(
-              //               onTap: () {
-              //                 popupAddHistory(
-              //                   context: context,
-              //                   histories: customerModel?.histories ?? [],
-              //                   customer: customerModel!,
-              //                   initContent: todo.content,
-              //                 );
-              //               },
-              //               child: Text(
-              //                 '${todo.dueDate.formattedDate} - ${todo.content}',
-              //                 overflow: TextOverflow.ellipsis,
-              //                 maxLines: 1,
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //         PopupMenuItem<String>(
-              //           value: 'add',
-              //           child: Row(
-              //             children: const [
-              //               Icon(Icons.add, size: 18),
-              //               SizedBox(width: 6),
-              //               Text('할 일 추가'),
-              //             ],
-              //           ),
-              //           onTap: () {
-              //             Future.delayed(const Duration(milliseconds: 200), () {
-              //               showAddTodoDialog(context);
-              //             });
-              //           },
-              //         ),
-              //       ],
-              // ),
+                  return items;
+                },
+              ),
             ],
           ),
         if (todoList.isEmpty)
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: '할 일 추가',
-            onPressed: () => showAddTodoDialog(context),
+            onPressed: () async {
+              final newTodo = await showAddTodoDialog(context);
+              if (newTodo != null) {
+                final todoData = TodoModel.toMapForCreateTodo(
+                  content: newTodo.content,
+                  dueDate: newTodo.dueDate,
+                );
+
+                await viewModel.onEvent(
+                  RegistrationEvent.addTodo(
+                    userKey: UserSession.userId,
+                    customerKey: customer?.customerKey ?? '',
+                    todoData: todoData,
+                  ),
+                );
+              }
+            },
           ),
       ],
     );
@@ -246,7 +260,7 @@ class RegistrationAppBar extends StatelessWidget
           if (isNeedNewHistory)
             BlinkingCursorIcon(
               key: ValueKey(isNeedNewHistory),
-              sex: customerModel?.sex ?? '',
+              sex: customer?.sex ?? '',
               size: 30,
             )
           else
@@ -266,7 +280,7 @@ class RegistrationAppBar extends StatelessWidget
             await viewModel.onEvent(
               RegistrationEvent.deleteCustomer(
                 userKey: UserSession.userId,
-                customerKey: customerModel!.customerKey,
+                customerKey: customer!.customerKey,
               ),
             );
 
@@ -286,10 +300,11 @@ class RegistrationAppBar extends StatelessWidget
 
   Widget _buildAddPolicyButton() {
     return AddPolicyButton(
-      customerModel: customerModel!,
+      customerModel: customer!,
       onRegistered: (bool result) async {
         if (result) {
           await getIt<CustomerListViewModel>().refresh();
+          await getIt<CustomerListViewModel>().fetchData(); // 정책 등록 후 갱신
         } else {
           debugPrint('등록 취소 또는 실패');
         }

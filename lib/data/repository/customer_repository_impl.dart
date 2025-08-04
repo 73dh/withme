@@ -16,13 +16,13 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
-    required Map<String,dynamic> todoData,
+    // required Map<String, dynamic> todoData,
   }) async {
     await fBase.registerCustomer(
       userKey: userKey,
       customerData: customerData,
       historyData: historyData,
-      todoData: todoData
+      // todoData: todoData,
     );
   }
 

@@ -7,7 +7,7 @@ abstract interface class CustomerRepository implements Repository {
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
-    required Map<String,dynamic> todoData,
+    // required Map<String, dynamic> todoData,
   });
 
   Future<void> updateCustomer({
@@ -15,7 +15,10 @@ abstract interface class CustomerRepository implements Repository {
     required Map<String, dynamic> customerData,
   });
 
-  Future<void> deleteCustomer({required String userKey, required String customerKey});
+  Future<void> deleteCustomer({
+    required String userKey,
+    required String customerKey,
+  });
 
   Stream<List<CustomerModel>> getAll({required String userKey});
 

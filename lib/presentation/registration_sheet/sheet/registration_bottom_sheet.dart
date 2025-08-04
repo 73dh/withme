@@ -74,9 +74,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
 
   void _initializeCustomer() {
     final customer = widget.customerModel;
-    _registeredDateController.text = DateTime
-        .now()
-        .formattedDate;
+    _registeredDateController.text = DateTime.now().formattedDate;
     if (customer != null) {
       _isReadOnly = true;
       _nameController.text = customer.name;
@@ -119,7 +117,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
                 });
 
                 final fabMixin =
-                context.findAncestorStateOfType<FabOverlayManagerMixin>();
+                    context.findAncestorStateOfType<FabOverlayManagerMixin>();
                 if (fabMixin != null) {
                   fabMixin.setFabCanBeShown(false);
                 }
@@ -134,7 +132,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
               },
               isNeedNewHistory: _isNeedNewHistory,
               viewModel: viewModel,
-              customerModel: widget.customerModel,
+              customer: widget.customerModel,
             ),
             _buildForm(),
             if (!_isReadOnly) _buildSubmitButton(),
@@ -217,11 +215,9 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
             context: context,
             isScrollControlled: true,
             builder:
-                (modalContext) =>
-                StatefulBuilder(
+                (modalContext) => StatefulBuilder(
                   builder:
-                      (context, setModalState) =>
-                      Padding(
+                      (context, setModalState) => Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 16,
                           horizontal: 20,
@@ -296,7 +292,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       final customerMap = CustomerModel.toMapForCreateCustomer(
         userKey: currentUser?.uid ?? '',
         customerKey:
-        widget.customerModel?.customerKey ??
+            widget.customerModel?.customerKey ??
             generateCustomerKey('${currentUser?.email}'),
         name: _nameController.text,
         sex: _sex!,
@@ -315,16 +311,14 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
           ).parseStrict(_registeredDateController.text),
           content: _historyController.text,
         );
-        Map<String,dynamic> todoMap ={};
-
-
+        Map<String, dynamic> todoMap = {};
 
         await viewModel.onEvent(
           RegistrationEvent.registerCustomer(
-              userKey: currentUser!.uid,
-              customerData: customerMap,
-              historyData: historyMap,
-              todoData:todoMap,
+            userKey: currentUser!.uid,
+            customerData: customerMap,
+            historyData: historyMap,
+            todoData: todoMap,
           ),
         );
       } else {

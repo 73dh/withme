@@ -98,7 +98,7 @@ class FBase {
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
-    required Map<String,dynamic> todoData,
+    // required Map<String,dynamic> todoData,
   }) async {
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
@@ -113,7 +113,7 @@ class FBase {
     await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(customerRef, customerData);
       tx.set(historyRef, historyData);
-      tx.set(todoRef, todoData);
+      // tx.set(todoRef, todoData);
     });
   }
 
@@ -139,16 +139,48 @@ class FBase {
         .collection(collectionCustomer)
         .doc(customerKey);
 
-    // 하위 컬렉션 삭제 (예: histories 존재할 경우)
-    final historiesCollection = customerRef.collection(collectionHistories);
-    final histories = await historiesCollection.get();
-    for (var doc in histories.docs) {
-      await doc.reference.delete();
+    // 하위 컬렉션 문서를 병렬로 삭제하는 함수
+    Future<void> deleteSubCollection(String subCollectionName) async {
+      final subCollectionRef = customerRef.collection(subCollectionName);
+      final subDocs = await subCollectionRef.get();
+
+      // 문서 삭제를 병렬 처리
+      await Future.wait([
+        for (var doc in subDocs.docs) doc.reference.delete(),
+      ]);
     }
 
-    // 상위 문서 삭제
+    // 세 개의 하위 컬렉션 병렬 삭제
+    await Future.wait([
+      deleteSubCollection(collectionHistories),
+      deleteSubCollection(collectionTodos),
+      deleteSubCollection(collectionPolicies),
+    ]);
+
+    // 상위 고객 문서 삭제
     await customerRef.delete();
   }
+
+  // Future<void> deleteCustomer({
+  //   required String userKey,
+  //   required String customerKey,
+  // }) async {
+  //   final customerRef = FirebaseFirestore.instance
+  //       .collection(collectionUsers)
+  //       .doc(userKey)
+  //       .collection(collectionCustomer)
+  //       .doc(customerKey);
+  //
+  //   // 하위 컬렉션 삭제 (예: histories 존재할 경우)
+  //   final historiesCollection = customerRef.collection(collectionHistories);
+  //   final histories = await historiesCollection.get();
+  //   for (var doc in histories.docs) {
+  //     await doc.reference.delete();
+  //   }
+  //
+  //   // 상위 문서 삭제
+  //   await customerRef.delete();
+  // }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
     required String userKey,

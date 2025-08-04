@@ -47,7 +47,7 @@ class SearchCustomerItem extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        List<PolicyModel> policies = snapshot.data;
+        List<PolicyModel> policies = snapshot.data??[];
         return  ItemContainer(height: null,
 
 
