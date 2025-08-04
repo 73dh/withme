@@ -17,6 +17,7 @@ class RegistrationViewModel with ChangeNotifier {
           userKey: UserSession.userId,
           customerMap: event.customerData,
           historyMap: event.historyData,
+          todoMap: event.todoData
         );
       case UpdateCustomer():
         await _onUpdateCustomer(
@@ -35,12 +36,14 @@ class RegistrationViewModel with ChangeNotifier {
     required String userKey,
     required Map<String, dynamic> customerMap,
     required Map<String, dynamic> historyMap,
+    required Map<String,dynamic>todoMap,
   }) async {
     return await getIt<CustomerUseCase>().execute(
       usecase: RegisterCustomerUseCase(
         userKey: userKey,
         customerData: customerMap,
         historyData: historyMap,
+        todoData: todoMap,
       ),
     );
   }

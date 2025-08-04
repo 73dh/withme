@@ -14,7 +14,7 @@ import '../../../domain/model/user_model.dart';
 class FBase {
   // User
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid??'';
+    final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (userId.isEmpty) {
       throw Exception('FirebaseAuth returned empty userId');
     }
@@ -50,7 +50,6 @@ class FBase {
       debugPrint('ℹ️ 사용자 이미 존재함. 생성 생략');
     }
   }
-
 
   Future<void> deleteUserAccountAndData({
     required String userId,
@@ -99,6 +98,7 @@ class FBase {
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
+    required Map<String,dynamic> todoData,
   }) async {
     DocumentReference customerRef = FirebaseFirestore.instance
         .collection(collectionUsers)
@@ -107,10 +107,13 @@ class FBase {
         .doc(customerData[keyCustomerKey]);
     DocumentReference historyRef =
         customerRef.collection(collectionHistories).doc();
+    DocumentReference todoRef =
+    customerRef.collection(collectionTodos).doc();
 
     await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
       tx.set(customerRef, customerData);
       tx.set(historyRef, historyData);
+      tx.set(todoRef, todoData);
     });
   }
 
@@ -207,6 +210,37 @@ class FBase {
     });
   }
 
+  // Todos
+  Stream<QuerySnapshot<Map<String, dynamic>>> getTodos({
+    required String userKey,
+    required String customerKey,
+  }) {
+    return FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(userKey)
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionTodos)
+        .snapshots();
+  }
+  Future<void> addTodo({
+    required String userKey,
+    required String customerKey,
+    required Map<String, dynamic> todoData,
+  }) async {
+    DocumentReference todoRef =
+    FirebaseFirestore.instance
+        .collection(collectionUsers)
+        .doc(userKey)
+        .collection(collectionCustomer)
+        .doc(customerKey)
+        .collection(collectionTodos)
+        .doc();
+    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+      tx.set(todoRef, todoData);
+    });
+  }
+
   // Policy
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
@@ -289,16 +323,18 @@ class FBase {
 
   Future<void> deletePolicy({
     required String customerKey,
-  required String policyKey,
-  })async{
-    try{
-    DocumentReference policyRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .collection(collectionCustomer)
-        .doc(customerKey) .collection(collectionPolicies)
-        .doc(policyKey);
-    await policyRef.delete();}catch(e){
+    required String policyKey,
+  }) async {
+    try {
+      DocumentReference policyRef = FirebaseFirestore.instance
+          .collection(collectionUsers)
+          .doc(UserSession.userId)
+          .collection(collectionCustomer)
+          .doc(customerKey)
+          .collection(collectionPolicies)
+          .doc(policyKey);
+      await policyRef.delete();
+    } catch (e) {
       log('Error deleting policy: $e');
     }
   }

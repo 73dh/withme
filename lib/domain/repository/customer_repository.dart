@@ -7,6 +7,7 @@ abstract interface class CustomerRepository implements Repository {
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
+    required Map<String,dynamic> todoData,
   });
 
   Future<void> updateCustomer({

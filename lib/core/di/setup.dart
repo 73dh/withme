@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
+import 'package:withme/data/repository/todo_repository_impl.dart';
+import 'package:withme/domain/repository/todo_repository.dart';
+import 'package:withme/domain/use_case/todo_use_case.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
@@ -29,6 +32,9 @@ Future<void> diSetup() async {
   getIt.registerSingleton<PolicyRepository>(
     PolicyRepositoryImpl(fBase: getIt()),
   );
+  getIt.registerSingleton<TodoRepository>(
+    TodoRepositoryImpl(fBase: getIt()),
+  );
 
   // use_case
   getIt.registerSingleton<CustomerUseCase>(
@@ -40,7 +46,9 @@ Future<void> diSetup() async {
   getIt.registerSingleton<PolicyUseCase>(
     PolicyUseCase(policyRepository: getIt()),
   );
-
+  getIt.registerSingleton<TodoUseCase>(
+    TodoUseCase(todoRepository: getIt()),
+  );
   // viewModel
   getIt.registerLazySingleton<ProspectListViewModel>(
     () => ProspectListViewModel(),

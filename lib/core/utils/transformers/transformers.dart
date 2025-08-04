@@ -5,6 +5,7 @@ import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/model/policy_model.dart';
 
 import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/todo_model.dart';
 
 mixin class Transformers {
   final toPools = StreamTransformer<
@@ -34,6 +35,18 @@ mixin class Transformers {
     },
   );
 
+  final toTodos = StreamTransformer<
+      QuerySnapshot<Map<String, dynamic>>,
+      List<TodoModel>
+  >.fromHandlers(
+    handleData: (snapshot, sink) {
+      List<TodoModel> todos = [];
+      for (var documentSnapshot in snapshot.docs) {
+        todos.add(TodoModel.fromSnapshot(documentSnapshot));
+      }
+      sink.add(todos);
+    },
+  );
   final toPolicies = StreamTransformer<
       QuerySnapshot<Map<String, dynamic>>,
       List<PolicyModel>

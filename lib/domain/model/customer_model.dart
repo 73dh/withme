@@ -122,7 +122,6 @@ class CustomerModel {
     map[keyRegisteredDate] = registeredDate;
     map[keyRecommendByWho] = recommender ?? '';
     map[keyCustomerMemo] = memo;
-    map[keyCustomerTodo] = []; // 새 고객 생성 시 빈 리스트로 초기화
     return map;
   }
 

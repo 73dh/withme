@@ -2,6 +2,7 @@ const String collectionUsers = 'Users';
 const String collectionCustomer = 'Customers';
 const String collectionPolicies = 'Policies';
 const String collectionHistories = 'Histories';
+const String collectionTodos = 'Todos';
 
 // Customer
 const String keyCustomerKey = 'customer_key';
