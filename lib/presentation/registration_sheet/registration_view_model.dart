@@ -1,79 +1,60 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/use_case/customer/delete_customer_use_case.dart';
 import 'package:withme/domain/use_case/customer/update_customer_use_case.dart';
 import 'package:withme/domain/use_case/todo/add_todo_use_case.dart';
+import 'package:withme/domain/use_case/todo/get_todos_use_case.dart';
 import 'package:withme/domain/use_case/todo_use_case.dart';
 import 'package:withme/presentation/registration_sheet/registration_event.dart';
 
 import '../../core/data/fire_base/user_session.dart';
 import '../../core/di/setup.dart';
 import '../../domain/model/customer_model.dart';
+import '../../domain/model/todo_model.dart';
 import '../../domain/repository/customer_repository.dart';
 import '../../domain/use_case/customer/get_edited_all_use_case.dart';
 import '../../domain/use_case/customer/register_customer_use_case.dart';
 import '../../domain/use_case/customer_use_case.dart';
 
 class RegistrationViewModel with ChangeNotifier {
+  Stream<List<TodoModel>>? _todoStream;
 
-  CustomerModel? customer;
+  Stream<List<TodoModel>>? get todoStream => _todoStream;
+
+  List<TodoModel> _todoList = [];
+
+  List<TodoModel> get todoList => _todoList;
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
-  final CustomerUseCase _customerUseCase = getIt<CustomerUseCase>();
+  late final TodoUseCase _todoUseCase = getIt<TodoUseCase>();
+  StreamSubscription<List<TodoModel>>? _subscription;
 
-  Future<void> fetchCustomer(String userKey, String customerKey) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final result = await _customerUseCase.execute(
-        usecase: GetEditedAllUseCase(userKey: userKey),
-      );
-      customer = result;
-    } catch (e) {
-      // TODO: 에러 처리
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> addTodo({
-    required String userKey,
-    required String customerKey,
-    required Map<String, dynamic> todoData,
-  }) async {
-    await _customerUseCase.execute(
-      usecase: AddTodoUseCase(userKey: userKey, customerKey: customerKey, todoData: todoData),
+  Future<void> initializeTodos(String userKey, String customerKey) async {
+    _todoStream = _todoUseCase.call(
+      usecase: GetTodosUseCase(userKey: userKey, customerKey: customerKey),
     );
-    await fetchCustomer(userKey, customerKey); // 상태 갱신
+
+    _subscription?.cancel();
+    _subscription = _todoStream!.listen((todos) {
+      _todoList = todos;
+      notifyListeners();
+    });
   }
 
-  // Future<void> completeTodo({
-  //   required String userKey,
-  //   required String customerKey,
-  //   required String todoKey,
-  // }) async {
-  //   await _customerUseCase.execute(
-  //     usecase: CompleteTodoUseCase(userKey: userKey, customerKey: customerKey, todoKey: todoKey),
-  //   );
-  //   await fetchCustomer(userKey, customerKey);
-  // }
-  //
-  // Future<void> deleteTodo({
-  //   required String userKey,
-  //   required String customerKey,
-  //   required String todoKey,
-  // }) async {
-  //   await _customerUseCase.execute(
-  //     usecase: DeleteTodoUseCase(userKey: userKey, customerKey: customerKey, todoKey: todoKey),
-  //   );
-  //   await fetchCustomer(userKey, customerKey);
-  // }
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 
+  // 필요 시 onEvent에서도 initializeTodos 호출
   Future<void> onEvent(RegistrationEvent event) async {
     switch (event) {
       case RegisterCustomer():
@@ -145,14 +126,19 @@ class RegistrationViewModel with ChangeNotifier {
   Future<void> _addTodo({
     required String userKey,
     required String customerKey,
-    required Map<String,dynamic> todoData,
+    required Map<String, dynamic> todoData,
   }) async {
-    return await getIt<TodoUseCase>().execute(
+    _isLoading = true;
+    notifyListeners();
+
+    await _todoUseCase.execute(
       usecase: AddTodoUseCase(
         userKey: userKey,
         customerKey: customerKey,
         todoData: todoData,
       ),
     );
+    _isLoading = false;
+    notifyListeners();
   }
 }

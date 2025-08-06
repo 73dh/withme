@@ -31,12 +31,19 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
     required String userKey,
     required Map<String, dynamic> customerData,
   }) async {
-    await fBase.updateCustomer(userKey: userKey, customerData: customerData);
+    await fBase.updateCustomer(
+        userKey: userKey,
+        customerData: customerData);
   }
 
+  // @override
+  // Stream<List<CustomerModel>> getAll({required String userKey}) {
+  //   return fBase. getAllCustomers( userKey).transform(toPools);
+  // }
+
   @override
-  Stream<List<CustomerModel>> getAll({required String userKey}) {
-    return fBase.getAll(userKey: userKey).transform(toPools);
+  Future<List<CustomerModel>> getAllCustomers({required String userKey}) {
+    return fBase. getAllCustomers( userKey);
   }
 
   @override

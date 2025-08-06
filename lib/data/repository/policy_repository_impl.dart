@@ -11,13 +11,13 @@ class PolicyRepositoryImpl with Transformers implements PolicyRepository {
 
   @override
   Stream<List<PolicyModel>> fetchPolicies({required String customerKey}) {
-    return fBase.fetchPolicies(customerKey: customerKey).transform(toPolicies);
+    return fBase.fetchPolicies(  customerKey).transform(toPolicies);
   }
 
 
   @override
   Future<List<PolicyModel>> getPolicies({required String customerKey}) async {
-    final snapshot = await fBase.fetchPolicies(customerKey: customerKey).first;
+    final snapshot = await fBase.fetchPolicies(  customerKey).first;
 
     // snapshot.docs가 DocumentSnapshot의 리스트라면 다음과 같이 처리
     return snapshot.docs.map((doc) => PolicyModel.fromSnapshot(doc)).toList();

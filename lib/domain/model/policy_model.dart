@@ -71,7 +71,8 @@ class PolicyModel {
           : DateTime.now().toUtc(),
       policyState: map[keyPolicyState] ?? PolicyState.keep.label,
       customerKey: map[keyCustomerKey] ?? '',
-      policyKey:  map[keyPolicyKey] ?? reference?.id ?? '',
+      // policyKey:  map[keyPolicyKey] ?? reference?.id ?? '',
+      policyKey:  map[keyPolicyKey] ??  '',
       documentReference: reference,
     );
   }

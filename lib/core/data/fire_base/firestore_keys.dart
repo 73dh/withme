@@ -1,5 +1,5 @@
 const String collectionUsers = 'Users';
-const String collectionCustomer = 'Customers';
+const String collectionCustomers = 'Customers';
 const String collectionPolicies = 'Policies';
 const String collectionHistories = 'Histories';
 const String collectionTodos = 'Todos';

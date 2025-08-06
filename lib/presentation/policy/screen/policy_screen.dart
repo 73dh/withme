@@ -241,7 +241,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
     final policyRef = FirebaseFirestore.instance
         .collection(collectionUsers)
         .doc(userId)
-        .collection(collectionCustomer)
+        .collection(collectionCustomers)
         .doc(customerKey)
         .collection(collectionPolicies)
         .doc();

@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
 import '../../../core/domain/core_domain_import.dart';
@@ -12,7 +9,27 @@ import '../../../domain/model/policy_model.dart';
 import '../../../domain/model/user_model.dart';
 
 class FBase {
-  // User
+  // ───────────────────────────── Auth helper ─────────────────────────────
+  String get _userId => FirebaseAuth.instance.currentUser?.uid ?? '';
+
+  DocumentReference<Map<String, dynamic>> _userDoc(String userId) =>
+      FirebaseFirestore.instance.collection(collectionUsers).doc(userId);
+
+  CollectionReference<Map<String, dynamic>> _customersCol(String userId) =>
+      _userDoc(userId).collection(collectionCustomers);
+
+  DocumentReference<Map<String, dynamic>> _customerDoc(
+    String userId,
+    String customerKey,
+  ) => _customersCol(userId).doc(customerKey);
+
+  CollectionReference<Map<String, dynamic>> _subCol(
+    String userId,
+    String customerKey,
+    String subColName,
+  ) => _customerDoc(userId, customerKey).collection(subColName);
+
+  // ───────────────────────────── User ─────────────────────────────
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserInfo() async {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (userId.isEmpty) {
@@ -92,113 +109,60 @@ class FBase {
     }
   }
 
-  // Customer
+  // ───────────────────────────── Customer ─────────────────────────────
 
-  Future registerCustomer({
+  Future<void> registerCustomer({
     required String userKey,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> historyData,
-    // required Map<String,dynamic> todoData,
   }) async {
-    DocumentReference customerRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .doc(customerData[keyCustomerKey]);
-    DocumentReference historyRef =
-        customerRef.collection(collectionHistories).doc();
-    DocumentReference todoRef =
-    customerRef.collection(collectionTodos).doc();
+    final customerRef = _customerDoc(userKey, customerData[keyCustomerKey]);
+    final historyRef =
+        _subCol(
+          userKey,
+          customerData[keyCustomerKey],
+          collectionHistories,
+        ).doc();
 
-    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+    await FirebaseFirestore.instance.runTransaction((tx) async {
       tx.set(customerRef, customerData);
       tx.set(historyRef, historyData);
-      // tx.set(todoRef, todoData);
     });
   }
 
-  Future updateCustomer({
+  Future<void> updateCustomer({
     required String userKey,
     required Map<String, dynamic> customerData,
-  }) async {
-    DocumentReference customerRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .doc(customerData[keyCustomerKey]);
-    await customerRef.update(customerData);
-  }
+  }) async =>
+      _customerDoc(userKey, customerData[keyCustomerKey]).update(customerData);
 
   Future<void> deleteCustomer({
     required String userKey,
     required String customerKey,
   }) async {
-    final customerRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .doc(customerKey);
+    final ref = _customerDoc(userKey, customerKey);
 
-    // 하위 컬렉션 문서를 병렬로 삭제하는 함수
-    Future<void> deleteSubCollection(String subCollectionName) async {
-      final subCollectionRef = customerRef.collection(subCollectionName);
-      final subDocs = await subCollectionRef.get();
-
-      // 문서 삭제를 병렬 처리
-      await Future.wait([
-        for (var doc in subDocs.docs) doc.reference.delete(),
-      ]);
+    Future<void> deleteSub(String sub) async {
+      final subRef = _subCol(userKey, customerKey, sub);
+      final snapshot = await subRef.limit(1).get();
+      if (snapshot.size > 0) {
+        final allDocs = await subRef.get();
+        await Future.wait(allDocs.docs.map((d) => d.reference.delete()));
+      }
     }
 
-    // 세 개의 하위 컬렉션 병렬 삭제
     await Future.wait([
-      deleteSubCollection(collectionHistories),
-      deleteSubCollection(collectionTodos),
-      deleteSubCollection(collectionPolicies),
+      deleteSub(collectionHistories),
+      deleteSub(collectionTodos),
+      deleteSub(collectionPolicies),
     ]);
-
-    // 상위 고객 문서 삭제
-    await customerRef.delete();
+    await ref.delete();
   }
 
-  // Future<void> deleteCustomer({
-  //   required String userKey,
-  //   required String customerKey,
-  // }) async {
-  //   final customerRef = FirebaseFirestore.instance
-  //       .collection(collectionUsers)
-  //       .doc(userKey)
-  //       .collection(collectionCustomer)
-  //       .doc(customerKey);
-  //
-  //   // 하위 컬렉션 삭제 (예: histories 존재할 경우)
-  //   final historiesCollection = customerRef.collection(collectionHistories);
-  //   final histories = await historiesCollection.get();
-  //   for (var doc in histories.docs) {
-  //     await doc.reference.delete();
-  //   }
-  //
-  //   // 상위 문서 삭제
-  //   await customerRef.delete();
-  // }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAll({
-    required String userKey,
-  }) {
-    return FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .snapshots();
-  }
-
-  Future<List<CustomerModel>> getEditedAll({required String userKey}) async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .get(const GetOptions(source: Source.server)); // ✅ 서버에서 강제 fetch
-
+  Future<List<CustomerModel>> getAllCustomers(String userKey) async {
+    final snapshot = await _customersCol(
+      userKey,
+    ).get(const GetOptions(source: Source.serverAndCache));
     return snapshot.docs
         .map(
           (doc) => CustomerModel.fromMap(
@@ -210,110 +174,90 @@ class FBase {
         .toList();
   }
 
-  // History
+  Future<List<CustomerModel>> getEditedAll({required String userKey}) async {
+    final snapshot = await _customersCol(
+      userKey,
+    ).get(const GetOptions(source: Source.server));
+
+    // 각 고객 문서에 대해 policies도 병렬로 로드
+    final List<Future<CustomerModel>> futures =
+        snapshot.docs.map((doc) async {
+          final customer = CustomerModel.fromMap(
+            doc.data(),
+            doc.id,
+            documentReference: doc.reference,
+          );
+
+          // policies 서브컬렉션 가져오기
+          final policySnapshot =
+              await doc.reference.collection(collectionPolicies).get();
+          customer.policies =
+              policySnapshot.docs
+                  .map((p) => PolicyModel.fromMap(p.data()))
+                  .toList();
+
+          return customer;
+        }).toList();
+
+    return await Future.wait(futures);
+  }
+
+  // ───────────────────────────── History ─────────────────────────────
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistories({
     required String userKey,
     required String customerKey,
-  }) {
-    return FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionHistories)
-        .snapshots();
-  }
+  }) => _subCol(userKey, customerKey, collectionHistories).snapshots();
 
   Future<void> addHistory({
     required String userKey,
     required String customerKey,
     required Map<String, dynamic> historyData,
   }) async {
-    DocumentReference historyRef =
-        FirebaseFirestore.instance
-            .collection(collectionUsers)
-            .doc(userKey)
-            .collection(collectionCustomer)
-            .doc(customerKey)
-            .collection(collectionHistories)
-            .doc();
-    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
-      tx.set(historyRef, historyData);
-    });
+    final ref = _subCol(userKey, customerKey, collectionHistories).doc();
+    await ref.set(historyData);
   }
 
-  // Todos
+  // ───────────────────────────── Todos ─────────────────────────────
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getTodos({
     required String userKey,
     required String customerKey,
-  }) {
-    return FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionTodos)
-        .snapshots();
-  }
+  }) => _subCol(userKey, customerKey, collectionTodos).snapshots();
+
   Future<void> addTodo({
     required String userKey,
     required String customerKey,
     required Map<String, dynamic> todoData,
   }) async {
-    DocumentReference todoRef =
-    FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userKey)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionTodos)
-        .doc();
-    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
-      tx.set(todoRef, todoData);
-    });
+    final ref = _subCol(userKey, customerKey, collectionTodos).doc();
+    await ref.set(todoData);
   }
 
-  // Policy
+  // ───────────────────────────── Policies ─────────────────────────────
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies({
-    required String customerKey,
-  }) {
-    return FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .snapshots();
-  }
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies(
+    String customerKey,
+  ) => _subCol(_userId, customerKey, collectionPolicies).snapshots();
 
   Future<void> addPolicy({
     required String userKey,
     required String customerKey,
     required Map<String, dynamic> policyData,
   }) async {
-    DocumentReference customerRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .collection(collectionCustomer)
-        .doc(customerKey);
+    final customerRef = _customerDoc(userKey, customerKey);
+    final policyRef = _subCol(
+      userKey,
+      customerKey,
+      collectionPolicies,
+    ).doc(policyData[keyPolicyKey]);
 
-    DocumentReference policyRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .doc(policyData[keyPolicyKey]);
-
-    await FirebaseFirestore.instance.runTransaction((Transaction tx) async {
+    await FirebaseFirestore.instance.runTransaction((tx) async {
       tx.update(customerRef, {
         keyCustomerBirth: policyData[keyPolicyHolderBirth],
       });
       tx.set(policyRef, policyData);
     });
-
-    await policyRef.set(policyData);
   }
 
   Future<void> changePolicyState({
@@ -321,53 +265,35 @@ class FBase {
     required String policyKey,
     required String policyState,
   }) async {
-    DocumentReference policyRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(UserSession.userId)
-        .collection(collectionCustomer)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .doc(policyKey); // <- 기존 정책 문서의 key 사용
-
-    await policyRef.update({
-      keyPolicyState: policyState, // 이 필드만 업데이트됨
-    });
+    final ref = _subCol(
+      _userId,
+      customerKey,
+      collectionPolicies,
+    ).doc(policyKey);
+    await ref.update({keyPolicyState: policyState});
   }
 
   Future<void> updatePolicy({
     required String customerKey,
     required PolicyModel policy,
   }) async {
-    try {
-      DocumentReference policyRef = FirebaseFirestore.instance
-          .collection(collectionUsers)
-          .doc(UserSession.userId)
-          .collection(collectionCustomer)
-          .doc(customerKey)
-          .collection(collectionPolicies)
-          .doc(policy.policyKey);
-
-      await policyRef.update(policy.toJson());
-    } catch (e) {
-      log('Error updating policy: $e');
-    }
+    final ref = _subCol(
+      _userId,
+      customerKey,
+      collectionPolicies,
+    ).doc(policy.policyKey);
+    await ref.update(policy.toJson());
   }
 
   Future<void> deletePolicy({
     required String customerKey,
     required String policyKey,
   }) async {
-    try {
-      DocumentReference policyRef = FirebaseFirestore.instance
-          .collection(collectionUsers)
-          .doc(UserSession.userId)
-          .collection(collectionCustomer)
-          .doc(customerKey)
-          .collection(collectionPolicies)
-          .doc(policyKey);
-      await policyRef.delete();
-    } catch (e) {
-      log('Error deleting policy: $e');
-    }
+    final ref = _subCol(
+      _userId,
+      customerKey,
+      collectionPolicies,
+    ).doc(policyKey);
+    await ref.delete();
   }
 }

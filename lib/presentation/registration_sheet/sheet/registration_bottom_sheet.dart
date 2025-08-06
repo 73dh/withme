@@ -67,15 +67,27 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
     super.initState();
     _initializeCustomer();
     _isNeedNewHistory = isNeedNewHistory(widget.customerModel?.histories ?? []);
+
     if (widget.scrollController == null) {
       _internalController = ScrollController();
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final customerKey = widget.customerModel?.customerKey;
+      if (customerKey != null && customerKey.isNotEmpty) {
+        viewModel.initializeTodos(UserSession.userId, customerKey);
+      } else {
+        // 디버깅 로그나 처리
+        debugPrint("customerKey가 비어 있습니다. Todos를 초기화하지 않습니다.");
+      }
+    });
   }
 
-  void _initializeCustomer() {
+  void _initializeCustomer()async {
     final customer = widget.customerModel;
     _registeredDateController.text = DateTime.now().formattedDate;
     if (customer != null) {
+
       _isReadOnly = true;
       _nameController.text = customer.name;
       _sex = customer.sex;

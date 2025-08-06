@@ -62,7 +62,7 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
 
   Future<void> _fetchData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final allCustomers = await getIt<CustomerUseCase>().execute(
+    final List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
       usecase: GetAllDataUseCase(userKey: uid),
     );
 

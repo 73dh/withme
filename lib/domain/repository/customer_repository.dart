@@ -20,7 +20,8 @@ abstract interface class CustomerRepository implements Repository {
     required String customerKey,
   });
 
-  Stream<List<CustomerModel>> getAll({required String userKey});
+  // Stream<List<CustomerModel>> getAllCustomers({required String userKey});
+  Future<List<CustomerModel>> getAllCustomers({required String userKey});
 
   // 추가후 stream 아닌 data에서 가져오기
   Future<List<CustomerModel>> getEditedAll({required String userKey}); // 👈 추가

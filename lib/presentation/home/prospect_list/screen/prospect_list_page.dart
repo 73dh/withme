@@ -41,7 +41,7 @@ class _ProspectListPageState extends State<ProspectListPage>
   void initState() {
     super.initState();
 
-    viewModel.fetchData(force: true);
+    // viewModel.fetchData(force: true);
     _initPopup();
     initFilterBarAnimation(vsync: this);
   }
@@ -109,107 +109,101 @@ class _ProspectListPageState extends State<ProspectListPage>
       key: const Key('prospect-list-visibility'),
       onVisibilityChanged: handleVisibilityChange,
       child: SafeArea(
-        child: AnimatedBuilder(
-          animation: viewModel,
-          builder: (context, _) {
-            return StreamBuilder<List<CustomerModel>>(
-              stream: viewModel.cachedProspects,
-              builder: (context, snapshot) {
-                final filteredList = snapshot.data ?? [];
+        child: StreamBuilder<List<CustomerModel>>(
+          stream: viewModel.cachedProspects,
+          builder: (context, snapshot) {
+            final filteredList = snapshot.data ?? [];
 
-                return Scaffold(
-                  resizeToAvoidBottomInset: true,
-                  backgroundColor: Colors.transparent,
-                  appBar: ProspectListAppBar(
-                    viewModel: viewModel,
-                    customers: filteredList,
-                    filterBarExpanded: filterBarExpanded,
-                    onToggleFilterBar: _toggleFilterBar,
+            return Scaffold(
+              resizeToAvoidBottomInset: true,
+              backgroundColor: Colors.transparent,
+              appBar: ProspectListAppBar(
+                viewModel: viewModel,
+                customers: filteredList,
+                filterBarExpanded: filterBarExpanded,
+                onToggleFilterBar: _toggleFilterBar,
+              ),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizeTransitionFilterBar(
+                    heightFactor: heightFactor,
+                    child: InactiveAndUrgentFilterBar(
+                      showInactiveOnly: _showInactiveOnly,
+                      showUrgentOnly: _showUrgentOnly,
+                      onInactiveToggle: (val) {
+                        setState(() => _showInactiveOnly = val);
+                        viewModel.updateFilter(inactiveOnly: val);
+                      },
+                      onUrgentToggle: (val) {
+                        setState(() => _showUrgentOnly = val);
+                        viewModel.updateFilter(urgentOnly: val);
+                      },
+                      inactiveCount: viewModel.inactiveCount,
+                      urgentCount: viewModel.urgentCount,
+                    ),
                   ),
-                  body: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizeTransitionFilterBar(
-                        heightFactor: heightFactor,
-                        child: InactiveAndUrgentFilterBar(
-                          showInactiveOnly: _showInactiveOnly,
-                          showUrgentOnly: _showUrgentOnly,
-                          onInactiveToggle: (val) {
-                            setState(() => _showInactiveOnly = val);
-                            viewModel.updateFilter(inactiveOnly: val);
-                          },
-                          onUrgentToggle: (val) {
-                            setState(() => _showUrgentOnly = val);
-                            viewModel.updateFilter(urgentOnly: val);
-                          },
-                          inactiveCount: viewModel.inactiveCount,
-                          urgentCount: viewModel.urgentCount,
-                        ),
-                      ),
-                      height(5),
-                      Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          itemCount: filteredList.length,
-                          itemBuilder: (context, index) {
-                            final customer = filteredList[index];
+                  height(5),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      itemCount: filteredList.length,
+                      itemBuilder: (context, index) {
+                        final customer = filteredList[index];
 
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  // 1. 무조건 FAB 숨김
-                                  setFabCanBeShown(false);
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: GestureDetector(
+                            onTap: () async {
+                              // 1. 무조건 FAB 숨김
+                              setFabCanBeShown(false);
 
-                                  // 2. bottomSheet 닫힐 때까지 대기
-                                  await showBottomSheetWithDraggable(
-                                    context: context,
-                                    builder:
-                                        (scrollController) =>
-                                            RegistrationBottomSheet(
-                                              customerModel: customer,
-                                              scrollController:
-                                                  scrollController,
-                                              outerContext: context,
-                                            ),
-                                    onClosed: () async {
-                                      setIsProcessActive(false);
-                                      await viewModel.fetchData(force: true);
-                                      await Future.delayed(
-                                        const Duration(milliseconds: 200),
-                                      );
-                                      if (!mounted) return;
-                                      setFabCanBeShown(true);
-                                    },
+                              // 2. bottomSheet 닫힐 때까지 대기
+                              await showBottomSheetWithDraggable(
+                                context: context,
+                                builder:
+                                    (scrollController) =>
+                                        RegistrationBottomSheet(
+                                          customerModel: customer,
+                                          scrollController: scrollController,
+                                          outerContext: context,
+                                        ),
+                                onClosed: () async {
+                                  setIsProcessActive(false);
+                                  // 👇 삭제가 Firestore에 전파되도록 약간의 대기
+
+                                  await viewModel.fetchData(force: true);
+
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 200),
                                   );
+                                  if (!mounted) return;
+                                  setFabCanBeShown(true);
                                 },
+                              );
+                            },
 
-                                child: ProspectItem(
-                                  userKey: UserSession.userId,
+                            child: ProspectItem(
+                              userKey: UserSession.userId,
+                              customer: customer,
+                              onTap: (histories) async {
+                                setFabCanBeShown(false);
+                                await popupAddHistory(
+                                  context: context,
+                                  histories: histories,
                                   customer: customer,
-                                  onTap: (histories) async {
-                                    setFabCanBeShown(false);
-                                    await popupAddHistory(
-                                      context: context,
-                                      histories: histories,
-                                      customer: customer,
-                                      initContent:
-                                          HistoryContent.title.toString(),
-                                    );
-                                    if (mounted) setFabCanBeShown(true);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                                  initContent: HistoryContent.title.toString(),
+                                );
+                                if (mounted) setFabCanBeShown(true);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                );
-              },
+                ],
+              ),
             );
           },
         ),

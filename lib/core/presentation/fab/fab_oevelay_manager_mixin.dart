@@ -96,30 +96,51 @@ mixin FabOverlayManagerMixin<
   void didPushNext() {
     // 화면 전환 시작
     _isRouteTransitioning = true;
-    _fabCanBeShown = false;
+    // _fabCanBeShown = false;
     _removeFabOverlay();
   }
 
+  // @override
+  // void didPopNext() {
+  //   // 화면 복귀 시작
+  //   _isRouteTransitioning = true;
+  //   _removeFabOverlay();
+  //
+  //   // 다음 프레임에 화면 전환 완료 처리
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (!mounted) return;
+  //     _isRouteTransitioning = false;
+  //
+  //     if (!_isProcessActive) {
+  //       _fabCanBeShown = true;
+  //       _insertFabOverlayIfAllowed();
+  //     }
+  //
+  //     viewModel.fetchData(force: true);
+  //   });
+  // }
   @override
   void didPopNext() {
-    // 화면 복귀 시작
-    _isRouteTransitioning = true;
-    _removeFabOverlay();
+    _isRouteTransitioning = false;
+    _fabCanBeShown = true;
+    _insertFabOverlayIfAllowed(); // ✅ 즉시 재삽입 시도
 
-    // 다음 프레임에 화면 전환 완료 처리
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _isRouteTransitioning = false;
-
-      if (!_isProcessActive) {
-        _fabCanBeShown = true;
-        _insertFabOverlayIfAllowed();
-      }
-
-      viewModel.fetchData(force: true);
-    });
+    // 📌 데이터 갱신은 overlay 로직과 분리
+    viewModel.fetchData(force: true);
   }
 
+  // void setFabCanBeShown(bool canShow) {
+  //   if (_fabCanBeShown == canShow) return;
+  //
+  //   _fabCanBeShown = canShow;
+  //   callOverlaySetState();
+  //
+  //   if (_fabCanBeShown) {
+  //     _insertFabOverlayIfAllowed();
+  //   } else {
+  //     _removeFabOverlay();
+  //   }
+  // }
   void setFabCanBeShown(bool canShow) {
     if (_fabCanBeShown == canShow) return;
 
@@ -127,7 +148,7 @@ mixin FabOverlayManagerMixin<
     callOverlaySetState();
 
     if (_fabCanBeShown) {
-      _insertFabOverlayIfAllowed();
+      Future.microtask(_insertFabOverlayIfAllowed); // 📌 타이밍 명확히
     } else {
       _removeFabOverlay();
     }
@@ -143,11 +164,20 @@ mixin FabOverlayManagerMixin<
     }
   }
 
+  // void handleVisibilityChange(VisibilityInfo info) {
+  //   if (_isProcessActive) return;
+  //   if (info.visibleFraction < 0.9) {
+  //     setFabCanBeShown(false);
+  //   }
+  // }
   void handleVisibilityChange(VisibilityInfo info) {
-    if (_isProcessActive) return;
-    if (info.visibleFraction < 0.9) {
+    if (_isProcessActive || _isRouteTransitioning) return;
+
+    if (info.visibleFraction > 0.6) {
+      setFabCanBeShown(true);
+    } else {
       setFabCanBeShown(false);
-    } 
+    }
   }
 
   Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
@@ -186,11 +216,13 @@ mixin FabOverlayManagerMixin<
   }
 
   void _insertFabOverlayIfAllowed() {
-    if (!_fabCanBeShown ||
-        _fabOverlayIsInserted ||
-        !mounted ||
-        _isProcessActive ||
-        _isRouteTransitioning)
+    // if (!_fabCanBeShown ||
+    //     _fabOverlayIsInserted ||
+    //     !mounted ||
+    //     _isProcessActive ||
+    //     _isRouteTransitioning)
+    //   return;
+    if (!_fabCanBeShown || _fabOverlayIsInserted || !mounted || _isRouteTransitioning)
       return;
 
     _removeFabOverlay();

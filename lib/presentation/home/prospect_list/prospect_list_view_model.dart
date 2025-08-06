@@ -64,12 +64,16 @@ class ProspectListViewModel
 
     allCustomers = result;
 
+    // 필터 적용 및 캐시 갱신
     _applyFilterAndSort();
-    await Future.delayed(AppDurations.duration100);
+
+    // add 후 즉시 value 읽으면 이전 값일 수 있음. 잠시 딜레이 후 확인 가능
+    await Future.delayed(const Duration(milliseconds: 10));
   }
 
   void _applyFilterAndSort() {
     final now = DateTime.now();
+
     var filtered = allCustomers.where((e) => e.policies.isEmpty).toList();
 
     if (_searchText.isNotEmpty) {
@@ -92,6 +96,7 @@ class ProspectListViewModel
           }).toList();
     }
 
+    // 4. 긴급 필터 적용
     if (_urgentOnly) {
       final urgentDays = getIt<UserSession>().urgentThresholdDays;
       filtered =
@@ -104,14 +109,63 @@ class ProspectListViewModel
           }).toList();
     }
 
+    // 5. 정렬 적용
     final sorted = ApplyCurrentSortUseCase(
       isAscending: _sortStatus.isAscending,
       currentSortType: _sortStatus.type,
     ).call(filtered);
 
-    _cachedProspects.add(List.from(sorted));
+    // 6. BehaviorSubject에 새 리스트 추가 (복사본 생성)
+    _cachedProspects.add(filtered); // 🔴 이 라인이 반드시 필요
+
+    // 7. ChangeNotifier에게 변경 알림
     notifyListeners();
   }
+
+  // void _applyFilterAndSort() {
+  //   final now = DateTime.now();
+  //   var filtered = allCustomers.where((e) => e.policies.isEmpty).toList();
+  //
+  //   if (_searchText.isNotEmpty) {
+  //     filtered = filtered.where((e) => e.name.contains(_searchText)).toList();
+  //   }
+  //
+  //   if (_inactiveOnly) {
+  //     final threshold = getIt<UserSession>().managePeriodDays;
+  //     filtered =
+  //         filtered.where((e) {
+  //           final latest = e.histories
+  //               .map((h) => h.contactDate)
+  //               .fold<DateTime?>(
+  //                 null,
+  //                 (prev, date) =>
+  //                     prev == null || date.isAfter(prev) ? date : prev,
+  //               );
+  //           return latest == null ||
+  //               latest.add(Duration(days: threshold)).isBefore(now);
+  //         }).toList();
+  //   }
+  //
+  //   if (_urgentOnly) {
+  //     final urgentDays = getIt<UserSession>().urgentThresholdDays;
+  //     filtered =
+  //         filtered.where((e) {
+  //           final birth = e.birth;
+  //           if (birth == null) return false;
+  //           final changeDate = getInsuranceAgeChangeDate(birth);
+  //           final diff = changeDate.difference(now).inDays;
+  //           return diff >= 0 && diff <= urgentDays;
+  //         }).toList();
+  //   }
+  //
+  //   final sorted = ApplyCurrentSortUseCase(
+  //     isAscending: _sortStatus.isAscending,
+  //     currentSortType: _sortStatus.type,
+  //   ).call(filtered);
+  //
+  //   _cachedProspects.add(List.from(sorted));
+  //   notifyListeners();
+  // }
 
   void _sort(SortType type) {
     final currentList = _cachedProspects.valueOrNull ?? [];
