@@ -96,7 +96,7 @@ class CustomerScreen extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '(${customer.registeredDate.formattedDate})',
+            '(${customer.registeredDate.formattedBirth})',
             style: const TextStyle(fontSize: 18, color: Colors.black45),
           ),
         ],

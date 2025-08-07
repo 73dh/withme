@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/stream_todo_text.dart';
 import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
@@ -70,19 +71,23 @@ class ProspectItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      customer.registeredDate.formattedMonth,
+                      customer.registeredDate.formattedYearAndMonth,
                       style: TextStyles.normal12,
                     ),
                     height(5),
                     ProspectItemIcon(
                       number: histories.length,
                       sex: customer.sex,
-                      backgroundImagePath:customer.sex=='남'?IconsPath.manIcon: IconsPath.womanIcon,
+                      backgroundImagePath:
+                          customer.sex == '남'
+                              ? IconsPath.manIcon
+                              : IconsPath.womanIcon,
                     ),
                   ],
                 ),
                 width(20),
                 _namePart(birthDate, difference, isUrgent, insuranceChangeDate),
+
                 const Spacer(),
                 Expanded(
                   child: HistoryPartWidget(
@@ -115,16 +120,19 @@ class ProspectItem extends StatelessWidget {
               shortenedNameText(customer.name, length: 6),
               style: TextStyles.bold14.copyWith(color: Colors.black87),
             ),
+
             width(6),
             if (birthDate != null)
               Row(
                 children: [
                   Text(
                     '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
-                    style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+                    style: TextStyles.normal12.copyWith(
+                      color: Colors.grey[700],
+                    ),
                   ),
                   if (isBirthdayWithin7Days(birthDate)) ...[
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 3),
                     const Icon(
                       Icons.cake_rounded,
                       color: Colors.pinkAccent,
@@ -134,16 +142,26 @@ class ProspectItem extends StatelessWidget {
 
                     Text(
                       '(D-${getBirthdayCountdown(birthDate)})',
-                      style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
+                      style: TextStyles.normal10.copyWith(
+                        color: Colors.pinkAccent,
+                      ),
                     ),
+
+
                   ],
                 ],
-              )
-,
+              ),
+            if(customer.todos.isNotEmpty)...[
+              width(3),
+              SizedBox(width: 35,
+                child: StreamTodoText(todoList: customer.todos),
+              ),],
           ],
         ),
         height(6),
-        if (birthDate != null && difference != null && insuranceChangeDate != null)
+        if (birthDate != null &&
+            difference != null &&
+            insuranceChangeDate != null)
           InsuranceAgeWidget(
             difference: difference,
             isUrgent: isUrgent,
@@ -157,9 +175,8 @@ class ProspectItem extends StatelessWidget {
             style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
           ),
         ],
+
       ],
     );
   }
-
-
 }

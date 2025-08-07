@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/data_chase_indicator.dart';
 import 'package:withme/core/presentation/widget/history_part_widget.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/todo_model.dart';
@@ -69,67 +70,21 @@ class RegistrationAppBar extends StatelessWidget
         AnimatedBuilder(
           animation: viewModel,
           builder: (context, _) {
-            if(viewModel.isLoading){
-              return MyCircularIndicator();
-            }else {
+            if (viewModel.isLoading) {
+              return DataChaseIndicator();
+            } else {
               return BuildTodoList(
                 viewModel: viewModel,
                 customer: customer,
                 onSelected: (value) async {
                   await _onAddTodo(context);
-                  // final newTodo = await showAddTodoDialog(context);
-                  // if (newTodo != null) {
-                  //   final todoData = TodoModel.toMapForCreateTodo(
-                  //     content: newTodo.content,
-                  //     dueDate: newTodo.dueDate,
-                  //   );
-                  //
-                  //   await viewModel.onEvent(
-                  //     RegistrationEvent.addTodo(
-                  //       userKey: UserSession.userId,
-                  //       customerKey: customer?.customerKey ?? '',
-                  //       todoData: todoData,
-                  //     ),
-                  //   );
-                  // }
-                  // if (value == 'add') {
-                  //   final newTodo = await showAddTodoDialog(context);
-                  //   if (newTodo != null) {
-                  //     final todoData = TodoModel.toMapForCreateTodo(
-                  //       content: newTodo.content,
-                  //       dueDate: newTodo.dueDate,
-                  //     );
-                  //
-                  //     await viewModel.onEvent(
-                  //       RegistrationEvent.addTodo(
-                  //         userKey: UserSession.userId,
-                  //         customerKey: customer?.customerKey ?? '',
-                  //         todoData: todoData,
-                  //       ),
-                  //     );
-                  //   }
-                  // }
                 },
                 onPressed: () async {
                   await _onAddTodo(context);
-                  // final newTodo = await showAddTodoDialog(context);
-                  // if (newTodo != null) {
-                  //   final todoData = TodoModel.toMapForCreateTodo(
-                  //     content: newTodo.content,
-                  //     dueDate: newTodo.dueDate,
-                  //   );
-                  //
-                  //   await viewModel.onEvent(
-                  //     RegistrationEvent.addTodo(
-                  //       userKey: UserSession.userId,
-                  //       customerKey: customer?.customerKey ?? '',
-                  //       todoData: todoData,
-                  //     ),
-                  //   );
-                  // }
                 },
               );
-            } },
+            }
+          },
         ),
         _buildHistoryButton(),
         width(10),
@@ -143,7 +98,7 @@ class RegistrationAppBar extends StatelessWidget
     );
   }
 
-  Future<void> _onAddTodo(BuildContext context)async{
+  Future<void> _onAddTodo(BuildContext context) async {
     final newTodo = await showAddTodoDialog(context);
     if (newTodo != null) {
       final todoData = TodoModel.toMapForCreateTodo(
@@ -160,7 +115,6 @@ class RegistrationAppBar extends StatelessWidget
       );
     }
   }
-
 
   Widget _buildHistoryButton() {
     return GestureDetector(

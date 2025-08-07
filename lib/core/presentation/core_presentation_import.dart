@@ -2,7 +2,6 @@ export 'package:withme/core/presentation/components/dashed_divider.dart';
 export 'package:withme/core/presentation/components/part_box.dart';
 export 'package:withme/core/presentation/components/part_title.dart';
 export 'package:withme/core/presentation/components/prospect_item.dart';
-export 'package:withme/core/presentation/components/search_customer_item.dart';
 export 'package:withme/core/presentation/components/title_widget.dart';
 export 'package:withme/core/presentation/components/width_height.dart';
 export 'package:withme/core/presentation/widget/add_policy_widget.dart';

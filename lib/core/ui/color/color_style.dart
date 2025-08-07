@@ -20,4 +20,6 @@ abstract interface class ColorStyles{
   static Color badgeColor=Colors.deepPurple.shade300;
   static Color manColor=Colors.blue;
   static Color womanColor=Colors.deepOrange;
+  static Color todoBoxColor=Colors.deepPurple.shade50;
+  static Color todoTextColor=Colors.deepPurple;
 }

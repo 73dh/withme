@@ -98,7 +98,7 @@ class DashBoardSideMenu extends StatelessWidget {
                                 BuildIconRow(
                                   icon: Icons.date_range,
                                   text:
-                                      '가입일시: ${currentUser?.agreedDate.formattedDate ?? '-'}',
+                                      '가입일시: ${currentUser?.agreedDate.formattedBirth ?? '-'}',
                                 ),
                                 const DashedDivider(height: 30),
 
@@ -244,7 +244,7 @@ class DashBoardSideMenu extends StatelessWidget {
           width(8),
           currentUser!.isMembershipValid
               ? Text(
-                '(만료일: ${currentUser!.membershipExpiresAt?.formattedDate ?? '-'})',
+                '(만료일: ${currentUser!.membershipExpiresAt?.formattedBirth ?? '-'})',
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               )
               : const Text(
@@ -270,7 +270,7 @@ class DashBoardSideMenu extends StatelessWidget {
         height(15),
         BuildIconRow(
           icon: Icons.date_range,
-          text: '직전결제일: ${hasPaid ? paidAt.formattedDate : '이력 없음'}',
+          text: '직전결제일: ${hasPaid ? paidAt.formattedBirth : '이력 없음'}',
         ),
       ],
     );

@@ -59,7 +59,7 @@ class ConfirmBoxPart extends StatelessWidget {
                   text2:
                       birthController.text.isEmpty
                           ? '추후입력'
-                          : birth?.formattedDate,
+                          : birth?.formattedBirth,
                 ),
                 ConfirmBoxText(
                   text: '소개자: ',

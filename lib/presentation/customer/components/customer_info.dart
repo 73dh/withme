@@ -1,3 +1,4 @@
+import 'package:withme/core/presentation/components/stream_todo_text.dart';
 import 'package:withme/domain/model/customer_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
@@ -31,7 +32,7 @@ class CustomerInfo extends StatelessWidget {
     final birthDate = customer.birth;
 
     return ItemContainer(
-      height:customer.recommended.isEmpty? 100:120,
+      height: customer.recommended.isEmpty ? 100 : 120,
       backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,6 +46,8 @@ class CustomerInfo extends StatelessWidget {
                 padding: const EdgeInsets.all(5.0),
                 child: Row(
                   children: [
+                    sexIcon(customer.sex),
+                    width(6),
                     Text(
                       shortenedNameText(customer.name),
                       style: const TextStyle(
@@ -52,8 +55,8 @@ class CustomerInfo extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    width(6),
-                    sexIcon(customer.sex),
+                    width(10),
+                    StreamTodoText(todoList: customer.todos),
                   ],
                 ),
               ),
@@ -66,7 +69,7 @@ class CustomerInfo extends StatelessWidget {
                   width(4),
                   Text(
                     birthDate != null
-                        ? '${birthDate.formattedDate} (${calculateAge(birthDate)}세)'
+                        ? '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)'
                         : '정보 없음',
                     style: TextStyle(fontSize: 12, color: Colors.grey[800]),
                   ),
@@ -113,10 +116,10 @@ class CustomerInfo extends StatelessWidget {
                 histories: histories,
                 onTap: (histories) async {
                   await popupAddHistory(
-              context:       context,
-            histories:         histories,
-             customer:        customer,
-              initContent:       HistoryContent.title.toString(),
+                    context: context,
+                    histories: histories,
+                    customer: customer,
+                    initContent: HistoryContent.title.toString(),
                   );
                 },
                 sex: customer.sex,

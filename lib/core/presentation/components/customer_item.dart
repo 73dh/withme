@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/policy_state.dart';
 import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/components/orbiting_dots.dart';
+import 'package:withme/core/presentation/components/stream_todo_text.dart';
 import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
@@ -63,9 +64,7 @@ class CustomerItem extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CustomerItemIcon(
-                    customer: customer,
-                  ),
+                  CustomerItemIcon(customer: customer),
                   width(20),
                   Expanded(
                     child: Column(
@@ -92,7 +91,6 @@ class CustomerItem extends StatelessWidget {
               ),
             ],
           ),
-
         );
       },
     );
@@ -138,19 +136,17 @@ class CustomerItem extends StatelessWidget {
           ),
         if (isBirthdayWithin7Days(birthDate)) ...[
           const SizedBox(width: 4),
-          const Icon(
-            Icons.cake_rounded,
-            color: Colors.pinkAccent,
-            size: 16,
-          ),
+          const Icon(Icons.cake_rounded, color: Colors.pinkAccent, size: 16),
           const SizedBox(width: 2),
+          if(getBirthdayCountdown(birthDate)!=0)
           Text(
             '(D-${getBirthdayCountdown(birthDate)})',
             style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
           ),
         ],
         if (difference == null || difference < 0) const SizedBox.shrink(),
-        Flexible(child: Text(customer.recommended.isNotEmpty ? customer.recommended : '')),
+        width(5),
+        SizedBox(width: 30, child: StreamTodoText(todoList: customer.todos)),
       ],
     );
   }
@@ -160,7 +156,9 @@ class CustomerItem extends StatelessWidget {
 
     // 가장 최근 1개
     final List<PolicyModel> recentPolicies =
-    showPrev ? policies.reversed.take(1).toList().reversed.toList() : policies;
+        showPrev
+            ? policies.reversed.take(1).toList().reversed.toList()
+            : policies;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +173,8 @@ class CustomerItem extends StatelessWidget {
             ),
           ),
         ...recentPolicies.map((e) {
-          final isCancelled = e.policyState == PolicyState.cancelled.label ||
+          final isCancelled =
+              e.policyState == PolicyState.cancelled.label ||
               e.policyState == PolicyState.lapsed.label;
 
           final premiumText = numFormatter.format(
@@ -186,14 +185,11 @@ class CustomerItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(e.startDate?.formattedDate ?? ''),
+              Text(e.startDate?.formattedBirth ?? ''),
               width(5),
               Flexible(
                 fit: FlexFit.loose,
-                child: Text(
-                  e.productCategory,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(e.productCategory, overflow: TextOverflow.ellipsis),
               ),
               width(5),
               Text(
@@ -201,8 +197,7 @@ class CustomerItem extends StatelessWidget {
                 style: TextStyle(
                   color: isCancelled ? Colors.red : null,
                   fontWeight: isCancelled ? FontWeight.bold : null,
-                  decoration:
-                  isCancelled ? TextDecoration.lineThrough : null,
+                  decoration: isCancelled ? TextDecoration.lineThrough : null,
                   decorationColor: isCancelled ? Colors.red : null,
                   decorationThickness: isCancelled ? 2 : null,
                 ),

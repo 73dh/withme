@@ -16,7 +16,7 @@ import '../../../domain/model/history_model.dart';
 import '../../ui/text_style/text_styles.dart';
 import '../components/orbiting_dots.dart';
 import '../core_presentation_import.dart';
-import '../components/blinking_dots.dart';
+import '../components/stream_todo_text.dart';
 
 class HistoryPartWidget extends StatelessWidget {
   final List<HistoryModel> histories;
@@ -111,8 +111,8 @@ class HistoryPartWidget extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            width(6),
-            Text(history.contactDate.formattedDate, style: dateStyle),
+            width(5),
+            Text(history.contactDate.formattedBirth, style: dateStyle),
           ],
         ),
         height(2),

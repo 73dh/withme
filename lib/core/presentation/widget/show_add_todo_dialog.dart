@@ -53,7 +53,7 @@ return  await showDialog(
                             const Text('날짜:'),
                             const SizedBox(width: 6),
                             Text(
-                              selectedDate.formattedDate,
+                              selectedDate.formattedBirth,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),

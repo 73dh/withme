@@ -105,6 +105,7 @@ class _ProspectListPageState extends State<ProspectListPage>
 
   @override
   Widget build(BuildContext context) {
+
     return VisibilityDetector(
       key: const Key('prospect-list-visibility'),
       onVisibilityChanged: handleVisibilityChange,
@@ -113,7 +114,6 @@ class _ProspectListPageState extends State<ProspectListPage>
           stream: viewModel.cachedProspects,
           builder: (context, snapshot) {
             final filteredList = snapshot.data ?? [];
-
             return Scaffold(
               resizeToAvoidBottomInset: true,
               backgroundColor: Colors.transparent,
@@ -150,7 +150,6 @@ class _ProspectListPageState extends State<ProspectListPage>
                       itemCount: filteredList.length,
                       itemBuilder: (context, index) {
                         final customer = filteredList[index];
-
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: GestureDetector(

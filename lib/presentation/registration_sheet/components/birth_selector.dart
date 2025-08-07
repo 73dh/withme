@@ -57,7 +57,7 @@ class BirthSelector extends StatelessWidget {
                             : ColorStyles.activeButtonColor,
                   borderRadius: 5,
                   onPressed: isReadOnly ? null : onSetPressed,
-                  text: birth?.formattedDate ?? '선택',
+                  text: birth?.formattedBirth ?? '선택',
                 ),
             ),
             // RenderFilledButton(

@@ -17,7 +17,7 @@ import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/is_need_new_history.dart';
 import '../part/confirm_box_part.dart';
 import '../part/customer_info_part.dart';
-import '../part/registration_app_bar.dart';
+import 'registration_app_bar.dart';
 import '../registration_event.dart';
 import '../registration_view_model.dart';
 
@@ -85,7 +85,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
 
   void _initializeCustomer()async {
     final customer = widget.customerModel;
-    _registeredDateController.text = DateTime.now().formattedDate;
+    _registeredDateController.text = DateTime.now().formattedBirth;
     if (customer != null) {
 
       _isReadOnly = true;
@@ -93,7 +93,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       _sex = customer.sex;
       _birth = customer.birth;
       _birthController.text = customer.birth.toString();
-      _registeredDateController.text = customer.registeredDate.formattedDate;
+      _registeredDateController.text = customer.registeredDate.formattedBirth;
       _memoController.text = customer.memo;
       if (customer.recommended.isNotEmpty) {
         _isRecommended = true;
@@ -202,7 +202,7 @@ class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
       },
       onRegisteredDatePressed: (date) async {
         setState(() {
-          _registeredDateController.text = date.formattedDate;
+          _registeredDateController.text = date.formattedBirth;
         });
       },
       isRecommended: _isRecommended,

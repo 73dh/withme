@@ -92,7 +92,7 @@ class CommonDialog {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    e.contactDate.formattedDate,
+                                    e.contactDate.formattedBirth,
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,

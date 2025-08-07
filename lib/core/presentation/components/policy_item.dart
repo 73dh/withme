@@ -72,16 +72,16 @@ class PolicyItem extends StatelessWidget {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       _personDetail(
-        name: shortenedNameText(policy.policyHolder, length: 5),
         sexIcon: sexIcon(policy.policyHolderSex),
+        name: shortenedNameText(policy.policyHolder, length: 5),
         age: calculateAge(policy.policyHolderBirth!),
-        birth: policy.policyHolderBirth?.formattedDate ?? '-',
+        birth: policy.policyHolderBirth?.formattedBirth ?? '-',
       ),
       _personDetail(
-        name: shortenedNameText(policy.insured, length: 5),
         sexIcon: sexIcon(policy.insuredSex),
+        name: shortenedNameText(policy.insured, length: 5),
         age: calculateAge(policy.insuredBirth!),
-        birth: policy.insuredBirth?.formattedDate ?? '-',
+        birth: policy.insuredBirth?.formattedBirth ?? '-',
       ),
     ],
   );
@@ -97,8 +97,8 @@ class PolicyItem extends StatelessWidget {
   Widget _contractDateRow() => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      _labelValue('계약일', policy.startDate?.formattedDate ?? '-'),
-      _labelValue('만기일', policy.endDate?.formattedDate ?? '-'),
+      _labelValue('계약일', policy.startDate?.formattedBirth ?? '-'),
+      _labelValue('만기일', policy.endDate?.formattedBirth ?? '-'),
     ],
   );
 
@@ -169,9 +169,9 @@ class PolicyItem extends StatelessWidget {
   }) =>
       Row(
         children: [
-          Text(name, style: TextStyles.bodyBold),
-          width(4),
           sexIcon,
+          width(4),
+          Text(name, style: TextStyles.bodyBold),
           width(6),
           Text('$birth ($age세)', style: TextStyles.normal12),
         ],

@@ -32,7 +32,7 @@ class RegisteredDateSelector extends StatelessWidget {
                 backgroundColor: ColorStyles.unActiveButtonColor,
                 borderRadius: 5,
                 onPressed: onPressed,
-                text: registeredDate.formattedDate,
+                text: registeredDate.formattedBirth,
               ),
             ),
           ],
