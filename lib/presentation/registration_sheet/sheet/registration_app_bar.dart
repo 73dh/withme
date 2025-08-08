@@ -82,6 +82,7 @@ class RegistrationAppBar extends StatelessWidget
                 onPressed: () async {
                   await _onAddTodo(context);
                 },
+                onDeleteTodo: (TodoModel todo) => _onDeleteTodo(todo),
               );
             }
           },
@@ -114,6 +115,17 @@ class RegistrationAppBar extends StatelessWidget
         ),
       );
     }
+  }
+
+  Future<void> _onDeleteTodo(TodoModel todo) async {
+    viewModel.onEvent(
+      RegistrationEvent.deleteTodo(
+        userKey: UserSession.userId,
+        customerKey: customer?.customerKey ?? '',
+        todoId: todo.docId,
+      ),
+    );
+    print('todoId: ${todo.docId}');
   }
 
   Widget _buildHistoryButton() {

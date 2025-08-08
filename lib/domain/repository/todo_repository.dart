@@ -12,4 +12,5 @@ abstract interface class TodoRepository implements Repository{
     required String customerKey,
     required Map<String, dynamic> todoData,
   });
+
 }

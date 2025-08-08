@@ -21,8 +21,14 @@ sealed class RegistrationEvent {
   factory RegistrationEvent.addTodo({
     required String userKey,
     required String customerKey,
-    required Map<String,dynamic> todoData,
+    required Map<String, dynamic> todoData,
   }) = AddTodo;
+
+  factory RegistrationEvent.deleteTodo({
+    required String userKey,
+    required String customerKey,
+    required String todoId,
+  }) = DeleteTodo;
 }
 
 class RegisterCustomer implements RegistrationEvent {
@@ -62,5 +68,17 @@ class AddTodo implements RegistrationEvent {
     required this.userKey,
     required this.customerKey,
     required this.todoData,
+  });
+}
+
+class DeleteTodo implements RegistrationEvent {
+  final String userKey;
+  final String customerKey;
+  final String todoId;
+
+  DeleteTodo({
+    required this.userKey,
+    required this.customerKey,
+    required this.todoId,
   });
 }

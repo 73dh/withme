@@ -234,6 +234,15 @@ class FBase {
     await ref.set(todoData);
   }
 
+  Future<void> deleteTodo({
+    required String userKey,
+    required String customerKey,
+    required String todoDocId,
+  }) async {
+    final ref = _subCol(userKey, customerKey, collectionTodos).doc(todoDocId);
+    await ref.delete();
+  }
+
   // ───────────────────────────── Policies ─────────────────────────────
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchPolicies(

@@ -42,4 +42,7 @@ class TodoModel {
       keyTodoContent: content,
     };
   }
+
+  // 🔹 docId getter
+  String get docId => reference?.id??'';
 }

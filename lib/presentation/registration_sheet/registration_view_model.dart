@@ -80,6 +80,12 @@ class RegistrationViewModel with ChangeNotifier {
           customerKey: event.customerKey,
           todoData: event.todoData,
         );
+      case DeleteTodo():
+        _onDeleteTodo(
+          userKey: event.userKey,
+          customerKey: event.customerKey,
+          todoId: event.todoId,
+        );
     }
   }
 
@@ -87,14 +93,12 @@ class RegistrationViewModel with ChangeNotifier {
     required String userKey,
     required Map<String, dynamic> customerMap,
     required Map<String, dynamic> historyMap,
-    // required Map<String,dynamic>todoMap,
   }) async {
     return await getIt<CustomerUseCase>().execute(
       usecase: RegisterCustomerUseCase(
         userKey: userKey,
         customerData: customerMap,
         historyData: historyMap,
-        // todoData: todoMap,
       ),
     );
   }
@@ -140,5 +144,13 @@ class RegistrationViewModel with ChangeNotifier {
     );
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> _onDeleteTodo({
+    required String userKey,
+    required String customerKey,
+    required String todoId,
+  }) async {
+    print('$customerKey $todoId');
   }
 }

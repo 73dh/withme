@@ -13,8 +13,13 @@ abstract interface class PolicyRepository implements Repository {
     required Map<String, dynamic> policyData,
   });
 
+  Future<void> updatePolicy({
+    required String customerKey,
+    required PolicyModel policy,
+  });
 
-
-  Future<void> updatePolicy({required String customerKey, required PolicyModel policy});
-Future<void> deletePolicy({required String customerKey, required String policyKey});
+  Future<void> deletePolicy({
+    required String customerKey,
+    required String policyKey,
+  });
 }

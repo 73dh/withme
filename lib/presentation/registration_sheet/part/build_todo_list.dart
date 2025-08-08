@@ -16,20 +16,19 @@ class BuildTodoList extends StatelessWidget {
   final CustomerModel? customer;
   final void Function(String)? onSelected;
   final VoidCallback onPressed;
+  final void Function(TodoModel) onDeleteTodo;
 
   const BuildTodoList({
     super.key,
     required this.viewModel,
     this.customer,
     this.onSelected,
-    required this.onPressed,
+    required this.onPressed, required this.onDeleteTodo,
   });
 
   @override
   Widget build(BuildContext context) {
     final List<TodoModel> todoList = viewModel.todoList;
-    // todoList.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-    // final TodoModel? nearestTodo = todoList.isNotEmpty ? todoList.first : null;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -47,20 +46,21 @@ class BuildTodoList extends StatelessWidget {
               if (todoList.isNotEmpty)
                 PopupMenuButton<String>(
                   tooltip: '할 일 목록',
-                  icon:Stack(
-    alignment: Alignment.center,
-    children: [
-     Icon(Icons.circle, size: 25, color: ColorStyles.badgeColor),
-    Text(
-    '${todoList.length}',
-    style: const TextStyle(
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    ),
-    ),
-    ],
-    ),
+                  icon: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(Icons.circle, size: 25,
+                          color: ColorStyles.badgeColor),
+                      Text(
+                        '${todoList.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                   onSelected: onSelected,
                   itemBuilder: (context) {
                     final List<PopupMenuEntry<String>> items = [];
@@ -90,7 +90,7 @@ class BuildTodoList extends StatelessWidget {
                                       children: [
                                         TextSpan(
                                           text:
-                                              '${todo.dueDate.formattedBirth} ',
+                                          '${todo.dueDate.formattedBirth} ',
                                           style: const TextStyle(
                                             fontSize: 12,
                                             color: Colors.black54,
@@ -130,9 +130,7 @@ class BuildTodoList extends StatelessWidget {
                                       ),
                                     ),
                                     TextButton.icon(
-                                      onPressed: () async {
-                                        // TODO: 삭제 처리
-                                      },
+                                      onPressed:()=> onDeleteTodo(todo),
                                       icon: const Icon(
                                         Icons.delete_outline,
                                         size: 15,
