@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart';
 import 'package:withme/domain/use_case/customer/get_edited_all_use_case.dart';
 
 import '../../../core/di/setup.dart';
-import '../../../core/domain/sort_status.dart';
-import '../../../core/presentation/fab/fab_oevelay_manager_mixin.dart';
+import '../../../core/domain/enum/sort_type.dart';
+import '../../../core/domain/enum/sort_status.dart';
+import '../../../core/presentation/fab/fab_view_model_interface.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
 
@@ -22,13 +22,34 @@ class ProspectListViewModel
   Stream<List<CustomerModel>> get cachedProspects => _cachedProspects.stream;
 
   List<CustomerModel> allCustomers = [];
+  bool _isFabVisible = true; // 기본값 설정
 
-  SortStatus _sortStatus = SortStatus(SortType.name, true);
+  @override
+  bool get isFabVisible => _isFabVisible;
+
+  @override
+  void showFab() {
+    if (!_isFabVisible) {
+      _isFabVisible = true;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void hideFab() {
+    if (_isFabVisible) {
+      _isFabVisible = false;
+      notifyListeners();
+    }
+  }
+
+  SortStatus _sortStatus = SortStatus(type: SortType.name, isAscending: true);
 
   @override
   SortStatus get sortStatus => _sortStatus;
 
   // 필터 조건
+  bool _todoOnly = false;
   bool _inactiveOnly = false;
   bool _urgentOnly = false;
   String _searchText = '';
@@ -39,10 +60,12 @@ class ProspectListViewModel
   }
 
   void updateFilter({
+    bool? todoOnly,
     bool? inactiveOnly,
     bool? urgentOnly,
     String? searchText,
   }) {
+    if (todoOnly != null) _todoOnly = todoOnly;
     if (inactiveOnly != null) _inactiveOnly = inactiveOnly;
     if (urgentOnly != null) _urgentOnly = urgentOnly;
     if (searchText != null) _searchText = searchText;
@@ -64,10 +87,8 @@ class ProspectListViewModel
 
     allCustomers = result;
 
-    // 필터 적용 및 캐시 갱신
     _applyFilterAndSort();
 
-    // add 후 즉시 value 읽으면 이전 값일 수 있음. 잠시 딜레이 후 확인 가능
     await Future.delayed(const Duration(milliseconds: 10));
   }
 
@@ -78,6 +99,11 @@ class ProspectListViewModel
 
     if (_searchText.isNotEmpty) {
       filtered = filtered.where((e) => e.name.contains(_searchText)).toList();
+    }
+
+    if (_todoOnly) {
+      filtered =
+          filtered.where((customer) => customer.todos.isNotEmpty).toList();
     }
 
     if (_inactiveOnly) {
@@ -96,7 +122,6 @@ class ProspectListViewModel
           }).toList();
     }
 
-    // 4. 긴급 필터 적용
     if (_urgentOnly) {
       final urgentDays = getIt<UserSession>().urgentThresholdDays;
       filtered =
@@ -109,16 +134,14 @@ class ProspectListViewModel
           }).toList();
     }
 
-    // 5. 정렬 적용
+    // 정렬 적용: _sortStatus가 null일 수 없으니 바로 적용
     final sorted = ApplyCurrentSortUseCase(
       isAscending: _sortStatus.isAscending,
       currentSortType: _sortStatus.type,
     ).call(filtered);
 
-    // 6. BehaviorSubject에 새 리스트 추가 (복사본 생성)
-    _cachedProspects.add(filtered); // 🔴 이 라인이 반드시 필요
+    _cachedProspects.add(List.from(sorted));
 
-    // 7. ChangeNotifier에게 변경 알림
     notifyListeners();
   }
 
@@ -127,7 +150,7 @@ class ProspectListViewModel
     final ascending =
         (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
 
-    _sortStatus = SortStatus(type, ascending);
+    _sortStatus = SortStatus(type: type, isAscending: ascending);
 
     final sorted = ApplyCurrentSortUseCase(
       isAscending: ascending,
@@ -149,6 +172,23 @@ class ProspectListViewModel
 
   @override
   void sortByHistoryCount() => _sort(SortType.manage);
+
+  int get todoCount {
+    final now = DateTime.now();
+
+    return allCustomers.where((customer) => customer.policies.isEmpty).where((
+      e,
+    ) {
+      if (e.todos.isNotEmpty) return false;
+      final latest = e.todos
+          .map((h) => h.dueDate)
+          .fold<DateTime?>(
+            null,
+            (prev, date) => prev == null || date.isAfter(prev) ? date : prev,
+          );
+      return latest == null || latest.add(Duration(days: 10)).isBefore(now);
+    }).length;
+  }
 
   int get inactiveCount {
     final now = DateTime.now();

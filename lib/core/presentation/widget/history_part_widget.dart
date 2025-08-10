@@ -1,22 +1,24 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:withme/core/data/fire_base/firestore_keys.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/core/utils/show_history_util.dart';
 
 import '../../../domain/model/history_model.dart';
-import '../../di/setup.dart';
 import '../../ui/core_ui_import.dart';
-import '../components/orbiting_dots.dart';
+import '../../utils/is_need_new_history.dart';
+import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
-import 'package:flutter/material.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../domain/model/history_model.dart';
-import '../../ui/text_style/text_styles.dart';
-import '../components/orbiting_dots.dart';
+import '../../ui/core_ui_import.dart';
+import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
-import '../components/stream_todo_text.dart';
+
+import 'package:withme/core/utils/core_utils_import.dart';
+
+import '../../../domain/model/history_model.dart';
+import '../../ui/core_ui_import.dart';
+import '../components/blinking_calendar_icon.dart';
+import '../core_presentation_import.dart';
 
 class HistoryPartWidget extends StatelessWidget {
   final List<HistoryModel> histories;
@@ -33,42 +35,46 @@ class HistoryPartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (histories.isEmpty) return const SizedBox.shrink();
-    final result = showHistoryUtil(histories);
-    final recent = result.recent;
-    final previous = result.previous;
-    final showReminderAnimation = result.showReminder;
+
+    final bool showReminderAnimation = isNeedNewHistory(histories);
+
+    List<HistoryModel> displayHistories;
+    if (showReminderAnimation) {
+      // 최근 1개만 보여줌
+      displayHistories =
+          histories.length <= 1
+              ? histories
+              : histories.sublist(histories.length - 1);
+    } else {
+      // 최근 최대 2개 보여줌
+      displayHistories =
+          histories.length <= 2
+              ? histories
+              : histories.sublist(histories.length - 2);
+    }
+
+    // 오래된 순으로 정렬
+    displayHistories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
+
     return GestureDetector(
       onTap: () => onTap(histories),
-      child: AnimatedSwitcher(
-        duration: AppDurations.duration300,
-        transitionBuilder:
-            (child, animation) =>
-                ScaleTransition(scale: animation, child: child),
-        child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Align(
-            key: ValueKey(histories.length),
-            alignment: Alignment.topRight,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 240),
-              child: SingleChildScrollView(
-                reverse: true,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (previous != null)
-                      _buildHistoryBox(history: previous, isRecent: false),
-                    if (previous != null) height(5),
-                    _buildHistoryBox(history: recent!, isRecent: true),
-                    if (showReminderAnimation) height(5),
-                    if (showReminderAnimation) BlinkingCursorIcon(sex: sex),
-                  ],
-                ),
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          for (var i = 0; i < displayHistories.length; i++)
+            _buildHistoryBox(
+              history: displayHistories[i],
+              isRecent: i == displayHistories.length - 1,
+              historyNumber:
+                  histories.length - (displayHistories.length - 1) + i,
             ),
-          ),
-        ),
+          if (showReminderAnimation) ...[
+            height(3),
+            BlinkingCalendarIcon(sex: sex, size: 25),
+          ],
+        ],
       ),
     );
   }
@@ -76,6 +82,7 @@ class HistoryPartWidget extends StatelessWidget {
   Widget _buildHistoryBox({
     required HistoryModel history,
     required bool isRecent,
+    required int historyNumber,
   }) {
     final TextStyle contentStyle =
         isRecent
@@ -87,12 +94,9 @@ class HistoryPartWidget extends StatelessWidget {
             ? TextStyles.normal9.copyWith(color: Colors.grey[700])
             : TextStyles.normal8.copyWith(color: Colors.grey[600]);
 
-    final Color dotColor =
+    final Color numberColor =
         isRecent
-            ? switch (sex) {
-              '남' => ColorStyles.manColor,
-              _ => ColorStyles.womanColor,
-            }
+            ? (sex == '남' ? ColorStyles.manColor : ColorStyles.womanColor)
             : Colors.grey;
 
     return Column(
@@ -103,15 +107,21 @@ class HistoryPartWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              width: 5,
-              height: 5,
-              margin: const EdgeInsets.only(right: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 2),
               decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
+                color: numberColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '$historyNumber',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: numberColor,
+                ),
               ),
             ),
-            width(5),
+            width(3),
             Text(history.contactDate.formattedBirth, style: dateStyle),
           ],
         ),

@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
-import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/free_count.dart';
 import 'package:withme/domain/model/user_model.dart';
 
@@ -39,8 +38,8 @@ class FreeLimitDialog {
                   '무료 회원은 최대 $limitCount건까지만 등록할 수 있습니다.\n'
                   '이메일 문의 후 제한을 해제하세요.',
               cancelButtonText: '',
-              onConfirm:null,
-                  // () async => context.pop(),
+              onConfirm: null,
+              // () async => context.pop(),
             );
           }
           return true;

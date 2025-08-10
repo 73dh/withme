@@ -1,18 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:withme/presentation/home/search/search_page_view_model.dart';
-
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:withme/presentation/home/search/search_page_view_model.dart';
 class SearchByNameFilterButton extends StatefulWidget {
   final SearchPageViewModel viewModel;
   final FocusNode? focusNode;

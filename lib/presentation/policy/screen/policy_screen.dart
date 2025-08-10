@@ -1,21 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
-
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/presentation/policy/components/policy_confirm_box.dart';
 import 'package:withme/presentation/policy/part/customer_part.dart';
 import 'package:withme/presentation/policy/part/policy_part.dart';
-import 'package:withme/presentation/policy/policy_view_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
-import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/model/customer_model.dart';
@@ -127,8 +122,10 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     insuredSex: _insuredSex,
                     insuredBirth: _insuredBirth,
                     onInsuredNameChanged: (_) {},
-                    onManChanged: (value) => setState(() => _insuredSex = value),
-                    onWomanChanged: (value) => setState(() => _insuredSex = value),
+                    onManChanged:
+                        (value) => setState(() => _insuredSex = value),
+                    onWomanChanged:
+                        (value) => setState(() => _insuredSex = value),
                     onBirthChanged: (_) async {
                       final birth = await selectDate(context);
                       if (birth != null) {
@@ -141,26 +138,29 @@ class _PolicyScreenState extends State<PolicyScreen> {
                   PolicyPart(
                     productCategory: _productCategory,
                     insuranceCompany: _insuranceCompany,
-                    onCategoryTap: (value) =>
-                        setState(() => _productCategory = value.toString()),
-                    onCompanyTap: (value) =>
-                        setState(() => _insuranceCompany = value.toString()),
+                    onCategoryTap:
+                        (value) =>
+                            setState(() => _productCategory = value.toString()),
+                    onCompanyTap:
+                        (value) => setState(
+                          () => _insuranceCompany = value.toString(),
+                        ),
                     productNameController: _productNameController,
                     paymentMethod: _paymentMethod,
                     premiumController: _premiumController,
-                    onPremiumMonthTap: (value) =>
-                        setState(() => _paymentMethod = value),
-                    onPremiumSingleTap: (value) =>
-                        setState(() => _paymentMethod = value),
+                    onPremiumMonthTap:
+                        (value) => setState(() => _paymentMethod = value),
+                    onPremiumSingleTap:
+                        (value) => setState(() => _paymentMethod = value),
                     onProductNameTap: (_) {},
-                    onInputPremiumTap: (value) =>
-                        setState(() => _premiumController.text = value),
+                    onInputPremiumTap:
+                        (value) =>
+                            setState(() => _premiumController.text = value),
                     startDate: _startDate,
                     endDate: _endDate,
-                    onStartDateChanged: (date) =>
-                        setState(() => _startDate = date),
-                    onEndDateChanged: (date) =>
-                        setState(() => _endDate = date),
+                    onStartDateChanged:
+                        (date) => setState(() => _startDate = date),
+                    onEndDateChanged: (date) => setState(() => _endDate = date),
                   ),
                 ],
               ),
@@ -195,11 +195,12 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
     final result = await showModalBottomSheet<bool>(
       context: context,
-      builder: (_) => SizedBox(
-        height: 360,
-        width: double.infinity,
-        child: _buildConfirmBox(context),
-      ),
+      builder:
+          (_) => SizedBox(
+            height: 360,
+            width: double.infinity,
+            child: _buildConfirmBox(context),
+          ),
     );
 
     if (result == true && mounted) {
@@ -238,13 +239,14 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
     final customerKey = widget.customer.customerKey;
     final userId = UserSession.userId;
-    final policyRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userId)
-        .collection(collectionCustomers)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .doc();
+    final policyRef =
+        FirebaseFirestore.instance
+            .collection(collectionUsers)
+            .doc(userId)
+            .collection(collectionCustomers)
+            .doc(customerKey)
+            .collection(collectionPolicies)
+            .doc();
 
     final policyMap = PolicyModel.toMapForCreatePolicy(
       policyHolder: _policyHolderName,

@@ -1,13 +1,8 @@
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/size.dart';
-import 'package:withme/core/ui/icon/const.dart';
-import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 
-import '../../core/di/di_setup_import.dart';
-import '../../core/di/setup.dart';
 import '../../core/domain/enum/home_menu.dart';
 import '../../core/presentation/core_presentation_import.dart';
-import '../../core/router/router_import.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -8,6 +8,7 @@ import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
 import '../../presentation/registration_sheet/registration_view_model.dart';
+import '../presentation/todo/todo_view_model.dart';
 import '../router/router.dart';
 import 'di_setup_import.dart';
 
@@ -63,4 +64,5 @@ Future<void> diSetup() async {
   getIt.registerFactory<CustomerViewModel>(() => CustomerViewModel());
   getIt.registerSingleton<SearchPageViewModel>(SearchPageViewModel());
   getIt.registerSingleton<DashBoardViewModel>(DashBoardViewModel());
+  getIt.registerSingleton<TodoViewModel>(TodoViewModel());
 }

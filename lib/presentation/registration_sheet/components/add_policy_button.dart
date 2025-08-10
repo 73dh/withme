@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/domain/domain_import.dart';
 
@@ -8,6 +7,7 @@ import '../../../core/router/router_path.dart';
 class AddPolicyButton extends StatelessWidget {
   final CustomerModel customerModel;
   final Future<void> Function(bool result)? onRegistered;
+
   // final VoidCallback? onFailed; // 👈 실패 시 호출 콜백 추가
 
   const AddPolicyButton({
@@ -22,12 +22,7 @@ class AddPolicyButton extends StatelessWidget {
     return AddPolicyWidget(
       onTap: () async {
         context.pop();
-        final result = await context.push(
-          RoutePath.policy,
-          extra: customerModel,
-        );
-        // final bool isSuccess = result == true;
-        // await onRegistered?.call(isSuccess);
+        await context.push(RoutePath.policy, extra: customerModel);
       },
     );
   }

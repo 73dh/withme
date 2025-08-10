@@ -1,36 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/domain/core_domain_import.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/use_case/history/add_history_use_case.dart';
 import 'package:withme/presentation/customer/screen/customer_screen.dart';
 
-import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_bottom_sheet_with_draggable.dart';
-import '../../../../core/router/router_import.dart';
-import '../../../../domain/model/history_model.dart';
-import '../../../../domain/use_case/customer/update_searched_customers_use_case.dart';
-import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
-import '../search_page_view_model.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/domain/core_domain_import.dart';
-import 'package:withme/core/presentation/components/customer_item.dart';
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/use_case/history/add_history_use_case.dart';
-import 'package:withme/presentation/customer/screen/customer_screen.dart';
-
-import '../../../../core/di/setup.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/presentation/widget/show_bottom_sheet_with_draggable.dart';
-import '../../../../core/router/router_import.dart';
-import '../../../../domain/model/history_model.dart';
 import '../../../../domain/use_case/customer/update_searched_customers_use_case.dart';
 import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
 import '../search_page_view_model.dart';
@@ -118,7 +93,9 @@ class CustomerListView extends StatelessWidget {
         // 고객 상세화면 (모달 시트)
         await showBottomSheetWithDraggable(
           context: context,
-          builder: (scrollController) => RegistrationBottomSheet(customerModel: customer),
+          builder:
+              (scrollController) =>
+                  RegistrationBottomSheet(customer: customer),
           onClosed: () async {
             // 닫힌 후 검색 결과 다시 갱신
             await UpdateSearchedCustomersUseCase.call(viewModel);

@@ -17,9 +17,10 @@ abstract interface class ColorStyles{
   static Color tableHeadColor=Colors.deepPurple.shade50;
   static Color activeSwitchColor=Colors.deepPurple.shade300;
   static Color isUrgentColor=Colors.deepPurple.shade50;
-  static Color badgeColor=Colors.deepPurple.shade300;
+  static Color todoBadgeColor=Colors.deepPurple.shade300;
   static Color manColor=Colors.blue;
-  static Color womanColor=Colors.deepOrange;
+  static Color womanColor=Colors.red;
   static Color todoBoxColor=Colors.deepPurple.shade50;
   static Color todoTextColor=Colors.deepPurple;
+  static Color cakeColor=Colors.pinkAccent.shade100;
 }

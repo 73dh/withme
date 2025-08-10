@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/core/presentation/components/render_pop_up_menu.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/presentation/home/search/enum/search_option.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
 import '../../../../core/domain/enum/insurance_company.dart';
 import '../../../../core/domain/enum/product_category.dart';
-import '../../../../core/presentation/components/render_filled_button.dart';
 import '../../../../core/ui/color/color_style.dart';
 import '../search_page_event.dart';
 
@@ -100,7 +99,7 @@ class PolicyFilterButton extends StatelessWidget {
                       productCategory: viewModel.state.productCategory,
                       insuranceCompany: viewModel.state.insuranceCompany,
                       selectedContractMonth:
-                          viewModel.state.selectedContractMonth ?? '',
+                          viewModel.state.selectedContractMonth,
                     ),
                   );
                 },

@@ -1,0 +1,231 @@
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
+
+import '../../../domain/domain_import.dart';
+import '../../../domain/model/todo_model.dart';
+import 'todo_view_model.dart';
+import '../../presentation/core_presentation_import.dart';
+import '../../ui/core_ui_import.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
+
+import '../../../domain/domain_import.dart';
+import '../../../domain/model/todo_model.dart';
+import 'todo_view_model.dart';
+import '../../presentation/core_presentation_import.dart';
+import '../../ui/core_ui_import.dart';
+
+class BuildTodoList extends StatefulWidget {
+  final TodoViewModel viewModel;
+  final CustomerModel? customer;
+  final void Function(String)? onSelected;
+  final VoidCallback onPressed;
+  final void Function(TodoModel) onDeleteTodo;
+  final void Function(TodoModel) onUpdateTodo;
+  final void Function(TodoModel) onCompleteTodo;
+
+  const BuildTodoList({
+    super.key,
+    required this.viewModel,
+    this.customer,
+    this.onSelected,
+    required this.onPressed,
+    required this.onDeleteTodo,
+    required this.onUpdateTodo, required this.onCompleteTodo,
+  });
+
+  @override
+  State<BuildTodoList> createState() => _BuildTodoListState();
+}
+
+class _BuildTodoListState extends State<BuildTodoList> {
+  late List<TodoModel> todoList;
+
+  @override
+  void initState() {
+    super.initState();
+    todoList = widget.viewModel.todoList;
+    widget.viewModel.addListener(_onTodoChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.removeListener(_onTodoChanged);
+    super.dispose();
+  }
+
+  void _onTodoChanged() {
+    if (!mounted) return;
+    setState(() {
+      todoList = widget.viewModel.todoList;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (todoList.isEmpty) {
+      return IconButton(
+        icon: const Icon(Icons.add_circle_outline_outlined),
+        tooltip: '할 일 추가',
+        onPressed: widget.onPressed,
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildTodoText(),
+              _buildPopupMenu(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTodoText() {
+    return Flexible(
+      child: SizedBox(
+        width: 100,
+        child: StreamTodoText(
+          todoList: todoList,
+          sex: widget.customer?.sex ?? '',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopupMenu() {
+    return GestureDetector(
+      onTapDown: (details) async {
+        final RenderBox overlay = Overlay
+            .of(context)
+            .context
+            .findRenderObject()! as RenderBox;
+
+        // 터치 위치에서 Y축을 20만큼 아래로 이동
+        final Offset position = details.globalPosition + Offset(0, 20);
+
+        final selected = await showMenu<String>(
+          context: context,
+          position: RelativeRect.fromRect(
+            position & const Size(40, 40),
+            Offset.zero & overlay.size,
+          ),
+          items: buildTodoMenuItems(),
+          elevation: 8,
+        );
+
+        if (selected != null) {
+          widget.onSelected?.call(selected);
+        }
+      },
+      child: TodoCountIcon(
+        todos: todoList,
+        sex: widget.customer?.sex ?? '',
+      ),
+    );
+  }
+  List<PopupMenuEntry<String>> buildTodoMenuItems() {
+    final items = <PopupMenuEntry<String>>[];
+
+    for (final todo in todoList) {
+      items.add(
+        PopupMenuItem<String>(
+          enabled: false,
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          child: _buildTodoMenuItem(todo),
+        ),
+      );
+    }
+
+    // 추가 버튼
+    items.add(
+      const PopupMenuItem<String>(
+        value: 'add',
+        child: Row(
+          children: [
+            Spacer(),
+            Icon(Icons.add_circle_outline_outlined, size: 18),
+            SizedBox(width: 6),
+            Text('할 일 추가'),
+          ],
+        ),
+      ),
+    );
+
+    return items;
+  }
+
+  Widget _buildTodoMenuItem(TodoModel todo) {
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorStyles.todoBoxColor,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTodoTitle(todo),
+          _buildTodoActions(todo),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTodoTitle(TodoModel todo) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: GestureDetector(
+        onTap: () => widget.onUpdateTodo(todo),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: '[${todo.dueDate.formattedMonthAndDate}] ',
+                style: const TextStyle(fontSize: 14, color: Colors.black38),
+              ),
+              TextSpan(
+                text: todo.content,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTodoActions(TodoModel todo) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton.icon(
+          onPressed: () =>widget.onCompleteTodo(todo),
+          icon: const Icon(Icons.check_circle_outline, size: 15),
+          label: const Text('완료 (이력추가)', style: TextStyle(fontSize: 13)),
+          style: TextButton.styleFrom(foregroundColor: Colors.black),
+        ),
+        TextButton.icon(
+          onPressed: () => widget.onDeleteTodo(todo),
+          icon: const Icon(Icons.delete_outline, size: 15, color: Colors.red),
+          label: const Text(
+            '취소 (삭제)',
+            style: TextStyle(fontSize: 13, color: Colors.red),
+          ),
+          style: TextButton.styleFrom(foregroundColor: Colors.red),
+        ),
+      ],
+    );
+  }
+}

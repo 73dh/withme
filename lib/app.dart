@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:withme/core/router/router.dart';
 
-import 'core/di/setup.dart';
 import 'core/ui/theme/theme.dart';
 
 

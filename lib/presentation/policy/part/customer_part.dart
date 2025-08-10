@@ -1,4 +1,3 @@
-import 'package:withme/core/presentation/widget/item_container.dart';
 import 'package:withme/presentation/policy/part/insured_holder_part.dart';
 import 'package:withme/presentation/policy/part/policy_holder_part.dart';
 

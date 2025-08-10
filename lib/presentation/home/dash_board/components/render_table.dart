@@ -1,12 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class RenderTable extends StatelessWidget {
   final Map<int, TableColumnWidth> columnWidths;
   final List<TableRow> tableRows;
 
-  const RenderTable({super.key,required this.columnWidths, required this.tableRows});
+  const RenderTable({
+    super.key,
+    required this.columnWidths,
+    required this.tableRows,
+  });
 
   @override
   Widget build(BuildContext context) {

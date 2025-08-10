@@ -1,6 +1,7 @@
 
+import '../../../core/domain/enum/sort_type.dart';
 import '../../../core/utils/core_utils_import.dart';
-import '../../../core/domain/sort_status.dart';
+import '../../../core/domain/enum/sort_status.dart';
 import '../../domain_import.dart';
 
 class ApplyCurrentSortUseCase {

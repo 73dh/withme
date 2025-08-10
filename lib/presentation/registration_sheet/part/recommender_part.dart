@@ -1,8 +1,3 @@
-import 'package:withme/core/presentation/widget/item_container.dart';
-
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/core_ui_import.dart';
-
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 
@@ -64,7 +59,6 @@ class RecommenderPart extends StatelessWidget {
                           onSaved:
                               (text) =>
                                   recommendedController.text = text.trim(),
-
                         ),
               ),
           ],

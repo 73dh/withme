@@ -234,12 +234,23 @@ class FBase {
     await ref.set(todoData);
   }
 
-  Future<void> deleteTodo({
+
+  Future<void> updateTodo({
     required String userKey,
     required String customerKey,
     required String todoDocId,
+    required Map<String, dynamic> todoData,
   }) async {
+    print('updated todo data: $todoData');
     final ref = _subCol(userKey, customerKey, collectionTodos).doc(todoDocId);
+    await ref.update(todoData);
+  }
+  Future<void> deleteTodo({
+    required String userKey,
+    required String customerKey,
+    required String todoId,
+  }) async {
+    final ref = _subCol(userKey, customerKey, collectionTodos).doc(todoId);
     await ref.delete();
   }
 

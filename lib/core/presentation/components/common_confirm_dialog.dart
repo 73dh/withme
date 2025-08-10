@@ -1,6 +1,4 @@
-import 'package:go_router/go_router.dart';
-
-import '../core_presentation_import.dart'; // MyCircularIndicator 위치에 맞게 import
+import '../core_presentation_import.dart';
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
@@ -45,15 +43,15 @@ class CommonConfirmDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Cancel Button: Only pops the dialog itself with 'false'
-                 if(cancelButtonText.isNotEmpty)
-                    FilledButton(
-                      onPressed: () {
-                        if (context.mounted) {
-                          Navigator.of(context).pop(false);
-                        }
-                      },
-                      child: Text(cancelButtonText),
-                    ),
+                    if (cancelButtonText.isNotEmpty)
+                      FilledButton(
+                        onPressed: () {
+                          if (context.mounted) {
+                            Navigator.of(context).pop(false);
+                          }
+                        },
+                        child: Text(cancelButtonText),
+                      ),
                     width(10),
                     // Confirm Button: Executes onConfirm, then pops the dialog with 'true'
                     FilledButton(

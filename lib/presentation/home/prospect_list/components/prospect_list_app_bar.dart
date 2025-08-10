@@ -7,15 +7,6 @@ import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 
-import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-
-import '../../../../core/presentation/components/animation_pregress_bar.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-
 class ProspectListAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final ProspectListViewModel viewModel;
@@ -78,7 +69,7 @@ class ProspectListAppBar extends StatelessWidget
           Image.asset(
             IconsPath.womanIcon,
             width: 40,
-            color: ColorStyles.badgeColor.withOpacity(0.7),
+            color: ColorStyles.todoBadgeColor.withOpacity(0.7),
           ),
           Positioned(
             left: -13,
@@ -86,7 +77,7 @@ class ProspectListAppBar extends StatelessWidget
             child: Image.asset(
               IconsPath.manIcon,
               width: 35,
-              color: ColorStyles.badgeColor.withOpacity(0.5),
+              color: ColorStyles.todoBadgeColor.withOpacity(0.5),
             ),
           ),
         ],
@@ -124,4 +115,3 @@ class ProspectListAppBar extends StatelessWidget
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
-

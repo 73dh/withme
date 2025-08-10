@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
 
-class BlinkingCursorIcon extends StatefulWidget {
+class BlinkingCalendarIcon extends StatefulWidget {
   final IconData icon; // 깜빡일 아이콘 (예: Icons.edit, Icons.text_fields)
   final double size; // 아이콘 크기
   final Duration blinkSpeed; // 깜빡이는 속도
   final String sex;
 
-  const BlinkingCursorIcon({
+  const BlinkingCalendarIcon({
     super.key,
     this.icon = Icons.edit_calendar_outlined, // 기본값은 '편집' 아이콘
     this.size = 23.0,
@@ -18,10 +18,10 @@ class BlinkingCursorIcon extends StatefulWidget {
   });
 
   @override
-  State<BlinkingCursorIcon> createState() => _BlinkingCursorIconState();
+  State<BlinkingCalendarIcon> createState() => _BlinkingCalendarIconState();
 }
 
-class _BlinkingCursorIconState extends State<BlinkingCursorIcon>
+class _BlinkingCalendarIconState extends State<BlinkingCalendarIcon>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;

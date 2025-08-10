@@ -1,34 +1,20 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/policy_state.dart';
-import 'package:withme/core/presentation/components/prospect_item_icon.dart';
-import 'package:withme/core/presentation/components/orbiting_dots.dart';
-import 'package:withme/core/presentation/components/stream_todo_text.dart';
-import 'package:withme/core/presentation/widget/item_container.dart';
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
-import 'package:withme/core/utils/is_need_new_history.dart';
 
-import '../../../domain/model/history_model.dart';
-import '../../data/fire_base/user_session.dart';
-import '../../di/setup.dart';
-
-import '../../ui/color/color_style.dart';
-import '../../utils/is_birthday_within_7days.dart';
-import '../../utils/show_history_util.dart';
-import '../core_presentation_import.dart';
-import '../../ui/text_style/text_styles.dart';
-import '../../utils/calculate_age.dart';
-import '../../utils/calculate_insurance_age.dart';
-import '../../utils/days_until_insurance_age.dart';
-import '../../utils/shortened_text.dart';
 import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../../presentation/home/customer_list/customer_list_view_model.dart';
-import '../widget/history_part_widget.dart';
-import '../widget/insurance_age_widget.dart';
+import '../../di/setup.dart';
+import '../../utils/calculate_age.dart';
+import '../../utils/is_birthday_within_7days.dart';
+import '../../utils/shortened_text.dart';
+import '../core_presentation_import.dart';
 import 'customer_item_icon.dart';
 
 class CustomerItem extends StatelessWidget {
@@ -65,12 +51,13 @@ class CustomerItem extends StatelessWidget {
               Row(
                 children: [
                   CustomerItemIcon(customer: customer),
-                  width(20),
+                  width(12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _namePart(
+                          customer,
                           birthDate,
                           difference,
                           isUrgent,
@@ -97,11 +84,14 @@ class CustomerItem extends StatelessWidget {
   }
 
   Widget _namePart(
+    CustomerModel customer,
     DateTime? birthDate,
     int? difference,
     bool isUrgent,
     DateTime? insuranceChangeDate,
   ) {
+    final iconPath =
+        customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
     if (birthDate == null) {
       return Row(
         children: [
@@ -119,6 +109,14 @@ class CustomerItem extends StatelessWidget {
 
     return Row(
       children: [
+        SexIconWithBirthday(
+          birth: birthDate,
+          sex: customer.sex,
+          backgroundImagePath: iconPath,
+          size: 20,
+          isShowDay: false,
+        ),
+        width(3),
         Text(
           shortenedNameText(customer.name, length: 6),
           style: TextStyles.bold14,
@@ -138,15 +136,20 @@ class CustomerItem extends StatelessWidget {
           const SizedBox(width: 4),
           const Icon(Icons.cake_rounded, color: Colors.pinkAccent, size: 16),
           const SizedBox(width: 2),
-          if(getBirthdayCountdown(birthDate)!=0)
-          Text(
-            '(D-${getBirthdayCountdown(birthDate)})',
-            style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
-          ),
+          if (getBirthdayCountdown(birthDate) != 0)
+            Text(
+              '(D-${getBirthdayCountdown(birthDate)})',
+              style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
+            ),
         ],
         if (difference == null || difference < 0) const SizedBox.shrink(),
         width(5),
-        SizedBox(width: 30, child: StreamTodoText(todoList: customer.todos)),
+        SizedBox(
+          width: 30,
+          child: StreamTodoText(todoList: customer.todos, sex: customer.sex),
+        ),
+        if (customer.todos.isNotEmpty)
+          TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 20),
       ],
     );
   }

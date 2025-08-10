@@ -1,22 +1,6 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:withme/core/data/fire_base/firestore_keys.dart';
-import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 
-import '../../../domain/model/user_model.dart';
-import '../../data/fire_base/user_session.dart';
-import '../../di/setup.dart';
 import '../core_presentation_import.dart';
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/core_presentation_import.dart'; // renderSnackBar를 위해 필요
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/core_presentation_import.dart';
 
 Future<void> showCycleEditDialog(
   BuildContext context, {
@@ -63,7 +47,7 @@ Future<void> showCycleEditDialog(
                           Text(
                             title,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),

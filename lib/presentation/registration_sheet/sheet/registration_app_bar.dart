@@ -1,23 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/data_chase_indicator.dart';
-import 'package:withme/core/presentation/widget/history_part_widget.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/todo_model.dart';
-import 'package:withme/domain/use_case/history/add_history_use_case.dart';
-import 'package:withme/presentation/registration_sheet/part/build_todo_list.dart';
+import 'package:withme/domain/use_case/todo/add_todo_use_case.dart';
+import 'package:withme/domain/use_case/todo/delete_todo_use_case.dart';
+import 'package:withme/domain/use_case/todo/update_todo_use_case.dart';
+import 'package:withme/domain/use_case/todo_use_case.dart';
+import 'package:withme/core/presentation/todo/todo_view_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
-import '../../../core/domain/core_domain_import.dart';
-import '../../../core/presentation/components/orbiting_dots.dart';
+import '../../../core/presentation/components/blinking_calendar_icon.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/presentation/widget/show_add_todo_dialog.dart';
 import '../../../core/ui/core_ui_import.dart';
-import '../../../core/utils/show_history_util.dart';
 import '../../../domain/domain_import.dart';
-import '../../../domain/model/history_model.dart';
 import '../components/add_policy_button.dart';
 import '../components/edit_toggle_icon.dart';
 import '../registration_event.dart';
@@ -44,6 +40,15 @@ class RegistrationAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    if (customer == null) {
+      return AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text('New'),
+      );
+    }
+
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
@@ -54,39 +59,30 @@ class RegistrationAppBar extends StatelessWidget
   }
 
   Widget _buildTitle() {
-    if (customer == null) return const Text('New');
-    final iconPath =
-        customer?.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
-    final color = getSexIconColor(customer?.sex).withOpacity(0.6);
-    return Image.asset(iconPath, fit: BoxFit.cover, color: color);
+    final iconPath = customer!.sex == '남' ? IconsPath.manIcon : IconsPath
+        .womanIcon;
+    return SexIconWithBirthday(
+      birth: customer!.birth,
+      sex: customer!.sex,
+      backgroundImagePath: iconPath,
+    );
   }
 
   Widget _buildActions(BuildContext context) {
-    if (customer == null) return const SizedBox.shrink();
-
+    final todoViewModel = getIt<TodoViewModel>();
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        AnimatedBuilder(
-          animation: viewModel,
-          builder: (context, _) {
-            if (viewModel.isLoading) {
-              return DataChaseIndicator();
-            } else {
-              return BuildTodoList(
-                viewModel: viewModel,
-                customer: customer,
-                onSelected: (value) async {
-                  await _onAddTodo(context);
-                },
-                onPressed: () async {
-                  await _onAddTodo(context);
-                },
-                onDeleteTodo: (TodoModel todo) => _onDeleteTodo(todo),
-              );
-            }
-          },
+        BuildTodoList(
+          viewModel: todoViewModel,
+          customer: customer,
+          onSelected: (_) => _addOrUpdateTodo(context),
+          onPressed: () => _addOrUpdateTodo(context),
+          onDeleteTodo: (todo) => _deleteTodo(context, todo),
+          onUpdateTodo: (todo) => _addOrUpdateTodo(context, currentTodo: todo),
+          onCompleteTodo: (todo) => _completeTodo(context, todo),
         ),
+        width(5),
         _buildHistoryButton(),
         width(10),
         EditToggleIcon(isReadOnly: isReadOnly, onPressed: onPressed),
@@ -94,38 +90,51 @@ class RegistrationAppBar extends StatelessWidget
         _buildDeleteButton(context),
         width(10),
         _buildAddPolicyButton(),
-        const SizedBox(width: 8),
+        width(8),
       ],
     );
   }
 
-  Future<void> _onAddTodo(BuildContext context) async {
-    final newTodo = await showAddTodoDialog(context);
-    if (newTodo != null) {
-      final todoData = TodoModel.toMapForCreateTodo(
-        content: newTodo.content,
-        dueDate: newTodo.dueDate,
-      );
+  Future<void> _addOrUpdateTodo(BuildContext context,
+      {TodoModel? currentTodo}) async {
+    final newTodo = await showAddOrEditTodoDialog(
+        context, currentTodo: currentTodo);
+    if (newTodo == null) return;
 
-      await viewModel.onEvent(
-        RegistrationEvent.addTodo(
-          userKey: UserSession.userId,
-          customerKey: customer?.customerKey ?? '',
-          todoData: todoData,
-        ),
-      );
-    }
+    final todoData = TodoModel.toMapForCreateTodo(
+      content: newTodo.content,
+      dueDate: newTodo.dueDate,
+    );
+
+    final useCase = currentTodo == null
+        ? AddTodoUseCase(
+      userKey: UserSession.userId,
+      customerKey: customer!.customerKey,
+      todoData: todoData,
+    )
+        : UpdateTodoUseCase(
+      userKey: UserSession.userId,
+      customerKey: customer!.customerKey,
+      todoId: currentTodo.docId,
+      todoData: todoData,
+    );
+
+    await getIt<TodoUseCase>().execute(usecase: useCase);
+    if (context.mounted) context.pop();
   }
 
-  Future<void> _onDeleteTodo(TodoModel todo) async {
-    viewModel.onEvent(
-      RegistrationEvent.deleteTodo(
+  Future<void> _deleteTodo(BuildContext context, TodoModel todo) async {
+    await getIt<TodoUseCase>().execute(usecase: DeleteTodoUseCase(
         userKey: UserSession.userId,
-        customerKey: customer?.customerKey ?? '',
-        todoId: todo.docId,
-      ),
-    );
-    print('todoId: ${todo.docId}');
+        customerKey: customer!.customerKey,
+        todoId: todo.docId));
+    if (context.mounted) context.pop();
+  }
+
+
+  Future<void> _completeTodo(BuildContext context, TodoModel todo) async {
+    print('complete Todo: $todo');
+    if (context.mounted) context.pop();
   }
 
   Widget _buildHistoryButton() {
@@ -135,9 +144,9 @@ class RegistrationAppBar extends StatelessWidget
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (isNeedNewHistory)
-            BlinkingCursorIcon(
+            BlinkingCalendarIcon(
               key: ValueKey(isNeedNewHistory),
-              sex: customer?.sex ?? '',
+              sex: customer!.sex,
               size: 30,
             )
           else
@@ -160,16 +169,12 @@ class RegistrationAppBar extends StatelessWidget
                 customerKey: customer!.customerKey,
               ),
             );
-
             final prospectViewModel = getIt<ProspectListViewModel>();
             prospectViewModel.clearCache();
             await prospectViewModel.fetchData(force: true);
           },
         );
-
-        if (context.mounted && confirmed == true) {
-          context.pop();
-        }
+        if (context.mounted && confirmed == true) context.pop();
       },
       child: Image.asset(IconsPath.deleteIcon, width: 22),
     );
@@ -181,9 +186,7 @@ class RegistrationAppBar extends StatelessWidget
       onRegistered: (bool result) async {
         if (result) {
           await getIt<CustomerListViewModel>().refresh();
-          await getIt<CustomerListViewModel>().fetchData(); // 정책 등록 후 갱신
-        } else {
-          debugPrint('등록 취소 또는 실패');
+          await getIt<CustomerListViewModel>().fetchData();
         }
       },
     );
@@ -192,3 +195,4 @@ class RegistrationAppBar extends StatelessWidget
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+

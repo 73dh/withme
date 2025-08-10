@@ -1,22 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/domain/error_handling/signup_error.dart';
-import 'package:withme/core/presentation/components/custom_text_form_field.dart';
-import 'package:withme/core/presentation/components/render_filled_button.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
 import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 
-import '../../../core/di/setup.dart';
 import '../../../core/router/router_import.dart';
-import '../../../core/ui/color/color_style.dart';
 import '../../../core/ui/core_ui_import.dart';
-import '../../../core/ui/text_style/text_styles.dart';
-import '../../home/customer_list/customer_list_view_model.dart';
-import '../../home/prospect_list/prospect_list_view_model.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

@@ -1,5 +1,3 @@
-import '../../domain/model/todo_model.dart';
-
 sealed class RegistrationEvent {
   factory RegistrationEvent.registerCustomer({
     required String userKey,
@@ -17,18 +15,6 @@ sealed class RegistrationEvent {
     required String userKey,
     required String customerKey,
   }) = DeleteCustomer;
-
-  factory RegistrationEvent.addTodo({
-    required String userKey,
-    required String customerKey,
-    required Map<String, dynamic> todoData,
-  }) = AddTodo;
-
-  factory RegistrationEvent.deleteTodo({
-    required String userKey,
-    required String customerKey,
-    required String todoId,
-  }) = DeleteTodo;
 }
 
 class RegisterCustomer implements RegistrationEvent {
@@ -57,28 +43,4 @@ class DeleteCustomer implements RegistrationEvent {
   final String customerKey;
 
   DeleteCustomer({required this.userKey, required this.customerKey});
-}
-
-class AddTodo implements RegistrationEvent {
-  final String userKey;
-  final String customerKey;
-  final Map<String, dynamic> todoData;
-
-  AddTodo({
-    required this.userKey,
-    required this.customerKey,
-    required this.todoData,
-  });
-}
-
-class DeleteTodo implements RegistrationEvent {
-  final String userKey;
-  final String customerKey;
-  final String todoId;
-
-  DeleteTodo({
-    required this.userKey,
-    required this.customerKey,
-    required this.todoId,
-  });
 }

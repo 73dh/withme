@@ -1,14 +1,14 @@
-import '../../../domain/model/todo_model.dart';
-import '../core_presentation_import.dart';
 import 'dart:async';
 
 import '../../../domain/model/todo_model.dart';
+import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
 
 class StreamTodoText extends StatefulWidget {
   final List<TodoModel> todoList;
+  final String sex;
 
-  const StreamTodoText({super.key, required this.todoList});
+  const StreamTodoText({super.key, required this.todoList, required this.sex});
 
   @override
   State<StreamTodoText> createState() => _StreamTodoTextState();
@@ -16,11 +16,9 @@ class StreamTodoText extends StatefulWidget {
 
 class _StreamTodoTextState extends State<StreamTodoText>
     with TickerProviderStateMixin {
-  late final AnimationController _slideController;
-  late final AnimationController _fadeController;
+  late final AnimationController _controller;
   late final Animation<Offset> _slideAnimation;
   late final Animation<double> _fadeAnimation;
-  late Timer _textTimer;
 
   int _currentIndex = 0;
 
@@ -28,49 +26,65 @@ class _StreamTodoTextState extends State<StreamTodoText>
   void initState() {
     super.initState();
 
-    widget.todoList.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-
-    _slideController = AnimationController(
+    _controller = AnimationController(
       duration: const Duration(seconds: 6),
-      vsync: this,
-    )..repeat();
-
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(1.0, 0.0),
       end: const Offset(-1.0, 0.0),
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.linear));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
-    _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
+    _fadeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 10),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 80),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 10),
+    ]).animate(_controller);
 
-    _fadeController.forward(); // 처음에 FadeIn
-
-    _textTimer = Timer.periodic(const Duration(seconds: 7), (_) async {
-      await _fadeController.reverse(); // FadeOut
-      setState(() {
-        _currentIndex = (_currentIndex + 1) % widget.todoList.length;
-      });
-      await _fadeController.forward(); // FadeIn
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _currentIndex = (_currentIndex + 1) % widget.todoList.length;
+        });
+        _controller.reset();
+        _controller.forward();
+      }
     });
+
+    if (widget.todoList.isNotEmpty) {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant StreamTodoText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.todoList.isNotEmpty &&
+        (oldWidget.todoList.isEmpty || oldWidget.todoList != widget.todoList)) {
+      _currentIndex = 0;
+      _controller.reset();
+      _controller.forward();
+    } else if (widget.todoList.isEmpty) {
+      _controller.stop();
+    }
   }
 
   @override
   void dispose() {
-    _slideController.dispose();
-    _fadeController.dispose();
-    _textTimer.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.todoList.isEmpty) return const SizedBox.shrink();
-
     final currentTodo = widget.todoList[_currentIndex];
+
+    final textColor = widget.sex == '남'
+        ? ColorStyles.manColor
+        : ColorStyles.womanColor;
 
     return ClipRect(
       child: SlideTransition(
@@ -79,12 +93,18 @@ class _StreamTodoTextState extends State<StreamTodoText>
           opacity: _fadeAnimation,
           child: Text(
             currentTodo.content,
-            style: const TextStyle(fontSize: 12, color: Colors.purple),
-            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              color: textColor,
+              fontWeight: FontWeight.bold,
+            ),
             maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
     );
   }
 }
+
+

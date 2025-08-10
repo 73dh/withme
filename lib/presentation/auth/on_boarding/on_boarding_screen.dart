@@ -2,16 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
-import 'package:withme/core/presentation/widget/show_cycle_edit_dialog.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 
 import '../../../core/di/di_setup_import.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/router/router.dart';
-import '../../../core/ui/const/info_text.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

@@ -1,4 +1,3 @@
-import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/domain/use_case/base/base_stream_use_case.dart';
 

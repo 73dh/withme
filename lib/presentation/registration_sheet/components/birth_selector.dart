@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/core_utils_import.dart';
@@ -27,7 +25,7 @@ class BirthSelector extends StatelessWidget {
           children: [
             Text('생년월일 ${isReadOnly ? '' : '(선택)'}'),
             // const Spacer(),
-            Spacer(),
+            const Spacer(),
             if (birth != null && !isReadOnly)
               if (birth != null && !isReadOnly)
                 ElevatedButton(
@@ -49,16 +47,18 @@ class BirthSelector extends StatelessWidget {
             //   text: '모름',
             // ),
             width(5),
-            SizedBox(width: 120,
+            SizedBox(
+              width: 120,
               child: RenderFilledButton(
-                  width: 100,
-                  backgroundColor:  birth != null
-                            ? ColorStyles.unActiveButtonColor
-                            : ColorStyles.activeButtonColor,
-                  borderRadius: 5,
-                  onPressed: isReadOnly ? null : onSetPressed,
-                  text: birth?.formattedBirth ?? '선택',
-                ),
+                width: 100,
+                backgroundColor:
+                    birth != null
+                        ? ColorStyles.unActiveButtonColor
+                        : ColorStyles.activeButtonColor,
+                borderRadius: 5,
+                onPressed: isReadOnly ? null : onSetPressed,
+                text: birth?.formattedBirth ?? '선택',
+              ),
             ),
             // RenderFilledButton(
             //   width: 120,

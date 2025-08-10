@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/data/fire_base/firestore_keys.dart';
 import '../../core/domain/enum/policy_state.dart';
-import '../domain_import.dart';
 
 class PolicyModel {
   final String policyHolder;
@@ -44,35 +43,39 @@ class PolicyModel {
   });
 
   factory PolicyModel.fromMap(
-      Map<String, dynamic> map, {
-        DocumentReference? reference,
-      }) {
+    Map<String, dynamic> map, {
+    DocumentReference? reference,
+  }) {
     return PolicyModel(
       policyHolder: map[keyPolicyHolder] ?? '',
-      policyHolderBirth: map[keyPolicyHolderBirth] is Timestamp
-          ? (map[keyPolicyHolderBirth] as Timestamp).toDate()
-          : DateTime.now().toUtc(),
+      policyHolderBirth:
+          map[keyPolicyHolderBirth] is Timestamp
+              ? (map[keyPolicyHolderBirth] as Timestamp).toDate()
+              : DateTime.now().toUtc(),
       policyHolderSex: map[keyPolicyHolderSex] ?? '',
       insured: map[keyInsured] ?? '',
-      insuredBirth: map[keyInsuredBirth] is Timestamp
-          ? (map[keyInsuredBirth] as Timestamp).toDate()
-          : DateTime.now().toUtc(),
+      insuredBirth:
+          map[keyInsuredBirth] is Timestamp
+              ? (map[keyInsuredBirth] as Timestamp).toDate()
+              : DateTime.now().toUtc(),
       insuredSex: map[keyInsuredSex] ?? '',
       productCategory: map[keyProductCategory] ?? '',
       insuranceCompany: map[keyInsuranceCompany] ?? '',
       productName: map[keyProductName] ?? '',
       paymentMethod: map[keyPaymentMethod] ?? '',
       premium: map[keyPremium] ?? '',
-      startDate: map[keyStartDate] is Timestamp
-          ? (map[keyStartDate] as Timestamp).toDate()
-          : DateTime.now().toUtc(),
-      endDate: map[keyEndDate] is Timestamp
-          ? (map[keyEndDate] as Timestamp).toDate()
-          : DateTime.now().toUtc(),
+      startDate:
+          map[keyStartDate] is Timestamp
+              ? (map[keyStartDate] as Timestamp).toDate()
+              : DateTime.now().toUtc(),
+      endDate:
+          map[keyEndDate] is Timestamp
+              ? (map[keyEndDate] as Timestamp).toDate()
+              : DateTime.now().toUtc(),
       policyState: map[keyPolicyState] ?? PolicyState.keep.label,
       customerKey: map[keyCustomerKey] ?? '',
       // policyKey:  map[keyPolicyKey] ?? reference?.id ?? '',
-      policyKey:  map[keyPolicyKey] ??  '',
+      policyKey: map[keyPolicyKey] ?? '',
       documentReference: reference,
     );
   }
@@ -128,10 +131,7 @@ class PolicyModel {
   }
 
   // ✅ copyWith 추가
-  PolicyModel copyWith({
-    String? premium,
-    String? policyState,
-  }) {
+  PolicyModel copyWith({String? premium, String? policyState}) {
     return PolicyModel(
       policyHolder: policyHolder,
       policyHolderBirth: policyHolderBirth,

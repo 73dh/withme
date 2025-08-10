@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../domain/enum/policy_state.dart';
 import '../core_presentation_import.dart';
@@ -53,20 +52,21 @@ class _CommonPolicyStateDialogState extends State<CommonPolicyStateDialog> {
                 ),
                 height(10),
                 Column(
-                  children: PolicyState.values.map((state) {
-                    return RadioListTile<String>(
-                      title: Text(state.label),
-                      value: state.label,
-                      groupValue: selectedState,
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            selectedState = value;
-                          });
-                        }
-                      },
-                    );
-                  }).toList(),
+                  children:
+                      PolicyState.values.map((state) {
+                        return RadioListTile<String>(
+                          title: Text(state.label),
+                          value: state.label,
+                          groupValue: selectedState,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedState = value;
+                              });
+                            }
+                          },
+                        );
+                      }).toList(),
                 ),
                 height(10),
                 Row(

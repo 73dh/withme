@@ -1,42 +1,67 @@
 import 'dart:developer';
 
-import 'package:go_router/go_router.dart';
 import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/router/router_path.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
+import 'package:withme/core/presentation/todo/customerRegistrationAppBar.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
+import 'package:withme/presentation/customer/screen/customer_app_bar.dart';
 
+import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/presentation/widget/show_edit_policy_dialog.dart';
 import '../../../domain/model/customer_model.dart';
+import '../../../core/presentation/todo/todo_view_model.dart';
 import '../components/customer_info.dart';
 
-class CustomerScreen extends StatelessWidget {
+class CustomerScreen extends StatefulWidget {
   final CustomerModel customer;
 
   const CustomerScreen({super.key, required this.customer});
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = getIt<CustomerViewModel>();
+  State<CustomerScreen> createState() => _CustomerScreenState();
+}
 
-    final info = customer.insuranceInfo;
+class _CustomerScreenState extends State<CustomerScreen> {
+  final viewModel = getIt<CustomerViewModel>();
+  final todoViewModel = getIt<TodoViewModel>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final customerKey = widget.customer.customerKey;
+
+      todoViewModel.initializeTodos(
+        userKey: UserSession.userId,
+        customerKey: customerKey,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final info = widget.customer.insuranceInfo;
     final difference = info.difference;
     final isUrgent = info.isUrgent;
     final insuranceChangeDate = info.insuranceChangeDate;
 
     return SafeArea(
       child: Scaffold(
-        appBar: _appBar(context),
+        appBar:CustomerRegistrationAppBar(customer: widget.customer, todoViewModel: todoViewModel),
+        // CustomerAppBar(
+        //   customer: widget.customer,
+        //   todoViewModel: todoViewModel,
+        // ),
+        // _appBar(context),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
               height(10),
               CustomerInfo(
-                customer: customer,
+                customer: widget.customer,
                 viewModel: viewModel,
                 isUrgent: isUrgent,
                 difference: difference,
@@ -46,7 +71,7 @@ class CustomerScreen extends StatelessWidget {
               const PartTitle(text: '보험계약 정보'),
               Expanded(
                 child: StreamBuilder<List<PolicyModel>>(
-                  stream: viewModel.getPolicies(customer.customerKey),
+                  stream: viewModel.getPolicies(widget.customer.customerKey),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       log(snapshot.error.toString());
@@ -79,44 +104,6 @@ class CustomerScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  AppBar _appBar(BuildContext context) {
-    return AppBar(
-      centerTitle: true,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            customer.name,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '(${customer.registeredDate.formattedBirth})',
-            style: const TextStyle(fontSize: 18, color: Colors.black45),
-          ),
-        ],
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: AddPolicyWidget(
-            onTap: ()async {
-              final updated = await context.push<bool>(RoutePath.policy, extra: customer);
-              if (updated == true) {
-                // 수정된 경우에만 showBottomSheet 닫으면서 true 반환
-                if (context.mounted) Navigator.pop(context, true);
-              }
-              // context.push(RoutePath.policy, extra: customer);
-            },
-            size: 40,
-          ),
-        ),
-      ],
     );
   }
 }

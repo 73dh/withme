@@ -1,18 +1,17 @@
 import '../core_presentation_import.dart';
-import '../core_presentation_import.dart';
 
 Future<bool?> showBottomSheetWithDraggable({
   required BuildContext context,
   Widget Function(ScrollController)? builder,
   Widget? child,
   VoidCallback? onClosed,
-}) async{
+}) async {
   assert(
     (child != null) ^ (builder != null),
     'Either child or builder must be provided, but not both.',
   );
 
- final result= await showModalBottomSheet<bool>(
+  final result = await showModalBottomSheet<bool>(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
@@ -27,7 +26,9 @@ Future<bool?> showBottomSheetWithDraggable({
 
   // ✅ showModalBottomSheet 완전히 닫힌 후 호출
   if (onClosed != null) {
-    Future.microtask(onClosed); // 또는 await Future.delayed(Duration(milliseconds: 50));
+    Future.microtask(
+      onClosed,
+    ); // 또는 await Future.delayed(Duration(milliseconds: 50));
   }
   return result;
 }

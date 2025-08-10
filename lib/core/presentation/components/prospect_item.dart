@@ -1,24 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/stream_todo_text.dart';
-import 'package:withme/core/presentation/components/prospect_item_icon.dart';
-import 'package:withme/core/presentation/widget/history_part_widget.dart';
-import 'package:withme/core/presentation/widget/item_container.dart';
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
-import 'package:withme/core/utils/calculate_age.dart';
-import 'package:withme/core/utils/extension/date_time.dart';
-import 'package:withme/core/utils/shortened_text.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../../domain/model/customer_model.dart';
-import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
-import '../../ui/text_style/text_styles.dart';
 import '../../utils/core_utils_import.dart';
-import '../../utils/is_birthday_within_7days.dart';
-import '../widget/insurance_age_widget.dart';
-import 'width_height.dart';
+import '../core_presentation_import.dart';
 
 class ProspectItem extends StatelessWidget {
   final String userKey;
@@ -34,15 +23,8 @@ class ProspectItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<HistoryModel> histories = customer.histories;
-    histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
-
-    DateTime? birthDate = customer.birth?.toLocal();
-
+    final DateTime? birthDate = customer.birth?.toLocal();
     final info = customer.insuranceInfo;
-    final difference = info.difference;
-    final isUrgent = info.isUrgent;
-    final insuranceChangeDate = info.insuranceChangeDate;
 
     return IntrinsicHeight(
       child: StreamBuilder<List<HistoryModel>>(
@@ -56,43 +38,30 @@ class ProspectItem extends StatelessWidget {
           if (snapshot.hasError) {
             debugPrint(snapshot.error.toString());
           }
-          if (!snapshot.hasData) {
-            return const SizedBox.shrink();
-          }
-          List<HistoryModel> histories = snapshot.data!;
-          histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
+          if (!snapshot.hasData) return const SizedBox.shrink();
+
+          final histories =
+              snapshot.data!
+                ..sort((a, b) => a.contactDate.compareTo(b.contactDate));
 
           return ItemContainer(
-            backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
+            backgroundColor: info.isUrgent ? ColorStyles.isUrgentColor : null,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      customer.registeredDate.formattedYearAndMonth,
-                      style: TextStyles.normal12,
-                    ),
-                    height(5),
-                    ProspectItemIcon(
-                      number: histories.length,
-                      sex: customer.sex,
-                      backgroundImagePath:
-                          customer.sex == '남'
-                              ? IconsPath.manIcon
-                              : IconsPath.womanIcon,
-                    ),
-                  ],
+                _buildProfileColumn(customer),
+                width(12),
+                _buildNamePart(
+                  birthDate: birthDate,
+                  difference: info.difference,
+                  isUrgent: info.isUrgent,
+                  insuranceChangeDate: info.insuranceChangeDate,
                 ),
-                width(20),
-                _namePart(birthDate, difference, isUrgent, insuranceChangeDate),
-
-                const Spacer(),
+                width(10),
                 Expanded(
                   child: HistoryPartWidget(
                     histories: histories,
-                    onTap: (histories) => onTap(histories),
+                    onTap: onTap,
                     sex: customer.sex,
                   ),
                 ),
@@ -104,79 +73,83 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _namePart(
-    DateTime? birthDate,
-    int? difference,
-    bool isUrgent,
-    DateTime? insuranceChangeDate,
-  ) {
+  Widget _buildProfileColumn(CustomerModel customer) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              shortenedNameText(customer.name, length: 6),
-              style: TextStyles.bold14.copyWith(color: Colors.black87),
-            ),
-
-            width(6),
-            if (birthDate != null)
-              Row(
-                children: [
-                  Text(
-                    '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
-                    style: TextStyles.normal12.copyWith(
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  if (isBirthdayWithin7Days(birthDate)) ...[
-                    const SizedBox(width: 3),
-                    const Icon(
-                      Icons.cake_rounded,
-                      color: Colors.pinkAccent,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 2),
-
-                    Text(
-                      '(D-${getBirthdayCountdown(birthDate)})',
-                      style: TextStyles.normal10.copyWith(
-                        color: Colors.pinkAccent,
-                      ),
-                    ),
-
-
-                  ],
-                ],
-              ),
-            if(customer.todos.isNotEmpty)...[
-              width(3),
-              SizedBox(width: 35,
-                child: StreamTodoText(todoList: customer.todos),
-              ),],
-          ],
+        Text(
+          customer.registeredDate.formattedYearAndMonth,
+          style: TextStyles.normal12,
         ),
-        height(6),
-        if (birthDate != null &&
-            difference != null &&
-            insuranceChangeDate != null)
-          InsuranceAgeWidget(
-            difference: difference,
-            isUrgent: isUrgent,
-            insuranceChangeDate: insuranceChangeDate,
-          ),
-
-        if (customer.recommended.isNotEmpty) ...[
-          height(2),
-          Text(
-            '소개자: ${customer.recommended}',
-            style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
-          ),
-        ],
-
+        height(3),
+        SexIconWithBirthday(
+          birth: customer.birth,
+          sex: customer.sex,
+          backgroundImagePath:
+              customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,
+        ),
       ],
+    );
+  }
+
+  Widget _buildNamePart({
+    required DateTime? birthDate,
+    required int? difference,
+    required bool isUrgent,
+    required DateTime? insuranceChangeDate,
+  }) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                shortenedNameText(customer.name, length: 6),
+                style: TextStyles.bold14.copyWith(color: Colors.black87),
+              ),
+              width(6),
+              if (birthDate != null)
+                Text(
+                  '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
+                  style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+                ),
+              if (customer.todos.isNotEmpty) ...[
+                width(3),
+                SizedBox(
+                  width: 50,
+                  child: StreamTodoText(
+                    todoList: customer.todos,
+                    sex: customer.sex,
+                  ),
+                ),
+                TodoCountIcon(
+                  todos: customer.todos,
+                  sex: customer.sex,
+                  iconSize: 18,
+                ),
+              ],
+            ],
+          ),
+          height(6),
+          if (birthDate != null &&
+              difference != null &&
+              insuranceChangeDate != null)
+            InsuranceAgeWidget(
+              difference: difference,
+              isUrgent: isUrgent,
+              insuranceChangeDate: insuranceChangeDate,
+            ),
+          if (customer.recommended.isNotEmpty) ...[
+            height(2),
+            Text(
+              '소개자: ${customer.recommended}',
+              style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

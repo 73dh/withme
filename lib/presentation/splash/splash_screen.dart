@@ -5,9 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/presentation/components/my_circular_indicator.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 
-import '../../core/data/fire_base/user_session.dart';
 import '../../core/di/setup.dart';
-import '../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../core/router/router.dart';
 import '../../core/router/router_path.dart';
 import '../../core/ui/core_ui_import.dart';

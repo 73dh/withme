@@ -1,9 +1,7 @@
+import 'package:flutter/material.dart';
+
 import '../../ui/color/color_style.dart';
 import '../core_presentation_import.dart';
-
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 
 class BlinkingToggleIcon extends StatefulWidget {
   final bool expanded;

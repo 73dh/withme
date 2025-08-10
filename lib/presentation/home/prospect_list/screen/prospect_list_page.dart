@@ -1,7 +1,7 @@
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/fab/fab_oevelay_manager_mixin.dart';
+import 'package:withme/core/presentation/fab/fab_overlay_manager_mixin.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
 import 'package:withme/core/presentation/widget/inactive_and_urgent_filter_bar.dart';
 import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
@@ -33,6 +33,7 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
+  bool _showTodoOnly = false;
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
   bool _hasCheckedAgreement = false;
@@ -40,8 +41,6 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   void initState() {
     super.initState();
-
-    // viewModel.fetchData(force: true);
     _initPopup();
     initFilterBarAnimation(vsync: this);
   }
@@ -103,9 +102,41 @@ class _ProspectListPageState extends State<ProspectListPage>
     callOverlaySetState();
   }
 
+  /// ★ 필수 구현: FabOverlayManagerMixin 추상 메서드 구현 ★
+  @override
+  Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
+    if (!mounted) return;
+
+    // 무료 사용량 제한 확인 및 다이얼로그 표시 예시 (필요시 수정)
+    final isLimited = await FreeLimitDialog.checkAndShow(
+      context: context,
+      viewModel: viewModel,
+    );
+    if (isLimited) return;
+
+    setIsProcessActive(true);
+    setFabCanBeShown(false);
+
+    await showBottomSheetWithDraggable(
+      context: context,
+      builder:
+          (scrollController) => RegistrationBottomSheet(
+            scrollController: scrollController,
+            // customerModel: null, // 새 등록이라면 필요시 전달
+            outerContext: context,
+          ),
+      onClosed: () async {
+        setIsProcessActive(false);
+        await viewModel.fetchData(force: true);
+
+        if (!mounted) return;
+        setFabCanBeShown(true);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return VisibilityDetector(
       key: const Key('prospect-list-visibility'),
       onVisibilityChanged: handleVisibilityChange,
@@ -141,6 +172,12 @@ class _ProspectListPageState extends State<ProspectListPage>
                       },
                       inactiveCount: viewModel.inactiveCount,
                       urgentCount: viewModel.urgentCount,
+                      showTodoOnly: _showTodoOnly,
+                      onTodoToggle: (val) {
+                        setState(() => _showTodoOnly = val);
+                        viewModel.updateFilter(todoOnly: val);
+                      },
+                      todoCount: viewModel.todoCount,
                     ),
                   ),
                   height(5),
@@ -154,25 +191,21 @@ class _ProspectListPageState extends State<ProspectListPage>
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: GestureDetector(
                             onTap: () async {
-                              // 1. 무조건 FAB 숨김
+                              setIsProcessActive(true);  // 추가
                               setFabCanBeShown(false);
 
-                              // 2. bottomSheet 닫힐 때까지 대기
                               await showBottomSheetWithDraggable(
                                 context: context,
                                 builder:
                                     (scrollController) =>
                                         RegistrationBottomSheet(
-                                          customerModel: customer,
+                                          customer: customer,
                                           scrollController: scrollController,
                                           outerContext: context,
                                         ),
                                 onClosed: () async {
                                   setIsProcessActive(false);
-                                  // 👇 삭제가 Firestore에 전파되도록 약간의 대기
-
                                   await viewModel.fetchData(force: true);
-
                                   await Future.delayed(
                                     const Duration(milliseconds: 200),
                                   );
@@ -181,7 +214,6 @@ class _ProspectListPageState extends State<ProspectListPage>
                                 },
                               );
                             },
-
                             child: ProspectItem(
                               userKey: UserSession.userId,
                               customer: customer,

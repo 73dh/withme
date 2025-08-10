@@ -162,14 +162,16 @@ class DashBoardSideMenu extends StatelessWidget {
                                   text: '상령일 도래 알림: $urgentThresholdDays일',
                                   onTap:
                                       () => showCycleEditDialog(
-                                    context,
-                                    title:'상령일 알림 기준일' ,
-                                    initNumber: urgentThresholdDays,
-                                    onUpdate: (newDays) {
-                                      getIt<UserSession>()
-                                          .updateUrgentThresholdDays(newDays);
-                                    },
-                                  ),
+                                        context,
+                                        title: '상령일 알림 기준일',
+                                        initNumber: urgentThresholdDays,
+                                        onUpdate: (newDays) {
+                                          getIt<UserSession>()
+                                              .updateUrgentThresholdDays(
+                                                newDays,
+                                              );
+                                        },
+                                      ),
                                 ),
                                 height(15),
                                 BuildMenuItem(
@@ -177,14 +179,16 @@ class DashBoardSideMenu extends StatelessWidget {
                                   text: '가망고객 목표: $targetProspectCount명',
                                   onTap:
                                       () => showCycleEditDialog(
-                                    context,
-                                    title: '가망고객 목표',
-                                    initNumber: targetProspectCount,
-                                    onUpdate: (newCount) {
-                                      getIt<UserSession>()
-                                          .updateTargetProspectCount(newCount);
-                                    },
-                                  ),
+                                        context,
+                                        title: '가망고객 목표',
+                                        initNumber: targetProspectCount,
+                                        onUpdate: (newCount) {
+                                          getIt<UserSession>()
+                                              .updateTargetProspectCount(
+                                                newCount,
+                                              );
+                                        },
+                                      ),
                                 ),
                                 height(15),
                               ],
@@ -193,7 +197,7 @@ class DashBoardSideMenu extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Spacer(),
+                   const Spacer(),
                     BuildMenuItem(
                       icon: Icons.info_outline,
                       text: 'App소개',
@@ -244,7 +248,7 @@ class DashBoardSideMenu extends StatelessWidget {
           width(8),
           currentUser!.isMembershipValid
               ? Text(
-                '(만료일: ${currentUser!.membershipExpiresAt?.formattedBirth ?? '-'})',
+                '(만료일: ${currentUser.membershipExpiresAt?.formattedBirth ?? '-'})',
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
               )
               : const Text(

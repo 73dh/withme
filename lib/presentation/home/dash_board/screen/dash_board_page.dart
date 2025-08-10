@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/dash_board/model/customer_data_model.dart';
 import 'package:withme/presentation/home/dash_board/part/custom_bar_chart.dart';

@@ -1,4 +1,3 @@
-import 'package:withme/core/presentation/components/stream_todo_text.dart';
 import 'package:withme/domain/model/customer_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
@@ -32,19 +31,18 @@ class CustomerInfo extends StatelessWidget {
     final birthDate = customer.birth;
 
     return ItemContainer(
-      height: customer.recommended.isEmpty ? 100 : 120,
+      height: customer.recommended.isEmpty ? 90 : 110,
       backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          /// 왼쪽 고객 정보
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// 이름 + 성별 아이콘
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: Row(
+          children: [
+            /// 왼쪽 고객 정보
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// 이름 + 성별 아이콘
+                Row(
                   children: [
                     sexIcon(customer.sex),
                     width(6),
@@ -55,78 +53,76 @@ class CustomerInfo extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    width(10),
-                    StreamTodoText(todoList: customer.todos),
                   ],
                 ),
-              ),
-              height(6),
+                height(6),
 
-              /// 생년월일
-              Row(
-                children: [
-                  const Icon(Icons.cake, size: 16, color: Colors.grey),
-                  width(4),
+                /// 생년월일
+                Row(
+                  children: [
+                    const Icon(Icons.cake, size: 16, color: Colors.grey),
+                    width(4),
+                    Text(
+                      birthDate != null
+                          ? '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)'
+                          : '정보 없음',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                    ),
+                  ],
+                ),
+                height(4),
+
+                /// 상령일 (D-xxx)
+                if (birthDate != null &&
+                    difference != null &&
+                    difference! >= 0 &&
+                    insuranceChangeDate != null)
+                  InsuranceAgeWidget(
+                    difference: difference!,
+                    isUrgent: isUrgent,
+                    insuranceChangeDate: insuranceChangeDate!,
+                  ),
+
+                /// 소개자
+                if (customer.recommended.isNotEmpty) ...[
+                  height(4),
                   Text(
-                    birthDate != null
-                        ? '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)'
-                        : '정보 없음',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                    '소개자: ${customer.recommended}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                   ),
                 ],
-              ),
-              height(4),
-
-              /// 상령일 (D-xxx)
-              if (birthDate != null &&
-                  difference != null &&
-                  difference! >= 0 &&
-                  insuranceChangeDate != null)
-                InsuranceAgeWidget(
-                  difference: difference!,
-                  isUrgent: isUrgent,
-                  insuranceChangeDate: insuranceChangeDate!,
-                ),
-
-              /// 소개자
-              if (customer.recommended.isNotEmpty) ...[
-                height(4),
-                Text(
-                  '소개자: ${customer.recommended}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                ),
               ],
-            ],
-          ),
-
-          const Spacer(),
-
-          /// 오른쪽 이력 표시
-          StreamBuilder<List<HistoryModel>>(
-            stream: viewModel.getHistories(
-              UserSession.userId,
-              customer.customerKey,
             ),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const MyCircularIndicator();
-              }
-              final histories = snapshot.data!;
-              return HistoryPartWidget(
-                histories: histories,
-                onTap: (histories) async {
-                  await popupAddHistory(
-                    context: context,
-                    histories: histories,
-                    customer: customer,
-                    initContent: HistoryContent.title.toString(),
-                  );
-                },
-                sex: customer.sex,
-              );
-            },
-          ),
-        ],
+
+            const Spacer(),
+
+            /// 오른쪽 이력 표시
+            StreamBuilder<List<HistoryModel>>(
+              stream: viewModel.getHistories(
+                UserSession.userId,
+                customer.customerKey,
+              ),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const MyCircularIndicator();
+                }
+                final histories = snapshot.data!;
+                return HistoryPartWidget(
+                  histories: histories,
+                  onTap: (histories) async {
+                    await popupAddHistory(
+                      context: context,
+                      histories: histories,
+                      customer: customer,
+                      initContent: HistoryContent.title.toString(),
+                    );
+                  },
+                  sex: customer.sex,
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

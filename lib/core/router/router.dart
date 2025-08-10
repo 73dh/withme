@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/presentation/auth/log_in/log_in_screen.dart';
@@ -86,7 +83,7 @@ final router = GoRouter(
       pageBuilder:
           (context, state) => _fadePage(
             child: RegistrationBottomSheet(
-              customerModel: state.extra as CustomerModel?,
+              customer: state.extra as CustomerModel?,
             ),
             state: state,
           ),

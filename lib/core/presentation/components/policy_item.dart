@@ -1,13 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/widget/item_container.dart';
-import '../../../domain/model/policy_model.dart';
-import '../../domain/enum/policy_state.dart';
-import '../../ui/text_style/text_styles.dart';
-import '../../utils/core_utils_import.dart';
-import '../../utils/extension/number_format.dart';
-import '../core_presentation_import.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/widget/item_container.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../domain/enum/policy_state.dart';
 import '../../ui/text_style/text_styles.dart';
@@ -21,6 +11,7 @@ class PolicyItem extends StatelessWidget {
   const PolicyItem({super.key, required this.policy});
 
   bool get isCancelled => policy.policyState == PolicyState.cancelled.label;
+
   bool get isLapsed => policy.policyState == PolicyState.lapsed.label;
 
   Color get statusColor {
@@ -62,10 +53,7 @@ class PolicyItem extends StatelessWidget {
 
   Widget _titleRow() => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      _labelValue('계약자', ''),
-      _labelValue('피보험자', ''),
-    ],
+    children: [_labelValue('계약자', ''), _labelValue('피보험자', '')],
   );
 
   Widget _personInfoRow() => Row(
@@ -104,10 +92,7 @@ class PolicyItem extends StatelessWidget {
 
   Widget _premiumAndStateRow() => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Expanded(child: _premiumText()),
-      _statusBadge(),
-    ],
+    children: [Expanded(child: _premiumText()), _statusBadge()],
   );
 
   Widget _premiumText() {
@@ -124,9 +109,10 @@ class PolicyItem extends StatelessWidget {
             style: TextStyle(
               color: statusColor,
               fontWeight: FontWeight.w500,
-              decoration: (isCancelled || isLapsed)
-                  ? TextDecoration.lineThrough
-                  : TextDecoration.none,
+              decoration:
+                  (isCancelled || isLapsed)
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
             ),
           ),
           TextSpan(text: ' (${policy.paymentMethod})'),
@@ -166,14 +152,13 @@ class PolicyItem extends StatelessWidget {
     required Widget sexIcon,
     required int age,
     required String birth,
-  }) =>
-      Row(
-        children: [
-          sexIcon,
-          width(4),
-          Text(name, style: TextStyles.bodyBold),
-          width(6),
-          Text('$birth ($age세)', style: TextStyles.normal12),
-        ],
-      );
+  }) => Row(
+    children: [
+      sexIcon,
+      width(4),
+      Text(name, style: TextStyles.bodyBold),
+      width(6),
+      Text('$birth ($age세)', style: TextStyles.normal12),
+    ],
+  );
 }

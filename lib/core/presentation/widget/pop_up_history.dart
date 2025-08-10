@@ -16,7 +16,7 @@ Future<HistoryModel?> popupAddHistory({
   required BuildContext context,
   required List<HistoryModel> histories,
   required CustomerModel customer,
-   SearchPageViewModel? viewModel,
+  SearchPageViewModel? viewModel,
   String? initContent,
 }) async {
   final menuController = MenuController();
@@ -55,60 +55,10 @@ Future<HistoryModel?> popupAddHistory({
     if (viewModel != null) {
       await UpdateSearchedCustomersUseCase.call(viewModel);
     }
-   
-    return HistoryModel(
-      content: content.trim(),
-      contactDate: now,
-    );
+
+    return HistoryModel(content: content.trim(), contactDate: now);
   } catch (e) {
     debugPrint('popupAddHistory error: $e');
     return null;
   }
 }
-
-// Future<HistoryModel?> popupAddHistory(
-//   BuildContext context,
-//   List<HistoryModel> histories,
-//   CustomerModel prospect,
-//   String? initContent,
-// ) async {
-//   final MenuController menuController = MenuController();
-//   final TextEditingController textController = TextEditingController(
-//     text: initContent,
-//   );
-//
-//   try {
-//     String? content = await CommonDialog(
-//       menuController: menuController,
-//       textController: textController,
-//     ).showHistories(context, histories);
-//
-//     if (content == null) return null;
-//     if (textController.text == HistoryContent.title.toString() &&
-//         context.mounted) {
-//       showOverlaySnackBar(context, '내용을 입력해 주세요');
-//       return null;
-//     }
-//     if (content.trim().isNotEmpty) {
-//       final now = DateTime.now();
-//       Map<String, dynamic> historyData = HistoryModel.toMapForHistory(
-//         content: content,
-//         registeredDate: DateTime.now(),
-//       );
-//       if (historyData.isNotEmpty) {
-//         await getIt<HistoryUseCase>().execute(
-//           usecase: AddHistoryUseCase(
-//             userKey: UserSession.userId,
-//             customerKey: prospect.customerKey,
-//             historyData: historyData,
-//           ),
-//         );
-//         return HistoryModel(content: content, contactDate: now); // 🎯 성공 시 true
-//       }
-//     }
-//     return null; // 사용자가 취소했거나 내용 없음
-//   } catch (e) {
-//     debugPrint('popupAddHistory error: $e');
-//     return null;
-//   }
-// }

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ui/color/color_style.dart';
@@ -15,7 +14,7 @@ class RenderPopUpMenu extends StatelessWidget {
     required this.label,
     required this.items,
     required this.onSelect,
-    this.icon
+    this.icon,
   });
 
   @override
@@ -27,7 +26,7 @@ class RenderPopUpMenu extends StatelessWidget {
           padding: EdgeInsets.zero, // 버튼 바깥 padding 제거
           constraints: const BoxConstraints(), // 메뉴 항목의 기본 크기 제한 제거
           child: Icon(
-           icon ?? Icons.more_vert,
+            icon ?? Icons.more_vert,
             size: 18,
             color: ColorStyles.menuButtonColor,
           ), // 작고 간단한 버튼 UI

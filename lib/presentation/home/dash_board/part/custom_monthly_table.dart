@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/dash_board/components/render_scrollable_table.dart';
-import 'package:withme/presentation/home/dash_board/components/render_table.dart';
 import 'package:withme/presentation/home/dash_board/components/render_table_row.dart';
 
 import '../../../../core/ui/core_ui_import.dart';
@@ -33,7 +32,7 @@ class CustomMonthlyTable extends StatelessWidget {
       renderTableRow(
         cells: ['구분', ...sortedKeys],
         isHeader: true,
-        backgroundColor:  ColorStyles.tableHeadColor, // ✅ Header 색상 적용
+        backgroundColor: ColorStyles.tableHeadColor, // ✅ Header 색상 적용
       ),
       renderTableRow(
         cells: ['가망고객', ...prospectData],

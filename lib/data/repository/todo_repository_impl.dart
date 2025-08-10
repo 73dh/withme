@@ -31,4 +31,32 @@ class TodoRepositoryImpl with Transformers implements TodoRepository {
       todoData: todoData,
     );
   }
+
+  @override
+  Future<void> deleteTodo({
+    required String userKey,
+    required String customerKey,
+    required String todoId,
+  }) async {
+    return await fBase.deleteTodo(
+      userKey: userKey,
+      customerKey: customerKey,
+      todoId: todoId,
+    );
+  }
+
+  @override
+  Future<void> updateTodo({
+    required String userKey,
+    required String customerKey,
+    required String todoId,
+    required Map<String, dynamic> todoData,
+  }) async {
+    return await fBase.updateTodo(
+      userKey: userKey,
+      customerKey: customerKey,
+      todoDocId: todoId,
+      todoData: todoData,
+    );
+  }
 }

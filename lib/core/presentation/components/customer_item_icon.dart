@@ -1,17 +1,12 @@
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/policy_model.dart';
-import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
-import '../../ui/core_ui_import.dart';
-import '../core_presentation_import.dart';class CustomerItemIcon extends StatelessWidget {
+
+class CustomerItemIcon extends StatelessWidget {
   final CustomerModel customer;
   final double size;
 
-  const CustomerItemIcon({
-    super.key,
-    required this.customer,
-    this.size = 32,
-  });
+  const CustomerItemIcon({super.key, required this.customer, this.size = 32});
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +28,11 @@ import '../core_presentation_import.dart';class CustomerItemIcon extends Statele
     switch (displayCount) {
       case 1:
         circleSize = size; // 1개일 땐 기본 크기
-        positions = [Offset(0, 0)];
+        positions = [const Offset(0, 0)];
         break;
       case 2:
         circleSize = size * 0.7; // 2개 이상부터 조금 키움
-        positions = [
-          Offset(0, size * 0.15),
-          Offset(size * 0.3, 0),
-        ];
+        positions = [Offset(0, size * 0.15), Offset(size * 0.3, 0)];
         break;
       case 3:
         circleSize = size * 0.7;
@@ -53,7 +45,7 @@ import '../core_presentation_import.dart';class CustomerItemIcon extends Statele
       default:
         circleSize = size * 0.6;
         positions = [
-          Offset(0, 0),
+          const Offset(0, 0),
           Offset(size * 0.5, 0),
           Offset(0, size * 0.5),
           Offset(size * 0.5, size * 0.5),
@@ -96,10 +88,7 @@ import '../core_presentation_import.dart';class CustomerItemIcon extends Statele
                     ),
                   ],
                 ),
-                constraints: const BoxConstraints(
-                  minWidth: 16,
-                  minHeight: 16,
-                ),
+                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                 child: Text(
                   '$totalCount',
                   style: const TextStyle(

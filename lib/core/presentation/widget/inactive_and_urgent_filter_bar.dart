@@ -5,19 +5,25 @@ import 'package:withme/core/di/setup.dart';
 import '../components/info_icon_with_popup.dart';
 
 class InactiveAndUrgentFilterBar extends StatelessWidget {
+  final bool showTodoOnly;
   final bool showInactiveOnly;
   final bool? showUrgentOnly;
+  final void Function(bool) onTodoToggle;
   final void Function(bool) onInactiveToggle;
   final void Function(bool)? onUrgentToggle;
+  final int todoCount;
   final int inactiveCount;
   final int? urgentCount;
 
   const InactiveAndUrgentFilterBar({
     super.key,
+    required this.showTodoOnly,
     required this.showInactiveOnly,
     this.showUrgentOnly,
+    required this.onTodoToggle,
     required this.onInactiveToggle,
     this.onUrgentToggle,
+    required this.todoCount,
     required this.inactiveCount,
     this.urgentCount,
   });
@@ -34,12 +40,18 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
         children: [
           _buildFilterButton(
             context: context,
+            label: '할 일 ($todoCount)',
+            isActive: showTodoOnly,
+            onTap: () => onTodoToggle(!showTodoOnly),
+          ),
+          _buildFilterButton(
+            context: context,
             label: '관리기간 경과 ($inactiveCount)',
             isActive: showInactiveOnly,
             onTap: () => onInactiveToggle(!showInactiveOnly),
           ),
           // 조건부: 상령일 버튼
-          if (showUrgentOnly != null &&
+          if ( showUrgentOnly != null &&
               onUrgentToggle != null &&
               urgentCount != null)
             _buildFilterButton(
@@ -80,7 +92,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06), // 희미한 그림자
-            offset: Offset(1, 1), // 오른쪽 1px, 아래쪽 1px
+            offset: const Offset(1, 1), // 오른쪽 1px, 아래쪽 1px
             blurRadius: 1.5, // 퍼지는 정도
             spreadRadius: 0, // 그림자가 바깥으로 퍼지지 않게
           ),

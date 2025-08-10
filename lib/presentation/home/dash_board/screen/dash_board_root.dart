@@ -1,25 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/domain/error_handling/signout_error.dart';
-import 'package:withme/core/presentation/components/animated_text.dart';
-import 'package:withme/core/presentation/components/common_confirm_dialog.dart';
-import 'package:withme/core/presentation/components/my_circular_indicator.dart';
-import 'package:withme/core/presentation/components/width_height.dart';
-import 'package:withme/core/presentation/widget/show_histories.dart';
 import 'package:withme/core/presentation/widget/show_inquiry_confirm_dialog.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/core/ui/const/info_text.dart';
-import 'package:withme/core/ui/const/size.dart';
-import 'package:withme/domain/model/user_model.dart';
 import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
 
-import '../../../../core/data/fire_base/user_session.dart';
 import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_reauth_dialog.dart';
@@ -128,7 +114,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
         } on FirebaseAuthException catch (e) {
           final error = SignOutError.fromCode(e.code);
           if (mounted) {
-            showOverlaySnackBar(context,  error.toString());
+            showOverlaySnackBar(context, error.toString());
           }
         }
       },

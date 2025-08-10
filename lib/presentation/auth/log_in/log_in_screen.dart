@@ -1,14 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:withme/core/presentation/widget/reset_password.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:withme/core/ui/const/info_text.dart';
-import 'package:withme/core/ui/text_style/text_styles.dart';
 
-import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../core/router/router_import.dart';
+import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/domain_import.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -27,7 +27,7 @@ class CommonDialog {
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
       }
     });
-
+    histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
     return await showModalBottomSheet<String>(
       context: Overlay.of(context).context,
       isScrollControlled: true,

@@ -1,16 +1,6 @@
 import 'package:intl/intl.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
-
-import '../components/birth_selector.dart';
-import '../components/name_field.dart';
-import '../components/registered_date_selector.dart';
-import '../components/sex_selector.dart';
-
-import 'package:intl/intl.dart';
-
-import '../../../core/presentation/core_presentation_import.dart';
-
 import '../components/birth_selector.dart';
 import '../components/name_field.dart';
 import '../components/registered_date_selector.dart';
@@ -54,7 +44,6 @@ class CustomerInfoPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return ItemContainer(
       height: 352, // ✅ 기존보다 높이 증가 (메모 영역 포함)
       child: Padding(
@@ -87,30 +76,33 @@ class CustomerInfoPart extends StatelessWidget {
               birth: birth,
               isReadOnly: isReadOnly,
               onInitPressed: isReadOnly ? null : onBirthInitPressed,
-              onSetPressed: isReadOnly
-                  ? null
-                  : () async {
-                final date = await selectDate(context);
-                if (date != null) {
-                  onBirthSetPressed(date);
-                }
-              },
+              onSetPressed:
+                  isReadOnly
+                      ? null
+                      : () async {
+                        final date = await selectDate(context);
+                        if (date != null) {
+                          onBirthSetPressed(date);
+                        }
+                      },
             ),
             height(3),
 
             /// 등록일 선택
             RegisteredDateSelector(
               isReadOnly: isReadOnly,
-              registeredDate: DateFormat('yy/MM/dd')
-                  .parseStrict(registeredDateController.text),
-              onPressed: isReadOnly
-                  ? null
-                  : () async {
-                final date = await selectDate(context);
-                if (date != null) {
-                  onRegisteredDatePressed(date);
-                }
-              },
+              registeredDate: DateFormat(
+                'yy/MM/dd',
+              ).parseStrict(registeredDateController.text),
+              onPressed:
+                  isReadOnly
+                      ? null
+                      : () async {
+                        final date = await selectDate(context);
+                        if (date != null) {
+                          onRegisteredDatePressed(date);
+                        }
+                      },
             ),
             height(3),
 
@@ -121,13 +113,17 @@ class CustomerInfoPart extends StatelessWidget {
                 controller: memoController,
                 enabled: !isReadOnly,
                 minLines: 2,
-                maxLines: null, // 제한 없이 확장 가능
+                maxLines: null,
+                // 제한 없이 확장 가능
                 scrollPhysics: const BouncingScrollPhysics(),
                 decoration: const InputDecoration(
                   labelText: '메모',
                   border: OutlineInputBorder(),
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
                 ),
               ),
             ),
@@ -155,10 +151,11 @@ class CustomerInfoPart extends StatelessWidget {
                         errorBorder: InputBorder.none,
                         focusedErrorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
-                        errorText: isRecommended &&
-                            recommendedController.text.trim().isEmpty
-                            ? '소개자 이름을 입력하세요'
-                            : null,
+                        errorText:
+                            isRecommended &&
+                                    recommendedController.text.trim().isEmpty
+                                ? '소개자 이름을 입력하세요'
+                                : null,
                         errorStyle: const TextStyle(
                           fontSize: 12,
                           color: Colors.red,

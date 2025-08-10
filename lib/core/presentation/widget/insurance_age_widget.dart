@@ -1,8 +1,6 @@
-import '../../data/fire_base/user_session.dart';
-import '../../di/setup.dart';
 import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
-import '../core_presentation_import.dart'; // width 함수
+import '../core_presentation_import.dart';
 
 class InsuranceAgeWidget extends StatelessWidget {
   final int difference;
@@ -23,7 +21,7 @@ class InsuranceAgeWidget extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '(상) ${insuranceChangeDate.formattedMonthAndDate}',
+          '(상령일) ${insuranceChangeDate.formattedMonthAndDate}',
           style: TextStyles.normal12,
         ),
         width(6),

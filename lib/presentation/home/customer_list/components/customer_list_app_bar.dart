@@ -58,11 +58,11 @@ class CustomerListAppBar extends StatelessWidget implements PreferredSizeWidget 
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Image.asset(IconsPath.folderIcon, width: 45, color: ColorStyles.badgeColor.withOpacity(0.5)),
+          Image.asset(IconsPath.folderIcon, width: 45, color: ColorStyles.todoBadgeColor.withOpacity(0.5)),
           Positioned(
             left: -12,
             top: -2,
-            child: Image.asset(IconsPath.folderIcon, width: 35, color: ColorStyles.badgeColor.withOpacity(0.5)),
+            child: Image.asset(IconsPath.folderIcon, width: 35, color: ColorStyles.todoBadgeColor.withOpacity(0.5)),
           ),
         ],
       ),

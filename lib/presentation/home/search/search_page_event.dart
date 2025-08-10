@@ -1,9 +1,5 @@
-
-
 import '../../../core/domain/core_domain_import.dart';
 import '../home_grand_import.dart';
-import 'enum/coming_birth.dart';
-import 'enum/upcoming_insurance_age.dart';
 
 sealed class SearchPageEvent {
   factory SearchPageEvent.filterNoRecentHistoryCustomers({

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/core/ui/icon/const.dart';
 
 import '../../ui/core_ui_import.dart';
-
 
 class AddPolicyWidget extends StatefulWidget {
   final void Function() onTap;
@@ -31,17 +28,13 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
     )..repeat(reverse: true);
 
     _colorAnimation = ColorTween(
-      begin:ColorStyles.activeSwitchColor,
+      begin: ColorStyles.activeSwitchColor,
       end: ColorStyles.activeSearchButtonColor,
     ).animate(_animationController);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.95,
-      end: 1.1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -90,4 +83,3 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
     );
   }
 }
-

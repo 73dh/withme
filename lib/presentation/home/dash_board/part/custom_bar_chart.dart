@@ -48,15 +48,17 @@ class _CustomBarChartState extends State<CustomBarChart> {
     final stats = _convertToStats(widget.monthlyData);
     final keys = stats.keys.toList()..sort();
 
-    final maxY = stats.values
-        .expand((map) => map.values)
-        .fold<int>(0, (prev, element) => element > prev ? element : prev)
-        .toDouble();
+    final maxY =
+        stats.values
+            .expand((map) => map.values)
+            .fold<int>(0, (prev, element) => element > prev ? element : prev)
+            .toDouble();
 
     // 간소화된 y축 레이블 (5개로 제한)
     final step = (maxY / 4).ceil(); // 최대 5개
-    final yLabels = List.generate(5, (i) => step * i).toSet().toList()
-      ..sort((a, b) => b.compareTo(a)); // 높은 수부터 내림차순
+    final yLabels =
+        List.generate(5, (i) => step * i).toSet().toList()
+          ..sort((a, b) => b.compareTo(a)); // 높은 수부터 내림차순
 
     return LayoutBuilder(
       builder: (context, constraint) {
@@ -71,15 +73,18 @@ class _CustomBarChartState extends State<CustomBarChart> {
                 width: 24,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: yLabels
-                      .map((y) => Text(
-                    y.toString(),
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.black54,
-                    ),
-                  ))
-                      .toList(),
+                  children:
+                      yLabels
+                          .map(
+                            (y) => Text(
+                              y.toString(),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          )
+                          .toList(),
                 ),
               ),
 
@@ -127,25 +132,27 @@ class _CustomBarChartState extends State<CustomBarChart> {
                                     if (idx >= 0 && idx < keys.length) {
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 8),
-                                        child: Text(keys[idx].substring(5),
-                                            style: const TextStyle(fontSize: 10)),
+                                        child: Text(
+                                          keys[idx].substring(5),
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
                                       );
                                     }
                                     return const SizedBox.shrink();
                                   },
                                 ),
                               ),
-                              topTitles: AxisTitles(
+                              topTitles: const AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
                               ),
-                              leftTitles: AxisTitles(
+                              leftTitles: const AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
                               ),
-                              rightTitles: AxisTitles(
+                              rightTitles: const AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
                               ),
                             ),
-                            gridData: FlGridData(show: true),
+                            gridData: const FlGridData(show: true),
                             borderData: FlBorderData(
                               show: true,
                               border: const Border(
@@ -153,20 +160,20 @@ class _CustomBarChartState extends State<CustomBarChart> {
                                 bottom: BorderSide(color: Colors.grey),
                               ),
                             ),
-                            barTouchData: BarTouchData(enabled: false),
+                            barTouchData: const BarTouchData(enabled: false),
                           ),
                         ),
                       ),
                     ),
                     if (showLeftArrow)
-                      Positioned(
+                      const Positioned(
                         left: 0,
                         top: 0,
                         bottom: 0,
                         child: ArrowIndicator(isRight: false),
                       ),
                     if (showRightArrow)
-                      Positioned(
+                      const Positioned(
                         right: 0,
                         top: 0,
                         bottom: 0,
@@ -181,7 +188,6 @@ class _CustomBarChartState extends State<CustomBarChart> {
       },
     );
   }
-
 
   Map<String, Map<String, int>> _convertToStats(
     Map<String, List<CustomerModel>> monthlyData,

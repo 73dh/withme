@@ -49,6 +49,6 @@ class CustomSummeryTable extends StatelessWidget {
           ],
         ),
       ],
-    );;
+    );
   }
 }

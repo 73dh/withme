@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 
@@ -16,17 +14,12 @@ class NameField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isReadOnly
-        ? Row(
-          children: [
-            Text(nameController.text, style: TextStyles.bold20),
-          ],
-        )
+        ? Row(children: [Text(nameController.text, style: TextStyles.bold20)])
         : CustomTextFormField(
           controller: nameController,
           hintText: '이름',
           autoFocus: true,
           onSaved: (text) => nameController.text = text.trim(),
-
         );
   }
 }

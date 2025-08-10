@@ -1,37 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:withme/core/ui/const/shared_pref_value.dart';
 
-import '../../../domain/model/user_model.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../domain/model/user_model.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart'; // debugPrint를 위해 필요
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../domain/model/user_model.dart'; // UserModel 경로 확인 필요
-
-// core/data/fire_base/user_session.dart
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../domain/model/user_model.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../domain/model/user_model.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../domain/model/user_model.dart';
 
 class UserSession extends ChangeNotifier {

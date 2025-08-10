@@ -6,7 +6,7 @@ class ItemContainer extends StatelessWidget {
   final double? height;
   final Color? backgroundColor;
 
-  const ItemContainer({super.key, required this.child, this.height=88, this.backgroundColor});
+  const ItemContainer({super.key, required this.child, this.height=86, this.backgroundColor});
 
   @override
   Widget build(BuildContext context) {

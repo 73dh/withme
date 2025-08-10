@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
 import '../../ui/const/duration.dart';
 
 class AnimatedProgressBar extends StatelessWidget {
@@ -66,6 +58,3 @@ class AnimatedProgressBar extends StatelessWidget {
     );
   }
 }
-
-
-

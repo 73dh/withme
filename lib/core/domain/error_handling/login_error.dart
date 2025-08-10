@@ -1,5 +1,3 @@
-import '../core_domain_import.dart';
-
 enum LoginError {
   userNotFound,
   invalidEmail,

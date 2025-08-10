@@ -55,9 +55,9 @@ class InsuredHolderPart extends StatelessWidget {
                         borderSide: BorderSide.none,
                       ),
                     ),
+
                     // onChanged: onInsuredNameChanged,
                     // onSaved: (value) => insuredNameController.text = value!,
-
                   ),
                 ),
                 width(12),
@@ -71,10 +71,11 @@ class InsuredHolderPart extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                   onPressed: (index) {
-                    if (index == 0)
+                    if (index == 0) {
                       onManChanged('남');
-                    else
+                    } else {
                       onWomanChanged('여');
+                    }
                   },
                   children: const [
                     Padding(

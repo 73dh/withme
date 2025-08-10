@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/ui/const/size.dart';
-import 'package:flutter/material.dart';
+
 import '../../../core/ui/const/size.dart';
 import '../../../core/ui/core_ui_import.dart';
 
@@ -44,13 +43,15 @@ class SexSelector extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    final backgroundColor = isReadOnly
-        ? (isSelected ? Colors.grey.shade300 : Colors.white)
-        : (isSelected ? ColorStyles.unActiveButtonColor : Colors.white);
+    final backgroundColor =
+        isReadOnly
+            ? (isSelected ? Colors.grey.shade300 : Colors.white)
+            : (isSelected ? ColorStyles.unActiveButtonColor : Colors.white);
 
-    final textColor = isReadOnly
-        ? Colors.grey
-        : (isSelected ? Colors.black87 : Colors.black45);
+    final textColor =
+        isReadOnly
+            ? Colors.grey
+            : (isSelected ? Colors.black87 : Colors.black45);
 
     return GestureDetector(
       onTap: isReadOnly ? null : onTap,
