@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
+import 'package:withme/domain/use_case/todo/complete_todo_use_case.dart';
 
 import '../../../domain/domain_import.dart';
+import '../../../domain/model/history_model.dart';
 import '../../../domain/model/todo_model.dart';
 import '../../../domain/use_case/todo/add_todo_use_case.dart';
 import '../../../domain/use_case/todo/delete_todo_use_case.dart';
@@ -13,10 +15,10 @@ import '../widget/show_add_todo_dialog.dart';
 
 mixin TodoActionMixin {
   Future<void> addOrUpdateTodo(
-      BuildContext context,
-      CustomerModel customer,
-      {TodoModel? currentTodo}
-      ) async {
+    BuildContext context,
+    CustomerModel customer, {
+    TodoModel? currentTodo,
+  }) async {
     final newTodo = await showAddOrEditTodoDialog(
       context,
       currentTodo: currentTodo,
@@ -28,28 +30,28 @@ mixin TodoActionMixin {
       dueDate: newTodo.dueDate,
     );
 
-    final useCase = currentTodo == null
-        ? AddTodoUseCase(
-      userKey: UserSession.userId,
-      customerKey: customer.customerKey,
-      todoData: todoData,
-    )
-        : UpdateTodoUseCase(
-      userKey: UserSession.userId,
-      customerKey: customer.customerKey,
-      todoId: currentTodo.docId,
-      todoData: todoData,
-    );
+    final useCase =
+        currentTodo == null
+            ? AddTodoUseCase(
+              userKey: UserSession.userId,
+              customerKey: customer.customerKey,
+              todoData: todoData,
+            )
+            : UpdateTodoUseCase(
+              userKey: UserSession.userId,
+              customerKey: customer.customerKey,
+              todoId: currentTodo.docId,
+              todoData: todoData,
+            );
 
     await getIt<TodoUseCase>().execute(usecase: useCase);
-    if (context.mounted) context.pop();
   }
 
   Future<void> deleteTodo(
-      BuildContext context,
-      CustomerModel customer,
-      TodoModel todo
-      ) async {
+    BuildContext context,
+    CustomerModel customer,
+    TodoModel todo,
+  ) async {
     await getIt<TodoUseCase>().execute(
       usecase: DeleteTodoUseCase(
         userKey: UserSession.userId,
@@ -61,10 +63,36 @@ mixin TodoActionMixin {
   }
 
   Future<void> completeTodo(
-      BuildContext context,
-      TodoModel todo
-      ) async {
-    print('complete Todo: $todo');
-    if (context.mounted) context.pop();
+    BuildContext context,
+    CustomerModel customer,
+    TodoModel currentTodo,
+  ) async {
+    // 1. 팝업에서 현재 todo 내용과 날짜 보여주고, 필요시 수정
+    final editedTodo = await showAddOrEditTodoDialog(
+      context,
+      currentTodo: currentTodo,
+      type: TodoDialogType.complete,
+    );
+
+    // 2. 사용자가 취소 버튼을 눌렀다면 종료
+    if (editedTodo == null) return;
+    // 3. Usecase 실행
+    final newHistory = HistoryModel(
+      contactDate: editedTodo.dueDate,
+      content: editedTodo.content,
+    );
+    await getIt<TodoUseCase>().execute(
+      usecase: CompleteTodoUseCase(
+        userKey: customer.userKey,
+        customerKey: customer.customerKey,
+        todoId: currentTodo.docId,
+        newHistory: newHistory, // 수정된 내용 전달
+      ),
+    );
+
+    // 4. 팝업 닫기
+    if (context.mounted) {
+      context.pop();
+    }
   }
 }

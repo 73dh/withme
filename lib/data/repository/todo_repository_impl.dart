@@ -2,6 +2,7 @@ import 'package:withme/domain/model/todo_model.dart';
 import 'package:withme/domain/repository/todo_repository.dart';
 
 import '../../core/utils/transformers/transformers.dart';
+import '../../domain/model/history_model.dart';
 import '../data_source/remote/fbase.dart';
 
 class TodoRepositoryImpl with Transformers implements TodoRepository {
@@ -58,5 +59,14 @@ class TodoRepositoryImpl with Transformers implements TodoRepository {
       todoDocId: todoId,
       todoData: todoData,
     );
+  }
+
+  @override
+  Future<void> completeTodo({
+    required String customerKey,
+    required String todoId,
+    required HistoryModel newHistory,
+  }) async {
+ return await fBase.completeTodo( customerKey: customerKey, todoId: todoId,newHistory: newHistory);
   }
 }

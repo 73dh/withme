@@ -94,8 +94,7 @@ class CustomerListView extends StatelessWidget {
         await showBottomSheetWithDraggable(
           context: context,
           builder:
-              (scrollController) =>
-                  RegistrationBottomSheet(customer: customer),
+              (scrollController) => RegistrationBottomSheet(customer: customer),
           onClosed: () async {
             // 닫힌 후 검색 결과 다시 갱신
             await UpdateSearchedCustomersUseCase.call(viewModel);

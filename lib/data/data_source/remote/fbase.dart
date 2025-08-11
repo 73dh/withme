@@ -5,6 +5,7 @@ import '../../../core/data/fire_base/firestore_keys.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
 import '../../../domain/model/user_model.dart';
 
@@ -241,7 +242,6 @@ class FBase {
     required String todoDocId,
     required Map<String, dynamic> todoData,
   }) async {
-    print('updated todo data: $todoData');
     final ref = _subCol(userKey, customerKey, collectionTodos).doc(todoDocId);
     await ref.update(todoData);
   }
@@ -252,6 +252,28 @@ class FBase {
   }) async {
     final ref = _subCol(userKey, customerKey, collectionTodos).doc(todoId);
     await ref.delete();
+  }
+
+  Future<void> completeTodo({
+    required String customerKey,
+    required String todoId,
+    required HistoryModel newHistory,
+  }) async {
+    final String uid = FirebaseAuth.instance.currentUser?.uid
+        ?? (throw Exception("User not authenticated"));
+
+    final todoRef = _subCol(uid, customerKey, collectionTodos).doc(todoId);
+    final historyRef = _subCol(uid, customerKey, collectionHistories).doc();
+
+    await FirebaseFirestore.instance.runTransaction((tx) async {
+      final historyData = HistoryModel.toMapForHistory(
+        content: newHistory.content,
+        registeredDate: newHistory.contactDate,
+      );
+
+      tx.set(historyRef, historyData);
+      tx.delete(todoRef);
+    });
   }
 
   // ───────────────────────────── Policies ─────────────────────────────

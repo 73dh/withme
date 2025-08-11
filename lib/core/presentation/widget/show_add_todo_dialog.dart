@@ -5,17 +5,27 @@ import '../core_presentation_import.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/todo_model.dart';
 import '../core_presentation_import.dart';
-
+enum TodoDialogType { add, edit, complete }
 Future<TodoModel?> showAddOrEditTodoDialog(
     BuildContext context, {
       TodoModel? currentTodo,
+      TodoDialogType type = TodoDialogType.add,
     }) async {
   final TextEditingController controller =
   TextEditingController(text: currentTodo?.content ?? '');
   DateTime selectedDate = currentTodo?.dueDate ?? DateTime.now();
 
   final isEditMode = currentTodo != null;
-
+  final confirmText = () {
+    switch (type) {
+      case TodoDialogType.add:
+        return '추가';
+      case TodoDialogType.edit:
+        return '수정';
+      case TodoDialogType.complete:
+        return '완료';
+    }
+  }();
   return await showDialog<TodoModel>(
     context: context,
     builder: (dialogContext) {
@@ -41,7 +51,8 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                     child: Column(
                       children: [
                         Text(
-                          isEditMode ? '할 일 수정' : '할 일 추가',
+                          // isEditMode ? '할 일 수정' : '할 일 추가',
+                         confirmText,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -51,8 +62,8 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                         const SizedBox(height: 15),
                         TextField(
                           controller: controller,
-                          decoration: const InputDecoration(
-                            labelText: '할 일 내용',
+                          decoration:  InputDecoration(
+                            labelText: '$confirmText 내용',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -114,7 +125,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                           final todoText = controller.text.trim();
                           if (todoText.isNotEmpty) {
                             final newTodo = isEditMode
-                                ? currentTodo!.copyWith(
+                                ? currentTodo.copyWith(
                               content: todoText,
                               dueDate: selectedDate,
                             )
@@ -132,7 +143,8 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text(isEditMode ? '수정' : '추가'),
+                        // child: Text(isEditMode ? '수정' : '추가'),
+                        child: Text(confirmText),
                       ),
                     ],
                   ),

@@ -137,9 +137,6 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
               heroTag: 'mainSmallFab',
               backgroundColor: ColorStyles.fabColor,
               onPressed: () {
-                // 이 콜백은 FabOverlayManagerMixin의 _toggleFabExpanded를 호출합니다.
-                // _toggleFabExpanded 내부에서 _overlaySetState가 호출되어
-                // 오버레이 전체(SmallFab 포함)를 다시 빌드하게 됩니다.
                 widget.overlaySetState?.call(() {});
               },
               child: AnimatedSwitcher(
@@ -149,7 +146,7 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
                   return ScaleTransition(scale: animation, child: child);
                 },
                 child: Icon(
-                  widget.fabExpanded ? Icons.close : Icons.sort_outlined,
+                  widget.fabExpanded ? Icons.close : Icons.sort_by_alpha_outlined,
                   key: ValueKey(widget.fabExpanded), // 키를 변경하여 애니메이션 트리거
                   color: Colors.black87,
                 ),

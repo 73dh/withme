@@ -21,7 +21,7 @@ class InsuranceAgeWidget extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '(상령일) ${insuranceChangeDate.formattedMonthAndDate}',
+          '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',
           style: TextStyles.normal12,
         ),
         width(6),

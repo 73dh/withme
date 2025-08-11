@@ -3,8 +3,8 @@ abstract class SharedPrefValue {
   static const int managePeriodDays = 60;
 
   // 상령일 도래일
-  static const int urgentThresholdDays = 50;
+  static const int urgentThresholdDays = 30;
 
   // 목표고객수
-  static const int targetProspectCount = 30;
+  static const int targetProspectCount = 20;
 }

@@ -12,7 +12,7 @@ import '../../../core/di/setup.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/presentation/fab/fab_overlay_manager_mixin.dart';
-import '../../../core/presentation/todo/customerRegistrationAppBar.dart';
+import '../../../core/presentation/widget/customerRegistrationAppBar.dart';
 import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/is_need_new_history.dart';
 import '../../../core/presentation/todo/todo_view_model.dart';
@@ -20,7 +20,6 @@ import '../part/confirm_box_part.dart';
 import '../part/customer_info_part.dart';
 import '../registration_event.dart';
 import '../registration_view_model.dart';
-import 'registration_app_bar.dart';
 
 class RegistrationBottomSheet extends StatefulWidget {
   final CustomerModel? customer;

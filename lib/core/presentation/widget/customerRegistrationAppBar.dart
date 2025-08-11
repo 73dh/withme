@@ -13,7 +13,7 @@ import '../../di/setup.dart';
 import '../../ui/core_ui_import.dart';
 import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
-import 'common_todo_list.dart';
+import '../todo/common_todo_list.dart';
 
 class CustomerRegistrationAppBar extends StatelessWidget   implements PreferredSizeWidget {
   final CustomerModel? customer;

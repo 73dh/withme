@@ -1,5 +1,6 @@
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
+import 'package:withme/core/presentation/todo/common_todo_list.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
@@ -117,18 +118,22 @@ class ProspectItem extends StatelessWidget {
                 ),
               if (customer.todos.isNotEmpty) ...[
                 width(3),
-                SizedBox(
-                  width: 50,
-                  child: StreamTodoText(
-                    todoList: customer.todos,
-                    sex: customer.sex,
-                  ),
-                ),
-                TodoCountIcon(
-                  todos: customer.todos,
-                  sex: customer.sex,
-                  iconSize: 18,
-                ),
+
+                    SizedBox(
+                      width: 50,
+                      child: StreamTodoText(
+                        todoList: customer.todos,
+                        sex: customer.sex,
+                      ),
+                    ),
+                    TodoCountIcon(
+                      todos: customer.todos,
+                      sex: customer.sex,
+                      iconSize: 18,
+                    ),
+
+
+
               ],
             ],
           ),

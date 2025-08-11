@@ -23,7 +23,7 @@ class CommonTodoList extends StatelessWidget with TodoActionMixin {
       onPressed: () => addOrUpdateTodo(context, customer),
       onDeleteTodo: (todo) => deleteTodo(context, customer, todo),
       onUpdateTodo: (todo) => addOrUpdateTodo(context, customer, currentTodo: todo),
-      onCompleteTodo: (todo) => completeTodo(context, todo),
+      onCompleteTodo: (todo) => completeTodo(context,customer, todo),
     );
   }
 }

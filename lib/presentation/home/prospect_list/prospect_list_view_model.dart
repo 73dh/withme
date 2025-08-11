@@ -174,20 +174,10 @@ class ProspectListViewModel
   void sortByHistoryCount() => _sort(SortType.manage);
 
   int get todoCount {
-    final now = DateTime.now();
-
-    return allCustomers.where((customer) => customer.policies.isEmpty).where((
-      e,
-    ) {
-      if (e.todos.isNotEmpty) return false;
-      final latest = e.todos
-          .map((h) => h.dueDate)
-          .fold<DateTime?>(
-            null,
-            (prev, date) => prev == null || date.isAfter(prev) ? date : prev,
-          );
-      return latest == null || latest.add(Duration(days: 10)).isBefore(now);
-    }).length;
+    return allCustomers
+        .where((customer) => customer.policies.isEmpty) // prospect만
+        .where((customer) => customer.todos.isNotEmpty) // todo가 있는 경우만
+        .length;
   }
 
   int get inactiveCount {

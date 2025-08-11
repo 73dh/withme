@@ -1,10 +1,9 @@
 import 'dart:developer';
 
 import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/presentation/todo/customerRegistrationAppBar.dart';
+import 'package:withme/core/presentation/widget/customerRegistrationAppBar.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
-import 'package:withme/presentation/customer/screen/customer_app_bar.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
@@ -50,11 +49,6 @@ class _CustomerScreenState extends State<CustomerScreen> {
     return SafeArea(
       child: Scaffold(
         appBar:CustomerRegistrationAppBar(customer: widget.customer, todoViewModel: todoViewModel),
-        // CustomerAppBar(
-        //   customer: widget.customer,
-        //   todoViewModel: todoViewModel,
-        // ),
-        // _appBar(context),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

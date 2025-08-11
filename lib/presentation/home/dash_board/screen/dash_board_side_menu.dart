@@ -11,7 +11,9 @@ import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
+import '../../../../core/ui/theme/theme_controller.dart';
 import '../../../../domain/model/user_model.dart';
+import '../../../../main.dart' show themeController;
 import '../components/build_menu_item.dart';
 
 class DashBoardSideMenu extends StatelessWidget {
@@ -36,6 +38,7 @@ class DashBoardSideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = themeController.themeMode == AppThemeMode.light;
     return SafeArea(
       child: AnimatedContainer(
         color: Colors.white,
@@ -197,7 +200,24 @@ class DashBoardSideMenu extends StatelessWidget {
                         ),
                       ],
                     ),
-                   const Spacer(),
+                    const Spacer(),
+                AnimatedBuilder(
+                  animation: themeController,
+                  builder: (context, _) {
+                    final isLight = themeController.flutterThemeMode == ThemeMode.light;
+
+                    return IconButton.filledTonal(
+                      onPressed: themeController.toggleTheme,
+                      icon: Icon(isLight ? Icons.dark_mode : Icons.light_mode),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
                     BuildMenuItem(
                       icon: Icons.info_outline,
                       text: 'App소개',
