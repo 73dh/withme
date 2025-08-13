@@ -22,7 +22,7 @@ class App extends StatelessWidget {
           // theme: theme,
           theme: lightTheme,
           darkTheme: darkTheme,
-          themeMode: themeController.flutterThemeMode,
+          themeMode:ThemeMode.system,
           localizationsDelegates: [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

@@ -31,9 +31,9 @@ class RecommenderPart extends StatelessWidget {
             /// 상단 소개자 텍스트 + 스위치
             Row(
               children: [
-                const Text('소개자', style: TextStyles.normal14),
+                 Text('소개자', style: Theme.of(context).textTheme.headlineMedium),
                 if (!isReadOnly)
-                  const Text(' (선택)', style: TextStyles.normal14),
+                   Text(' (선택)', style: Theme.of(context).textTheme.bodyMedium),
                 const Spacer(),
                 Switch.adaptive(
                   value: isRecommended,
@@ -51,7 +51,7 @@ class RecommenderPart extends StatelessWidget {
                     isReadOnly
                         ? Text(
                           recommendedController.text,
-                          style: TextStyles.bold14,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         )
                         : CustomTextFormField(
                           controller: recommendedController,

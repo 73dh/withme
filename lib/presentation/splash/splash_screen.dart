@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('withMe', style: TextStyles.bold20),
+             Text('withMe', style: Theme.of(context).textTheme.displayLarge),
             height(10),
             const MyCircularIndicator(),
           ],

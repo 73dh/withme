@@ -52,7 +52,7 @@ class SexIconWithBirthday extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 countdown != 0 ? 'D-$countdown' : '오늘',
-                style: TextStyles.bold12.copyWith(color: ColorStyles.cakeColor),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: ColorStyles.cakeColor),
               ),
             ],
           ),

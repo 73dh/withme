@@ -42,7 +42,7 @@ class PolicyConfirmBox extends StatelessWidget {
     return Column(
       children: [
         height(20),
-        const Text('계약정보 확인', style: TextStyles.bold20),
+         Text('계약정보 확인', style: Theme.of(context).textTheme.displayLarge),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: Column(

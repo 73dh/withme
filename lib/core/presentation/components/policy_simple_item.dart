@@ -28,18 +28,20 @@ class PolicySimpleItem extends StatelessWidget {
               children: [
                 Text(
                   '계약자: ${shortenedNameText(policy.policyHolder)}',
-                  style: TextStyles.bold14,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 Text(
                   '피보험자: ${shortenedNameText(policy.insured)}',
-                  style: TextStyles.bold14,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ],
             ),
             height(4),
             Text(
               '상품명: ${policy.productName}',
-              style: TextStyles.subTitle,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -58,7 +60,9 @@ class PolicySimpleItem extends StatelessWidget {
                               '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
                           style:
                               notKeepPolicyState
-                                  ? TextStyles.cancelStyle
+                                  ? Theme.of(
+                                context,
+                              ).textTheme.headlineMedium?.copyWith( color: Colors.red,decoration: TextDecoration.lineThrough,)
                                   : null,
                         ),
                         TextSpan(text: ' (${policy.paymentMethod})'),

@@ -23,11 +23,12 @@ class CustomerListAppBar extends StatelessWidget implements PreferredSizeWidget 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       title: Row(
         children: [
           _buildIconStack(),
           const SizedBox(width: 10),
-          Text('$count명', style: TextStyles.homeTopTextStyle),
+          Text('$count명', style:Theme.of(context).textTheme.displayMedium?.copyWith(color: Colors.deepPurple)),
           width(5),
           BlinkingToggleIcon(
             expanded: filterBarExpanded,

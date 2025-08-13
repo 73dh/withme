@@ -27,6 +27,7 @@ class CustomerListAppBar extends StatelessWidget implements PreferredSizeWidget 
 
     return AppBar(
       title: Text(titleText),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 

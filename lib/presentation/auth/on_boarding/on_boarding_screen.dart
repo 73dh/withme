@@ -64,7 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             height(10),
-            const Text('withMe에 오신 것을 환영합니다!', style: TextStyles.bold20),
+             Text('withMe에 오신 것을 환영합니다!', style: Theme.of(context).textTheme.displayLarge),
             height(40),
             styledInfoText,
             // const Text(infoText, style: TextStyles.normal14),

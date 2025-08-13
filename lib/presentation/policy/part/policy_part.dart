@@ -63,6 +63,7 @@ class PolicyPart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildPopupButton(
+                    context,
                     icon: Icons.dehaze_outlined,
                     label: productCategory,
                     onSelected: onCategoryTap,
@@ -79,6 +80,7 @@ class PolicyPart extends StatelessWidget {
                   ),
                   width(12),
                   _buildPopupButton(
+                    context,
                     icon: Icons.holiday_village_outlined,
                     label: insuranceCompany,
                     onSelected: onCompanyTap,
@@ -246,7 +248,8 @@ class PolicyPart extends StatelessWidget {
   }
 }
 
-Widget _buildPopupButton({
+Widget _buildPopupButton(
+  BuildContext context, {
   required IconData icon,
   required String label,
   required void Function(String) onSelected,
@@ -259,7 +262,11 @@ Widget _buildPopupButton({
         onSelected: (value) => onSelected(value.toString()),
         itemBuilder: (context) => items,
       ),
-      Text(label, style: TextStyles.normal12, overflow: TextOverflow.ellipsis),
+      Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall,
+        overflow: TextOverflow.ellipsis,
+      ),
     ],
   );
 }

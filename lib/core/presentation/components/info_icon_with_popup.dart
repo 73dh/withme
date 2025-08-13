@@ -3,7 +3,12 @@ import '../core_presentation_import.dart';
 class InfoIconWithPopup extends StatefulWidget {
   final String message;
   final Color color;
-  const InfoIconWithPopup({super.key, required this.message, required this.color});
+
+  const InfoIconWithPopup({
+    super.key,
+    required this.message,
+    required this.color,
+  });
 
   @override
   State<InfoIconWithPopup> createState() => _InfoIconWithPopupState();
@@ -21,24 +26,25 @@ class _InfoIconWithPopupState extends State<InfoIconWithPopup> {
 
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        left: position.dx + box.size.width + 8,
-        top: position.dy,
+        left: position.dx, // 버튼 왼쪽 기준
+        top: position.dy + box.size.height + 4, // 버튼 아래쪽 + 약간 여백
         child: Material(
           color: Colors.transparent,
           child: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: Theme.of(context).primaryColorDark,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               widget.message,
-              style: const TextStyle(color: Colors.black87, fontSize: 10),
+              style: Theme.of(context).textTheme.labelSmall,
             ),
           ),
         ),
       ),
     );
+
 
     overlay.insert(_overlayEntry!);
   }
@@ -68,11 +74,7 @@ class _InfoIconWithPopupState extends State<InfoIconWithPopup> {
       link: _layerLink,
       child: GestureDetector(
         onTap: _toggleOverlay,
-        child: Icon(
-          Icons.info_outline,
-          size: 15,
-          color: widget.color,
-        ),
+        child: Icon(Icons.info_outline, size: 15, color: widget.color),
       ),
     );
   }

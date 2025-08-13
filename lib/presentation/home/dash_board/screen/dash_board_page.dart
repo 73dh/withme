@@ -39,6 +39,7 @@ class DashBoardPage extends StatelessWidget {
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           title: const Text('DashBoard'),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           actions: [
             IconButton(onPressed: onMenuTap, icon: const Icon(Icons.settings)),
           ],

@@ -65,6 +65,7 @@ class HistoryPartWidget extends StatelessWidget {
         children: [
           for (var i = 0; i < displayHistories.length; i++)
             _buildHistoryBox(
+              context,
               history: displayHistories[i],
               isRecent: i == displayHistories.length - 1,
               historyNumber:
@@ -79,20 +80,21 @@ class HistoryPartWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryBox({
+  Widget _buildHistoryBox(BuildContext context,{
+
     required HistoryModel history,
     required bool isRecent,
     required int historyNumber,
   }) {
     final TextStyle contentStyle =
         isRecent
-            ? TextStyles.normal10.copyWith(fontWeight: FontWeight.w500)
-            : TextStyles.normal9.copyWith(color: Colors.grey[700]);
+            ? Theme.of(context).textTheme.labelSmall! .copyWith(fontWeight: FontWeight.w500)
+            : Theme.of(context).textTheme.labelSmall!.copyWith(fontSize: 9, color: Colors.grey[700]);
 
     final TextStyle dateStyle =
         isRecent
-            ? TextStyles.normal9.copyWith(color: Colors.grey[700])
-            : TextStyles.normal8.copyWith(color: Colors.grey[600]);
+            ? Theme.of(context).textTheme.labelSmall!.copyWith (fontSize: 9, color: Colors.grey[700])
+            : Theme.of(context).textTheme.labelSmall!.copyWith(fontSize: 8, color: Colors.grey[600]);
 
     final Color numberColor =
         isRecent

@@ -14,7 +14,7 @@ class NameField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isReadOnly
-        ? Row(children: [Text(nameController.text, style: TextStyles.bold20)])
+        ? Row(children: [Text(nameController.text, style: Theme.of(context).textTheme.displayLarge)])
         : CustomTextFormField(
           controller: nameController,
           hintText: '이름',

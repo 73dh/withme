@@ -116,7 +116,7 @@ class InsuredHolderPart extends StatelessWidget {
                     icon: const Icon(Icons.cake_outlined, size: 18),
                     label: Text(
                       insuredBirth?.formattedBirth ?? '생년월일',
-                      style: TextStyles.normal12,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                 ),

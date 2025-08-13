@@ -25,16 +25,16 @@ Future<Map<String, String>?> showReauthDialog(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                     Text(
                       '비밀번호를 입력하세요.',
                       textAlign: TextAlign.center,
-                      style: TextStyles.bold16,
+                      style: Theme.of(context).textTheme.displaySmall,
                     ),
                     height(20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(email, style: TextStyles.normal14),
+                        Text(email, style: Theme.of(context).textTheme.bodyMedium),
                         height(10),
                         TextField(
                           controller: passwordController,

@@ -25,14 +25,14 @@ class ProspectListAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 2,
       title: Row(
         children: [
           width(5),
           _buildGenderIcons(),
           width(4),
-          Text('${customers.length}명', style: TextStyles.homeTopTextStyle),
+          Text('${customers.length}명', style: Theme.of(context).textTheme.displayMedium?.copyWith(color: Colors.deepPurple),),
           width(5),
           BlinkingToggleIcon(
             expanded: filterBarExpanded,

@@ -17,7 +17,7 @@ class PartTitle extends StatelessWidget {
           padding:  EdgeInsets.symmetric(vertical: padding),
           child: Text(
             text,
-            style: TextStyles.bold14.copyWith(fontStyle: FontStyle.italic),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontStyle: FontStyle.italic),
           ),
         ),
         const Spacer(),

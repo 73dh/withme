@@ -66,9 +66,9 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
             message: [
               '관리기간: $manageDays일\n',
               if (showUrgentOnly != null) '상령일: $urgentDays일\n',
-              '설정에서 변경 가능',
+              '설정에서 변경',
             ].join(', '),
-            color: Colors.grey,
+            color: Theme.of(context).unselectedWidgetColor,
           ),
         ],
       ),
@@ -83,7 +83,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: isActive ? Colors.purple.withOpacity(0.1) : Colors.white,
+        color: isActive ? Colors.purple.withOpacity(0.1) :Theme.of(context).canvasColor,
         border: Border.all(
           color: isActive ? Colors.purple : Colors.grey[300]!,
           width: 1.2,
@@ -106,7 +106,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: isActive ? Colors.purple : Colors.black54,
+              color: isActive ? Colors.purple : Theme.of(context).unselectedWidgetColor,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),
           ),

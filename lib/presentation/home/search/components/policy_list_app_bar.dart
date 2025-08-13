@@ -9,7 +9,8 @@ class PolicyListAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Text('전체 계약 $count건'),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      // backgroundColor: Colors.white,
       foregroundColor: Colors.black,
       elevation: 1,
     );

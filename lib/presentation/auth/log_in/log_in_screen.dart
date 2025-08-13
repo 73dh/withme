@@ -101,7 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(30.0),
@@ -111,11 +116,13 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 height(50),
-                const SizedBox(
+                SizedBox(
                   width: 200,
                   child: Text(
                     'Welcome back!\nLog in to manage your customers.',
-                    style: TextStyles.bold20,
+                    style: textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onSurface, // 라이트/다크 자동 대응
+                    ),
                   ),
                 ),
                 height(60),
@@ -131,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
+                height(5),
                 CustomTextFormField(
                   controller: _passwordController,
                   labelText: 'Password',
@@ -142,6 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
+                height(10),
                 Row(
                   children: [
                     const Spacer(),
@@ -160,14 +169,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Icon(
                             Icons.lock_reset,
-                            color: ColorStyles.menuButtonColor,
+                            color: colorScheme.primary,
                             size: 20,
                           ),
                           width(3),
                           Text(
                             '비밀번호 재설정',
-                            style: TextStyles.bold12.copyWith(
-                              color: ColorStyles.menuButtonColor,
+                            style: textTheme.labelMedium?.copyWith(
+                              color: colorScheme.primary,
                             ),
                           ),
                         ],
@@ -175,30 +184,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-
                 RenderFilledButton(
                   text: _isLoading ? '로그인 중...' : '로그인',
-                  foregroundColor: Colors.white,
-                  backgroundColor:
-                      _isFormValid
-                          ? ColorStyles.menuButtonColor
-                          : Colors.grey[300],
+                  foregroundColor: colorScheme.onPrimary,
+                  backgroundColor: _isFormValid
+                      ? colorScheme.primary
+                      : theme.disabledColor,
                   onPressed: _isFormValid && !_isLoading ? _login : null,
                 ),
                 height(20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Don't have an account?",
-                      style: TextStyles.bold16,
+                    Text(
+                      "Don't have an account ?",
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onBackground,
+                      ),
                     ),
                     GestureDetector(
                       onTap: () => context.go(RoutePath.signUp),
                       child: Text(
                         ' 회원가입',
-                        style: TextStyles.bold16.copyWith(
-                          color: ColorStyles.menuButtonColor,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),

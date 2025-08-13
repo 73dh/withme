@@ -30,19 +30,21 @@ class PolicyItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _titleRow(),
+            _titleRow(context),
             height(3),
-            _personInfoRow(),
+            _personInfoRow(context),
             const DashedDivider(),
-            _insuranceInfoRow(),
+            _insuranceInfoRow(context),
             height(4),
             Text(
               '상품명: ${policy.productName}',
-              style: TextStyles.subTitle,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium,
               overflow: TextOverflow.ellipsis,
             ),
             const DashedDivider(),
-            _contractDateRow(),
+            _contractDateRow(context),
             const DashedDivider(),
             _premiumAndStateRow(),
           ],
@@ -51,21 +53,26 @@ class PolicyItem extends StatelessWidget {
     );
   }
 
-  Widget _titleRow() => Row(
+  Widget _titleRow(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [_labelValue('계약자', ''), _labelValue('피보험자', '')],
+    children: [
+      _labelValue(context, '계약자', ''),
+      _labelValue(context, '피보험자', ''),
+    ],
   );
 
-  Widget _personInfoRow() => Row(
+  Widget _personInfoRow(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       _personDetail(
+        context,
         sexIcon: sexIcon(policy.policyHolderSex),
         name: shortenedNameText(policy.policyHolder, length: 5),
         age: calculateAge(policy.policyHolderBirth!),
         birth: policy.policyHolderBirth?.formattedBirth ?? '-',
       ),
       _personDetail(
+        context,
         sexIcon: sexIcon(policy.insuredSex),
         name: shortenedNameText(policy.insured, length: 5),
         age: calculateAge(policy.insuredBirth!),
@@ -74,19 +81,19 @@ class PolicyItem extends StatelessWidget {
     ],
   );
 
-  Widget _insuranceInfoRow() => Row(
+  Widget _insuranceInfoRow(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      _labelValue('보험사', policy.insuranceCompany),
-      _labelValue('종류', policy.productCategory),
+      _labelValue(context, '보험사', policy.insuranceCompany),
+      _labelValue(context, '종류', policy.productCategory),
     ],
   );
 
-  Widget _contractDateRow() => Row(
+  Widget _contractDateRow(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      _labelValue('계약일', policy.startDate?.formattedBirth ?? '-'),
-      _labelValue('만기일', policy.endDate?.formattedBirth ?? '-'),
+      _labelValue(context, '계약일', policy.startDate?.formattedBirth ?? '-'),
+      _labelValue(context, '만기일', policy.endDate?.formattedBirth ?? '-'),
     ],
   );
 
@@ -136,18 +143,27 @@ class PolicyItem extends StatelessWidget {
     ),
   );
 
-  Widget _labelValue(String label, String value) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: TextStyles.caption),
-      if (value.isNotEmpty) ...[
-        height(2),
-        Text(value, style: TextStyles.bodyBold),
-      ],
-    ],
-  );
+  Widget _labelValue(BuildContext context, String label, String value) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(color: Colors.grey),
+          ),
+          if (value.isNotEmpty) ...[
+            height(2),
+            Text(value, style:Theme.of(
+              context,
+            ).textTheme.headlineMedium),
+          ],
+        ],
+      );
 
-  Widget _personDetail({
+  Widget _personDetail(
+    BuildContext context, {
     required String name,
     required Widget sexIcon,
     required int age,
@@ -156,9 +172,11 @@ class PolicyItem extends StatelessWidget {
     children: [
       sexIcon,
       width(4),
-      Text(name, style: TextStyles.bodyBold),
+      Text(name, style: Theme.of(
+        context,
+      ).textTheme.headlineMedium),
       width(6),
-      Text('$birth ($age세)', style: TextStyles.normal12),
+      Text('$birth ($age세)', style: Theme.of(context).textTheme.labelMedium),
     ],
   );
 }

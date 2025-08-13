@@ -22,12 +22,12 @@ class InsuranceAgeWidget extends StatelessWidget {
       children: [
         Text(
           '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',
-          style: TextStyles.normal12,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         width(6),
         Text(
           isFuture ? '(D-$difference)' : '(D+${difference.abs()})',
-          style: TextStyles.normal12.copyWith(
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             color: Colors.black,
             fontWeight: FontWeight.normal,
           ),

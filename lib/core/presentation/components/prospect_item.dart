@@ -50,9 +50,10 @@ class ProspectItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProfileColumn(customer),
+                _buildProfileColumn(context,customer),
                 width(12),
                 _buildNamePart(
+                  context,
                   birthDate: birthDate,
                   difference: info.difference,
                   isUrgent: info.isUrgent,
@@ -74,13 +75,13 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileColumn(CustomerModel customer) {
+  Widget _buildProfileColumn(BuildContext context, CustomerModel customer) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           customer.registeredDate.formattedYearAndMonth,
-          style: TextStyles.normal12,
+          style: Theme.of(context).textTheme.labelMedium,
         ),
         height(3),
         SexIconWithBirthday(
@@ -93,7 +94,7 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _buildNamePart({
+  Widget _buildNamePart(BuildContext context,{
     required DateTime? birthDate,
     required int? difference,
     required bool isUrgent,
@@ -108,13 +109,13 @@ class ProspectItem extends StatelessWidget {
             children: [
               Text(
                 shortenedNameText(customer.name, length: 6),
-                style: TextStyles.bold14.copyWith(color: Colors.black87),
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               width(6),
               if (birthDate != null)
                 Text(
                   '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
-                  style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey[700]),
                 ),
               if (customer.todos.isNotEmpty) ...[
                 width(3),
@@ -150,7 +151,7 @@ class ProspectItem extends StatelessWidget {
             height(2),
             Text(
               '소개자: ${customer.recommended}',
-              style: TextStyles.normal12.copyWith(color: Colors.grey[700]),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey[700]),
             ),
           ],
         ],

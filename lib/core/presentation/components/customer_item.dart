@@ -57,6 +57,7 @@ class CustomerItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _namePart(
+                          context,
                           customer,
                           birthDate,
                           difference,
@@ -84,6 +85,7 @@ class CustomerItem extends StatelessWidget {
   }
 
   Widget _namePart(
+      BuildContext context,
     CustomerModel customer,
     DateTime? birthDate,
     int? difference,
@@ -97,7 +99,7 @@ class CustomerItem extends StatelessWidget {
         children: [
           Text(
             shortenedNameText(customer.name, length: 6),
-            style: TextStyles.bold14,
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
           width(5),
           const Text('정보 없음'),
@@ -119,7 +121,7 @@ class CustomerItem extends StatelessWidget {
         width(3),
         Text(
           shortenedNameText(customer.name, length: 6),
-          style: TextStyles.bold14,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
         width(5),
         Text('${calculateAge(birthDate)}세/'),
@@ -139,7 +141,7 @@ class CustomerItem extends StatelessWidget {
           if (getBirthdayCountdown(birthDate) != 0)
             Text(
               '(D-${getBirthdayCountdown(birthDate)})',
-              style: TextStyles.normal10.copyWith(color: Colors.pinkAccent),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.pinkAccent),
             ),
         ],
         if (difference == null || difference < 0) const SizedBox.shrink(),
