@@ -33,30 +33,35 @@ class FilterBox extends StatelessWidget {
       children: [
         _buildDragHandle(),
         const SizedBox(height: 17),
-        const PartTitle(text: '고객조회', padding: 6),
-ItemContainer(height: 60, child: Row(
-  children: [
-    Expanded(child: NoContactFilterButton(viewModel: viewModel)),
-    const SizedBox(width: 5),
-    Expanded(child: ComingBirthFilterButton(viewModel: viewModel)),
-    const SizedBox(width: 5),
-    Expanded(child: UpcomingInsuranceAgeFilterButton(viewModel: viewModel)),
-  ],
-)),
-        // PartBox(
-        //   child: Row(
-        //     children: [
-        //       Expanded(child: NoContactFilterButton(viewModel: viewModel)),
-        //       const SizedBox(width: 5),
-        //       Expanded(child: ComingBirthFilterButton(viewModel: viewModel)),
-        //       const SizedBox(width: 5),
-        //       Expanded(child: UpcomingInsuranceAgeFilterButton(viewModel: viewModel)),
-        //     ],
-        //   ),
-        // ),
+        PartTitle(
+          text: '고객조회',
+          verticalPadding: 6,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.bold, // 강조를 원하면 추가
+          ),
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        ItemContainer(
+          height: 60,
+          child: Row(
+            children: [
+              Expanded(child: NoContactFilterButton(viewModel: viewModel)),
+              const SizedBox(width: 5),
+              Expanded(child: ComingBirthFilterButton(viewModel: viewModel)),
+              const SizedBox(width: 5),
+              Expanded(
+                child: UpcomingInsuranceAgeFilterButton(viewModel: viewModel),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 14),
-        _buildSearchByName(),
-        ItemContainer(height: 60, child: PolicyFilterButton(viewModel: viewModel))
+        _buildSearchByName(context),
+        ItemContainer(
+          height: 60,
+          child: PolicyFilterButton(viewModel: viewModel),
+        ),
         // PartBox(child: PolicyFilterButton(viewModel: viewModel)),
       ],
     );
@@ -75,10 +80,18 @@ ItemContainer(height: 60, child: Row(
     );
   }
 
-  Widget _buildSearchByName() {
+  Widget _buildSearchByName(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: PartTitle(text: '계약조회', padding: 6)),
+         Expanded(child:  PartTitle(
+          text: '계약조회',
+          verticalPadding: 6,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.bold,
+          ),
+          color: Theme.of(context).colorScheme.onSurface,
+        )),
         if (isSearchingByName)
           SearchByNameFilterButton(
             viewModel: viewModel,

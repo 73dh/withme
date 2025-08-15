@@ -2,23 +2,20 @@ import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../domain/domain_import.dart';
-
 class ConfirmBoxPart extends StatelessWidget {
   final bool isRegistering;
   final CustomerModel? customerModel;
   final TextEditingController nameController;
-
   final TextEditingController recommendedController;
-
   final TextEditingController historyController;
-
   final TextEditingController birthController;
-
   final TextEditingController registeredDateController;
-
   final String? sex;
   final DateTime? birth;
   final void Function() onPressed;
+
+  final Color? textColor;
+  final Color? backgroundColor;
 
   const ConfirmBoxPart({
     super.key,
@@ -32,57 +29,71 @@ class ConfirmBoxPart extends StatelessWidget {
     required this.onPressed,
     required this.sex,
     required this.birth,
+    this.textColor,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final effectiveTextColor = textColor ?? theme.colorScheme.onSurface;
+    final effectiveBackground = backgroundColor ?? theme.colorScheme.surfaceVariant;
+
     return Stack(
       children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            height(15),
-            ConfirmBoxText(
-              text: customerModel == null ? '신규등록 확인' : '수정내용 확인',
-              size: 18,
-            ),
-            height(10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ConfirmBoxText(
-                  text: '등록자: ',
-                  text2: ' ${nameController.text} ($sex)',
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: effectiveBackground,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              height(15),
+              Text(
+                customerModel == null ? '신규등록 확인' : '수정내용 확인',
+                style: textTheme.titleLarge?.copyWith(
+                  color: effectiveTextColor,
+                  fontWeight: FontWeight.w600,
                 ),
-                ConfirmBoxText(
-                  text: '생년월일: ',
-                  text2:
-                      birthController.text.isEmpty
-                          ? '추후입력'
-                          : birth?.formattedBirth,
-                ),
-                ConfirmBoxText(
-                  text: '소개자: ',
-                  text2:
-                      recommendedController.text.isEmpty
-                          ? '없음'
-                          : recommendedController.text,
-                ),
-                ConfirmBoxText(
-                  text: '등록일: ',
-                  text2: registeredDateController.text,
-                ),
-                // if (customerModel == null)
-                //   ConfirmBoxText(text2: historyController.text),
-              ],
-            ),
-            height(20),
-            RenderFilledButton(
-              text: customerModel == null ? '등록' : '수정',
-              onPressed: onPressed,
-              foregroundColor: Colors.white,
-            ),
-          ],
+              ),
+              height(10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInfoRow('등록자:', '${nameController.text} ($sex)', textTheme, effectiveTextColor),
+                  _buildInfoRow(
+                    '생년월일:',
+                    birthController.text.isEmpty ? '추후입력' : birth?.formattedBirth ?? '',
+                    textTheme,
+                    effectiveTextColor,
+                  ),
+                  _buildInfoRow(
+                    '소개자:',
+                    recommendedController.text.isEmpty ? '없음' : recommendedController.text,
+                    textTheme,
+                    effectiveTextColor,
+                  ),
+                  _buildInfoRow(
+                    '등록일:',
+                    registeredDateController.text,
+                    textTheme,
+                    effectiveTextColor,
+                  ),
+                ],
+              ),
+              height(20),
+              RenderFilledButton(
+                text: customerModel == null ? '등록' : '수정',
+                onPressed: onPressed,
+                foregroundColor: theme.colorScheme.onPrimary,
+                backgroundColor: theme.colorScheme.primary,
+              ),
+            ],
+          ),
         ),
         if (isRegistering)
           Positioned(
@@ -90,13 +101,47 @@ class ConfirmBoxPart extends StatelessWidget {
             top: 10,
             child: Row(
               children: [
-                const Text('저장중'),
+                Text(
+                  '저장중',
+                  style: textTheme.bodyMedium?.copyWith(color: effectiveTextColor.withOpacity(0.7)),
+                ),
                 width(5),
                 const MyCircularIndicator(size: 10),
               ],
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildInfoRow(
+      String label,
+      String value,
+      TextTheme textTheme,
+      Color textColor,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$label ',
+              style: textTheme.bodyMedium?.copyWith(
+                color: textColor.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: textTheme.bodyMedium?.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import '../core_presentation_import.dart';
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
+  final List<TextSpan> textSpans;
   final String confirmButtonText;
   final String cancelButtonText;
   final Future<void> Function() onConfirm;
@@ -10,6 +11,7 @@ class CommonConfirmDialog extends StatelessWidget {
   const CommonConfirmDialog({
     super.key,
     required this.text,
+    required this.textSpans,
     required this.confirmButtonText,
     required this.cancelButtonText,
     required this.onConfirm,
@@ -22,8 +24,9 @@ class CommonConfirmDialog extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       child: Container(
+        // color: colorScheme.surface,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: colorScheme.surface,
@@ -33,12 +36,22 @@ class CommonConfirmDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if(textSpans.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Text(
                 text,
                 textAlign: TextAlign.center,
-                style: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(children: textSpans),
               ),
             ),
             const SizedBox(height: 20),
@@ -54,7 +67,7 @@ class CommonConfirmDialog extends StatelessWidget {
                       }
                     },
                     style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.surfaceVariant,
+                      backgroundColor: colorScheme.surfaceContainerHighest,
                       foregroundColor: colorScheme.onSurfaceVariant,
                     ),
                     child: Text(cancelButtonText, style: textTheme.labelLarge),
@@ -70,9 +83,14 @@ class CommonConfirmDialog extends StatelessWidget {
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
+                    foregroundColor: colorScheme.surfaceContainerHighest,
                   ),
-                  child: Text(confirmButtonText, style: textTheme.labelLarge),
+                  child: Text(
+                    confirmButtonText,
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.surfaceContainerHighest,
+                    ),
+                  ),
                 ),
               ],
             ),

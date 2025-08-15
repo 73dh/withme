@@ -15,6 +15,11 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
   final int inactiveCount;
   final int? urgentCount;
 
+  // Theme 관련 파라미터 추가
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final Color? textColor;
+
   const InactiveAndUrgentFilterBar({
     super.key,
     required this.showTodoOnly,
@@ -26,12 +31,20 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
     required this.todoCount,
     required this.inactiveCount,
     this.urgentCount,
+    this.backgroundColor,
+    this.iconColor,
+    this.textColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final manageDays = getIt<UserSession>().managePeriodDays;
     final urgentDays = getIt<UserSession>().urgentThresholdDays;
+
+    final bgColor = backgroundColor ?? theme.colorScheme.surfaceVariant;
+    final txtColor = textColor ?? theme.colorScheme.onSurfaceVariant;
+    final icColor = iconColor ?? theme.colorScheme.primary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
@@ -39,36 +52,39 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
         spacing: 5,
         children: [
           _buildFilterButton(
-            context: context,
             label: '할 일 ($todoCount)',
             isActive: showTodoOnly,
             onTap: () => onTodoToggle(!showTodoOnly),
+            bgColor: bgColor,
+            txtColor: txtColor,
+            activeColor: icColor,
           ),
           _buildFilterButton(
-            context: context,
             label: '관리기간 경과 ($inactiveCount)',
             isActive: showInactiveOnly,
             onTap: () => onInactiveToggle(!showInactiveOnly),
+            bgColor: bgColor,
+            txtColor: txtColor,
+            activeColor: icColor,
           ),
-          // 조건부: 상령일 버튼
-          if ( showUrgentOnly != null &&
+          if (showUrgentOnly != null &&
               onUrgentToggle != null &&
               urgentCount != null)
             _buildFilterButton(
-              context: context,
               label: '상령일 도래 ($urgentCount)',
               isActive: showUrgentOnly!,
               onTap: () => onUrgentToggle!(!showUrgentOnly!),
+              bgColor: bgColor,
+              txtColor: txtColor,
+              activeColor: icColor,
             ),
-
-          // Info 아이콘
           InfoIconWithPopup(
             message: [
               '관리기간: $manageDays일\n',
               if (showUrgentOnly != null) '상령일: $urgentDays일\n',
               '설정에서 변경',
             ].join(', '),
-            color: Theme.of(context).unselectedWidgetColor,
+            color: txtColor,
           ),
         ],
       ),
@@ -76,25 +92,26 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
   }
 
   Widget _buildFilterButton({
-    required BuildContext context,
     required String label,
     required bool isActive,
     required VoidCallback onTap,
+    required Color bgColor,
+    required Color txtColor,
+    required Color activeColor,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: isActive ? Colors.purple.withOpacity(0.1) :Theme.of(context).canvasColor,
+        color: isActive ? activeColor.withOpacity(0.1) : bgColor,
         border: Border.all(
-          color: isActive ? Colors.purple : Colors.grey[300]!,
+          color: isActive ? activeColor : Colors.grey[300]!,
           width: 1.2,
         ),
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06), // 희미한 그림자
-            offset: const Offset(1, 1), // 오른쪽 1px, 아래쪽 1px
-            blurRadius: 1.5, // 퍼지는 정도
-            spreadRadius: 0, // 그림자가 바깥으로 퍼지지 않게
+            color: Colors.black.withOpacity(0.06),
+            offset: const Offset(1, 1),
+            blurRadius: 1.5,
           ),
         ],
       ),
@@ -106,7 +123,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: isActive ? Colors.purple : Theme.of(context).unselectedWidgetColor,
+              color: isActive ? activeColor : txtColor,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),
           ),

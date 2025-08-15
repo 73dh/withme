@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../ui/color/color_style.dart';
 import '../core_presentation_import.dart';
-
+import 'package:flutter/material.dart';
+import '../core_presentation_import.dart';
 class BlinkingToggleIcon extends StatefulWidget {
   final bool expanded;
   final VoidCallback onTap;
+  final Color? color; // 추가
 
   const BlinkingToggleIcon({
     super.key,
     required this.expanded,
     required this.onTap,
+    this.color, // 추가
   });
 
   @override
@@ -28,9 +31,9 @@ class _BlinkingToggleIconState extends State<BlinkingToggleIcon>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
-    )..repeat(reverse: true); // 깜빡임 반복
+    )..repeat(reverse: true);
 
-    _animation = Tween(
+    _animation = Tween<double>(
       begin: 1.0,
       end: 0.3,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
@@ -44,17 +47,18 @@ class _BlinkingToggleIconState extends State<BlinkingToggleIcon>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: widget.onTap,
       child: FadeTransition(
         opacity: _animation,
         child: Icon(
           widget.expanded
-              ? Icons
-                  .keyboard_double_arrow_up // 펼친 상태: 위쪽 화살표
-              : Icons.keyboard_double_arrow_down, // 접힌 상태: 아래쪽 화살표
+              ? Icons.keyboard_double_arrow_up
+              : Icons.keyboard_double_arrow_down,
           size: 25,
-          color: ColorStyles.activeSwitchColor,
+          color: widget.color ?? colorScheme.primary, // color 사용
         ),
       ),
     );

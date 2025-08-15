@@ -48,7 +48,10 @@ class _CustomerScreenState extends State<CustomerScreen> {
 
     return SafeArea(
       child: Scaffold(
-        appBar:CustomerRegistrationAppBar(customer: widget.customer, todoViewModel: todoViewModel),
+        appBar: CustomerRegistrationAppBar(
+          customer: widget.customer,
+          todoViewModel: todoViewModel,
+        ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

@@ -11,7 +11,7 @@ import '../../../../core/ui/core_ui_import.dart';
 
 class DashBoardPage extends StatelessWidget {
   final DashBoardViewModel viewModel;
-  final void Function() onMenuTap;
+  final VoidCallback onMenuTap;
   final AnimationController animationController;
 
   const DashBoardPage({
@@ -23,74 +23,122 @@ class DashBoardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     final processedData = processCustomerData(
       viewModel.state.customers,
       viewModel.state.monthlyCustomers,
     );
     final customers = viewModel.state.customers;
 
-    return AnimatedPositioned(
-      duration: AppDurations.duration300,
-      left: viewModel.state.bodyXPosition,
-      right: -viewModel.state.bodyXPosition,
-      top: 0,
-      bottom: 0,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          title: const Text('DashBoard'),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          actions: [
-            IconButton(onPressed: onMenuTap, icon: const Icon(Icons.settings)),
-          ],
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final tableWidth = constraints.maxWidth;
-                final cellWidth = tableWidth / 5;
+    Widget height(double h) => SizedBox(height: h);
 
-                return ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    const PartTitle(text: '고객수 종합'),
-                    CustomSummeryTable(
-                      cellWidth: cellWidth,
-                      total: processedData.total,
-                      prospect: processedData.prospect,
-                      contract: processedData.contract,
-                    ),
-                    height(5),
-                    const PartTitle(text: '보험사'),
-                    InsuranceCompanySummaryTable(
-                      cellWidth: cellWidth,
-                      customers: customers,
-                    ),
-                    height(5),
-                    const PartTitle(text: '판매상품'),
-                    ProductCategorySummaryTable(
-                      cellWidth: cellWidth,
-                      customers: customers,
-                    ),
-                    height(5),
-                    const PartTitle(text: '월별 고객 및 건수'),
-                    CustomMonthlyTable(
-                      monthlyData: processedData.flattenedMonthly,
-                    ),
+    return Stack(
+      children: [
+        AnimatedPositioned(
+          duration: AppDurations.duration300,
+          left: viewModel.state.bodyXPosition,
+          right: -viewModel.state.bodyXPosition,
+          top: 0,
+          bottom: 0,
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: colorScheme.surface,
+            appBar: AppBar(
+              title: Text(
+                'DashBoard',
+                style: textTheme.titleLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              backgroundColor: colorScheme.surface,
+              elevation: 0,
+              iconTheme: IconThemeData(color: colorScheme.onSurface),
+              actions: [
+                IconButton(
+                  onPressed: onMenuTap,
+                  icon: Icon(Icons.settings, color: colorScheme.primary),
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final tableWidth = constraints.maxWidth;
+                    final cellWidth = tableWidth / 5;
 
-                    height(20),
-                    const PartTitle(text: 'Monthly Chart'),
-                    height(10),
-                    CustomBarChart(monthlyData: processedData.flattenedMonthly),
-                  ],
-                );
-              },
+                    return ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        PartTitle(text: '고객수 종합', color: colorScheme.onSurface),
+                        CustomSummeryTable(
+                          cellWidth: cellWidth,
+                          total: processedData.total,
+                          prospect: processedData.prospect,
+                          contract: processedData.contract,
+                          textStyle: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                          cellColor: colorScheme.surfaceContainerHighest,
+                        ),
+                        height(5),
+                        PartTitle(text: '보험사', color: colorScheme.onSurface),
+                        InsuranceCompanySummaryTable(
+                          cellWidth: cellWidth,
+                          customers: customers,
+                          textStyle: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                          cellColor: colorScheme.surfaceContainerHighest,
+                        ),
+                        height(5),
+                        PartTitle(text: '판매상품', color: colorScheme.onSurface),
+                        ProductCategorySummaryTable(
+                          cellWidth: cellWidth,
+                          customers: customers,
+                          textStyle: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                          cellColor: colorScheme.surfaceContainerHighest,
+                        ),
+                        height(5),
+                        PartTitle(
+                          text: '월별 고객 및 건수',
+                          color: colorScheme.onSurface,
+                        ),
+                        CustomMonthlyTable(
+                          monthlyData: processedData.flattenedMonthly,
+                          textStyle: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        height(20),
+                        PartTitle(
+                          text: 'Monthly Chart',
+                          color: colorScheme.onSurface,
+                        ),
+                        height(10),
+                        CustomBarChart(
+                          monthlyData: processedData.flattenedMonthly,
+                          prospectBarColor: colorScheme.primary,
+                          contractBarColor: colorScheme.secondary,
+                          labelStyle: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

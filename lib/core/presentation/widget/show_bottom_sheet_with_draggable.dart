@@ -5,6 +5,7 @@ Future<bool?> showBottomSheetWithDraggable({
   Widget Function(ScrollController)? builder,
   Widget? child,
   VoidCallback? onClosed,
+  Color? backgroundColor, // 추가: 외부에서 색상 지정 가능
 }) async {
   assert(
     (child != null) ^ (builder != null),
@@ -20,15 +21,17 @@ Future<bool?> showBottomSheetWithDraggable({
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     builder: (modalContext) {
-      return _KeyboardResponsiveBottomSheet(builder: builder, child: child);
+      return _KeyboardResponsiveBottomSheet(
+        builder: builder,
+        child: child,
+        backgroundColor:
+            backgroundColor ?? Theme.of(context).colorScheme.surface,
+      );
     },
   );
 
-  // ✅ showModalBottomSheet 완전히 닫힌 후 호출
   if (onClosed != null) {
-    Future.microtask(
-      onClosed,
-    ); // 또는 await Future.delayed(Duration(milliseconds: 50));
+    Future.microtask(onClosed);
   }
   return result;
 }
@@ -36,8 +39,13 @@ Future<bool?> showBottomSheetWithDraggable({
 class _KeyboardResponsiveBottomSheet extends StatefulWidget {
   final Widget Function(ScrollController)? builder;
   final Widget? child;
+  final Color backgroundColor;
 
-  const _KeyboardResponsiveBottomSheet({this.builder, this.child});
+  const _KeyboardResponsiveBottomSheet({
+    this.builder,
+    this.child,
+    required this.backgroundColor,
+  });
 
   @override
   State<_KeyboardResponsiveBottomSheet> createState() =>
@@ -66,9 +74,7 @@ class _KeyboardResponsiveBottomSheetState
   void didChangeMetrics() {
     final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
     if (_keyboardInset != bottomInset) {
-      setState(() {
-        _keyboardInset = bottomInset;
-      });
+      setState(() => _keyboardInset = bottomInset);
     }
   }
 
@@ -77,6 +83,7 @@ class _KeyboardResponsiveBottomSheetState
     final mediaBottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = mediaBottomInset > 0;
     final maxSize = isKeyboardOpen ? 0.95 : 0.57;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -95,14 +102,17 @@ class _KeyboardResponsiveBottomSheetState
                   top: Radius.circular(16),
                 ),
                 child: Material(
-                  color: Colors.white,
-                  child:
-                      widget.builder != null
-                          ? widget.builder!(scrollController)
-                          : SingleChildScrollView(
-                            controller: scrollController,
-                            child: widget.child!,
-                          ),
+                  color: widget.backgroundColor, // Theme 적용
+                  child: DefaultTextStyle(
+                    style: TextStyle(color: colorScheme.onSurface),
+                    child:
+                        widget.builder != null
+                            ? widget.builder!(scrollController)
+                            : SingleChildScrollView(
+                              controller: scrollController,
+                              child: widget.child!,
+                            ),
+                  ),
                 ),
               );
             },

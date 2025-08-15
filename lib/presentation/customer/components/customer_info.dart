@@ -8,6 +8,16 @@ import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
 import '../customer_view_model.dart';
+import 'package:withme/domain/model/customer_model.dart';
+
+import '../../../core/data/fire_base/user_session.dart';
+import '../../../core/domain/core_domain_import.dart';
+import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/ui/core_ui_import.dart';
+import '../../../core/utils/core_utils_import.dart';
+import '../../../domain/domain_import.dart';
+import '../../../domain/model/history_model.dart';
+import '../customer_view_model.dart';
 
 class CustomerInfo extends StatelessWidget {
   final CustomerModel customer;
@@ -29,10 +39,11 @@ class CustomerInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final birthDate = customer.birth;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return ItemContainer(
       height: customer.recommended.isEmpty ? 90 : 110,
-      backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
+      backgroundColor: isUrgent ? colorScheme.errorContainer : null, // 기존 isUrgentColor
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5.0),
         child: Row(
@@ -44,13 +55,14 @@ class CustomerInfo extends StatelessWidget {
                 /// 이름 + 성별 아이콘
                 Row(
                   children: [
-                    sexIcon(customer.sex),
+                    sexIcon(customer.sex, colorScheme), // ColorScheme 기반 sexIcon
                     width(6),
                     Text(
                       shortenedNameText(customer.name),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface, // 다크/라이트 대응
                       ),
                     ),
                   ],
@@ -60,13 +72,13 @@ class CustomerInfo extends StatelessWidget {
                 /// 생년월일
                 Row(
                   children: [
-                    const Icon(Icons.cake, size: 16, color: Colors.grey),
+                    Icon(Icons.cake, size: 16, color: colorScheme.onSurfaceVariant),
                     width(4),
                     Text(
                       birthDate != null
                           ? '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)'
                           : '정보 없음',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -88,7 +100,7 @@ class CustomerInfo extends StatelessWidget {
                   height(4),
                   Text(
                     '소개자: ${customer.recommended}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ],

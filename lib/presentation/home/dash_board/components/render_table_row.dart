@@ -3,25 +3,26 @@ import 'package:withme/presentation/home/dash_board/components/render_table_cell
 
 TableRow renderTableRow({
   required List<String> cells,
-  bool? isHeader = false,
+  bool isHeader = false,
   Color? backgroundColor,
-  bool? isBarProspect = false,
-  bool? isBarContract = false,
+  bool? isBarProspect,
+  bool? isBarContract,
+  TextStyle? textStyle, // ← 추가
 }) {
   return TableRow(
-    children:
-        cells.map((text) {
-          return Container(
-            decoration: BoxDecoration(color: backgroundColor),
-            height: 46,
-            alignment: Alignment.center,
-            child: RenderTableCellText(
-              text,
-              isHeader: isHeader!,
-              isBarProspect: isBarProspect,
-              isBarContract: isBarContract,
-            ),
-          );
-        }).toList(),
+    children: cells.map((text) {
+      return Container(
+        decoration: BoxDecoration(color: backgroundColor),
+        height: 46,
+        alignment: Alignment.center,
+        child: RenderTableCellText(
+          text,
+          isHeader: isHeader,
+          isBarProspect: isBarProspect,
+          isBarContract: isBarContract,
+          style: textStyle, // ← 적용
+        ),
+      );
+    }).toList(),
   );
 }

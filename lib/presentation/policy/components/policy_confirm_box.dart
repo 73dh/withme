@@ -7,7 +7,6 @@ import '../../../core/presentation/widget/confirm_box_text.dart';
 import '../../../core/presentation/components/render_filled_button.dart';
 import '../../../core/presentation/components/width_height.dart';
 import '../../../core/ui/color/color_style.dart';
-import '../../../core/ui/text_style/text_styles.dart';
 
 class PolicyConfirmBox extends StatelessWidget {
   final Map<String, dynamic> policyMap;

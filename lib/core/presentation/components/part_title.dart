@@ -1,27 +1,44 @@
 import 'package:flutter/material.dart';
 
-import '../../ui/text_style/text_styles.dart';
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
 
 class PartTitle extends StatelessWidget {
   final String text;
-  final double padding ;
+  final double verticalPadding;
+  final TextStyle? style;
+  final Color? color; // ← 추가
 
-  const PartTitle({super.key, required this.text, this.padding = 6});
+  const PartTitle({
+    super.key,
+    required this.text,
+    this.verticalPadding = 6,
+    this.style,
+    this.color, // ← 추가
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Padding(
-          padding:  EdgeInsets.symmetric(vertical: padding),
-          child: Text(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: verticalPadding),
+      child: Row(
+        children: [
+          Text(
             text,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontStyle: FontStyle.italic),
+            style: style ??
+                textTheme.titleMedium?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: color ?? colorScheme.onSurface,
+                ),
           ),
-        ),
-        const Spacer(),
-      ],
+          const Spacer(),
+        ],
+      ),
     );
   }
 }

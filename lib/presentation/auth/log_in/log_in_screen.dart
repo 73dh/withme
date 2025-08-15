@@ -118,10 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 height(50),
                 SizedBox(
-                  width: 200,
+                  width: 250,
                   child: Text(
                     'Welcome back!\nLog in to manage your customers.',
-                    style: textTheme.titleLarge?.copyWith(
+                    style: textTheme.headlineSmall?.copyWith(
                       color: colorScheme.onSurface, // 라이트/다크 자동 대응
                     ),
                   ),
@@ -209,7 +209,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () => context.go(RoutePath.signUp),
                       child: Text(
                         ' 회원가입',
-                        style: textTheme.displaySmall?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                           color: colorScheme.primary,
                         ),
                       ),

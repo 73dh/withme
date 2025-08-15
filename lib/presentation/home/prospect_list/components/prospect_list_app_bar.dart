@@ -13,6 +13,7 @@ class ProspectListAppBar extends StatelessWidget
   final List<CustomerModel> customers;
   final bool filterBarExpanded;
   final VoidCallback onToggleFilterBar;
+  final Color backgroundColor; // ← 추가
 
   const ProspectListAppBar({
     super.key,
@@ -20,26 +21,39 @@ class ProspectListAppBar extends StatelessWidget
     required this.customers,
     required this.filterBarExpanded,
     required this.onToggleFilterBar,
+    required this.backgroundColor, // ← 추가
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return AppBar(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
+      // Scaffold와 동일하게
+      surfaceTintColor: Colors.transparent,
+      // 오버레이 제거
       elevation: 2,
       title: Row(
         children: [
           width(5),
-          _buildGenderIcons(),
+          _buildGenderIcons(colorScheme),
           width(4),
-          Text('${customers.length}명', style: Theme.of(context).textTheme.displayMedium?.copyWith(color: Colors.deepPurple),),
+          Text(
+            '${customers.length}명',
+            style: textTheme.titleLarge?.copyWith(
+              color: colorScheme.primary, // 강조색
+              fontSize: 20,
+            ),
+          ),
           width(5),
           BlinkingToggleIcon(
             expanded: filterBarExpanded,
             onTap: onToggleFilterBar,
           ),
-
-          Expanded(child: _buildProgressBar(viewModel)),
+          Expanded(child: _buildProgressBar(viewModel, colorScheme, textTheme)),
         ],
       ),
       actions: [
@@ -51,13 +65,13 @@ class ProspectListAppBar extends StatelessWidget
   }
 
   /// 아이콘 겹쳐진 부분 렌더링
-  Widget _buildGenderIcons() {
+  Widget _buildGenderIcons(ColorScheme colorScheme) {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: colorScheme.shadow.withOpacity(0.1),
             offset: const Offset(0, 0),
             blurRadius: 4,
           ),
@@ -69,7 +83,7 @@ class ProspectListAppBar extends StatelessWidget
           Image.asset(
             IconsPath.womanIcon,
             width: 40,
-            color: ColorStyles.todoBadgeColor.withOpacity(0.7),
+            color: colorScheme.secondary.withOpacity(0.7),
           ),
           Positioned(
             left: -13,
@@ -77,7 +91,7 @@ class ProspectListAppBar extends StatelessWidget
             child: Image.asset(
               IconsPath.manIcon,
               width: 35,
-              color: ColorStyles.todoBadgeColor.withOpacity(0.5),
+              color: colorScheme.tertiary.withOpacity(0.5),
             ),
           ),
         ],
@@ -86,25 +100,28 @@ class ProspectListAppBar extends StatelessWidget
   }
 
   /// 목표 대비 진행률 표시 바
-  Widget _buildProgressBar(ProspectListViewModel viewModel) {
+  Widget _buildProgressBar(
+    ProspectListViewModel viewModel,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     final total = viewModel.totalProspectCount;
     final target = UserSession().targetProspectCount;
-    final ratio = (total / target).clamp(0.0, 1.0); // 0.0 ~ 1.0
+    final ratio = (total / target).clamp(0.0, 1.0);
 
     return Row(
       children: [
         AnimatedProgressBar(
           progress: ratio,
           height: 18,
-          progressColor: ColorStyles.activeButtonColor.withOpacity(0.7),
-          backgroundColor: Colors.grey.shade200,
+          progressColor: colorScheme.primary.withValues(alpha: 0.5),
+          backgroundColor: colorScheme.surfaceContainerHighest,
         ),
         width(3),
         Text(
           '$target명',
-          style: TextStyle(
-            fontSize: 10,
-            color: ColorStyles.activeSwitchColor,
+          style: textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -115,3 +132,4 @@ class ProspectListAppBar extends StatelessWidget
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+

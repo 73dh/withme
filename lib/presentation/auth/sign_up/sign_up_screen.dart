@@ -7,6 +7,7 @@ import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/theme/theme.dart';
 
+import '../../../core/presentation/components/temporary/text_theme_font_size_pop_up.dart';
 import '../../../core/router/router_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -56,10 +57,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
 
       final user = userCredential.user;
 
@@ -93,8 +95,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -108,10 +110,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 height(50),
                 SizedBox(
-                  width: 200,
+                  width: 250,
                   child: Text(
                     'Welcome to withMe,\nthe app for managing your customers!',
-                    style: textTheme.titleLarge?.copyWith(
+                    style: textTheme.headlineSmall?.copyWith(
                       color: colorScheme.onSurface, // 라이트/다크 자동 대응
                     ),
                   ),
@@ -157,19 +159,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () => showAgreementDialog(
-                        context,
-                        onPressed: () {
-                          setState(() {
-                            _isChecked = true;
-                            _agreedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
-                          });
-                          Navigator.of(context).pop();
-                        },
-                      ),
+                      onTap:
+                          () => showAgreementDialog(
+                            context,
+                            onPressed: () {
+                              setState(() {
+                                _isChecked = true;
+                                _agreedDateTime = DateFormat(
+                                  'yyyy-MM-dd HH:mm',
+                                ).format(DateTime.now());
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
                       child: Text(
                         '약관확인',
-                        style: textTheme.displaySmall?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                           color: colorScheme.primary,
                           decoration: TextDecoration.underline,
                         ),
@@ -178,28 +184,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     width(10),
                     _isChecked
                         ? Text(
-                      '동의일시: $_agreedDateTime',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    )
+                          '동의일시: $_agreedDateTime',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        )
                         : Text(
-                      '(필수)',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface60,
-                      ),
-                    ),
+                          '(필수)',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface60,
+                          ),
+                        ),
                   ],
                 ),
                 height(20),
                 RenderFilledButton(
                   text: '회원가입',
-                  foregroundColor: _isChecked
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurface38,
-                  backgroundColor: _isChecked
-                      ? colorScheme.primary
-                      : colorScheme.onSurface12,
+                  foregroundColor:
+                      _isChecked
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurface38,
+                  backgroundColor:
+                      _isChecked
+                          ? colorScheme.primary
+                          : colorScheme.onSurface12,
                   onPressed: _isChecked ? _signUp : null,
                 ),
                 height(20),
@@ -216,8 +224,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onTap: () => context.go(RoutePath.login),
                       child: Text(
                         ' 로그인',
-                        style: textTheme.displaySmall?.copyWith(
-                          color: colorScheme.primary,
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,   color: colorScheme.primary,
                         ),
                       ),
                     ),
@@ -228,6 +236,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
       ),
+
     );
   }
 }

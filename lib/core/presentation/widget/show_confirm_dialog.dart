@@ -7,7 +7,8 @@ import '../core_presentation_import.dart';
 
 Future<bool?> showConfirmDialog(
     BuildContext context, {
-      required String text,
+       String? text,
+       List<TextSpan>? textSpans,
       String? confirmButtonText,
       String? cancelButtonText,
       required Future<void> Function()? onConfirm,
@@ -16,7 +17,8 @@ Future<bool?> showConfirmDialog(
     context: context,
     barrierDismissible: false, // 바깥 클릭 시 닫히지 않음
     builder: (context) => CommonConfirmDialog(
-      text: text,
+      text: text??'',
+      textSpans:textSpans??[],
       confirmButtonText: confirmButtonText ?? '확인',
       cancelButtonText: cancelButtonText ?? '취소',
       onConfirm: onConfirm ?? () async {},

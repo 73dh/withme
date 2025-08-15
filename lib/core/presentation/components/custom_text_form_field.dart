@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../ui/text_style/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,6 +20,10 @@ class CustomTextFormField extends StatelessWidget {
   final Function(String)? onSaved;
   final FocusNode? focusNode;
 
+  // 🔹 추가
+  final TextStyle? textStyle;
+  final Color? fillColor;
+
   const CustomTextFormField({
     super.key,
     this.controller,
@@ -37,6 +40,8 @@ class CustomTextFormField extends StatelessWidget {
     this.validator,
     this.onSaved,
     this.focusNode,
+    this.textStyle,  // 추가
+    this.fillColor,  // 추가
   });
 
   @override
@@ -56,9 +61,8 @@ class CustomTextFormField extends StatelessWidget {
       obscureText: obscureText,
       autofocus: autoFocus,
       focusNode: focusNode,
-      textAlign: textAlign!,
-      style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-      // 입력 글자 색상
+      textAlign: textAlign ?? TextAlign.start,
+      style: textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
       keyboardType: inputType,
       inputFormatters: inputFormatters,
       onEditingComplete: onCompleted,
@@ -80,7 +84,7 @@ class CustomTextFormField extends StatelessWidget {
         errorBorder: baseBorder.copyWith(
           borderSide: BorderSide(color: colorScheme.error),
         ),
-        fillColor: colorScheme.surface,
+        fillColor: fillColor ?? colorScheme.surface,
         filled: true,
         border: baseBorder,
         enabledBorder: baseBorder,
@@ -94,95 +98,3 @@ class CustomTextFormField extends StatelessWidget {
     );
   }
 }
-
-//
-// class CustomTextFormField extends StatelessWidget {
-//   final TextEditingController? controller;
-//   final String? hintText;
-//   final String? labelText;
-//   final bool obscureText;
-//   final TextAlign? textAlign;
-//   final TextInputType? inputType;
-//   final TextStyle? textStyle;
-//   final bool autoFocus;
-//   final bool readOnly;
-//   final List<TextInputFormatter>? inputFormatters;
-//   final Function(String)? onChanged;
-//   final VoidCallback? onCompleted;
-//   final Function(String)? validator;
-//   final Function(String)? onSaved;
-//   final FocusNode? focusNode;
-//
-//   const CustomTextFormField({
-//     super.key,
-//     this.controller,
-//     this.hintText,
-//     this.labelText,
-//     this.obscureText = false,
-//     this.autoFocus = false,
-//     this.textStyle,
-//     this.textAlign = TextAlign.start,
-//     this.inputType,
-//     this.inputFormatters,
-//     this.readOnly = false,
-//     this.onChanged,
-//     this.onCompleted,
-//     this.validator,
-//     this.onSaved,
-//     this.focusNode,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final baseBorder = const OutlineInputBorder(borderSide: BorderSide.none);
-//
-//     return TextFormField(
-//       controller: controller,
-//       readOnly: readOnly,
-//       cursorColor: Colors.black87,
-//       obscureText: obscureText,
-//       autofocus: autoFocus,
-//       focusNode: focusNode,
-//       textAlign: textAlign!,
-//       style: textStyle,
-//       keyboardType: inputType,
-//       onEditingComplete: onCompleted,
-//       decoration: InputDecoration(
-//         contentPadding: EdgeInsets.zero,
-//         hintText: hintText,
-//         hintStyle: Theme.of(
-//           context,
-//         ).textTheme.labelMedium?.copyWith(fontStyle: FontStyle.italic),
-//         labelText: labelText,
-//         labelStyle: Theme.of(
-//           context,
-//         ).textTheme.bodyMedium,
-//         errorStyle: Theme.of(
-//           context,
-//         ).textTheme.labelMedium?.copyWith(fontStyle: FontStyle.italic),
-//         errorBorder: baseBorder,
-//         fillColor: Colors.white,
-//         filled: true,
-//         border: baseBorder,
-//         enabledBorder: baseBorder,
-//         focusedBorder: baseBorder.copyWith(
-//           borderSide: baseBorder.borderSide.copyWith(color: Colors.blueGrey),
-//         ),
-//       ),
-//       onChanged: (text) {
-//         if (onChanged != null) onChanged!(text);
-//       },
-//
-//       validator: (text) {
-//         if (validator != null) return validator!(text!);
-//         return null;
-//       },
-//
-//       onSaved: (text) {
-//         if (onSaved != null) {
-//           onSaved!(text!);
-//         }
-//       },
-//     );
-//   }
-// }

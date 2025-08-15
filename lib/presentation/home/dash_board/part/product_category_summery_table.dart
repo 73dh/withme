@@ -4,14 +4,24 @@ import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
 
+import 'package:flutter/material.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import '../components/render_table.dart';
+import '../components/render_table_cell_text.dart';
+
 class ProductCategorySummaryTable extends StatelessWidget {
   final double cellWidth;
   final List<CustomerModel> customers;
+  final TextStyle? textStyle;
+  final Color? cellColor;
 
   const ProductCategorySummaryTable({
     super.key,
     required this.cellWidth,
     required this.customers,
+    this.textStyle,
+    this.cellColor,
   });
 
   @override
@@ -22,8 +32,8 @@ class ProductCategorySummaryTable extends StatelessWidget {
       final Set<String> categoriesPerCustomer = {};
 
       for (final policy in customer.policies) {
-        final category = policy.productCategory;
-        if (category.trim().isEmpty) continue;
+        final category = policy.productCategory.trim();
+        if (category.isEmpty) continue;
 
         categoryStats.putIfAbsent(category, () => _CategoryStats());
         categoryStats[category]!.contractCount += 1;
@@ -40,11 +50,11 @@ class ProductCategorySummaryTable extends StatelessWidget {
 
     final List<TableRow> rows = [
       TableRow(
-        decoration: BoxDecoration(color: ColorStyles.tableHeadColor),
-        children: const [
-          RenderTableCellText('상품 카테고리', isHeader: true),
-          RenderTableCellText('고객 수', isHeader: true),
-          RenderTableCellText('계약 건수', isHeader: true),
+        decoration: BoxDecoration(color: cellColor ?? ColorStyles.tableHeadColor),
+        children: [
+          RenderTableCellText('상품 카테고리', isHeader: true, style: textStyle),
+          RenderTableCellText('고객 수', isHeader: true, style: textStyle),
+          RenderTableCellText('계약 건수', isHeader: true, style: textStyle),
         ],
       ),
     ];
@@ -52,11 +62,11 @@ class ProductCategorySummaryTable extends StatelessWidget {
     if (sortedKeys.isEmpty) {
       rows.add(
         TableRow(
-          decoration: BoxDecoration(color: Colors.grey.shade100),
-          children: const [
-            RenderTableCellText('해당건 없음'),
-            RenderTableCellText(''),
-            RenderTableCellText(''),
+          decoration: BoxDecoration(color: (cellColor ?? Colors.grey.shade100).withOpacity(0.8)),
+          children: [
+            RenderTableCellText('해당건 없음', style: textStyle),
+            RenderTableCellText('', style: textStyle),
+            RenderTableCellText('', style: textStyle),
           ],
         ),
       );
@@ -64,11 +74,11 @@ class ProductCategorySummaryTable extends StatelessWidget {
       for (final category in sortedKeys) {
         rows.add(
           TableRow(
-            decoration: BoxDecoration(color: Colors.grey.shade100),
+            decoration: BoxDecoration(color: (cellColor ?? Colors.grey.shade100).withOpacity(0.8)),
             children: [
-              RenderTableCellText(category),
-              RenderTableCellText('${categoryStats[category]!.customerCount}명'),
-              RenderTableCellText('${categoryStats[category]!.contractCount}건'),
+              RenderTableCellText(category, style: textStyle),
+              RenderTableCellText('${categoryStats[category]!.customerCount}명', style: textStyle),
+              RenderTableCellText('${categoryStats[category]!.contractCount}건', style: textStyle),
             ],
           ),
         );
@@ -90,3 +100,5 @@ class _CategoryStats {
   int customerCount = 0;
   int contractCount = 0;
 }
+
+

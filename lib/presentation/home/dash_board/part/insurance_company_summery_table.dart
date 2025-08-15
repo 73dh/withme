@@ -4,14 +4,24 @@ import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
 
+import 'package:flutter/material.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import '../components/render_table.dart';
+import '../components/render_table_cell_text.dart';
+
 class InsuranceCompanySummaryTable extends StatelessWidget {
   final double cellWidth;
   final List<CustomerModel> customers;
+  final TextStyle? textStyle;
+  final Color? cellColor;
 
   const InsuranceCompanySummaryTable({
     super.key,
     required this.cellWidth,
     required this.customers,
+    this.textStyle,
+    this.cellColor,
   });
 
   @override
@@ -39,11 +49,11 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
 
     final List<TableRow> rows = [
       TableRow(
-        decoration: BoxDecoration(color: ColorStyles.tableHeadColor),
-        children: const [
-          RenderTableCellText('보험사', isHeader: true),
-          RenderTableCellText('고객 수', isHeader: true),
-          RenderTableCellText('계약 건수', isHeader: true),
+        decoration: BoxDecoration(color: cellColor ?? ColorStyles.tableHeadColor),
+        children: [
+          RenderTableCellText('보험사', isHeader: true, style: textStyle),
+          RenderTableCellText('고객 수', isHeader: true, style: textStyle),
+          RenderTableCellText('계약 건수', isHeader: true, style: textStyle),
         ],
       ),
     ];
@@ -51,11 +61,11 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
     if (sortedKeys.isEmpty) {
       rows.add(
         TableRow(
-          decoration: BoxDecoration(color: Colors.grey.shade100),
-          children: const [
-            RenderTableCellText('해당건 없음'),
-            RenderTableCellText(''),
-            RenderTableCellText(''),
+          decoration: BoxDecoration(color: (cellColor ?? Colors.grey.shade100).withOpacity(0.8)),
+          children: [
+            RenderTableCellText('해당건 없음', style: textStyle),
+            RenderTableCellText('', style: textStyle),
+            RenderTableCellText('', style: textStyle),
           ],
         ),
       );
@@ -63,11 +73,11 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
       for (final company in sortedKeys) {
         rows.add(
           TableRow(
-            decoration: BoxDecoration(color: Colors.grey.shade100),
+            decoration: BoxDecoration(color: (cellColor ?? Colors.grey.shade100).withOpacity(0.8)),
             children: [
-              RenderTableCellText(company),
-              RenderTableCellText('${statsMap[company]!.customerCount}명'),
-              RenderTableCellText('${statsMap[company]!.contractCount}건'),
+              RenderTableCellText(company, style: textStyle),
+              RenderTableCellText('${statsMap[company]!.customerCount}명', style: textStyle),
+              RenderTableCellText('${statsMap[company]!.contractCount}건', style: textStyle),
             ],
           ),
         );
@@ -89,3 +99,5 @@ class _InsuranceCompanyStats {
   int customerCount = 0;
   int contractCount = 0;
 }
+
+

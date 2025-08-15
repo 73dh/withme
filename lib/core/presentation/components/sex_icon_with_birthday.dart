@@ -1,6 +1,10 @@
 import '../../ui/core_ui_import.dart';
 import '../../utils/is_birthday_within_7days.dart';
 import '../core_presentation_import.dart';
+import '../../ui/core_ui_import.dart';
+import '../../utils/is_birthday_within_7days.dart';
+import '../core_presentation_import.dart';
+import 'package:flutter/material.dart';
 
 class SexIconWithBirthday extends StatelessWidget {
   final DateTime? birth;
@@ -20,12 +24,14 @@ class SexIconWithBirthday extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     final bool hasUpcomingBirthday =
         birth != null && isBirthdayWithin7Days(birth!);
     final int countdown = birth != null ? getBirthdayCountdown(birth!) : -1;
 
     final double iconSize =
-        hasUpcomingBirthday && isShowDay ? size * 0.75 : size;
+    hasUpcomingBirthday && isShowDay ? size * 0.75 : size;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -37,22 +43,26 @@ class SexIconWithBirthday extends StatelessWidget {
             fit: BoxFit.cover,
             width: iconSize,
             height: iconSize,
-            color: getSexIconColor(sex).withOpacity(0.6),
+            color: getSexIconColor(sex, colorScheme).withOpacity(0.6),
           ),
         ),
         if (hasUpcomingBirthday && isShowDay) ...[
+          const SizedBox(width: 4),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.cake_rounded,
-                color: ColorStyles.cakeColor,
+                color: colorScheme.tertiary, // 케이크 아이콘 색상도 ColorScheme 기반
                 size: iconSize * 0.6,
               ),
               const SizedBox(height: 2),
               Text(
                 countdown != 0 ? 'D-$countdown' : '오늘',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: ColorStyles.cakeColor),
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(color: colorScheme.tertiary),
               ),
             ],
           ),

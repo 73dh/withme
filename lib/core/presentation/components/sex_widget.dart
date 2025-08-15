@@ -3,29 +3,43 @@ import 'package:flutter/material.dart';
 import '../../ui/core_ui_import.dart';
 
 
-Widget sexIcon(String sex) => switch (sex) {
-  '남' => Image.asset(IconsPath.manIcon, width: 15,color: Colors.blueAccent,),
-  _ => Image.asset(IconsPath.womanIcon, width: 15,color: Colors.redAccent,),
+import 'package:flutter/material.dart';
+import '../../ui/core_ui_import.dart';
+
+/// 성별 아이콘 반환 (ColorScheme 기반)
+Widget sexIcon(String sex, ColorScheme colorScheme) => switch (sex) {
+  '남' => Image.asset(
+    IconsPath.manIcon,
+    width: 15,
+    color: colorScheme.primary, // 남성 색상 → primary
+  ),
+  _ => Image.asset(
+    IconsPath.womanIcon,
+    width: 15,
+    color: colorScheme.secondary, // 여성 색상 → secondary
+  ),
 };
 
-Color getSexBackgroundColor(String? sex) {
+/// 성별 배경색 반환 (ColorScheme 기반)
+Color getSexBackgroundColor(String? sex, ColorScheme colorScheme) {
   switch (sex) {
     case '남':
-      return const Color(0xFFD0E8FF); // 연한 파란색
+      return colorScheme.primaryContainer.withOpacity(0.3); // 연한 파란색 계열
     case '여':
-      return const Color(0xFFFFE0E6); // 연한 분홍색
+      return colorScheme.secondaryContainer.withOpacity(0.3); // 연한 분홍색 계열
     default:
-      return ColorStyles.customerItemColor; // 기본 색
+      return colorScheme.surfaceVariant; // 기본 색
   }
 }
 
-Color getSexIconColor(String? sex) {
+/// 성별 아이콘 색상 반환 (ColorScheme 기반)
+Color getSexIconColor(String? sex, ColorScheme colorScheme) {
   switch (sex) {
     case '남':
-      return ColorStyles.manColor; // 연한 파란색
+      return colorScheme.primary; // 남성 색상
     case '여':
-      return ColorStyles.womanColor; // 연한 분홍색
+      return colorScheme.secondary; // 여성 색상
     default:
-      return ColorStyles.customerItemColor; // 기본 색
+      return colorScheme.onSurfaceVariant; // 기본 색
   }
 }
