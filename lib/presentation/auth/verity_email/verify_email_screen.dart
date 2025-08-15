@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:withme/core/router/router_path.dart';
+import 'package:withme/core/ui/theme/theme.dart';
+
 class VerifyEmailScreen extends StatefulWidget {
   const VerifyEmailScreen({super.key});
 
@@ -18,11 +25,10 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   Future<void> _checkVerification() async {
     setState(() => _isVerifying = true);
     try {
-      await user?.reload(); // 사용자 정보 새로고침
+      await user?.reload();
       final refreshedUser = FirebaseAuth.instance.currentUser;
 
       if (refreshedUser?.emailVerified == true && mounted) {
-
         context.go(RoutePath.splash);
       } else {
         _showSnackBar('이메일 인증이 완료되지 않았습니다.');
@@ -52,52 +58,75 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final email = user?.email ?? '이메일 없음';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('이메일 인증')),
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        title: Text('이메일 인증', style: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface)),
+        backgroundColor: colorScheme.surface,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+        elevation: 0,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text('이메일 인증을 완료해주세요', style: Theme.of(context).textTheme.titleLarge),
+            Text('이메일 인증을 완료해주세요',
+                style: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 12),
-             Text(
+            Text(
               '회원가입 시 입력한 이메일 주소로 인증 메일을 보냈습니다.',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface80),
             ),
             const SizedBox(height: 4),
             Text(
               '📬 $email',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Theme.of(context).primaryColor),
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 24),
-             Text(
+            Text(
               '이메일의 링크를 클릭한 후 아래 버튼을 눌러주세요.',
-              style: Theme.of(context).textTheme.displayMedium,
+              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface80),
             ),
             const SizedBox(height: 32),
 
-            // ✅ 이메일 인증 완료 버튼
+            // 이메일 인증 완료 버튼
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  textStyle: textTheme.labelLarge,
+                ),
                 onPressed: _isVerifying ? null : _checkVerification,
                 child: _isVerifying
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? CircularProgressIndicator(color: colorScheme.onPrimary)
                     : const Text('이메일 인증 완료'),
               ),
             ),
             const SizedBox(height: 16),
 
-            // 🔁 인증 메일 재전송
+            // 인증 메일 재전송
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: colorScheme.primary,
+                  textStyle: textTheme.labelLarge,
+                  side: BorderSide(color: colorScheme.primary),
+                ),
                 onPressed: _isResending ? null : _resendEmail,
                 child: _isResending
-                    ? const CircularProgressIndicator()
+                    ? CircularProgressIndicator(color: colorScheme.primary)
                     : const Text('인증 메일 다시 보내기'),
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:withme/core/domain/error_handling/signup_error.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
 import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
+import 'package:withme/core/ui/theme/theme.dart';
 
 import '../../../core/router/router_import.dart';
 import '../../../core/ui/core_ui_import.dart';
@@ -91,10 +92,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(30.0),
@@ -181,9 +184,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     )
                         : Text(
-                      '미동의',
+                      '(필수)',
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.6),
+                        color: colorScheme.onSurface60,
                       ),
                     ),
                   ],
@@ -193,10 +196,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   text: '회원가입',
                   foregroundColor: _isChecked
                       ? colorScheme.onPrimary
-                      : colorScheme.onSurface.withOpacity(0.38),
+                      : colorScheme.onSurface38,
                   backgroundColor: _isChecked
                       ? colorScheme.primary
-                      : colorScheme.onSurface.withOpacity(0.12),
+                      : colorScheme.onSurface12,
                   onPressed: _isChecked ? _signUp : null,
                 ),
                 height(20),
@@ -205,8 +208,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   children: [
                     Text(
                       "Already a member?",
-                      style: textTheme.displaySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     GestureDetector(

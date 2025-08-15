@@ -1,4 +1,5 @@
 import '../core_presentation_import.dart';
+import '../core_presentation_import.dart';
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
@@ -16,60 +17,68 @@ class CommonConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              border: Border.all(color: Colors.grey.shade500, width: 1.2),
-              borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border.all(color: colorScheme.outline, width: 1.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
+              ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 20.0,
-                    left: 12,
-                    right: 12,
-                  ),
-                  child: Text(text, textAlign: TextAlign.center),
-                ),
-                height(20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Cancel Button: Only pops the dialog itself with 'false'
-                    if (cancelButtonText.isNotEmpty)
-                      FilledButton(
-                        onPressed: () {
-                          if (context.mounted) {
-                            Navigator.of(context).pop(false);
-                          }
-                        },
-                        child: Text(cancelButtonText),
-                      ),
-                    width(10),
-                    // Confirm Button: Executes onConfirm, then pops the dialog with 'true'
-                    FilledButton(
-                      onPressed: () async {
-                        await onConfirm();
-                        if (context.mounted) {
-                          Navigator.of(context).pop(true);
-                        }
-                      },
-                      child: Text(confirmButtonText),
+                // Cancel Button
+                if (cancelButtonText.isNotEmpty)
+                  FilledButton(
+                    onPressed: () {
+                      if (context.mounted) {
+                        Navigator.of(context).pop(false);
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.surfaceVariant,
+                      foregroundColor: colorScheme.onSurfaceVariant,
                     ),
-                  ],
+                    child: Text(cancelButtonText, style: textTheme.labelLarge),
+                  ),
+                const SizedBox(width: 12),
+                // Confirm Button
+                FilledButton(
+                  onPressed: () async {
+                    await onConfirm();
+                    if (context.mounted) {
+                      Navigator.of(context).pop(true);
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                  ),
+                  child: Text(confirmButtonText, style: textTheme.labelLarge),
                 ),
-                height(10),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }

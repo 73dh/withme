@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:withme/core/presentation/widget/reset_password.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
+import 'package:withme/core/ui/theme/theme.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/router/router_import.dart';
@@ -186,10 +187,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 RenderFilledButton(
                   text: _isLoading ? '로그인 중...' : '로그인',
-                  foregroundColor: colorScheme.onPrimary,
+                  foregroundColor: _isFormValid
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurface38,
                   backgroundColor: _isFormValid
                       ? colorScheme.primary
-                      : theme.disabledColor,
+                      : colorScheme.onSurface12,
                   onPressed: _isFormValid && !_isLoading ? _login : null,
                 ),
                 height(20),
@@ -199,14 +202,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       "Don't have an account ?",
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onBackground,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => context.go(RoutePath.signUp),
                       child: Text(
                         ' 회원가입',
-                        style: textTheme.bodyMedium?.copyWith(
+                        style: textTheme.displaySmall?.copyWith(
                           color: colorScheme.primary,
                         ),
                       ),

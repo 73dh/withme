@@ -231,3 +231,10 @@ final darkTheme = ThemeData(
     ),
   ),
 );
+
+extension ColorSchemeX on ColorScheme {
+  Color get onSurface38 => onSurface.withValues(alpha: 0.38);
+  Color get onSurface12=> onSurface.withValues(alpha: 0.12);
+  Color get onSurface60 => onSurface.withValues(alpha: 0.6);
+  Color get onSurface80 => onSurface.withValues(alpha: 0.8);
+}

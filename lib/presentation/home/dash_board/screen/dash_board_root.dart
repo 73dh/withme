@@ -166,7 +166,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
                       child: Column(
                         // 제목과 내용을 세로로 배치하기 위한 Column
                         mainAxisSize: MainAxisSize.min,
-                        children: [styledInfoText],
+                        children: [styledInfoText(context)],
                       ),
                     ),
 
