@@ -3,7 +3,7 @@ import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
 import 'package:withme/core/presentation/widget/size_transition_filter_bar.dart';
-import 'package:withme/core/ui/const/position.dart';
+import 'package:withme/core/ui/const/fab_position.dart';
 import 'package:withme/presentation/customer/screen/customer_screen.dart';
 
 import '../../../../../core/di/setup.dart';
@@ -42,7 +42,7 @@ class _CustomerListPageState extends State<CustomerListPage>
   @override
   void initState() {
     super.initState();
-    smallFabBottomPosition = FabPosition.secondFabBottomPosition;
+    smallFabBottomPosition = FabPosition.bottomFabBottomHeight;
     viewModel.fetchData(force: true);
     initFilterBarAnimation(vsync: this);
   }

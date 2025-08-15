@@ -61,7 +61,7 @@ class SexIconWithBirthday extends StatelessWidget {
                 countdown != 0 ? 'D-$countdown' : '오늘',
                 style: Theme.of(context)
                     .textTheme
-                    .headlineSmall
+                    .titleSmall
                     ?.copyWith(color: colorScheme.tertiary),
               ),
             ],

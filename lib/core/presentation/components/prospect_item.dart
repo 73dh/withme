@@ -1,6 +1,5 @@
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/presentation/todo/common_todo_list.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
@@ -24,6 +23,10 @@ class ProspectItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     final DateTime? birthDate = customer.birth?.toLocal();
     final info = customer.insuranceInfo;
 
@@ -46,11 +49,14 @@ class ProspectItem extends StatelessWidget {
                 ..sort((a, b) => a.contactDate.compareTo(b.contactDate));
 
           return ItemContainer(
-            backgroundColor: info.isUrgent ? ColorStyles.isUrgentColor : null,
+            backgroundColor:
+                info.isUrgent
+                    ? colorScheme.errorContainer
+                    : colorScheme.surface,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProfileColumn(context,customer),
+                _buildProfileColumn(context, customer, textTheme, colorScheme),
                 width(12),
                 _buildNamePart(
                   context,
@@ -58,6 +64,8 @@ class ProspectItem extends StatelessWidget {
                   difference: info.difference,
                   isUrgent: info.isUrgent,
                   insuranceChangeDate: info.insuranceChangeDate,
+                  textTheme: textTheme,
+                  colorScheme: colorScheme,
                 ),
                 width(10),
                 Expanded(
@@ -75,13 +83,20 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileColumn(BuildContext context, CustomerModel customer) {
+  Widget _buildProfileColumn(
+    BuildContext context,
+    CustomerModel customer,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           customer.registeredDate.formattedYearAndMonth,
-          style: Theme.of(context).textTheme.labelMedium,
+          style: textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         height(3),
         SexIconWithBirthday(
@@ -94,11 +109,14 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _buildNamePart(BuildContext context,{
+  Widget _buildNamePart(
+    BuildContext context, {
     required DateTime? birthDate,
     required int? difference,
     required bool isUrgent,
     required DateTime? insuranceChangeDate,
+    required TextTheme textTheme,
+    required ColorScheme colorScheme,
   }) {
     return SingleChildScrollView(
       child: Column(
@@ -109,32 +127,33 @@ class ProspectItem extends StatelessWidget {
             children: [
               Text(
                 shortenedNameText(customer.name, length: 6),
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.bold
+                ),
               ),
               width(6),
               if (birthDate != null)
                 Text(
                   '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey[700]),
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               if (customer.todos.isNotEmpty) ...[
                 width(3),
-
-                    SizedBox(
-                      width: 50,
-                      child: StreamTodoText(
-                        todoList: customer.todos,
-                        sex: customer.sex,
-                      ),
-                    ),
-                    TodoCountIcon(
-                      todos: customer.todos,
-                      sex: customer.sex,
-                      iconSize: 18,
-                    ),
-
-
-
+                SizedBox(
+                  width: 50,
+                  child: StreamTodoText(
+                    todoList: customer.todos,
+                    sex: customer.sex,
+                  ),
+                ),
+                TodoCountIcon(
+                  todos: customer.todos,
+                  sex: customer.sex,
+                  iconSize: 18,
+                ),
               ],
             ],
           ),
@@ -151,7 +170,9 @@ class ProspectItem extends StatelessWidget {
             height(2),
             Text(
               '소개자: ${customer.recommended}',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey[700]),
+              style: textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ],

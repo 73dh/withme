@@ -43,9 +43,9 @@ class ProspectListAppBar extends StatelessWidget
           width(4),
           Text(
             '${customers.length}명',
-            style: textTheme.titleLarge?.copyWith(
-              color: colorScheme.primary, // 강조색
-              fontSize: 20,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface, // 강조색
+
             ),
           ),
           width(5),

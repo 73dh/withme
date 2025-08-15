@@ -7,7 +7,7 @@ import 'package:withme/presentation/customer/screen/customer_screen.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_bottom_sheet_with_draggable.dart';
 import '../../../../domain/use_case/customer/update_searched_customers_use_case.dart';
-import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
+import '../../../registration_sheet/screen/registration_screen.dart';
 import '../search_page_view_model.dart';
 
 /// 고객 목록 리스트 뷰
@@ -94,7 +94,7 @@ class CustomerListView extends StatelessWidget {
         await showBottomSheetWithDraggable(
           context: context,
           builder:
-              (scrollController) => RegistrationBottomSheet(customer: customer),
+              (scrollController) => RegistrationScreen(customer: customer),
           onClosed: () async {
             // 닫힌 후 검색 결과 다시 갱신
             await UpdateSearchedCustomersUseCase.call(viewModel);

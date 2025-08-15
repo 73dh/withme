@@ -93,8 +93,6 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
         _visibilityController.reverse();
       }
     }
-    // selectedSortStatus는 자동으로 rebuild될 때 _buildMiniAction에서 반영됩니다.
-    // 여기에 별도의 setState 호출은 필요하지 않습니다.
   }
 
   @override
@@ -146,7 +144,9 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
                   return ScaleTransition(scale: animation, child: child);
                 },
                 child: Icon(
-                  widget.fabExpanded ? Icons.close : Icons.sort_by_alpha_outlined,
+                  widget.fabExpanded
+                      ? Icons.close
+                      : Icons.sort_by_alpha_outlined,
                   key: ValueKey(widget.fabExpanded), // 키를 변경하여 애니메이션 트리거
                   color: Colors.black87,
                 ),

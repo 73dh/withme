@@ -6,7 +6,6 @@ import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/presentation/auth/log_in/log_in_screen.dart';
 import 'package:withme/presentation/customer/screen/customer_screen.dart';
 import 'package:withme/presentation/home/home_screen.dart';
-import 'package:withme/presentation/registration_sheet/sheet/registration_bottom_sheet.dart';
 import 'package:withme/presentation/splash/splash_screen.dart';
 
 import '../../domain/model/customer_model.dart';
@@ -14,6 +13,7 @@ import '../../presentation/auth/on_boarding/on_boarding_screen.dart';
 import '../../presentation/auth/sign_up/sign_up_screen.dart';
 import '../../presentation/auth/verity_email/verify_email_screen.dart';
 import '../../presentation/policy/screen/policy_screen.dart';
+import '../../presentation/registration_sheet/screen/registration_screen.dart';
 import '../di/setup.dart';
 
 final authChangeNotifier = AuthChangeNotifier();
@@ -82,7 +82,7 @@ final router = GoRouter(
       path: RoutePath.registration,
       pageBuilder:
           (context, state) => _fadePage(
-            child: RegistrationBottomSheet(
+            child: RegistrationScreen(
               customer: state.extra as CustomerModel?,
             ),
             state: state,

@@ -87,9 +87,10 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Text(
               'withMe',
-              style: textTheme.headlineSmall?.copyWith(
+              style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.primary, // M3 primary 색상 적용
                 fontWeight: FontWeight.bold,
+                fontSize: 18
               ),
             ),
             height(10),

@@ -6,7 +6,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/presentation/fab/animated_fab_container.dart';
 import 'package:withme/core/presentation/fab/main_fab.dart';
 import 'package:withme/core/presentation/fab/small_fab.dart';
-import 'package:withme/core/ui/const/position.dart';
+import 'package:withme/core/ui/const/fab_position.dart';
 
 import 'fab_view_model_interface.dart';
 
@@ -26,7 +26,7 @@ mixin FabOverlayManagerMixin<
   bool _isBottomSheetOpen = false;
 
   void Function(void Function())? _overlaySetState;
-  double smallFabBottomPosition = FabPosition.firstFabBottomPosition;
+  double smallFabBottomPosition = FabPosition.topFabBottomHeight;
 
   /// ViewModel을 State 클래스에서 주입
   VM get viewModel;
@@ -179,7 +179,7 @@ mixin FabOverlayManagerMixin<
                       AnimatedFabContainer(
                         fabVisibleLocal: _fabVisibleInOverlay,
                         rightPosition: 16,
-                        bottomPosition: FabPosition.secondFabBottomPosition,
+                        bottomPosition: FabPosition.bottomFabBottomHeight,
                         child: buildMainFab(),
                       ),
                     ],

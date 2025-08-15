@@ -13,7 +13,7 @@ import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/components/temporary/text_theme_font_size_pop_up.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../registration_sheet/sheet/registration_bottom_sheet.dart';
+import '../../../registration_sheet/screen/registration_screen.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});
@@ -30,7 +30,6 @@ class _ProspectListPageState extends State<ProspectListPage>
         FilterBarAnimationMixin {
   final RouteObserver<PageRoute> _routeObserver =
       getIt<RouteObserver<PageRoute>>();
-
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
@@ -42,70 +41,8 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   void initState() {
     super.initState();
-    _initPopup();
     initFilterBarAnimation(vsync: this);
-  }
-
-  void _initPopup() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_hasCheckedAgreement) return;
-      _hasCheckedAgreement = true;
-
-      final userSession = getIt<UserSession>();
-      await userSession.loadAgreementCheckFromPrefs();
-
-      final managePeriod = userSession.managePeriodDays;
-      final urgentThreshold = userSession.urgentThresholdDays;
-      final targetCount = userSession.targetProspectCount;
-
-      if (userSession.isFirstLogin && mounted) {
-        await showConfirmDialog(
-          context,
-          textSpans: [
-            TextSpan(
-              text: '= 현재 설정 =\n\n',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            TextSpan(
-              text: '고객 관리주기: $managePeriod 일\n',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-
-            TextSpan(
-              text: '상령일 알림: $urgentThreshold 일\n',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            TextSpan(
-              text: '목표 고객수: $targetCount 명\n\n',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
-            TextSpan(
-              text: '[변경] DashBoard 우측상단 ⚙️',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ],
-          onConfirm: () async {
-            await userSession.markAgreementSeen();
-            if (mounted) {
-              Navigator.of(context).maybePop();
-            }
-          },
-          cancelButtonText: '',
-        );
-      }
-    });
+    _maybeShowAgreementPopup();
   }
 
   @override
@@ -124,6 +61,85 @@ class _ProspectListPageState extends State<ProspectListPage>
     super.dispose();
   }
 
+  Future<void> _maybeShowAgreementPopup() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_hasCheckedAgreement) return;
+      _hasCheckedAgreement = true;
+
+      final userSession = getIt<UserSession>();
+      await userSession.loadAgreementCheckFromPrefs();
+
+      if (userSession.isFirstLogin && mounted) {
+        await _showAgreementDialog(userSession);
+      }
+    });
+  }
+
+  Future<void> _showAgreementDialog(UserSession userSession) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return showConfirmDialog(
+      context,
+      textSpans: [
+        TextSpan(
+          text: '= 현재 설정 =\n\n',
+          style: textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        _settingsText(
+          '고객 관리주기',
+          '${userSession.managePeriodDays}일',
+          textTheme,
+          colorScheme,
+        ),
+        _settingsText(
+          '상령일 알림',
+          '${userSession.urgentThresholdDays}일',
+          textTheme,
+          colorScheme,
+        ),
+        _settingsText(
+          '목표 고객수',
+          '${userSession.targetProspectCount}명',
+          textTheme,
+          colorScheme,
+          highlight: true,
+        ),
+        TextSpan(
+          text: '[변경] DashBoard 우측상단 ⚙️',
+          style: textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.primary,
+          ),
+        ),
+      ],
+      onConfirm: () async {
+        await userSession.markAgreementSeen();
+        if (mounted) Navigator.of(context).maybePop();
+      },
+      cancelButtonText: '',
+    );
+  }
+
+  TextSpan _settingsText(
+    String label,
+    String value,
+    TextTheme textTheme,
+    ColorScheme colorScheme, {
+    bool highlight = false,
+  }) {
+    return TextSpan(
+      text: '$label: $value\n',
+      style: textTheme.bodyLarge?.copyWith(
+        color: highlight ? colorScheme.secondary : colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+
   void _toggleFilterBar() => toggleFilterBarAnimation();
 
   @override
@@ -132,32 +148,35 @@ class _ProspectListPageState extends State<ProspectListPage>
     callOverlaySetState();
   }
 
-  /// ★ 필수 구현: FabOverlayManagerMixin 추상 메서드 구현 ★
   @override
   Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
     if (!mounted) return;
-
     final isLimited = await FreeLimitDialog.checkAndShow(
       context: context,
       viewModel: viewModel,
     );
     if (isLimited) return;
 
+    await _openRegistrationSheet();
+  }
+
+  Future<void> _openRegistrationSheet({CustomerModel? customer}) async {
     setIsProcessActive(true);
     setFabCanBeShown(false);
 
     await showBottomSheetWithDraggable(
       context: context,
       builder:
-          (scrollController) => RegistrationBottomSheet(
+          (scrollController) => RegistrationScreen(
+            customer: customer,
             scrollController: scrollController,
             outerContext: context,
           ),
       onClosed: () async {
         setIsProcessActive(false);
         await viewModel.fetchData(force: true);
-
         if (!mounted) return;
+        await Future.delayed(const Duration(milliseconds: 200));
         setFabCanBeShown(true);
       },
     );
@@ -166,9 +185,6 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
     return VisibilityDetector(
       key: const Key('prospect-list-visibility'),
       onVisibilityChanged: handleVisibilityChange,
@@ -176,120 +192,108 @@ class _ProspectListPageState extends State<ProspectListPage>
         child: StreamBuilder<List<CustomerModel>>(
           stream: viewModel.cachedProspects,
           builder: (context, snapshot) {
-            final filteredList = snapshot.data ?? [];
-
+            final customers = snapshot.data ?? [];
             return Scaffold(
-              resizeToAvoidBottomInset: true,
               backgroundColor: theme.scaffoldBackgroundColor,
-              appBar: ProspectListAppBar(
-                backgroundColor: theme.scaffoldBackgroundColor,
-                viewModel: viewModel,
-                customers: filteredList,
-                filterBarExpanded: filterBarExpanded,
-                onToggleFilterBar: _toggleFilterBar,
-              ),
+              appBar: _buildAppBar(customers),
               body: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizeTransitionFilterBar(
-                    heightFactor: heightFactor,
-                    child: InactiveAndUrgentFilterBar(
-                      showInactiveOnly: _showInactiveOnly,
-                      showUrgentOnly: _showUrgentOnly,
-                      onInactiveToggle: (val) {
-                        setState(() => _showInactiveOnly = val);
-                        viewModel.updateFilter(inactiveOnly: val);
-                      },
-                      onUrgentToggle: (val) {
-                        setState(() => _showUrgentOnly = val);
-                        viewModel.updateFilter(urgentOnly: val);
-                      },
-                      inactiveCount: viewModel.inactiveCount,
-                      urgentCount: viewModel.urgentCount,
-                      showTodoOnly: _showTodoOnly,
-                      onTodoToggle: (val) {
-                        setState(() => _showTodoOnly = val);
-                        viewModel.updateFilter(todoOnly: val);
-                      },
-                      todoCount: viewModel.todoCount,
-                    ),
-                  ),
+                  _buildFilterBar(),
                   const SizedBox(height: 5),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      itemCount: filteredList.length,
-                      itemBuilder: (context, index) {
-                        final customer = filteredList[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: GestureDetector(
-                            onTap: () async {
-                              setIsProcessActive(true);
-                              setFabCanBeShown(false);
-
-                              await showBottomSheetWithDraggable(
-                                context: context,
-                                builder:
-                                    (scrollController) =>
-                                        RegistrationBottomSheet(
-                                          customer: customer,
-                                          scrollController: scrollController,
-                                          outerContext: context,
-                                        ),
-                                onClosed: () async {
-                                  setIsProcessActive(false);
-                                  await viewModel.fetchData(force: true);
-                                  await Future.delayed(
-                                    const Duration(milliseconds: 200),
-                                  );
-                                  if (!mounted) return;
-                                  setFabCanBeShown(true);
-                                },
-                              );
-                            },
-                            child: ProspectItem(
-                              userKey: UserSession.userId,
-                              customer: customer,
-                              onTap: (histories) async {
-                                setFabCanBeShown(false);
-                                await popupAddHistory(
-                                  context: context,
-                                  histories: histories,
-                                  customer: customer,
-                                  initContent: HistoryContent.title.toString(),
-                                );
-                                if (mounted) setFabCanBeShown(true);
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  Expanded(child: _buildProspectList(customers)),
                 ],
               ),
-              floatingActionButton: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) =>
-                            TextThemeFontSizePopup(textTheme: textTheme),
-                  );
-                },
-                child: const Text('FontSize 보기'),
-              ),
+              floatingActionButton: _buildDebugFab(),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.startFloat,
             );
           },
         ),
       ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(List<CustomerModel> customers) {
+    return ProspectListAppBar(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      viewModel: viewModel,
+      customers: customers,
+      filterBarExpanded: filterBarExpanded,
+      onToggleFilterBar: _toggleFilterBar,
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return SizeTransitionFilterBar(
+      heightFactor: heightFactor,
+      child: InactiveAndUrgentFilterBar(
+        showInactiveOnly: _showInactiveOnly,
+        showUrgentOnly: _showUrgentOnly,
+        onInactiveToggle: (val) {
+          setState(() => _showInactiveOnly = val);
+          viewModel.updateFilter(inactiveOnly: val);
+        },
+        onUrgentToggle: (val) {
+          setState(() => _showUrgentOnly = val);
+          viewModel.updateFilter(urgentOnly: val);
+        },
+        inactiveCount: viewModel.inactiveCount,
+        urgentCount: viewModel.urgentCount,
+        showTodoOnly: _showTodoOnly,
+        onTodoToggle: (val) {
+          setState(() => _showTodoOnly = val);
+          viewModel.updateFilter(todoOnly: val);
+        },
+        todoCount: viewModel.todoCount,
+      ),
+    );
+  }
+
+  Widget _buildProspectList(List<CustomerModel> customers) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      itemCount: customers.length,
+      itemBuilder: (context, index) {
+        final customer = customers[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: GestureDetector(
+            onTap: () => _openRegistrationSheet(customer: customer),
+            child: ProspectItem(
+              userKey: UserSession.userId,
+              customer: customer,
+              onTap: (histories) async {
+                setFabCanBeShown(false);
+                await popupAddHistory(
+                  context: context,
+                  histories: histories,
+                  customer: customer,
+                  initContent: HistoryContent.title.toString(),
+                );
+                if (mounted) setFabCanBeShown(true);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDebugFab() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+      ),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => TextThemeFontSizePopup(textTheme: textTheme),
+        );
+      },
+      child: const Text('FontSize 보기'),
     );
   }
 }

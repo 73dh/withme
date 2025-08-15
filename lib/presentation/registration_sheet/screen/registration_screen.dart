@@ -41,13 +41,13 @@ import '../registration_view_model.dart';
 import '../part/customer_info_part.dart';
 import '../part/confirm_box_part.dart';
 
-class RegistrationBottomSheet extends StatefulWidget {
+class RegistrationScreen extends StatefulWidget {
   final CustomerModel? customer;
   final ScrollController? scrollController;
   final BuildContext? outerContext;
   final void Function(bool)? onFabVisibilityChanged;
 
-  const RegistrationBottomSheet({
+  const RegistrationScreen({
     super.key,
     this.customer,
     this.scrollController,
@@ -56,11 +56,11 @@ class RegistrationBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<RegistrationBottomSheet> createState() =>
-      _RegistrationBottomSheetState();
+  State<RegistrationScreen> createState() =>
+      _RegistrationScreenState();
 }
 
-class _RegistrationBottomSheetState extends State<RegistrationBottomSheet> {
+class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _recommendedController = TextEditingController();

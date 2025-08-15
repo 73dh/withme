@@ -52,10 +52,9 @@ class ConfirmBoxPart extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              height(15),
               Text(
                 customerModel == null ? '신규등록 확인' : '수정내용 확인',
-                style: textTheme.titleLarge?.copyWith(
+                style: textTheme.titleMedium?.copyWith(
                   color: effectiveTextColor,
                   fontWeight: FontWeight.w600,
                 ),
@@ -92,6 +91,7 @@ class ConfirmBoxPart extends StatelessWidget {
                 foregroundColor: theme.colorScheme.onPrimary,
                 backgroundColor: theme.colorScheme.primary,
               ),
+              height(30),
             ],
           ),
         ),
