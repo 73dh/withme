@@ -13,7 +13,7 @@ import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/components/temporary/text_theme_font_size_pop_up.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../registration_sheet/screen/registration_screen.dart';
+import '../../../registration/screen/registration_screen.dart';
 
 class ProspectListPage extends StatefulWidget {
   const ProspectListPage({super.key});

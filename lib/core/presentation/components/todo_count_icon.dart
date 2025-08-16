@@ -1,6 +1,9 @@
 import '../../../domain/model/todo_model.dart';
 import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
+import '../../../domain/model/todo_model.dart';
+import '../../ui/core_ui_import.dart';
+import '../core_presentation_import.dart';
 
 class TodoCountIcon extends StatelessWidget {
   final List<TodoModel> todos;
@@ -16,9 +19,10 @@ class TodoCountIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 성별 색상 적용
     final bgColor = sex == '남'
-        ? ColorStyles.manColor.withOpacity(0.15)
-        : ColorStyles.womanColor.withOpacity(0.15);
+        ? ColorStyles.manColor.withValues(alpha: 0.15)
+        : ColorStyles.womanColor.withValues(alpha: 0.15);
     final textColor = sex == '남' ? ColorStyles.manColor : ColorStyles.womanColor;
 
     return Container(
@@ -33,7 +37,7 @@ class TodoCountIcon extends StatelessWidget {
         '${todos.length}',
         style: TextStyle(
           color: textColor,
-          fontSize: iconSize * 0.5, // 아이콘 크기에 비례하는 폰트 크기
+          fontSize: iconSize * 0.5,
           fontWeight: FontWeight.bold,
         ),
       ),

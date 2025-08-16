@@ -3,35 +3,38 @@ import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/core_ui_import.dart';
-
 class InsuredHolderPart extends StatelessWidget {
   final TextEditingController insuredNameController;
   final String? insuredSex;
   final DateTime? insuredBirth;
-  final void Function(String) onInsuredNameChanged;
+  // final void Function(String) onInsuredNameChanged;
   final void Function(String) onManChanged;
   final void Function(String) onWomanChanged;
   final void Function(DateTime?) onBirthChanged;
+  final TextStyle? textStyle; // ✅ 추가
 
   const InsuredHolderPart({
     super.key,
     required this.insuredNameController,
     required this.insuredSex,
     this.insuredBirth,
-    required this.onInsuredNameChanged,
+    // required this.onInsuredNameChanged,
     required this.onManChanged,
     required this.onWomanChanged,
     required this.onBirthChanged,
+    this.textStyle, // ✅ 추가
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: IntrinsicWidth(
-            // 이게 중요!
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,10 +45,16 @@ class InsuredHolderPart extends StatelessWidget {
                   child: TextFormField(
                     controller: insuredNameController,
                     textAlign: TextAlign.center,
+                    style: textStyle ??
+                        theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
                     decoration: InputDecoration(
                       hintText: '피보험자',
+                      hintStyle: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
                       filled: true,
-                      fillColor: Colors.grey[100],
+                      fillColor: colorScheme.surfaceVariant,
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 10,
@@ -55,9 +64,7 @@ class InsuredHolderPart extends StatelessWidget {
                         borderSide: BorderSide.none,
                       ),
                     ),
-
                     // onChanged: onInsuredNameChanged,
-                    // onSaved: (value) => insuredNameController.text = value!,
                   ),
                 ),
                 width(12),
@@ -77,6 +84,9 @@ class InsuredHolderPart extends StatelessWidget {
                       onWomanChanged('여');
                     }
                   },
+                  selectedColor: colorScheme.primary,
+                  fillColor: colorScheme.primary.withOpacity(0.12),
+                  color: colorScheme.onSurfaceVariant,
                   children: const [
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4),
@@ -103,11 +113,12 @@ class InsuredHolderPart extends StatelessWidget {
                         vertical: 12,
                         horizontal: 10,
                       ),
-                      backgroundColor:
-                          insuredBirth != null
-                              ? ColorStyles.unActiveButtonColor
-                              : ColorStyles.activeButtonColor,
-                      foregroundColor: Colors.black87,
+                      backgroundColor: insuredBirth != null
+                          ? colorScheme.surfaceVariant
+                          : colorScheme.primary,
+                      foregroundColor: insuredBirth != null
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -116,7 +127,11 @@ class InsuredHolderPart extends StatelessWidget {
                     icon: const Icon(Icons.cake_outlined, size: 18),
                     label: Text(
                       insuredBirth?.formattedBirth ?? '생년월일',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: insuredBirth != null
+                            ? colorScheme.onSurfaceVariant
+                            : colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ),

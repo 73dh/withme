@@ -19,15 +19,20 @@ class CommonDialog {
   CommonDialog({required this.menuController, required this.textController});
 
   Future<String?> showHistories(
-    BuildContext context,
-    List<HistoryModel> histories,
-  ) async {
+      BuildContext context,
+      List<HistoryModel> histories,
+      ) async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
       }
     });
+
     histories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
+
     return await showModalBottomSheet<String>(
       context: Overlay.of(context).context,
       isScrollControlled: true,
@@ -46,7 +51,7 @@ class CommonDialog {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface, // backgroundColor
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(16),
                     ),
@@ -59,13 +64,13 @@ class CommonDialog {
                     ],
                   ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // 최소 크기 유지
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       height(12),
-                      const Text(
+                      Text(
                         '관리 이력',
-                        style: TextStyle(
-                          fontSize: 18,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -73,7 +78,7 @@ class CommonDialog {
                       Divider(
                         height: 1,
                         thickness: 1,
-                        color: Colors.grey.shade200,
+                        color: colorScheme.outlineVariant,
                       ),
                       if (histories.isNotEmpty)
                         Flexible(
@@ -93,9 +98,8 @@ class CommonDialog {
                                 children: [
                                   Text(
                                     e.contactDate.formattedBirth,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                   height(2),
@@ -103,12 +107,14 @@ class CommonDialog {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(10),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
+                                      color: colorScheme.surfaceVariant,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       e.content,
-                                      style: const TextStyle(fontSize: 14),
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurface,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -117,17 +123,19 @@ class CommonDialog {
                           ),
                         )
                       else
-                        const Padding(
-                          padding: EdgeInsets.all(20),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
                           child: Text(
                             '등록된 이력이 없습니다.',
-                            style: TextStyle(color: Colors.grey),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ),
                       height(10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _inputArea(context, setState),
+                        child: _inputArea(context, setState, colorScheme),
                       ),
                       height(20),
                     ],
@@ -141,7 +149,7 @@ class CommonDialog {
     );
   }
 
-  Widget _inputArea(BuildContext context, StateSetter setState) {
+  Widget _inputArea(BuildContext context, StateSetter setState, ColorScheme colorScheme) {
     final showTextField = textController.text.isEmpty;
 
     return Row(
@@ -149,22 +157,44 @@ class CommonDialog {
         if (!showTextField) _historyButton(setState, context),
         _historyMenu(setState),
         width(5),
-        if (showTextField) _buildTextField(setState) else const Spacer(),
+        if (showTextField)
+          Flexible(
+            child: CustomTextFormField(
+              focusNode: FocusNode(),
+              controller: textController,
+              hintText: '내용을 입력 하세요.',
+              autoFocus: true,
+              textStyle: TextStyle(color: colorScheme.onSurface),
+              onCompleted: () => setState(() => textController.text.trim()),
+            ),
+          )
+        else
+          const Spacer(),
         width(5),
         FilledButton(
           onPressed: () {
             final input = textController.text.trim();
             if (input.isEmpty || input == HistoryContent.title.toString()) {
-              showOverlaySnackBar(context, '내용을 입력해 주세요');
-              return; // ✅ 닫지 않고 종료
+              showOverlaySnackBar(
+                context,
+                '내용을 입력해 주세요',
+                backgroundColor: colorScheme.errorContainer,
+                textColor: colorScheme.onErrorContainer,
+              );
+              return;
             }
-            context.pop(input); // ✅ 유효한 경우만 닫기
+            context.pop(input);
           },
+          style: FilledButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
+          ),
           child: const Text('추가'),
         ),
       ],
     );
   }
+
 
   HistoryButton _historyButton(StateSetter setState, BuildContext context) {
     return HistoryButton(
@@ -184,15 +214,4 @@ class CommonDialog {
     );
   }
 
-  Flexible _buildTextField(StateSetter setState) {
-    return Flexible(
-      child: CustomTextFormField(
-        focusNode: FocusNode(),
-        controller: textController,
-        hintText: '내용을 입력 하세요.',
-        autoFocus: true,
-        onCompleted: () => setState(() => textController.text.trim()),
-      ),
-    );
-  }
 }

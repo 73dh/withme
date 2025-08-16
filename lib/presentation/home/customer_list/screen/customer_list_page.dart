@@ -112,7 +112,7 @@ class _CustomerListPageState extends State<CustomerListPage>
               }
 
               return Scaffold(
-                backgroundColor: colorScheme.background,
+                backgroundColor: colorScheme.surface,
                 appBar: CustomerListAppBar(
                   backgroundColor: colorScheme.surface, // AppBar 색상
                   foregroundColor: colorScheme.onSurface, // 텍스트/아이콘 색상

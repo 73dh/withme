@@ -26,26 +26,25 @@ class CustomerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<CustomerListViewModel>();
-    final birthDate = customer.birth;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
+    final birthDate = customer.birth;
     final info = customer.insuranceInfo;
     final difference = info.difference;
     final isUrgent = info.isUrgent;
     final insuranceChangeDate = info.insuranceChangeDate;
 
-    return StreamBuilder(
+    return StreamBuilder<List<PolicyModel>>(
       stream: viewModel.getPolicies(customerKey: customer.customerKey),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          log(snapshot.error.toString());
-        }
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
+        if (snapshot.hasError) log(snapshot.error.toString());
+        if (!snapshot.hasData) return const SizedBox.shrink();
 
-        List<PolicyModel> policies = snapshot.data!;
+        final policies = snapshot.data!;
         return ItemContainer(
-          backgroundColor: isUrgent ? ColorStyles.isUrgentColor : null,
+          backgroundColor:
+              isUrgent ? ColorStyles.isUrgentColor : colorScheme.surfaceVariant,
           child: Stack(
             children: [
               Row(
@@ -56,15 +55,16 @@ class CustomerItem extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _namePart(
-                          context,
+                        _buildNameRow(
                           customer,
                           birthDate,
                           difference,
-                          isUrgent,
                           insuranceChangeDate,
+                          isUrgent,
+                          theme,
+                          colorScheme,
                         ),
-                        _policyPart(policies),
+                        _buildPolicyList(policies, theme, colorScheme),
                       ],
                     ),
                   ),
@@ -73,7 +73,7 @@ class CustomerItem extends StatelessWidget {
               Positioned.fill(
                 child: HistoryPartWidget(
                   histories: customer.histories,
-                  onTap: (histories) => onTap(histories),
+                  onTap: onTap,
                   sex: customer.sex,
                 ),
               ),
@@ -84,27 +84,41 @@ class CustomerItem extends StatelessWidget {
     );
   }
 
-  Widget _namePart(
-      BuildContext context,
+  Widget _buildNameRow(
     CustomerModel customer,
     DateTime? birthDate,
     int? difference,
-    bool isUrgent,
     DateTime? insuranceChangeDate,
+    bool isUrgent,
+    ThemeData theme,
+    ColorScheme colorScheme,
   ) {
     final iconPath =
         customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
+
     if (birthDate == null) {
       return Row(
         children: [
           Text(
             shortenedNameText(customer.name, length: 6),
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
           width(5),
-          const Text('정보 없음'),
+          Text(
+            '정보 없음',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
           width(3),
-          Text(customer.recommended.isNotEmpty ? customer.recommended : ''),
+          Text(
+            customer.recommended.isNotEmpty ? customer.recommended : '',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
         ],
       );
     }
@@ -116,15 +130,22 @@ class CustomerItem extends StatelessWidget {
           sex: customer.sex,
           backgroundImagePath: iconPath,
           size: 20,
-          isShowDay: false,
+          isShowDay: true,
         ),
         width(3),
         Text(
           shortenedNameText(customer.name, length: 6),
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
         ),
-        width(5),
-        Text('${calculateAge(birthDate)}세/'),
+        width(3),
+        Text(
+          '${calculateAge(birthDate)}세 /',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
         width(3),
         if (difference != null &&
             difference >= 0 &&
@@ -134,17 +155,7 @@ class CustomerItem extends StatelessWidget {
             isUrgent: isUrgent,
             insuranceChangeDate: insuranceChangeDate,
           ),
-        if (isBirthdayWithin7Days(birthDate)) ...[
-          const SizedBox(width: 4),
-          const Icon(Icons.cake_rounded, color: Colors.pinkAccent, size: 16),
-          const SizedBox(width: 2),
-          if (getBirthdayCountdown(birthDate) != 0)
-            Text(
-              '(D-${getBirthdayCountdown(birthDate)})',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.pinkAccent),
-            ),
-        ],
-        if (difference == null || difference < 0) const SizedBox.shrink(),
+
         width(5),
         SizedBox(
           width: 30,
@@ -156,11 +167,13 @@ class CustomerItem extends StatelessWidget {
     );
   }
 
-  Widget _policyPart(List<PolicyModel> policies) {
-    final bool showPrev = policies.length > 1;
-
-    // 가장 최근 1개
-    final List<PolicyModel> recentPolicies =
+  Widget _buildPolicyList(
+    List<PolicyModel> policies,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    final showPrev = policies.length > 1;
+    final recentPolicies =
         showPrev
             ? policies.reversed.take(1).toList().reversed.toList()
             : policies;
@@ -169,40 +182,53 @@ class CustomerItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showPrev)
-          const Text(
+          Text(
             '...prev',
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
               fontStyle: FontStyle.italic,
             ),
           ),
-        ...recentPolicies.map((e) {
+        height(2),
+        ...recentPolicies.map((policy) {
           final isCancelled =
-              e.policyState == PolicyState.cancelled.label ||
-              e.policyState == PolicyState.lapsed.label;
-
+              policy.policyState == PolicyState.cancelled.label ||
+              policy.policyState == PolicyState.lapsed.label;
           final premiumText = numFormatter.format(
-            int.tryParse(e.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
+            int.tryParse(policy.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
           );
 
           return Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(e.startDate?.formattedBirth ?? ''),
+              Text(
+                policy.startDate?.formattedBirth ?? '',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
               width(5),
               Flexible(
                 fit: FlexFit.loose,
-                child: Text(e.productCategory, overflow: TextOverflow.ellipsis),
+                child: Text(
+                  policy.productCategory,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
+                ),
               ),
               width(5),
               Text(
                 premiumText,
-                style: TextStyle(
-                  color: isCancelled ? Colors.red : null,
-                  fontWeight: isCancelled ? FontWeight.bold : null,
-                  decoration: isCancelled ? TextDecoration.lineThrough : null,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isCancelled ? Colors.red : colorScheme.onSurface,
+                  fontWeight: isCancelled ? FontWeight.bold : FontWeight.normal,
+                  decoration:
+                      isCancelled
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
                   decorationColor: isCancelled ? Colors.red : null,
                   decorationThickness: isCancelled ? 2 : null,
                 ),
@@ -211,8 +237,11 @@ class CustomerItem extends StatelessWidget {
               Flexible(
                 fit: FlexFit.loose,
                 child: Text(
-                  ' (${e.paymentMethod})',
+                  ' (${policy.paymentMethod})',
                   overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                 ),
               ),
             ],

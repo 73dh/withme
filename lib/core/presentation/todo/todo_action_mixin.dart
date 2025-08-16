@@ -12,13 +12,13 @@ import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 import '../core_presentation_import.dart';
 import '../widget/show_add_todo_dialog.dart';
-
 mixin TodoActionMixin {
   Future<void> addOrUpdateTodo(
-    BuildContext context,
-    CustomerModel customer, {
-    TodoModel? currentTodo,
-  }) async {
+      BuildContext context,
+      CustomerModel customer, {
+        TodoModel? currentTodo,
+      }) async {
+    // 다크/라이트 테마 자동 적용은 showAddOrEditTodoDialog 내부에서 colorScheme 사용
     final newTodo = await showAddOrEditTodoDialog(
       context,
       currentTodo: currentTodo,
@@ -30,28 +30,27 @@ mixin TodoActionMixin {
       dueDate: newTodo.dueDate,
     );
 
-    final useCase =
-        currentTodo == null
-            ? AddTodoUseCase(
-              userKey: UserSession.userId,
-              customerKey: customer.customerKey,
-              todoData: todoData,
-            )
-            : UpdateTodoUseCase(
-              userKey: UserSession.userId,
-              customerKey: customer.customerKey,
-              todoId: currentTodo.docId,
-              todoData: todoData,
-            );
+    final useCase = currentTodo == null
+        ? AddTodoUseCase(
+      userKey: UserSession.userId,
+      customerKey: customer.customerKey,
+      todoData: todoData,
+    )
+        : UpdateTodoUseCase(
+      userKey: UserSession.userId,
+      customerKey: customer.customerKey,
+      todoId: currentTodo.docId,
+      todoData: todoData,
+    );
 
     await getIt<TodoUseCase>().execute(usecase: useCase);
   }
 
   Future<void> deleteTodo(
-    BuildContext context,
-    CustomerModel customer,
-    TodoModel todo,
-  ) async {
+      BuildContext context,
+      CustomerModel customer,
+      TodoModel todo,
+      ) async {
     await getIt<TodoUseCase>().execute(
       usecase: DeleteTodoUseCase(
         userKey: UserSession.userId,
@@ -63,34 +62,33 @@ mixin TodoActionMixin {
   }
 
   Future<void> completeTodo(
-    BuildContext context,
-    CustomerModel customer,
-    TodoModel currentTodo,
-  ) async {
-    // 1. 팝업에서 현재 todo 내용과 날짜 보여주고, 필요시 수정
+      BuildContext context,
+      CustomerModel customer,
+      TodoModel currentTodo,
+      ) async {
+    // Dialog 내부에서 theme/colorScheme 적용
     final editedTodo = await showAddOrEditTodoDialog(
       context,
       currentTodo: currentTodo,
       type: TodoDialogType.complete,
     );
 
-    // 2. 사용자가 취소 버튼을 눌렀다면 종료
     if (editedTodo == null) return;
-    // 3. Usecase 실행
+
     final newHistory = HistoryModel(
       contactDate: editedTodo.dueDate,
       content: editedTodo.content,
     );
+
     await getIt<TodoUseCase>().execute(
       usecase: CompleteTodoUseCase(
         userKey: customer.userKey,
         customerKey: customer.customerKey,
         todoId: currentTodo.docId,
-        newHistory: newHistory, // 수정된 내용 전달
+        newHistory: newHistory,
       ),
     );
 
-    // 4. 팝업 닫기
     if (context.mounted) {
       context.pop();
     }

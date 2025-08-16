@@ -3,18 +3,8 @@ import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/todo_model.dart';
-import 'todo_view_model.dart';
 import '../../presentation/core_presentation_import.dart';
-import '../../ui/core_ui_import.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
-
-import '../../../domain/domain_import.dart';
-import '../../../domain/model/todo_model.dart';
 import 'todo_view_model.dart';
-import '../../presentation/core_presentation_import.dart';
-import '../../ui/core_ui_import.dart';
 
 class BuildTodoList extends StatefulWidget {
   final TodoViewModel viewModel;
@@ -24,6 +14,7 @@ class BuildTodoList extends StatefulWidget {
   final void Function(TodoModel) onDeleteTodo;
   final void Function(TodoModel) onUpdateTodo;
   final void Function(TodoModel) onCompleteTodo;
+  final Color? textColor;
 
   const BuildTodoList({
     super.key,
@@ -32,7 +23,9 @@ class BuildTodoList extends StatefulWidget {
     this.onSelected,
     required this.onPressed,
     required this.onDeleteTodo,
-    required this.onUpdateTodo, required this.onCompleteTodo,
+    required this.onUpdateTodo,
+    required this.onCompleteTodo,
+    this.textColor,
   });
 
   @override
@@ -64,9 +57,16 @@ class _BuildTodoListState extends State<BuildTodoList> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final effectiveTextColor = widget.textColor ?? colorScheme.onSurface;
+
     if (todoList.isEmpty) {
       return IconButton(
-        icon: const Icon(Icons.add_circle_outline_outlined),
+        icon: Icon(
+          Icons.add_circle_outline_outlined,
+          color: colorScheme.primary,
+        ),
         tooltip: '할 일 추가',
         onPressed: widget.onPressed,
       );
@@ -79,8 +79,8 @@ class _BuildTodoListState extends State<BuildTodoList> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildTodoText(),
-              _buildPopupMenu(),
+              _buildTodoText(effectiveTextColor),
+              _buildPopupMenu(effectiveTextColor, colorScheme),
             ],
           ),
         ),
@@ -88,28 +88,25 @@ class _BuildTodoListState extends State<BuildTodoList> {
     );
   }
 
-  Widget _buildTodoText() {
+  Widget _buildTodoText(Color textColor) {
     return Flexible(
       child: SizedBox(
         width: 100,
         child: StreamTodoText(
           todoList: todoList,
           sex: widget.customer?.sex ?? '',
+          textColor: textColor, // 외부에서 전달한 theme/colorScheme 기반 색상
         ),
       ),
     );
   }
 
-  Widget _buildPopupMenu() {
+  Widget _buildPopupMenu(Color textColor, ColorScheme colorScheme) {
     return GestureDetector(
       onTapDown: (details) async {
-        final RenderBox overlay = Overlay
-            .of(context)
-            .context
-            .findRenderObject()! as RenderBox;
-
-        // 터치 위치에서 Y축을 20만큼 아래로 이동
-        final Offset position = details.globalPosition + Offset(0, 20);
+        final RenderBox overlay =
+            Overlay.of(context).context.findRenderObject()! as RenderBox;
+        final Offset position = details.globalPosition + const Offset(0, 20);
 
         final selected = await showMenu<String>(
           context: context,
@@ -117,7 +114,7 @@ class _BuildTodoListState extends State<BuildTodoList> {
             position & const Size(40, 40),
             Offset.zero & overlay.size,
           ),
-          items: buildTodoMenuItems(),
+          items: buildTodoMenuItems(textColor, colorScheme),
           elevation: 8,
         );
 
@@ -125,13 +122,14 @@ class _BuildTodoListState extends State<BuildTodoList> {
           widget.onSelected?.call(selected);
         }
       },
-      child: TodoCountIcon(
-        todos: todoList,
-        sex: widget.customer?.sex ?? '',
-      ),
+      child: TodoCountIcon(todos: todoList, sex: widget.customer?.sex ?? ''),
     );
   }
-  List<PopupMenuEntry<String>> buildTodoMenuItems() {
+
+  List<PopupMenuEntry<String>> buildTodoMenuItems(
+    Color textColor,
+    ColorScheme colorScheme,
+  ) {
     final items = <PopupMenuEntry<String>>[];
 
     for (final todo in todoList) {
@@ -139,21 +137,28 @@ class _BuildTodoListState extends State<BuildTodoList> {
         PopupMenuItem<String>(
           enabled: false,
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-          child: _buildTodoMenuItem(todo),
+          child: _buildTodoMenuItem(todo, textColor, colorScheme),
         ),
       );
     }
 
     // 추가 버튼
     items.add(
-      const PopupMenuItem<String>(
+      PopupMenuItem<String>(
         value: 'add',
         child: Row(
           children: [
-            Spacer(),
-            Icon(Icons.add_circle_outline_outlined, size: 18),
-            SizedBox(width: 6),
-            Text('할 일 추가'),
+            const Spacer(),
+            Icon(
+              Icons.add_circle_outline_outlined,
+              size: 18,
+              color: colorScheme.primary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '할 일 추가',
+              style: TextStyle(fontSize: 14, color: colorScheme.primary),
+            ),
           ],
         ),
       ),
@@ -162,24 +167,28 @@ class _BuildTodoListState extends State<BuildTodoList> {
     return items;
   }
 
-  Widget _buildTodoMenuItem(TodoModel todo) {
+  Widget _buildTodoMenuItem(
+    TodoModel todo,
+    Color textColor,
+    ColorScheme colorScheme,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: ColorStyles.todoBoxColor,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(5),
       ),
       padding: const EdgeInsets.all(5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTodoTitle(todo),
-          _buildTodoActions(todo),
+          _buildTodoTitle(todo, colorScheme),
+          _buildTodoActions(todo, colorScheme),
         ],
       ),
     );
   }
 
-  Widget _buildTodoTitle(TodoModel todo) {
+  Widget _buildTodoTitle(TodoModel todo, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: GestureDetector(
@@ -189,13 +198,16 @@ class _BuildTodoListState extends State<BuildTodoList> {
             children: [
               TextSpan(
                 text: '[${todo.dueDate.formattedMonthAndDate}] ',
-                style: const TextStyle(fontSize: 14, color: Colors.black38),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
               TextSpan(
                 text: todo.content,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
-                  color: Colors.deepPurple,
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -206,24 +218,31 @@ class _BuildTodoListState extends State<BuildTodoList> {
     );
   }
 
-  Widget _buildTodoActions(TodoModel todo) {
+  Widget _buildTodoActions(TodoModel todo, ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TextButton.icon(
-          onPressed: () =>widget.onCompleteTodo(todo),
-          icon: const Icon(Icons.check_circle_outline, size: 15),
-          label: const Text('완료 (이력추가)', style: TextStyle(fontSize: 13)),
-          style: TextButton.styleFrom(foregroundColor: Colors.black),
+          onPressed: () => widget.onCompleteTodo(todo),
+          icon: Icon(
+            Icons.check_circle_outline,
+            size: 15,
+            color: colorScheme.primary,
+          ),
+          label: Text(
+            '완료 (이력추가)',
+            style: TextStyle(fontSize: 13, color: colorScheme.primary),
+          ),
+          style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
         ),
         TextButton.icon(
           onPressed: () => widget.onDeleteTodo(todo),
-          icon: const Icon(Icons.delete_outline, size: 15, color: Colors.red),
-          label: const Text(
+          icon: Icon(Icons.delete_outline, size: 15, color: colorScheme.error),
+          label: Text(
             '취소 (삭제)',
-            style: TextStyle(fontSize: 13, color: Colors.red),
+            style: TextStyle(fontSize: 13, color: colorScheme.error),
           ),
-          style: TextButton.styleFrom(foregroundColor: Colors.red),
+          style: TextButton.styleFrom(foregroundColor: colorScheme.error),
         ),
       ],
     );

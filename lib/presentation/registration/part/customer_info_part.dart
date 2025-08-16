@@ -50,9 +50,12 @@ class CustomerInfoPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return ItemContainer(
       height: 352,
-      backgroundColor: backgroundColor , // ✅ 배경색 적용
+      backgroundColor: backgroundColor ?? colorScheme.surfaceVariant,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         child: Column(
@@ -67,9 +70,13 @@ class CustomerInfoPart extends StatelessWidget {
                   child: NameField(
                     isReadOnly: isReadOnly,
                     nameController: nameController,
-                    textStyle: titleTextStyle, // ✅ 제목 스타일 적용
+                    textStyle: titleTextStyle ??
+                        theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
                   ),
                 ),
+                width(20),
                 SexSelector(
                   sex: sex,
                   isReadOnly: isReadOnly,
@@ -88,9 +95,7 @@ class CustomerInfoPart extends StatelessWidget {
                   ? null
                   : () async {
                 final date = await selectDate(context);
-                if (date != null) {
-                  onBirthSetPressed(date);
-                }
+                if (date != null) onBirthSetPressed(date);
               },
             ),
             height(3),
@@ -104,9 +109,7 @@ class CustomerInfoPart extends StatelessWidget {
                   ? null
                   : () async {
                 final date = await selectDate(context);
-                if (date != null) {
-                  onRegisteredDatePressed(date);
-                }
+                if (date != null) onRegisteredDatePressed(date);
               },
             ),
             height(3),
@@ -120,13 +123,34 @@ class CustomerInfoPart extends StatelessWidget {
                 minLines: 2,
                 maxLines: null,
                 scrollPhysics: const BouncingScrollPhysics(),
+                style: subtitleTextStyle ??
+                    theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                 decoration: InputDecoration(
                   labelText: '메모',
-                  labelStyle: titleTextStyle,
-                  border: const OutlineInputBorder(),
+                  labelStyle: titleTextStyle ??
+                      theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
                   isDense: true,
                   contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
+                      width: 1.5,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -136,10 +160,17 @@ class CustomerInfoPart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('소개 여부', style: titleTextStyle),
+                Text(
+                  '소개 여부',
+                  style: titleTextStyle ??
+                      theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                ),
                 Switch(
                   value: isRecommended,
                   onChanged: isReadOnly ? null : onRecommendedChanged,
+                  activeColor: colorScheme.primary,
                 ),
                 const Spacer(),
                 if (isRecommended)
@@ -147,7 +178,10 @@ class CustomerInfoPart extends StatelessWidget {
                     child: TextFormField(
                       controller: recommendedController,
                       textAlign: TextAlign.end,
-                      style: subtitleTextStyle,
+                      style: subtitleTextStyle ??
+                          theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         errorText: isRecommended &&

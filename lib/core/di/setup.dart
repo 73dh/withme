@@ -7,7 +7,7 @@ import 'package:withme/presentation/customer/customer_view_model.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
-import '../../presentation/registration_sheet/registration_view_model.dart';
+import '../../presentation/registration/registration_view_model.dart';
 import '../presentation/todo/todo_view_model.dart';
 import '../router/router.dart';
 import 'di_setup_import.dart';

@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 
 import '../../ui/core_ui_import.dart';
+// add_policy_widget.dart
+import 'package:flutter/material.dart';
+// add_policy_widget.dart
+import 'package:flutter/material.dart';
 
 class AddPolicyWidget extends StatefulWidget {
   final void Function() onTap;
   final double size;
+  final Color? iconColor; // 추가
 
-  const AddPolicyWidget({super.key, required this.onTap, this.size = 35});
+  const AddPolicyWidget({
+    super.key,
+    required this.onTap,
+    this.size = 35,
+    this.iconColor,
+  });
 
   @override
   State<AddPolicyWidget> createState() => _AddPolicyWidgetState();
@@ -15,8 +25,8 @@ class AddPolicyWidget extends StatefulWidget {
 class _AddPolicyWidgetState extends State<AddPolicyWidget>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
-  late final Animation<Color?> _colorAnimation;
-  late final Animation<double> _scaleAnimation;
+  late Animation<Color?> _colorAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
@@ -26,15 +36,6 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-
-    _colorAnimation = ColorTween(
-      begin: ColorStyles.activeSwitchColor,
-      end: ColorStyles.activeSearchButtonColor,
-    ).animate(_animationController);
-
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
   }
 
   @override
@@ -45,6 +46,18 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final iconColor = widget.iconColor ?? colorScheme.onPrimary;
+
+    _colorAnimation = ColorTween(
+      begin: colorScheme.primary,
+      end: colorScheme.primaryContainer,
+    ).animate(_animationController);
+
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -59,19 +72,19 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
                 decoration: BoxDecoration(
                   color: _colorAnimation.value,
                   shape: BoxShape.circle,
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black26,
+                      color: colorScheme.shadow.withOpacity(0.3),
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Transform.scale(
                   scale: _scaleAnimation.value,
-                  child: const Icon(
+                  child: Icon(
                     Icons.description,
-                    color: Colors.white,
+                    color: iconColor, // 전달받은 색상 사용
                     size: 24,
                   ),
                 ),

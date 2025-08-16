@@ -8,14 +8,14 @@ class PartTitle extends StatelessWidget {
   final String text;
   final double verticalPadding;
   final TextStyle? style;
-  final Color? color; // ← 추가
+  final Color? color;
 
   const PartTitle({
     super.key,
     required this.text,
     this.verticalPadding = 6,
     this.style,
-    this.color, // ← 추가
+    this.color,
   });
 
   @override

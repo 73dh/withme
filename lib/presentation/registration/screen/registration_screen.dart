@@ -12,34 +12,13 @@ import '../../../core/di/setup.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/presentation/fab/fab_overlay_manager_mixin.dart';
-import '../../../core/presentation/widget/customerRegistrationAppBar.dart';
-import '../../../core/ui/core_ui_import.dart';
-import '../../../core/utils/is_need_new_history.dart';
 import '../../../core/presentation/todo/todo_view_model.dart';
+import '../../../core/presentation/widget/customerRegistrationAppBar.dart';
+import '../../../core/utils/is_need_new_history.dart';
 import '../part/confirm_box_part.dart';
 import '../part/customer_info_part.dart';
 import '../registration_event.dart';
 import '../registration_view_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/presentation/widget/customerRegistrationAppBar.dart';
-import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
-import 'package:withme/core/utils/is_need_new_history.dart';
-import 'package:withme/domain/domain_import.dart';
-import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/core/presentation/fab/fab_overlay_manager_mixin.dart';
-import 'package:withme/core/presentation/todo/todo_view_model.dart';
-import '../registration_event.dart';
-import '../registration_view_model.dart';
-import '../part/customer_info_part.dart';
-import '../part/confirm_box_part.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final CustomerModel? customer;
@@ -56,8 +35,7 @@ class RegistrationScreen extends StatefulWidget {
   });
 
   @override
-  State<RegistrationScreen> createState() =>
-      _RegistrationScreenState();
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
@@ -299,10 +277,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       setModalState(() => _isRegistering = true);
                       final success = await _submitForm();
                       setModalState(() => _isRegistering = false);
-                      if (modalContext.mounted)
+                      if (modalContext.mounted) {
                         Navigator.of(modalContext).pop();
-                      if (success && mounted && context.mounted)
+                      }
+                      if (success && mounted && context.mounted) {
                         context.pop(true);
+                      }
                     },
                     sex: _sex,
                     birth: _birth,

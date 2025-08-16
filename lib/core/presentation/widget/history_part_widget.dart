@@ -19,7 +19,6 @@ import '../../../domain/model/history_model.dart';
 import '../../ui/core_ui_import.dart';
 import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
-
 class HistoryPartWidget extends StatelessWidget {
   final List<HistoryModel> histories;
   final void Function(List<HistoryModel> histories) onTap;
@@ -36,24 +35,19 @@ class HistoryPartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (histories.isEmpty) return const SizedBox.shrink();
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final bool showReminderAnimation = isNeedNewHistory(histories);
 
-    List<HistoryModel> displayHistories;
-    if (showReminderAnimation) {
-      // 최근 1개만 보여줌
-      displayHistories =
-          histories.length <= 1
-              ? histories
-              : histories.sublist(histories.length - 1);
-    } else {
-      // 최근 최대 2개 보여줌
-      displayHistories =
-          histories.length <= 2
-              ? histories
-              : histories.sublist(histories.length - 2);
-    }
+    // 최근 1개 또는 최대 2개 보여주기
+    List<HistoryModel> displayHistories = showReminderAnimation
+        ? [histories.last]
+        : histories.length <= 2
+        ? histories
+        : histories.sublist(histories.length - 2);
 
-    // 오래된 순으로 정렬
+    // 오래된 순 정렬
     displayHistories.sort((a, b) => a.contactDate.compareTo(b.contactDate));
 
     return GestureDetector(
@@ -68,8 +62,8 @@ class HistoryPartWidget extends StatelessWidget {
               context,
               history: displayHistories[i],
               isRecent: i == displayHistories.length - 1,
-              historyNumber:
-                  histories.length - (displayHistories.length - 1) + i,
+              historyNumber: histories.length - (displayHistories.length - 1) + i,
+              colorScheme: colorScheme,
             ),
           if (showReminderAnimation) ...[
             height(3),
@@ -80,26 +74,38 @@ class HistoryPartWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryBox(BuildContext context,{
+  Widget _buildHistoryBox(
+      BuildContext context, {
+        required HistoryModel history,
+        required bool isRecent,
+        required int historyNumber,
+        required ColorScheme colorScheme,
+      }) {
+    final theme = Theme.of(context);
 
-    required HistoryModel history,
-    required bool isRecent,
-    required int historyNumber,
-  }) {
-    final TextStyle contentStyle =
-        isRecent
-            ? Theme.of(context).textTheme.labelSmall! .copyWith(fontWeight: FontWeight.w500)
-            : Theme.of(context).textTheme.labelSmall!.copyWith(fontSize: 9, color: Colors.grey[700]);
+    final TextStyle contentStyle = isRecent
+        ? theme.textTheme.labelSmall!.copyWith(
+      fontWeight: FontWeight.w500,
+      color: colorScheme.onSurface,
+    )
+        : theme.textTheme.labelSmall!.copyWith(
+      fontSize: 9,
+      color: colorScheme.onSurfaceVariant,
+    );
 
-    final TextStyle dateStyle =
-        isRecent
-            ? Theme.of(context).textTheme.labelSmall!.copyWith (fontSize: 9, color: Colors.grey[700])
-            : Theme.of(context).textTheme.labelSmall!.copyWith(fontSize: 8, color: Colors.grey[600]);
+    final TextStyle dateStyle = isRecent
+        ? theme.textTheme.labelSmall!.copyWith(
+      fontSize: 9,
+      color: colorScheme.onSurfaceVariant,
+    )
+        : theme.textTheme.labelSmall!.copyWith(
+      fontSize: 8,
+      color: colorScheme.outline,
+    );
 
-    final Color numberColor =
-        isRecent
-            ? (sex == '남' ? ColorStyles.manColor : ColorStyles.womanColor)
-            : Colors.grey;
+    final Color numberColor = isRecent
+        ? (sex == '남' ? ColorStyles.manColor : ColorStyles.womanColor)
+        : colorScheme.outline;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,

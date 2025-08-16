@@ -13,7 +13,7 @@ import '../../presentation/auth/on_boarding/on_boarding_screen.dart';
 import '../../presentation/auth/sign_up/sign_up_screen.dart';
 import '../../presentation/auth/verity_email/verify_email_screen.dart';
 import '../../presentation/policy/screen/policy_screen.dart';
-import '../../presentation/registration_sheet/screen/registration_screen.dart';
+import '../../presentation/registration/screen/registration_screen.dart';
 import '../di/setup.dart';
 
 final authChangeNotifier = AuthChangeNotifier();

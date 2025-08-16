@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/const/size.dart';
@@ -36,7 +35,6 @@ class PolicyPart extends StatelessWidget {
     required this.onPremiumSingleTap,
     required this.onProductNameTap,
     required this.onInputPremiumTap,
-
     required this.startDate,
     required this.endDate,
     required this.onStartDateChanged,
@@ -45,22 +43,26 @@ class PolicyPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     final companyPopupItems =
         InsuranceCompany.values.skip(1).toList()
           ..sort((a, b) => a.toString().compareTo(b.toString()));
 
     return ItemContainer(
       height: 220,
+      backgroundColor: colorScheme.surfaceVariant, // theme 적용
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: IntrinsicWidth(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// 상단: 카테고리, 보험사, 상품명
+              // 상단: 카테고리, 보험사, 상품명
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildPopupButton(
                     context,
@@ -73,7 +75,12 @@ class PolicyPart extends StatelessWidget {
                             .map<PopupMenuEntry<ProductCategory>>(
                               (e) => PopupMenuItem<ProductCategory>(
                                 value: e,
-                                child: Text(e.toString()),
+                                child: Text(
+                                  e.toString(),
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
                               ),
                             )
                             .toList(),
@@ -89,7 +96,13 @@ class PolicyPart extends StatelessWidget {
                             .map<PopupMenuEntry<InsuranceCompany>>(
                               (e) => PopupMenuItem<InsuranceCompany>(
                                 value: e,
-                                child: Text(e.toString()),
+
+                                child: Text(
+                                  e.toString(),
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
                               ),
                             )
                             .toList(),
@@ -104,8 +117,7 @@ class PolicyPart extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: '상품명 입력',
                         filled: true,
-                        fillColor: Colors.grey[100],
-
+                        fillColor: colorScheme.surfaceVariant,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 10,
@@ -115,20 +127,18 @@ class PolicyPart extends StatelessWidget {
                           borderSide: BorderSide.none,
                         ),
                       ),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
                       onChanged: onProductNameTap,
-                      onSaved: (value) => productNameController.text = value!,
-                      // validator:
-                      //     (value) =>
-                      //         value == null || value.isEmpty ? '상품명 입력' : null,
                     ),
                   ),
                 ],
               ),
               height(10),
 
-              /// 하단: 납입방식, 보험료
+              // 하단: 납입방식, 보험료
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ToggleButtons(
                     isSelected: [paymentMethod == '월납', paymentMethod == '일시납'],
@@ -144,6 +154,9 @@ class PolicyPart extends StatelessWidget {
                         onPremiumSingleTap('일시납');
                       }
                     },
+                    selectedColor: colorScheme.onPrimary,
+                    fillColor: colorScheme.primary,
+                    color: colorScheme.onSurface,
                     children: const [
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 4),
@@ -166,7 +179,7 @@ class PolicyPart extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: '보험료 (예: 100,000)',
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: colorScheme.surfaceVariant,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 10,
@@ -176,29 +189,27 @@ class PolicyPart extends StatelessWidget {
                           borderSide: BorderSide.none,
                         ),
                       ),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
                       onChanged: onInputPremiumTap,
-                      onSaved: (value) => premiumController.text = value!,
-                      // validator:
-                      //     (value) =>
-                      //         value == null || value.isEmpty ? '보험료 입력' : null,
                     ),
                   ),
                 ],
               ),
               height(20),
 
-              /// 하단: 계약일 / 만기일
+              // 계약일 / 만기일
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
                       backgroundColor:
                           startDate != null
-                              ? ColorStyles.unActiveButtonColor
-                              : ColorStyles.activeButtonColor,
-                      foregroundColor: Colors.black87,
+                              ? colorScheme.surfaceVariant
+                              : colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -220,9 +231,9 @@ class PolicyPart extends StatelessWidget {
                       borderRadius: 5,
                       backgroundColor:
                           endDate != null
-                              ? ColorStyles.unActiveButtonColor
-                              : ColorStyles.activeButtonColor,
-                      foregroundColor: Colors.black87,
+                              ? colorScheme.surfaceVariant
+                              : colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -255,16 +266,20 @@ Widget _buildPopupButton(
   required void Function(String) onSelected,
   required List<PopupMenuEntry> items,
 }) {
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+  final textTheme = theme.textTheme;
+
   return Column(
     children: [
       PopupMenuButton(
-        icon: Icon(icon, color: ColorStyles.activeSwitchColor),
+        icon: Icon(icon, color: colorScheme.primary),
         onSelected: (value) => onSelected(value.toString()),
         itemBuilder: (context) => items,
       ),
       Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall,
+        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface),
         overflow: TextOverflow.ellipsis,
       ),
     ],

@@ -11,7 +11,7 @@ class CustomerPart extends StatelessWidget {
   final String insuredSex;
   final DateTime? insuredBirth;
   final void Function(DateTime?) onBirthPressed;
-  final void Function(String) onInsuredNameChanged;
+  // final void Function(String) onInsuredNameChanged;
   final void Function(String) onManChanged;
   final void Function(String) onWomanChanged;
   final void Function(DateTime?) onBirthChanged;
@@ -24,7 +24,7 @@ class CustomerPart extends StatelessWidget {
     required this.onBirthPressed,
     required this.insuredNameController,
     required this.insuredSex,
-    required this.onInsuredNameChanged,
+    // required this.onInsuredNameChanged,
     required this.onManChanged,
     required this.onWomanChanged,
     required this.onBirthChanged,
@@ -33,8 +33,12 @@ class CustomerPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return ItemContainer(
       height: 130,
+      backgroundColor: colorScheme.surfaceVariant, // 테마 기반 배경색
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -43,18 +47,23 @@ class CustomerPart extends StatelessWidget {
             policyHolderSex: policyHolderSex,
             policyHolderBirth: policyHolderBirth,
             onBirthPressed: (value) => onBirthPressed(value),
+            textStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
           height(5),
           InsuredHolderPart(
             insuredNameController: insuredNameController,
             insuredSex: insuredSex,
             insuredBirth: insuredBirth,
-            onInsuredNameChanged: onInsuredNameChanged,
+            // onInsuredNameChanged: onInsuredNameChanged,
             onManChanged: (value) => onManChanged(value),
             onWomanChanged: (value) => onWomanChanged(value),
             onBirthChanged: (value) => onBirthChanged(value),
+            textStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
-          // _insuredPart(),
         ],
       ),
     );

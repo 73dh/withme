@@ -3,12 +3,26 @@ import 'dart:async';
 import '../../../domain/model/todo_model.dart';
 import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
+import 'dart:async';
+
+import '../../../domain/model/todo_model.dart';
+import '../../ui/core_ui_import.dart';
+import '../core_presentation_import.dart';
+// stream_todo_text.dart
+import 'package:flutter/material.dart';
+import '../../../domain/model/todo_model.dart';
 
 class StreamTodoText extends StatefulWidget {
   final List<TodoModel> todoList;
   final String sex;
+  final Color? textColor;
 
-  const StreamTodoText({super.key, required this.todoList, required this.sex});
+  const StreamTodoText({
+    super.key,
+    required this.todoList,
+    required this.sex,
+    this.textColor,
+  });
 
   @override
   State<StreamTodoText> createState() => _StreamTodoTextState();
@@ -19,7 +33,6 @@ class _StreamTodoTextState extends State<StreamTodoText>
   late final AnimationController _controller;
   late final Animation<Offset> _slideAnimation;
   late final Animation<double> _fadeAnimation;
-
   int _currentIndex = 0;
 
   @override
@@ -52,15 +65,12 @@ class _StreamTodoTextState extends State<StreamTodoText>
       }
     });
 
-    if (widget.todoList.isNotEmpty) {
-      _controller.forward();
-    }
+    if (widget.todoList.isNotEmpty) _controller.forward();
   }
 
   @override
   void didUpdateWidget(covariant StreamTodoText oldWidget) {
     super.didUpdateWidget(oldWidget);
-
     if (widget.todoList.isNotEmpty &&
         (oldWidget.todoList.isEmpty || oldWidget.todoList != widget.todoList)) {
       _currentIndex = 0;
@@ -82,9 +92,14 @@ class _StreamTodoTextState extends State<StreamTodoText>
     if (widget.todoList.isEmpty) return const SizedBox.shrink();
     final currentTodo = widget.todoList[_currentIndex];
 
-    final textColor = widget.sex == '남'
-        ? ColorStyles.manColor
-        : ColorStyles.womanColor;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // 성별에 맞는 색상 지정 (ColorStyles 또는 colorScheme 활용)
+    final Color textColor = widget.textColor ??
+        (widget.sex == '남'
+            ? ColorStyles.manColor // 예: 파랑
+            : ColorStyles.womanColor); // 예: 핑크
 
     return ClipRect(
       child: SlideTransition(
@@ -93,8 +108,7 @@ class _StreamTodoTextState extends State<StreamTodoText>
           opacity: _fadeAnimation,
           child: Text(
             currentTodo.content,
-            style: TextStyle(
-              fontSize: 12,
+            style: theme.textTheme.bodySmall?.copyWith(
               color: textColor,
               fontWeight: FontWeight.bold,
             ),
@@ -106,5 +120,3 @@ class _StreamTodoTextState extends State<StreamTodoText>
     );
   }
 }
-
-

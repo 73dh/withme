@@ -30,8 +30,12 @@ class SexIconWithBirthday extends StatelessWidget {
         birth != null && isBirthdayWithin7Days(birth!);
     final int countdown = birth != null ? getBirthdayCountdown(birth!) : -1;
 
-    final double iconSize =
-    hasUpcomingBirthday && isShowDay ? size * 0.75 : size;
+    // SexIcon 원래 크기는 그대로 유지
+    final double iconSize = size;
+
+    // 케이크와 D-day 텍스트 크기는 SexIcon 크기에 비례해서 작게 설정
+    final double cakeIconSize = iconSize * 0.4;
+    final double dDayFontSize = iconSize * 0.3;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -41,28 +45,29 @@ class SexIconWithBirthday extends StatelessWidget {
           child: Image.asset(
             backgroundImagePath,
             fit: BoxFit.cover,
-            width: iconSize,
-            height: iconSize,
-            color: getSexIconColor(sex, colorScheme).withOpacity(0.6),
+            width:birth!=null? iconSize*0.7:iconSize,
+            height: birth!=null? iconSize*0.7:iconSize,
+            color: getSexIconColor(sex, colorScheme).withValues(alpha: 0.6),
           ),
         ),
         if (hasUpcomingBirthday && isShowDay) ...[
-          const SizedBox(width: 4),
+          // const SizedBox(width: 4),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.cake_rounded,
-                color: colorScheme.tertiary, // 케이크 아이콘 색상도 ColorScheme 기반
-                size: iconSize * 0.6,
+                color: Colors.redAccent,
+                size: cakeIconSize,
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 1),
               Text(
                 countdown != 0 ? 'D-$countdown' : '오늘',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(color: colorScheme.tertiary),
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: dDayFontSize,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

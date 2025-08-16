@@ -44,7 +44,7 @@ class ProspectListAppBar extends StatelessWidget
           Text(
             '${customers.length}명',
             style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface, // 강조색
+              color: colorScheme.primary, // 강조색
 
             ),
           ),
@@ -65,37 +65,26 @@ class ProspectListAppBar extends StatelessWidget
   }
 
   /// 아이콘 겹쳐진 부분 렌더링
+
   Widget _buildGenderIcons(ColorScheme colorScheme) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.1),
-            offset: const Offset(0, 0),
-            blurRadius: 4,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Image.asset(
+          IconsPath.womanIcon,
+          width: 40,
+          color: colorScheme.secondary.withOpacity(0.7),
+        ),
+        Positioned(
+          left: -13,
+          top: 0,
+          child: Image.asset(
+            IconsPath.manIcon,
+            width: 35,
+            color: colorScheme.tertiary.withOpacity(0.5),
           ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Image.asset(
-            IconsPath.womanIcon,
-            width: 40,
-            color: colorScheme.secondary.withOpacity(0.7),
-          ),
-          Positioned(
-            left: -13,
-            top: 0,
-            child: Image.asset(
-              IconsPath.manIcon,
-              width: 35,
-              color: colorScheme.tertiary.withOpacity(0.5),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

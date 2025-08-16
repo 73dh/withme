@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
+
 class TitleWidget extends StatelessWidget {
   final String title;
-  const TitleWidget({super.key, required this.title});
+  final TextStyle? textStyle; // 추가
+  const TitleWidget({super.key, required this.title, this.textStyle});
 
   @override
   Widget build(BuildContext context) {
-    return  Text(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Text(
       title,
-      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      style: textStyle ??
+          theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface,
+          ),
     );
   }
 }
+
+
