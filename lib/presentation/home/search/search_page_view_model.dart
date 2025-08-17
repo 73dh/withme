@@ -20,36 +20,56 @@ import 'enum/coming_birth.dart';
 import 'enum/no_contact_month.dart';
 import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/core/domain/enum/insurance_company.dart';
+import 'package:withme/core/domain/enum/product_category.dart';
+import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_policy_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_policy_by_name_use_case.dart';
+import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case.dart';
+import 'package:withme/presentation/home/search/search_page_event.dart';
+import 'package:withme/presentation/home/search/search_page_state.dart';
+import '../../../core/data/fire_base/user_session.dart';
+import '../../../core/di/setup.dart';
+import '../../../domain/domain_import.dart';
+import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/history_model.dart';
+import '../../../domain/model/policy_model.dart';
+import 'enum/coming_birth.dart';
+import 'enum/no_contact_month.dart';
+import 'enum/search_option.dart';
+import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
   SearchPageState _state = SearchPageState();
-
   SearchPageState get state => _state;
 
-  onEvent(SearchPageEvent event) {
-    switch (event) {
-      case FilterComingBirth():
-        _filterComingBirth(birthOption: event.birthDay);
-      case FilterUpcomingInsuranceAge():
-        _filterUpcomingInsuranceAge(insuranceAge: event.insuranceAge);
-      case FilterNoRecentHistoryCustomers():
-        _filterNoRecentHistoryCustomers(monthOption: event.month);
-      case SelectProductCategory():
-        _selectProductCategory(productCategory: event.productCategory);
-      case SelectInsuranceCompany():
-        _selectInsuranceCompany(insuranceCompany: event.insuranceCompany);
-      case FilterPolicy():
-        _filterPolicy(
-          productCategory: event.productCategory,
-          insuranceCompany: event.insuranceCompany,
-        );
-      case SelectContractMonth():
-        _selectContractMonth(
-          selectedContractMonth: event.selectedContractMonth,
-        );
+  /// 이벤트 처리
+  Future<void> onEvent(SearchPageEvent event) async {
+    if (event is FilterComingBirth) {
+      await _filterComingBirth(birthOption: event.birthDay);
+    } else if (event is FilterUpcomingInsuranceAge) {
+      await _filterUpcomingInsuranceAge(insuranceAge: event.insuranceAge);
+    } else if (event is FilterNoRecentHistoryCustomers) {
+      await _filterNoRecentHistoryCustomers(monthOption: event.month);
+    } else if (event is SelectProductCategory) {
+      _selectProductCategory(productCategory: event.productCategory);
+    } else if (event is SelectInsuranceCompany) {
+      _selectInsuranceCompany(insuranceCompany: event.insuranceCompany);
+    } else if (event is FilterPolicy) {
+      await _filterPolicy(
+        productCategory: event.productCategory,
+        insuranceCompany: event.insuranceCompany,
+      );
+    } else if (event is SelectContractMonth) {
+      _selectContractMonth(selectedContractMonth: event.selectedContractMonth);
     }
   }
 
+  /// 초기화
   void resetSearchOption() {
     _state = SearchPageState(
       customers: _state.customers,
@@ -61,26 +81,25 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 모든 데이터 가져오기
   Future<void> getAllData() async {
     final userKey = UserSession.userId;
-    if (userKey.isEmpty) {
-      debugPrint('[SearchPageViewModel] userKey is empty. Aborting data load.');
-      return;
-    }
+    if (userKey.isEmpty) return;
 
     _state = state.copyWith(isLoadingAllData: true);
     notifyListeners();
+
     final stopwatch = Stopwatch()..start();
 
     final customersAllData = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(userKey: UserSession.userId),
+      usecase: GetAllDataUseCase(userKey: userKey),
     );
     final customers = List<CustomerModel>.from(customersAllData);
 
-    // Step 1: 먼저 policies만 뽑음
+    // policies만 뽑기
     final policies = await compute(_extractPolicies, customers);
 
-    // Step 2: 병렬 작업
+    // 병렬 작업: histories, months, productCategories, insuranceCompanies
     final results = await Future.wait([
       compute(_extractHistories, customers),
       compute(_extractContractMonths, customers),
@@ -105,8 +124,7 @@ class SearchPageViewModel with ChangeNotifier {
     );
   }
 
-
-
+  /// 최근 연락 없는 고객 필터
   Future<void> _filterNoRecentHistoryCustomers({
     required NoContactMonth monthOption,
   }) async {
@@ -122,10 +140,10 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 다가오는 생일 필터
   Future<void> _filterComingBirth({required ComingBirth birthOption}) async {
     final result = await FilterComingBirthUseCase.call(state.customers);
     final filtered = result[birthOption] ?? [];
-
     _state = state.copyWith(
       filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.comingBirth,
@@ -134,12 +152,12 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 예정 보험 나이 필터
   Future<void> _filterUpcomingInsuranceAge({
     required UpcomingInsuranceAge insuranceAge,
   }) async {
     final result = await FilterUpcomingInsuranceUseCase.call(state.customers);
     final filtered = result[insuranceAge] ?? [];
-
     _state = state.copyWith(
       filteredCustomers: List.from(filtered),
       currentSearchOption: SearchOption.upcomingInsuranceAge,
@@ -148,22 +166,26 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 계약 월 선택
   void _selectContractMonth({required String selectedContractMonth}) {
     _state = state.copyWith(selectedContractMonth: selectedContractMonth);
     notifyListeners();
   }
 
+  /// 상품 카테고리 선택
   void _selectProductCategory({required ProductCategory productCategory}) {
     _state = state.copyWith(productCategory: productCategory);
     notifyListeners();
   }
 
+  /// 보험사 선택
   void _selectInsuranceCompany({required InsuranceCompany insuranceCompany}) {
     _state = state.copyWith(insuranceCompany: insuranceCompany);
     notifyListeners();
   }
 
-  void _filterPolicy({
+  /// 정책 필터
+  Future<void> _filterPolicy({
     required ProductCategory productCategory,
     required InsuranceCompany insuranceCompany,
   }) async {
@@ -180,12 +202,12 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  /// 이름으로 정책 검색
   void filterPolicyByName(String keyword) {
     final filtered = FilterPolicyByNameUseCase.call(
       policies: state.policies,
       keyword: keyword,
     );
-
     _state = state.copyWith(
       filteredPolicies: filtered,
       currentSearchOption: SearchOption.filterPolicy,
@@ -199,7 +221,7 @@ class SearchPageViewModel with ChangeNotifier {
   }
 }
 
-// compute에 사용될 함수들
+// ================= compute helper =================
 List<PolicyModel> _extractPolicies(List<CustomerModel> customers) =>
     customers.expand((e) => e.policies).toList();
 
@@ -207,39 +229,31 @@ List<HistoryModel> _extractHistories(List<CustomerModel> customers) =>
     customers.expand((e) => e.histories).toList();
 
 List<String> _extractContractMonths(List<CustomerModel> customers) {
-  final months =
-      customers
-          .expand((e) => e.policies)
-          .map((policy) => policy.startDate)
-          .whereType<DateTime>()
-          .map(
-            (date) => '${date.year}-${date.month.toString().padLeft(2, '0')}',
-          )
-          .toSet()
-          .toList();
+  final months = customers
+      .expand((e) => e.policies)
+      .map((policy) => policy.startDate)
+      .whereType<DateTime>()
+      .map((date) => '${date.year}-${date.month.toString().padLeft(2, '0')}')
+      .toSet()
+      .toList();
   months.sort();
   return months;
-
-
 }
 
 List<String> _extractProductCategories(List<PolicyModel> policies) {
   final categories = policies
-
-      .map((policy) => policy.productCategory)
+      .map((policy) => policy.productCategory.toString())
       .toSet()
       .toList();
-
-  categories.sort((a, b) => a.toString().compareTo(b.toString()));
+  categories.sort();
   return categories;
 }
 
 List<String> _extractInsuranceCompanies(List<PolicyModel> policies) {
   final companies = policies
-      .map((policy) => policy.insuranceCompany)
+      .map((policy) => policy.insuranceCompany.toString())
       .toSet()
       .toList();
-
-  companies.sort((a, b) => a.toString().compareTo(b.toString()));
+  companies.sort();
   return companies;
 }

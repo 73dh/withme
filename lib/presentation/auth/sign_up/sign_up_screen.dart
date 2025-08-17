@@ -7,7 +7,6 @@ import 'package:withme/core/presentation/widget/show_agreement_dialog.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/theme/theme.dart';
 
-import '../../../core/presentation/components/temporary/text_theme_font_size_pop_up.dart';
 import '../../../core/router/router_import.dart';
 import '../../../core/ui/core_ui_import.dart';
 import 'package:firebase_auth/firebase_auth.dart';

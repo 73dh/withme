@@ -40,23 +40,33 @@ class CustomMonthlyTable extends StatelessWidget {
       return '$count';
     }).toList();
 
+    final headerTextStyle = (textStyle ?? theme.textTheme.bodyMedium)?.copyWith(
+      color: colorScheme.onPrimaryContainer,
+      fontWeight: FontWeight.w600,
+    );
+
+    final rowTextStyle = textStyle ?? theme.textTheme.bodyMedium;
+
     final rows = <TableRow>[
+      // 헤더 행
       renderTableRow(
         cells: ['구분', ...sortedKeys],
         isHeader: true,
-        textStyle: textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-        backgroundColor: colorScheme.surfaceVariant, // M3 surfaceVariant 적용
+        textStyle: headerTextStyle,
+        backgroundColor: colorScheme.primaryContainer,
       ),
+      // 가망고객 행
       renderTableRow(
         cells: ['가망고객', ...prospectData],
-        textStyle: textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-        backgroundColor: colorScheme.surface, // M3 surface 적용
+        textStyle: rowTextStyle,
+        backgroundColor: colorScheme.surfaceVariant.withValues(alpha: 0.8),
         isBarProspect: true,
       ),
+      // 총 계약건수 행
       renderTableRow(
         cells: ['총 계약건수', ...contractData],
-        textStyle: textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-        backgroundColor: colorScheme.surface, // M3 surface 적용
+        textStyle: rowTextStyle,
+        backgroundColor: colorScheme.surfaceVariant.withValues(alpha: 0.8),
         isBarContract: true,
       ),
     ];

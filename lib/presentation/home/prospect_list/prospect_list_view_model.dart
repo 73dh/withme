@@ -13,6 +13,8 @@ import '../../../core/presentation/fab/fab_view_model_interface.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
 
+
+
 class ProspectListViewModel
     with ChangeNotifier
     implements FabViewModelInterface {

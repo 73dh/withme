@@ -1,16 +1,17 @@
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../domain/model/customer_model.dart';
+import '../components/render_table.dart';
+import '../components/render_table_cell_text.dart';
 import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/render_table_cell_text.dart';
-
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
-
+import '../components/render_table_cell_text.dart';
 import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/render_table_cell_text.dart';
-
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
+import '../components/render_table_cell_text.dart';
 
 class CustomSummeryTable extends StatelessWidget {
   final double cellWidth;
@@ -18,11 +19,7 @@ class CustomSummeryTable extends StatelessWidget {
   final List<CustomerModel> prospect;
   final List<CustomerModel> contract;
 
-  // 추가: 텍스트 스타일과 셀 색상 외부에서 전달 가능
   final TextStyle? textStyle;
-  final Color? cellColor;
-  final Color? headerColor;
-  final TextStyle? headerTextStyle;
 
   const CustomSummeryTable({
     super.key,
@@ -31,40 +28,41 @@ class CustomSummeryTable extends StatelessWidget {
     required this.prospect,
     required this.contract,
     this.textStyle,
-    this.cellColor,
-    this.headerColor,
-    this.headerTextStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final defaultTextStyle = textStyle ?? theme.textTheme.bodyMedium;
-    final defaultCellColor = cellColor ?? theme.colorScheme.surfaceVariant;
-    final defaultHeaderColor = headerColor ?? theme.colorScheme.primaryContainer;
-    final defaultHeaderTextStyle = headerTextStyle ??
-        theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onPrimaryContainer,
-          // fontWeight: FontWeight.bold,
-        );
+    final colorScheme = theme.colorScheme;
+
+    // 제목행 색상
+    final headerColor = colorScheme.primaryContainer;
+    final headerTextStyle = (textStyle ?? theme.textTheme.bodyMedium)?.copyWith(
+      color: colorScheme.onPrimaryContainer,
+      fontWeight: FontWeight.w600,
+    );
+
+    // 데이터행 색상
+    final rowColor = colorScheme.surface.withValues(alpha: 0.8);
+    final defaultTextStyle = textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface);
 
     return RenderTable(
       columnWidths: {for (int i = 0; i < 5; i++) i: FixedColumnWidth(cellWidth)},
       tableRows: [
-        // 헤더
+        // 헤더 행
         TableRow(
-          decoration: BoxDecoration(color: defaultHeaderColor),
+          decoration: BoxDecoration(color: headerColor),
           children: [
-            RenderTableCellText('구분', isHeader: true, style: defaultHeaderTextStyle),
-            RenderTableCellText('전체', isHeader: true, style: defaultHeaderTextStyle),
-            RenderTableCellText('가망고객', isHeader: true, style: defaultHeaderTextStyle),
-            RenderTableCellText('계약자', isHeader: true, style: defaultHeaderTextStyle),
-            RenderTableCellText('총계약', isHeader: true, style: defaultHeaderTextStyle),
+            RenderTableCellText('구분', isHeader: true, style: headerTextStyle),
+            RenderTableCellText('전체', isHeader: true, style: headerTextStyle),
+            RenderTableCellText('가망고객', isHeader: true, style: headerTextStyle),
+            RenderTableCellText('계약자', isHeader: true, style: headerTextStyle),
+            RenderTableCellText('총계약', isHeader: true, style: headerTextStyle),
           ],
         ),
         // 데이터 행
         TableRow(
-          decoration: BoxDecoration(color: defaultCellColor),
+          decoration: BoxDecoration(color: rowColor),
           children: [
             RenderTableCellText('고객/건', style: defaultTextStyle),
             RenderTableCellText('${total.length}명', style: defaultTextStyle),

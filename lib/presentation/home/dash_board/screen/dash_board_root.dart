@@ -142,17 +142,13 @@ class _DashBoardRootState extends State<DashBoardRoot>
       textSpans: [
         TextSpan(
           text: '계정 및 데이터가 모두 삭제됩니다.\n',
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         TextSpan(
           text: '탈퇴 후에는 복구할 수 없습니다.',
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.error,
             fontWeight: FontWeight.bold,
           ),
@@ -207,11 +203,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
 
   /// Excel 문의
   void _handleExcelMessage(BuildContext context) {
-    showInquiryConfirmDialog(
-      context,
-      title: '유료회원용',
-      content: '유료회원 문의 바랍니다.',
-    );
+    showInquiryConfirmDialog(context, title: '유료회원용', content: '유료회원 문의 바랍니다.');
   }
 
   /// 정보 다이얼로그
@@ -230,17 +222,21 @@ class _DashBoardRootState extends State<DashBoardRoot>
               border: Border.all(color: colorScheme.outline, width: 1.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                  child: styledInfoText(context), // RichText 지원
-                ),
-                height(10),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 20,
+                    ),
+                    child: styledInfoText(context), // RichText 지원
+                  ),
+                  height(10),
+                ],
+              ),
             ),
           ),
         );
@@ -248,210 +244,3 @@ class _DashBoardRootState extends State<DashBoardRoot>
     );
   }
 }
-
-//
-// class DashBoardRoot extends StatefulWidget {
-//   const DashBoardRoot({super.key});
-//
-//   @override
-//   State<DashBoardRoot> createState() => _DashBoardRootState();
-// }
-//
-// class _DashBoardRootState extends State<DashBoardRoot>
-//     with SingleTickerProviderStateMixin {
-//   late final AnimationController _animationController;
-//   final viewModel = getIt<DashBoardViewModel>();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     viewModel.loadData();
-//     _animationController = AnimationController(
-//       vsync: this,
-//       duration: AppDurations.duration300,
-//     );
-//   }
-//
-//   @override
-//   void dispose() {
-//     if (viewModel.state.menuStatus == MenuStatus.isOpened) {
-//       viewModel.forceCloseMenu();
-//     }
-//     _animationController.dispose();
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-//     final colorScheme = theme.colorScheme;
-//     final textTheme = theme.textTheme;
-//
-//     return SafeArea(
-//       child: ListenableBuilder(
-//         listenable: viewModel,
-//         builder: (context, widget) {
-//           return viewModel.state.isLoading
-//               ? Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               AnimatedText(
-//                 text: '통계 작성중',
-//                 style: textTheme.titleMedium?.copyWith(
-//                   color: colorScheme.primary,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//               height(20),
-//               const MyCircularIndicator(),
-//             ],
-//           )
-//               : Stack(
-//             children: [
-//               Container(
-//                 color: colorScheme.background,
-//                 child: DashBoardPage(
-//                   viewModel: viewModel,
-//                   animationController: _animationController,
-//                   onMenuTap: () =>
-//                       viewModel.toggleMenu(_animationController),
-//                 ),
-//               ),
-//               DashBoardSideMenu(
-//                 viewModel: viewModel,
-//                 onLogOutTap: _onLogOutTap,
-//                 onSignOutTap: _onSignOutTap,
-//                 onInquiryTap: _onInquiryTap,
-//                 onExcelMessageTap: _onExcelMessageTap,
-//                 onInfoTap: _onInfoTap,
-//               ),
-//             ],
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//   /// Logout
-//   void _onLogOutTap() async {
-//     final result = await showInquiryConfirmDialog(
-//       context,
-//       title: 'Logout',
-//       content: 'Logout 하시겠습니까?',
-//     );
-//     if (result == true && mounted) {
-//       viewModel.logout(context);
-//     }
-//   }
-//
-//   /// 회원탈퇴
-//   void _onSignOutTap() async {
-//     await showConfirmDialog(
-//       context,
-//       textSpans: [
-//         TextSpan(
-//           text: '계정 및 데이터가 모두 삭제됩니다.\n',
-//           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-//             color: Theme.of(context).colorScheme.onSurface,
-//           ),
-//         ),
-//         TextSpan(
-//           text: '탈퇴 후에는 복구할 수 없습니다.',
-//           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-//             color: Theme.of(context).colorScheme.error,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//       ],
-//       confirmButtonText: '회원탈퇴',
-//       onConfirm: () async {
-//         final credentials = await showReauthDialog(
-//           context,
-//           email: viewModel.state.userInfo?.email ?? '',
-//         );
-//         if (credentials == null) return;
-//
-//         try {
-//           if (mounted) {
-//             await viewModel.signOut(context, credentials);
-//           }
-//           if (mounted) {
-//             showOverlaySnackBar(
-//               context,
-//               '계정이 삭제되었습니다.',
-//               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-//               textColor: Theme.of(context).colorScheme.onPrimaryContainer,
-//             );
-//           }
-//         } on FirebaseAuthException catch (e) {
-//           final error = SignOutError.fromCode(e.code);
-//           if (mounted) {
-//             showOverlaySnackBar(
-//               context,
-//               error.toString(),
-//               backgroundColor: Theme.of(context).colorScheme.errorContainer,
-//               textColor: Theme.of(context).colorScheme.onErrorContainer,
-//             );
-//           }
-//         }
-//       },
-//     );
-//   }
-//
-//   /// 문의
-//   void _onInquiryTap() async {
-//     final result = await showInquiryConfirmDialog(
-//       context,
-//       title: '유료회원 문의',
-//       content: '문의 메일을 보내시겠습니까?',
-//     );
-//     if (result == true && mounted) {
-//       viewModel.sendInquiryEmail(context);
-//     }
-//   }
-//
-//   /// Excel 문의
-//   void _onExcelMessageTap() {
-//     showInquiryConfirmDialog(
-//       context,
-//       title: '유료회원용',
-//       content: '유료회원 문의 바랍니다.',
-//     );
-//   }
-//
-//   /// 정보 다이얼로그
-//   void _onInfoTap() {
-//     final theme = Theme.of(context);
-//     final colorScheme = theme.colorScheme;
-//
-//     showDialog(
-//       context: context,
-//       builder: (context) {
-//         return Dialog(
-//           backgroundColor: Colors.transparent,
-//           child: Container(
-//             padding: const EdgeInsets.all(12),
-//             decoration: BoxDecoration(
-//               color: colorScheme.surface,
-//               border: Border.all(color: colorScheme.outline, width: 1.2),
-//               borderRadius: BorderRadius.circular(12),
-//             ),
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Padding(
-//                   padding:
-//                   const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-//                   child: styledInfoText(context), // RichText 가능
-//                 ),
-//                 height(10),
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
-//

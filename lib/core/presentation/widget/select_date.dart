@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../ui/core_ui_import.dart';
 
 Future<DateTime?> selectDate(BuildContext context, {DateTime? initial}) {
   final DateTime today = DateTime.now();
   final theme = Theme.of(context);
   final colorScheme = theme.colorScheme;
-  final textTheme = theme.textTheme;
+  final isDark = theme.brightness == Brightness.dark;
+
+  // 다크/라이트 대비 색 지정
+  final textColor = isDark ? Colors.white : Colors.black87;
+  final hintColor = isDark ? Colors.white70 : Colors.black54;
 
   return showDatePicker(
     context: context,
@@ -17,24 +20,35 @@ Future<DateTime?> selectDate(BuildContext context, {DateTime? initial}) {
       return Theme(
         data: theme.copyWith(
           colorScheme: colorScheme.copyWith(
-            primary: ColorStyles.activeButtonColor, // 포커스 색상만 override
-            onPrimary: Colors.white,                // 버튼 텍스트 색
-            onSurface: colorScheme.onSurface,       // 일반 텍스트 색
+            primary: colorScheme.primary, // 선택/포커스 색
+            onPrimary: Colors.white, // 선택된 날짜 글자
+            surface: colorScheme.surface, // 다이얼로그 배경
+            onSurface: textColor, // 일반 텍스트, 입력 글자
           ),
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
-              foregroundColor: colorScheme.primary,
-              textStyle: textTheme.labelLarge,
+              foregroundColor: colorScheme.primary, // 확인/취소 버튼
             ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            hintStyle: TextStyle(color: hintColor),
+            labelStyle: TextStyle(color: textColor),
+          ),
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: colorScheme.primary,
+            selectionColor: colorScheme.primary.withOpacity(0.3),
+            selectionHandleColor: colorScheme.primary,
+          ),
+          textTheme: theme.textTheme.apply(
+            bodyColor: textColor,
+            displayColor: textColor,
           ),
         ),
         child: Builder(
           builder: (context) {
             return Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 380, // 최대 너비 제한 (선택)
-                ),
+                constraints: const BoxConstraints(maxWidth: 380),
                 child: Dialog(
                   insetPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -43,10 +57,7 @@ Future<DateTime?> selectDate(BuildContext context, {DateTime? initial}) {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: IntrinsicHeight(
-                    // 내부 높이에 맞춰 다이얼로그 크기 조정
-                    child: child!,
-                  ),
+                  child: IntrinsicHeight(child: child!),
                 ),
               ),
             );

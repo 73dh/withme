@@ -5,24 +5,43 @@ import '../core_presentation_import.dart';
 import 'package:withme/core/presentation/components/common_confirm_dialog.dart';
 import '../core_presentation_import.dart';
 
+import 'package:withme/core/presentation/components/common_confirm_dialog.dart';
+import '../core_presentation_import.dart';
+
 Future<bool?> showConfirmDialog(
     BuildContext context, {
-       String? text,
-       List<TextSpan>? textSpans,
+      String? text,
+      List<TextSpan>? textSpans,
       String? confirmButtonText,
       String? cancelButtonText,
-      required Future<void> Function()? onConfirm,
+      Future<void> Function()? onConfirm,
     }) {
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+
   return showDialog<bool>(
     context: context,
-    barrierDismissible: false, // 바깥 클릭 시 닫히지 않음
-    builder: (context) => CommonConfirmDialog(
-      text: text??'',
-      textSpans:textSpans??[],
+    barrierDismissible: false,
+    builder: (dialogContext) => CommonConfirmDialog(
+      text: text ?? '',
+      textSpans: textSpans ?? [],
       confirmButtonText: confirmButtonText ?? '확인',
       cancelButtonText: cancelButtonText ?? '취소',
-      onConfirm: onConfirm ?? () async {},
+      onConfirm: () async {
+        if (onConfirm != null) {
+          await onConfirm();
+        }
+        // ✅ 다이얼로그만 닫힘
+        if(dialogContext.mounted){
+
+        Navigator.of(dialogContext).pop(true);
+        }
+      },
+      backgroundColor: colorScheme.surface,
+      confirmButtonColor: colorScheme.primary,
+      cancelButtonColor: colorScheme.onSurface.withOpacity(0.12),
+      confirmTextColor: colorScheme.onPrimary,
+      cancelTextColor: colorScheme.onSurface,
     ),
   );
 }
-

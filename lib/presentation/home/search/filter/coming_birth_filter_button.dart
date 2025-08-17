@@ -6,6 +6,12 @@ import 'package:withme/presentation/home/search/search_page_view_model.dart';
 import '../../../../core/presentation/components/render_filled_button.dart';
 import '../../../../core/ui/color/color_style.dart';
 import '../search_page_event.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/search/enum/coming_birth.dart';
+import 'package:withme/presentation/home/search/enum/search_option.dart';
+import 'package:withme/presentation/home/search/search_page_view_model.dart';
+import '../../../../core/presentation/components/render_filled_button.dart';
+import '../search_page_event.dart';
 
 class ComingBirthFilterButton extends StatelessWidget {
   final SearchPageViewModel viewModel;
@@ -14,20 +20,26 @@ class ComingBirthFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final comingBirth = viewModel.state.comingBirth;
     final isActive =
         viewModel.state.currentSearchOption == SearchOption.comingBirth;
 
-    final menuItems =
-    ComingBirth.values
-        .map(
-          (menu) =>
-          PopupMenuItem<ComingBirth>(
-            value: menu,
-            child: Text(menu.toString()),
+    final menuItems = ComingBirth.values.map(
+          (menu) {
+        return PopupMenuItem<ComingBirth>(
+          value: menu,
+          child: Text(
+            menu.toString(),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
-    )
-        .toList();
+        );
+      },
+    ).toList();
 
     return RenderFilledButton(
       text: '$comingBirth',
@@ -42,10 +54,12 @@ class ComingBirthFilterButton extends StatelessWidget {
           SearchPageEvent.filterComingBirth(birthDay: comingBirth),
         );
       },
-      backgroundColor:
-      isActive
-          ? ColorStyles.activeSearchButtonColor
-          : ColorStyles.unActiveSearchButtonColor,
+      backgroundColor: isActive
+          ? colorScheme.primaryContainer
+          : colorScheme.surfaceContainerHighest,
+      foregroundColor: isActive
+          ? colorScheme.onPrimaryContainer
+          : colorScheme.onSurfaceVariant,
       borderRadius: 10,
     );
   }

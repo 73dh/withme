@@ -84,93 +84,112 @@ class _CustomerListPageState extends State<CustomerListPage>
       child: SafeArea(
         child: AnimatedBuilder(
           animation: viewModel,
-          builder: (context, _) => StreamBuilder<List<CustomerModel>>(
-            stream: viewModel.cachedCustomers,
-            builder: (context, snapshot) {
-              final data = snapshot.data ?? [];
-              var filtered = data.where((e) => e.policies.isNotEmpty).toList();
+          builder:
+              (context, _) => StreamBuilder<List<CustomerModel>>(
+                stream: viewModel.cachedCustomers,
+                builder: (context, snapshot) {
+                  final data = snapshot.data ?? [];
+                  var filtered =
+                      data.where((e) => e.policies.isNotEmpty).toList();
 
-              if (_searchText.isNotEmpty) {
-                filtered = filtered
-                    .where((e) => e.name.contains(_searchText.trim()))
-                    .toList();
-              }
+                  if (_searchText.isNotEmpty) {
+                    filtered =
+                        filtered
+                            .where((e) => e.name.contains(_searchText.trim()))
+                            .toList();
+                  }
 
-              if (_showInactiveOnly) {
-                final managePeriodDays = getIt<UserSession>().managePeriodDays;
-                final now = DateTime.now();
-                filtered = filtered.where((e) {
-                  final latest = e.histories
-                      .map((h) => h.contactDate)
-                      .fold<DateTime?>(null, (prev, date) =>
-                  prev == null || date.isAfter(prev) ? date : prev);
-                  return latest == null ||
-                      latest
-                          .add(Duration(days: managePeriodDays))
-                          .isBefore(now);
-                }).toList();
-              }
+                  if (_showInactiveOnly) {
+                    final managePeriodDays =
+                        getIt<UserSession>().managePeriodDays;
+                    final now = DateTime.now();
+                    filtered =
+                        filtered.where((e) {
+                          final latest = e.histories
+                              .map((h) => h.contactDate)
+                              .fold<DateTime?>(
+                                null,
+                                (prev, date) =>
+                                    prev == null || date.isAfter(prev)
+                                        ? date
+                                        : prev,
+                              );
+                          return latest == null ||
+                              latest
+                                  .add(Duration(days: managePeriodDays))
+                                  .isBefore(now);
+                        }).toList();
+                  }
 
-              return Scaffold(
-                backgroundColor: colorScheme.surface,
-                appBar: CustomerListAppBar(
-                  backgroundColor: colorScheme.surface, // AppBar 색상
-                  foregroundColor: colorScheme.onSurface, // 텍스트/아이콘 색상
-                  count: filtered.length,
-                  onSearch: (text) => setState(() => _searchText = text),
-                  filterBarExpanded: filterBarExpanded,
-                  onToggleFilterBar: _toggleFilterBar,
-                ),
-                body: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizeTransitionFilterBar(
-                      heightFactor: heightFactor,
-                      child: InactiveAndUrgentFilterBar(
-                        backgroundColor: colorScheme.surfaceVariant,
-                        iconColor: colorScheme.primary,
-                        textColor: colorScheme.onSurfaceVariant,
-                        showInactiveOnly: _showInactiveOnly,
-                        onInactiveToggle: (val) =>
-                            setState(() => _showInactiveOnly = val),
-                        inactiveCount: viewModel.inactiveCount,
-                        showTodoOnly: viewModel.showTodoOnly,
-                        onTodoToggle: (val) =>
-                            viewModel.updateShowTodoOnly(val),
-                        todoCount: viewModel.todoCount,
-                      ),
+                  return Scaffold(
+                    backgroundColor: colorScheme.surface,
+                    appBar: CustomerListAppBar(
+                      backgroundColor: colorScheme.surface,
+                      // AppBar 색상
+                      foregroundColor: colorScheme.onSurface,
+                      // 텍스트/아이콘 색상
+                      count: filtered.length,
+                      onSearch: (text) => setState(() => _searchText = text),
+                      filterBarExpanded: filterBarExpanded,
+                      onToggleFilterBar: _toggleFilterBar,
                     ),
-                    const SizedBox(height: 5),
-                    Expanded(
-                      child: _CustomerListView(
-                        customers: filtered,
-                        onTap: (customer) async {
-                          setIsProcessActive(true);
-                          setFabCanBeShown(false);
+                    body: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizeTransitionFilterBar(
+                          heightFactor: heightFactor,
+                          child: InactiveAndUrgentFilterBar(
+                            backgroundColor: colorScheme.surfaceVariant,
+                            iconColor: colorScheme.primary,
+                            textColor: colorScheme.onSurfaceVariant,
+                            showInactiveOnly: _showInactiveOnly,
+                            onInactiveToggle:
+                                (val) =>
+                                    setState(() => _showInactiveOnly = val),
+                            inactiveCount: viewModel.inactiveCount,
+                            showTodoOnly: viewModel.showTodoOnly,
+                            onTodoToggle:
+                                (val) => viewModel.updateShowTodoOnly(val),
+                            todoCount: viewModel.todoCount,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Expanded(
+                          child: _CustomerListView(
+                            customers: filtered,
+                            onTap: (customer) async {
+                              setIsProcessActive(true);
+                              setFabCanBeShown(false);
 
-                          await showBottomSheetWithDraggable(
-                            context: context,
-                            builder: (scrollController) => CustomerScreen(customer: customer),
-                            backgroundColor: Theme.of(context).colorScheme.surface, // 바텀시트 배경 적용
-                            onClosed: () async {
-                              setIsProcessActive(false);
-                              await viewModel.fetchData(force: true);
-                              await Future.delayed(const Duration(milliseconds: 200));
-                              if (!mounted) return;
-                              setFabCanBeShown(true);
+                              await showBottomSheetWithDraggable(
+                                context: context,
+                                builder:
+                                    (scrollController) =>
+                                        CustomerScreen(customer: customer),
+                                backgroundColor:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.surface, // 바텀시트 배경 적용
+                                onClosed: () async {
+                                  setIsProcessActive(false);
+                                  await viewModel.fetchData(force: true);
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 200),
+                                  );
+                                  if (!mounted) return;
+                                  setFabCanBeShown(true);
+                                },
+                              );
                             },
-                          );
-                        },
-                        viewModel: viewModel,
-                        setFabCanBeShown: setFabCanBeShown,
-                      )
-                      ,
+                            viewModel: viewModel,
+                            setFabCanBeShown: setFabCanBeShown,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  );
+                },
+              ),
         ),
       ),
     );

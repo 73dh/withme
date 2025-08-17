@@ -10,6 +10,18 @@ import '../../../../core/presentation/components/part_title.dart';
 import 'coming_birth_filter_button.dart';
 import 'no_contact_filter_button.dart';
 
+import 'package:flutter/material.dart';
+import 'package:withme/core/presentation/core_presentation_import.dart';
+import 'package:withme/presentation/home/search/components/policy_filter_button.dart';
+import 'package:withme/presentation/home/search/filter/search_by_name_filter_button.dart';
+import 'package:withme/presentation/home/search/filter/upcoming_insurance_age_filter_button.dart';
+import 'package:withme/presentation/home/search/search_page_view_model.dart';
+
+import '../../../../core/presentation/components/part_box.dart';
+import '../../../../core/presentation/components/part_title.dart';
+import 'coming_birth_filter_button.dart';
+import 'no_contact_filter_button.dart';
+
 class FilterBox extends StatelessWidget {
   final SearchPageViewModel viewModel;
   final ScrollController controller;
@@ -28,19 +40,23 @@ class FilterBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return ListView(
       controller: controller,
       children: [
-        _buildDragHandle(),
+        _buildDragHandle(colorScheme),
         const SizedBox(height: 17),
         PartTitle(
           text: '고객조회',
           verticalPadding: 6,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: textTheme.titleMedium?.copyWith(
             fontStyle: FontStyle.italic,
-            fontWeight: FontWeight.bold, // 강조를 원하면 추가
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface,
           ),
-          color: Theme.of(context).colorScheme.onSurface,
         ),
         ItemContainer(
           height: 60,
@@ -51,59 +67,60 @@ class FilterBox extends StatelessWidget {
               Expanded(child: ComingBirthFilterButton(viewModel: viewModel)),
               const SizedBox(width: 5),
               Expanded(
-                child: UpcomingInsuranceAgeFilterButton(viewModel: viewModel),
-              ),
+                  child: UpcomingInsuranceAgeFilterButton(viewModel: viewModel)),
             ],
           ),
         ),
         const SizedBox(height: 14),
-        _buildSearchByName(context),
+        _buildSearchByName(context, colorScheme, textTheme),
         ItemContainer(
           height: 60,
           child: PolicyFilterButton(viewModel: viewModel),
         ),
-        // PartBox(child: PolicyFilterButton(viewModel: viewModel)),
       ],
     );
   }
 
-  Widget _buildDragHandle() {
+  Widget _buildDragHandle(ColorScheme colorScheme) {
     return Center(
       child: Container(
         width: 40,
         height: 5,
         decoration: BoxDecoration(
-          color: Colors.grey[400],
+          color: colorScheme.onSurfaceVariant.withOpacity(0.4),
           borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
   }
 
-  Widget _buildSearchByName(BuildContext context) {
+  Widget _buildSearchByName(
+      BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
     return Row(
       children: [
-         Expanded(child:  PartTitle(
-          text: '계약조회',
-          verticalPadding: 6,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontStyle: FontStyle.italic,
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: PartTitle(
+            text: '계약조회',
+            verticalPadding: 6,
+            style: textTheme.titleMedium?.copyWith(
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
-          color: Theme.of(context).colorScheme.onSurface,
-        )),
+        ),
         if (isSearchingByName)
           SearchByNameFilterButton(
             viewModel: viewModel,
             focusNode: searchFocusNode,
           ),
-
         GestureDetector(
           onTap: onToggleSearch,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6),
             child: Icon(
               isSearchingByName ? Icons.close : Icons.person_search_outlined,
+              color: colorScheme.primary,
             ),
           ),
         ),

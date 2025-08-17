@@ -1,7 +1,6 @@
-import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
 import '../core_presentation_import.dart';
-import '../../ui/core_ui_import.dart';
+
 import '../../utils/core_utils_import.dart';
 import '../core_presentation_import.dart';
 
@@ -9,50 +8,57 @@ class InsuranceAgeWidget extends StatelessWidget {
   final int difference;
   final bool isUrgent;
   final DateTime insuranceChangeDate;
+  final ColorScheme colorScheme;
 
   const InsuranceAgeWidget({
     super.key,
     required this.difference,
     required this.isUrgent,
     required this.insuranceChangeDate,
+    required this.colorScheme,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     final bool isFuture = difference >= 0;
 
     return Row(
+      mainAxisSize: MainAxisSize.min, // Row 최소 폭만 차지
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
+        Flexible(
+          child: Text(
+            '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        width(6),
-        Text(
-          isFuture ? '(D-$difference)' : '(D+${difference.abs()})',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: isFuture
-                ? colorScheme.primary   // 미래 → 강조 색
-                : colorScheme.onSurface, // 지난 날짜 → 기본 텍스트 색
-            fontWeight: FontWeight.normal,
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            isFuture ? '(D-$difference)' : '(D+${difference.abs()})',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+              color: isFuture ? colorScheme.primary : colorScheme.onSurface,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         if (isFuture && isUrgent) ...[
-          width(4),
-          RotatingDots(
-            size: 15,
-            dotBaseSize: 4,
-            dotPulseRange: 2,
-            // ✅ theme 기반 색상 적용
-            colors: [
-              colorScheme.error,
-              colorScheme.primary,
-            ],
+          const SizedBox(width: 4),
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: RotatingDots(
+              size: 15,
+              dotBaseSize: 4,
+              dotPulseRange: 2,
+              colors: [colorScheme.error, colorScheme.primary],
+            ),
           ),
         ],
       ],

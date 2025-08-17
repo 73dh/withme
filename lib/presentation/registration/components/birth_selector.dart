@@ -29,7 +29,10 @@ class BirthSelector extends StatelessWidget {
           children: [
             Text(
               '생년월일 ${isReadOnly ? '' : '(선택)'}',
-              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const Spacer(),
             if (birth != null && !isReadOnly)
@@ -48,12 +51,18 @@ class BirthSelector extends StatelessWidget {
               width: 120,
               child: RenderFilledButton(
                 width: 100,
-                backgroundColor: birth != null
-                    ? colorScheme.surfaceVariant
-                    : colorScheme.primary,
-                foregroundColor: birth != null
-                    ? colorScheme.onSurfaceVariant
-                    : colorScheme.onPrimary,
+                backgroundColor:
+                    birth != null
+                        ? colorScheme.surfaceContainerHighest
+                        : colorScheme.primary,
+                foregroundColor:
+                    isReadOnly
+                        ? colorScheme
+                            .onSurfaceVariant // 읽기 전용
+                        : (birth != null
+                            ? colorScheme.onSurfaceVariant
+                            : colorScheme.onPrimary),
+                // 활성 상태
                 borderRadius: 5,
                 onPressed: isReadOnly ? null : onSetPressed,
                 text: birth?.formattedBirth ?? '선택',
@@ -67,7 +76,9 @@ class BirthSelector extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: Text(
               '${calculateAge(birth!)}세 (보험나이: ${calculateInsuranceAge(birth!)}세), 상령일까지 ${daysUntilInsuranceAgeChange(birth!)}일',
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],

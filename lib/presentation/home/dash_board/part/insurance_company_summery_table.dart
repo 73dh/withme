@@ -9,6 +9,17 @@ import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
+import 'package:flutter/material.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import '../components/render_table.dart';
+import '../components/render_table_cell_text.dart';
+
+import 'package:flutter/material.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import '../components/render_table.dart';
+import '../components/render_table_cell_text.dart';
 
 class InsuranceCompanySummaryTable extends StatelessWidget {
   final double cellWidth;
@@ -26,6 +37,9 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final Map<String, _InsuranceCompanyStats> statsMap = {};
 
     for (final customer in customers) {
@@ -47,13 +61,24 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
 
     final sortedKeys = statsMap.keys.toList()..sort();
 
+    // 제목행 색상은 CustomSummeryTable 스타일
+    final headerColor = colorScheme.primaryContainer;
+    final headerTextStyle = (textStyle ?? theme.textTheme.bodyMedium)?.copyWith(
+      color: colorScheme.onPrimaryContainer,
+      fontWeight: FontWeight.w600,
+    );
+
+    // 데이터행 색상
+    final rowColor = colorScheme.surface.withValues(alpha: 0.8);
+    final defaultTextStyle = textStyle ?? theme.textTheme.bodyMedium;
+
     final List<TableRow> rows = [
       TableRow(
-        decoration: BoxDecoration(color: cellColor ?? ColorStyles.tableHeadColor),
+        decoration: BoxDecoration(color: headerColor),
         children: [
-          RenderTableCellText('보험사', isHeader: true, style: textStyle),
-          RenderTableCellText('고객 수', isHeader: true, style: textStyle),
-          RenderTableCellText('계약 건수', isHeader: true, style: textStyle),
+          RenderTableCellText('보험사', isHeader: true, style: headerTextStyle),
+          RenderTableCellText('고객 수', isHeader: true, style: headerTextStyle),
+          RenderTableCellText('계약 건수', isHeader: true, style: headerTextStyle),
         ],
       ),
     ];
@@ -61,11 +86,11 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
     if (sortedKeys.isEmpty) {
       rows.add(
         TableRow(
-          decoration: BoxDecoration(color: (cellColor ?? Colors.grey.shade100).withOpacity(0.8)),
+          decoration: BoxDecoration(color: rowColor),
           children: [
-            RenderTableCellText('해당건 없음', style: textStyle),
-            RenderTableCellText('', style: textStyle),
-            RenderTableCellText('', style: textStyle),
+            RenderTableCellText('해당건 없음', style: defaultTextStyle),
+            RenderTableCellText('', style: defaultTextStyle),
+            RenderTableCellText('', style: defaultTextStyle),
           ],
         ),
       );
@@ -73,11 +98,11 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
       for (final company in sortedKeys) {
         rows.add(
           TableRow(
-            decoration: BoxDecoration(color: (cellColor ?? Colors.grey.shade100).withOpacity(0.8)),
+            decoration: BoxDecoration(color: rowColor),
             children: [
-              RenderTableCellText(company, style: textStyle),
-              RenderTableCellText('${statsMap[company]!.customerCount}명', style: textStyle),
-              RenderTableCellText('${statsMap[company]!.contractCount}건', style: textStyle),
+              RenderTableCellText(company, style: defaultTextStyle),
+              RenderTableCellText('${statsMap[company]!.customerCount}명', style: defaultTextStyle),
+              RenderTableCellText('${statsMap[company]!.contractCount}건', style: defaultTextStyle),
             ],
           ),
         );

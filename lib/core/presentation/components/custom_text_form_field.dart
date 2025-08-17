@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
@@ -20,9 +23,9 @@ class CustomTextFormField extends StatelessWidget {
   final Function(String)? onSaved;
   final FocusNode? focusNode;
 
-  // 🔹 추가
   final TextStyle? textStyle;
   final Color? fillColor;
+  final TextStyle? hintStyle;
 
   const CustomTextFormField({
     super.key,
@@ -31,7 +34,7 @@ class CustomTextFormField extends StatelessWidget {
     this.labelText,
     this.obscureText = false,
     this.autoFocus = false,
-    this.textAlign = TextAlign.start,
+    this.textAlign,
     this.inputType,
     this.inputFormatters,
     this.readOnly = false,
@@ -40,8 +43,9 @@ class CustomTextFormField extends StatelessWidget {
     this.validator,
     this.onSaved,
     this.focusNode,
-    this.textStyle,  // 추가
-    this.fillColor,  // 추가
+    this.textStyle,
+    this.fillColor,
+    this.hintStyle,
   });
 
   @override
@@ -66,12 +70,15 @@ class CustomTextFormField extends StatelessWidget {
       keyboardType: inputType,
       inputFormatters: inputFormatters,
       onEditingComplete: onCompleted,
+      onChanged: onChanged,
+      validator: validator != null ? (text) => validator!(text ?? '') : null,
+      onSaved: onSaved != null ? (text) => onSaved!(text ?? '') : null,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         hintText: hintText,
-        hintStyle: theme.textTheme.labelMedium?.copyWith(
+        hintStyle: hintStyle ?? theme.textTheme.labelMedium?.copyWith(
           fontStyle: FontStyle.italic,
-          color: theme.primaryColor,
+          color: colorScheme.onSurfaceVariant,
         ),
         labelText: labelText,
         labelStyle: theme.textTheme.bodyMedium?.copyWith(
@@ -81,9 +88,6 @@ class CustomTextFormField extends StatelessWidget {
           fontStyle: FontStyle.italic,
           color: colorScheme.error,
         ),
-        errorBorder: baseBorder.copyWith(
-          borderSide: BorderSide(color: colorScheme.error),
-        ),
         fillColor: fillColor ?? colorScheme.surface,
         filled: true,
         border: baseBorder,
@@ -91,10 +95,10 @@ class CustomTextFormField extends StatelessWidget {
         focusedBorder: baseBorder.copyWith(
           borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
         ),
+        errorBorder: baseBorder.copyWith(
+          borderSide: BorderSide(color: colorScheme.error),
+        ),
       ),
-      onChanged: onChanged,
-      validator: validator != null ? (text) => validator!(text ?? '') : null,
-      onSaved: onSaved != null ? (text) => onSaved!(text ?? '') : null,
     );
   }
 }

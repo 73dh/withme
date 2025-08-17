@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/presentation/todo/todo_view_model.dart';
 import 'package:withme/domain/use_case/todo/complete_todo_use_case.dart';
 
 import '../../../domain/domain_import.dart';
@@ -12,7 +13,10 @@ import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 import '../core_presentation_import.dart';
 import '../widget/show_add_todo_dialog.dart';
+
 mixin TodoActionMixin {
+
+
   Future<void> addOrUpdateTodo(
       BuildContext context,
       CustomerModel customer, {
@@ -42,9 +46,11 @@ mixin TodoActionMixin {
       todoId: currentTodo.docId,
       todoData: todoData,
     );
-
     await getIt<TodoUseCase>().execute(usecase: useCase);
+await getIt<TodoViewModel>().initializeTodos(userKey: UserSession.userId, customerKey: customer.customerKey);
   }
+
+
 
   Future<void> deleteTodo(
       BuildContext context,
@@ -62,10 +68,10 @@ mixin TodoActionMixin {
   }
 
   Future<void> completeTodo(
-      BuildContext context,
-      CustomerModel customer,
-      TodoModel currentTodo,
-      ) async {
+    BuildContext context,
+    CustomerModel customer,
+    TodoModel currentTodo,
+  ) async {
     // Dialog 내부에서 theme/colorScheme 적용
     final editedTodo = await showAddOrEditTodoDialog(
       context,

@@ -3,9 +3,22 @@ import '../../../../core/presentation/components/policy_item.dart';
 import '../../../../core/presentation/components/policy_simple_item.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../domain/model/policy_model.dart';
+import '../../../../core/domain/enum/policy_state.dart';
+import '../../../../core/presentation/components/policy_item.dart';
+import '../../../../core/presentation/components/policy_simple_item.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../domain/model/policy_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import '../../../../core/domain/enum/policy_state.dart';
+import '../../../../core/presentation/components/policy_item.dart';
+import '../../../../core/presentation/components/policy_simple_item.dart';
+import '../../../../domain/model/policy_model.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
 
 class PolicyListView extends StatefulWidget {
   final List<PolicyModel> policies;
+
   const PolicyListView({super.key, required this.policies});
 
   @override
@@ -24,22 +37,38 @@ class _PolicyListViewState extends State<PolicyListView> {
 
   List<PolicyModel> get filteredPolicies {
     if (selectedState == null) return widget.policies;
-    return widget.policies.where((p) => p.policyState == selectedState.toString()).toList();
+    return widget.policies
+        .where((p) => p.policyState == selectedState!.label)
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     final filtered = filteredPolicies;
 
     if (widget.policies.isEmpty) {
-      return Column(
-        children: [height(200), const AnimatedText(text: '조건에 맞는 계약이 없습니다.')],
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 100),
+          child: Text(
+            '조건에 맞는 계약이 없습니다.',
+            style: textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
       );
     }
 
     return Column(
       children: [
-        _buildStateFilterButtons(),
+        // 필터 버튼
+        _buildStateFilterButtons(colorScheme, textTheme),
+        // 리스트
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 90.0),
@@ -48,6 +77,7 @@ class _PolicyListViewState extends State<PolicyListView> {
               itemBuilder: (context, index) {
                 final policy = filtered[index];
                 final isExpanded = expandedIndex == index;
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: GestureDetector(
@@ -55,8 +85,14 @@ class _PolicyListViewState extends State<PolicyListView> {
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: isExpanded
-                          ? PolicyItem(key: ValueKey('expanded_$index'), policy: policy)
-                          : PolicySimpleItem(key: ValueKey('simple_$index'), policy: policy),
+                          ? PolicyItem(
+                        key: ValueKey('expanded_$index'),
+                        policy: policy,
+                      )
+                          : PolicySimpleItem(
+                        key: ValueKey('simple_$index'),
+                        policy: policy,
+                      ),
                     ),
                   ),
                 );
@@ -68,39 +104,42 @@ class _PolicyListViewState extends State<PolicyListView> {
     );
   }
 
-  Widget _buildStateFilterButtons() {
+  Widget _buildStateFilterButtons(ColorScheme colorScheme, TextTheme textTheme) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
-          _buildFilterChip(null, '전체'),
+          _buildFilterChip(null, '전체', colorScheme, textTheme),
           ...PolicyState.values.map(
-                (state) => _buildFilterChip(state, state.label),
+                (state) => _buildFilterChip(state, state.label, colorScheme, textTheme),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(PolicyState? state, String label) {
+  Widget _buildFilterChip(
+      PolicyState? state, String label, ColorScheme colorScheme, TextTheme textTheme) {
     final isSelected = selectedState == state;
 
     // 각 상태에 해당하는 계약 수 계산
-    int count;
-    if (state == null) {
-      count = widget.policies.length;
-    } else {
-      count = widget.policies
-          .where((p) => p.policyState == state.toString())
-          .length;
-    }
+    final count = state == null
+        ? widget.policies.length
+        : widget.policies.where((p) => p.policyState == state.label).length;
 
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ChoiceChip(
+        key: ValueKey(state ?? 'all'),
         label: Text('$label ($count)'),
+        labelStyle: textTheme.labelLarge?.copyWith(
+          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+        ),
         selected: isSelected,
+        showCheckmark: false, // 체크 표시 제거
+        selectedColor: colorScheme.primary,
+        backgroundColor: colorScheme.surfaceContainerHighest,
         onSelected: (_) {
           setState(() {
             selectedState = isSelected ? null : state;
@@ -111,4 +150,3 @@ class _PolicyListViewState extends State<PolicyListView> {
     );
   }
 }
-

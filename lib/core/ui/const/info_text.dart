@@ -26,16 +26,15 @@ Widget styledInfoText(BuildContext context) {
             const TextSpan(
               text: '이 App은 가망고객을 발굴한 후,\n고객을 손쉽게 체계적으로 관리할 수 있습니다.\n\n',
             ),
-            const TextSpan(text: '관리주기를 설정하여 '),
+            const TextSpan(text: '관리주기 설정 '),
             TextSpan(
-              text: '(기본 ${SharedPrefValue.managePeriodDays}일) ',
+              text: '(기본 ${SharedPrefValue.managePeriodDays}일), ',
               style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.primary,
               ),
             ),
-            const TextSpan(text: '지속적으로 고객이 관리될 수 있도록 하였으며,'),
-            const TextSpan(text: '고객 생년월일을 기반으로 상령일'),
+            const TextSpan(text: '상령일'),
             TextSpan(
               text: ' (기본 ${SharedPrefValue.urgentThresholdDays}일) ',
               style: textTheme.bodyMedium?.copyWith(
@@ -43,10 +42,7 @@ Widget styledInfoText(BuildContext context) {
                 color: colorScheme.primary,
               ),
             ),
-            const TextSpan(
-              text:
-                  '또한 사전에 관리가 가능하도록 하였습니다.\n\n',
-            ),
+            const TextSpan(text: '관리 설정을 통한, 주기적, 일상적 고객 관리가 가능하도록 하였으며,\n\n'),
             const TextSpan(text: '가망고객수의 중요도를 고려하여 고객 Pool 관리를 위한 목표를 설정하여'),
             TextSpan(
               text: ' (기본 ${SharedPrefValue.targetProspectCount}명), ',
@@ -55,11 +51,7 @@ Widget styledInfoText(BuildContext context) {
                 color: colorScheme.primary,
               ),
             ),
-            const TextSpan(
-              text:
-                  '고객 Pool을 늘리기 위한 동기부여가 가능하도록 화면에 진도율을 구성하였습니다. '
-                  '목표는 수정이 가능합니다.\n\n',
-            ),
+            const TextSpan(text: '고객 Pool을 늘리기 위한 동기부여도 가능토록 하였습니다.\n\n'),
             const TextSpan(
               text:
                   '가망고객 화면과, 계약자의 경우 계약내용까지 등록 및 관리할수 있도록 계약자화면,'

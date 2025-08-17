@@ -1,5 +1,8 @@
 import '../core_presentation_import.dart';
 import '../../ui/core_ui_import.dart';
+import 'package:flutter/material.dart';
+import '../../ui/core_ui_import.dart';
+import '../core_presentation_import.dart';
 
 class MainFab extends StatefulWidget {
   final bool fabVisibleLocal;
@@ -54,6 +57,8 @@ class _MainFabState extends State<MainFab>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return FadeTransition(
       opacity: _opacity,
       child: ScaleTransition(
@@ -61,10 +66,15 @@ class _MainFabState extends State<MainFab>
         child: FloatingActionButton(
           heroTag: 'fabMain',
           onPressed: widget.onPressed,
+          backgroundColor: colorScheme.primary,       // FAB 배경색
+          foregroundColor: colorScheme.onPrimary,     // FAB 아이콘 색
           child: SizedBox(
             width: 24,
             height: 24,
-            child: Image.asset(IconsPath.personAdd),
+            child: Image.asset(
+              IconsPath.personAdd,
+              color: colorScheme.onPrimary,           // 이미지 tint 적용
+            ),
           ),
         ),
       ),

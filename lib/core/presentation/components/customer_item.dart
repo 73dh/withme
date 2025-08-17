@@ -12,7 +12,6 @@ import '../../../domain/model/policy_model.dart';
 import '../../../presentation/home/customer_list/customer_list_view_model.dart';
 import '../../di/setup.dart';
 import '../../utils/calculate_age.dart';
-import '../../utils/is_birthday_within_7days.dart';
 import '../../utils/shortened_text.dart';
 import '../core_presentation_import.dart';
 import 'customer_item_icon.dart';
@@ -44,38 +43,32 @@ class CustomerItem extends StatelessWidget {
         final policies = snapshot.data!;
         return ItemContainer(
           backgroundColor:
-              isUrgent ? ColorStyles.isUrgentColor : colorScheme.surfaceVariant,
-          child: Stack(
+              isUrgent ? colorScheme.errorContainer : colorScheme.surface,
+          child: Row(
             children: [
-              Row(
-                children: [
-                  CustomerItemIcon(customer: customer),
-                  width(12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildNameRow(
-                          customer,
-                          birthDate,
-                          difference,
-                          insuranceChangeDate,
-                          isUrgent,
-                          theme,
-                          colorScheme,
-                        ),
-                        _buildPolicyList(policies, theme, colorScheme),
-                      ],
+              CustomerItemIcon(customer: customer),
+              width(6),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildNameRow(
+                      customer,
+                      birthDate,
+                      difference,
+                      insuranceChangeDate,
+                      isUrgent,
+                      theme,
+                      colorScheme,
                     ),
-                  ),
-                ],
-              ),
-              Positioned.fill(
-                child: HistoryPartWidget(
-                  histories: customer.histories,
-                  onTap: onTap,
-                  sex: customer.sex,
+                    _buildPolicyList(policies, theme, colorScheme),
+                  ],
                 ),
+              ),
+              HistoryPartWidget(
+                histories: customer.histories,
+                onTap: onTap,
+                sex: customer.sex,
               ),
             ],
           ),
@@ -96,73 +89,53 @@ class CustomerItem extends StatelessWidget {
     final iconPath =
         customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
 
-    if (birthDate == null) {
-      return Row(
-        children: [
-          Text(
-            shortenedNameText(customer.name, length: 6),
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
-          width(5),
-          Text(
-            '정보 없음',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          width(3),
-          Text(
-            customer.recommended.isNotEmpty ? customer.recommended : '',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ],
-      );
-    }
-
     return Row(
       children: [
+        // 성별 + 생일 아이콘
         SexIconWithBirthday(
           birth: birthDate,
           sex: customer.sex,
           backgroundImagePath: iconPath,
-          size: 20,
+          size: 23,
           isShowDay: true,
         ),
-        width(3),
+width(5),
+        // 이름 (아이콘과 바로 붙음)
         Text(
           shortenedNameText(customer.name, length: 6),
           style: theme.textTheme.bodyLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
+          overflow: TextOverflow.ellipsis,
         ),
-        width(3),
-        Text(
-          '${calculateAge(birthDate)}세 /',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurface,
+
+        // 나이
+        if (birthDate != null)
+          Text(
+            ' ${calculateAge(birthDate)}세',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
-        ),
-        width(3),
-        if (difference != null &&
-            difference >= 0 &&
-            insuranceChangeDate != null)
+
+        // 보험나이 / 상령일
+        if (difference != null && insuranceChangeDate != null)
           InsuranceAgeWidget(
             difference: difference,
             isUrgent: isUrgent,
             insuranceChangeDate: insuranceChangeDate,
+            colorScheme: colorScheme,
           ),
 
-        width(5),
-        SizedBox(
-          width: 30,
-          child: StreamTodoText(todoList: customer.todos, sex: customer.sex),
-        ),
-        if (customer.todos.isNotEmpty)
-          TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 20),
+        // 할일
+        if (customer.todos.isNotEmpty) ...[
+          SizedBox(
+            width: 30,
+            child: StreamTodoText(todoList: customer.todos, sex: customer.sex),
+          ),
+          const SizedBox(width: 2),
+          TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 18),
+        ],
       ],
     );
   }
@@ -223,13 +196,14 @@ class CustomerItem extends StatelessWidget {
               Text(
                 premiumText,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isCancelled ? Colors.red : colorScheme.onSurface,
+                  color:
+                      isCancelled ? colorScheme.error : colorScheme.onSurface,
                   fontWeight: isCancelled ? FontWeight.bold : FontWeight.normal,
                   decoration:
                       isCancelled
                           ? TextDecoration.lineThrough
                           : TextDecoration.none,
-                  decorationColor: isCancelled ? Colors.red : null,
+                  decorationColor: isCancelled ? colorScheme.error : null,
                   decorationThickness: isCancelled ? 2 : null,
                 ),
               ),

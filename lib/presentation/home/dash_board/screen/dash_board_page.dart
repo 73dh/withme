@@ -83,7 +83,6 @@ class DashBoardPage extends StatelessWidget {
                           textStyle: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
-                          cellColor: colorScheme.surfaceContainerHighest,
                         ),
                         height(5),
                         PartTitle(text: '보험사', color: colorScheme.onSurface),
@@ -130,6 +129,7 @@ class DashBoardPage extends StatelessWidget {
                             color: colorScheme.onSurface,
                           ),
                         ),
+                        height(10),
                       ],
                     );
                   },

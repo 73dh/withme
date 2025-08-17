@@ -9,8 +9,6 @@ import '../../../../core/presentation/widget/show_bottom_sheet_with_draggable.da
 import '../../../../domain/use_case/customer/update_searched_customers_use_case.dart';
 import '../../../registration/screen/registration_screen.dart';
 import '../search_page_view_model.dart';
-
-/// 고객 목록 리스트 뷰
 class CustomerListView extends StatelessWidget {
   final List<CustomerModel> customers; // 필터링된 고객 리스트
   final SearchPageViewModel viewModel; // 검색 뷰모델
@@ -25,6 +23,10 @@ class CustomerListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     // 하단 여백 설정 (FAB와 겹치지 않도록)
     final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
 
@@ -35,54 +37,54 @@ class CustomerListView extends StatelessWidget {
       duration: AppDurations.duration300,
       switchInCurve: Curves.easeIn,
       switchOutCurve: Curves.easeOut,
-      child:
-          customers.isEmpty
-              // 조건에 맞는 고객이 없을 때
-              ? Center(
-                key: const ValueKey('empty'),
-                child: Column(
-                  children: [
-                    height(200),
-                    const AnimatedText(text: '조건에 맞는 고객이 없습니다.'),
-                  ],
-                ),
-              )
-              // 조건에 맞는 고객이 있을 때
-              : Padding(
-                padding: const EdgeInsets.only(bottom: 90.0),
-                child: ListView.builder(
-                  key: ValueKey(
-                    'option-${viewModel.state.currentSearchOption}-$customersKey',
-                  ),
-                  padding: EdgeInsets.only(bottom: bottomPadding),
-                  itemCount: customers.length,
-                  itemBuilder: (context, index) {
-                    final customer = customers[index];
+      child: customers.isEmpty
+          ? Center(
+        key: const ValueKey('empty'),
+        child: Column(
+          children: [
+            height(200),
+            Text(
+              '조건에 맞는 고객이 없습니다.',
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant, // 다크/라이트 자동 적용
+              ),
+            ),
+          ],
+        ),
+      )
+          : Padding(
+        padding: const EdgeInsets.only(bottom: 90.0),
+        child: ListView.builder(
+          key: ValueKey(
+            'option-${viewModel.state.currentSearchOption}-$customersKey',
+          ),
+          padding: EdgeInsets.only(bottom: bottomPadding),
+          itemCount: customers.length,
+          itemBuilder: (context, index) {
+            final customer = customers[index];
 
-                    // 보험이 없는 경우: 잠재 고객 아이템
-                    // 보험이 있는 경우: 기존 고객 아이템
-                    final item =
-                        customer.policies.isEmpty
-                            ? _buildProspectItem(context, customer)
-                            : _buildCustomerItem(context, customer);
+            // 보험이 있는 경우: 기존 고객 아이템
+            final item = customer.policies.isEmpty
+                ? _buildProspectItem(context, customer)
+                : _buildCustomerItem(context, customer);
 
-                    // 슬라이드 및 페이드 애니메이션 효과 적용
-                    return AnimatedSlide(
-                      key: ValueKey(customer.customerKey),
-                      offset: const Offset(0, 0.1),
-                      duration: Duration(milliseconds: 300 + index * 30),
-                      child: AnimatedOpacity(
-                        opacity: 1,
-                        duration: Duration(milliseconds: 300 + index * 30),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: item,
-                        ),
-                      ),
-                    );
-                  },
+            // 슬라이드 및 페이드 애니메이션 효과 적용
+            return AnimatedSlide(
+              key: ValueKey(customer.customerKey),
+              offset: const Offset(0, 0.1),
+              duration: Duration(milliseconds: 300 + index * 30),
+              child: AnimatedOpacity(
+                opacity: 1,
+                duration: Duration(milliseconds: 300 + index * 30),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: item,
                 ),
               ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -90,13 +92,10 @@ class CustomerListView extends StatelessWidget {
   Widget _buildProspectItem(BuildContext context, CustomerModel customer) {
     return GestureDetector(
       onTap: () async {
-        // 고객 상세화면 (모달 시트)
         await showBottomSheetWithDraggable(
           context: context,
-          builder:
-              (scrollController) => RegistrationScreen(customer: customer),
+          builder: (scrollController) => RegistrationScreen(customer: customer),
           onClosed: () async {
-            // 닫힌 후 검색 결과 다시 갱신
             await UpdateSearchedCustomersUseCase.call(viewModel);
             await Future.delayed(const Duration(milliseconds: 200));
           },
@@ -126,12 +125,10 @@ class CustomerListView extends StatelessWidget {
   Widget _buildCustomerItem(BuildContext context, CustomerModel customer) {
     return GestureDetector(
       onTap: () async {
-        // 고객 상세화면 (모달 시트)
         await showBottomSheetWithDraggable(
           context: context,
           builder: (scrollController) => CustomerScreen(customer: customer),
           onClosed: () async {
-            // 닫힌 후 검색 결과 다시 갱신
             await UpdateSearchedCustomersUseCase.call(viewModel);
             await Future.delayed(const Duration(milliseconds: 200));
           },

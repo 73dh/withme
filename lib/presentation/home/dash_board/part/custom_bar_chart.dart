@@ -4,6 +4,44 @@ import 'package:withme/presentation/home/dash_board/components/arrow_indicator.d
 
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
+
+import '../../../../core/ui/core_ui_import.dart';
+import '../../../../domain/domain_import.dart';
+
 class CustomBarChart extends StatefulWidget {
   final Map<String, List<CustomerModel>> monthlyData;
   final Color? prospectBarColor;
@@ -49,134 +87,154 @@ class _CustomBarChartState extends State<CustomBarChart> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final stats = _convertToStats(widget.monthlyData);
-    final keys = stats.keys.toList()..sort();
-
-    final maxY = stats.values
-        .expand((map) => map.values)
-        .fold<int>(0, (prev, element) => element > prev ? element : prev)
-        .toDouble();
-
-    final step = (maxY / 4).ceil();
-    final yLabels = List.generate(5, (i) => step * i)
-      ..sort((a, b) => b.compareTo(a));
-
-    final prospectColor = widget.prospectBarColor ?? ColorStyles.barChartProspectColor;
-    final contractColor = widget.contractBarColor ?? ColorStyles.barChartContractColor;
-    final labelStyle = widget.labelStyle ?? Theme.of(context).textTheme.bodyMedium;
-
-    return LayoutBuilder(
-      builder: (context, constraint) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _updateArrows());
-
-        return SizedBox(
-          height: 300,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 24,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: yLabels
-                      .map((y) => Text(y.toString(), style: labelStyle))
-                      .toList(),
-                ),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      controller: _scrollController,
-                      child: SizedBox(
-                        width: keys.length * 60,
-                        height: 300,
-                        child: BarChart(
-                          BarChartData(
-                            maxY: maxY + 1,
-                            barGroups: List.generate(keys.length, (i) {
-                              final key = keys[i];
-                              final data = stats[key]!;
-                              return BarChartGroupData(
-                                x: i,
-                                barsSpace: 4,
-                                barRods: [
-                                  BarChartRodData(
-                                    toY: data['prospect']!.toDouble(),
-                                    color: prospectColor,
-                                    width: 8,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  BarChartRodData(
-                                    toY: data['contract']!.toDouble(),
-                                    color: contractColor,
-                                    width: 8,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ],
-                              );
-                            }),
-                            titlesData: FlTitlesData(
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: (value, meta) {
-                                    final idx = value.toInt();
-                                    if (idx >= 0 && idx < keys.length) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: Text(
-                                          keys[idx].substring(5),
-                                          style: labelStyle,
-                                        ),
-                                      );
-                                    }
-                                    return const SizedBox.shrink();
-                                  },
-                                ),
-                              ),
-                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            ),
-                            gridData: const FlGridData(show: true),
-                            borderData: FlBorderData(
-                              show: true,
-                              border: const Border(
-                                left: BorderSide(color: Colors.grey),
-                                bottom: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                            barTouchData: const BarTouchData(enabled: false),
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (showLeftArrow)
-                      const Positioned(left: 0, top: 0, bottom: 0, child: ArrowIndicator(isRight: false)),
-                    if (showRightArrow)
-                      const Positioned(right: 0, top: 0, bottom: 0, child: ArrowIndicator(isRight: true)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Map<String, Map<String, int>> _convertToStats(Map<String, List<CustomerModel>> monthlyData) {
+  Map<String, Map<String, int>> _convertToStats(
+      Map<String, List<CustomerModel>> monthlyData) {
     final Map<String, Map<String, int>> stats = {};
     for (final entry in monthlyData.entries) {
       final month = entry.key;
       final customers = entry.value;
       final prospectCount = customers.where((c) => c.policies.isEmpty).length;
-      final contractCount = customers.fold(0, (sum, c) => sum + c.policies.length);
+      final contractCount =
+      customers.fold(0, (sum, c) => sum + c.policies.length);
       stats[month] = {'prospect': prospectCount, 'contract': contractCount};
     }
     return stats;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    final stats = _convertToStats(widget.monthlyData);
+    final keys = stats.keys.toList()..sort();
+
+    final maxY = stats.values
+        .expand((map) => map.values)
+        .fold<int>(0, (prev, e) => e > prev ? e : prev)
+        .toDouble();
+
+    final prospectColor =
+        widget.prospectBarColor ?? colorScheme.primary.withOpacity(0.8);
+    final contractColor =
+        widget.contractBarColor ?? colorScheme.secondary.withOpacity(0.8);
+    final labelStyle =
+        widget.labelStyle ?? textTheme.bodySmall?.copyWith(color: colorScheme.onSurface);
+
+    return SizedBox(
+      height: 300,
+      child: Row(
+        children: [
+          // Y축 레이블
+          SizedBox(
+            width: 28,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(5, (i) {
+                final step = (maxY / 4).ceil();
+                return Text(
+                  '${step * (4 - i)}',
+                  style: labelStyle,
+                );
+              }),
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
+                  child: SizedBox(
+                    width: keys.length * 60,
+                    height: 300,
+                    child: BarChart(
+                      BarChartData(
+                        maxY: maxY + 2,
+                        barGroups: List.generate(keys.length, (i) {
+                          final key = keys[i];
+                          final data = stats[key]!;
+
+                          return BarChartGroupData(
+                            x: i,
+                            barsSpace: 4,
+                            barRods: [
+                              BarChartRodData(
+                                toY: data['prospect']!.toDouble(),
+                                width: 10,
+                                borderRadius: BorderRadius.circular(4),
+                                color: prospectColor,
+                              ),
+                              BarChartRodData(
+                                toY: data['contract']!.toDouble(),
+                                width: 10,
+                                borderRadius: BorderRadius.circular(4),
+                                color: contractColor,
+                              ),
+                            ],
+                          );
+                        }),
+                        titlesData: FlTitlesData(
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                final idx = value.toInt();
+                                if (idx >= 0 && idx < keys.length) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        keys[idx].substring(5),
+                                        style: labelStyle,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          leftTitles:
+                          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          rightTitles:
+                          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          topTitles:
+                          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        ),
+                        gridData: FlGridData(
+                          show: true,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: colorScheme.outline.withOpacity(0.3),
+                            strokeWidth: 0.5,
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
+                          border: Border(
+                            left: BorderSide(color: colorScheme.outline),
+                            bottom: BorderSide(color: colorScheme.outline),
+                          ),
+                        ),
+                        barTouchData: const BarTouchData(enabled: false),
+                      ),
+                    ),
+                  ),
+                ),
+                if (showLeftArrow)
+                  const Positioned(
+                      left: 0, top: 0, bottom: 0, child: ArrowIndicator(isRight: false)),
+                if (showRightArrow)
+                  const Positioned(
+                      right: 0, top: 0, bottom: 0, child: ArrowIndicator(isRight: true)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

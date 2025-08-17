@@ -42,7 +42,7 @@ class RegisteredDateSelector extends StatelessWidget {
               child: RenderFilledButton(
                 width: 100,
                 backgroundColor: isReadOnly
-                    ? colorScheme.surfaceVariant
+                    ? colorScheme.surfaceContainerHighest
                     : colorScheme.primary,
                 foregroundColor: isReadOnly
                     ? colorScheme.onSurfaceVariant

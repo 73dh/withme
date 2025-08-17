@@ -23,7 +23,7 @@ BottomNavigationBarThemeData buildBottomNavTheme(ColorScheme colors) {
 
 FloatingActionButtonThemeData buildFloatingActionButtonTheme(ColorScheme colors) {
   return FloatingActionButtonThemeData(
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: colors.primary,
     shape: const CircleBorder(),
   );
 }

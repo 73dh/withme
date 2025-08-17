@@ -5,13 +5,14 @@ import '../../../../core/ui/core_ui_import.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/ui/core_ui_import.dart';
+import 'package:flutter/material.dart';
 
 class RenderTableCellText extends StatelessWidget {
   final String text;
   final bool isHeader;
   final bool? isBarProspect;
   final bool? isBarContract;
-  final TextStyle? style; // ← 새로 추가
+  final TextStyle? style; // 외부 스타일 지정 가능
 
   const RenderTableCellText(
       this.text, {
@@ -19,18 +20,21 @@ class RenderTableCellText extends StatelessWidget {
         this.isHeader = false,
         this.isBarProspect,
         this.isBarContract,
-        this.style, // ← 외부 스타일 지정 가능
+        this.style,
       });
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor = isBarProspect == true
-        ? ColorStyles.barChartProspectColor
-        : isBarContract == true
-        ? ColorStyles.barChartContractColor
-        : Colors.black87;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    final defaultStyle = TextStyle(
+    // 상태별 기본 색상 결정
+    final Color defaultColor = isBarProspect == true
+        ? colorScheme.primary   // 가망고객 색상
+        : isBarContract == true
+        ? colorScheme.secondary // 계약고객 색상
+        : colorScheme.onSurface; // 일반 텍스트
+
+    final TextStyle defaultStyle = TextStyle(
       fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
       fontSize: 11,
       color: defaultColor,
@@ -42,7 +46,7 @@ class RenderTableCellText extends StatelessWidget {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: style ?? defaultStyle, // 전달받은 style 우선, 없으면 defaultStyle
+        style: style ?? defaultStyle, // 외부 스타일 우선
       ),
     );
   }

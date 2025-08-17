@@ -117,7 +117,7 @@ class PolicyPart extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: '상품명 입력',
                         filled: true,
-                        fillColor: colorScheme.surfaceVariant,
+                        fillColor: colorScheme.surfaceContainerHighest,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 10,
@@ -179,7 +179,7 @@ class PolicyPart extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: '보험료 (예: 100,000)',
                         filled: true,
-                        fillColor: colorScheme.surfaceVariant,
+                        fillColor: colorScheme.surfaceContainerHighest,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 10,
@@ -205,11 +205,12 @@ class PolicyPart extends StatelessWidget {
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
-                      backgroundColor:
-                          startDate != null
-                              ? colorScheme.surfaceVariant
-                              : colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
+                      backgroundColor: startDate != null
+                          ? colorScheme.primary
+                          : colorScheme.surfaceContainerHigh,
+                      foregroundColor: startDate != null
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -219,21 +220,21 @@ class PolicyPart extends StatelessWidget {
                           onStartDateChanged(selected);
                         }
                       },
-                      text:
-                          startDate == null
-                              ? '계약일'
-                              : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
+                      text: startDate == null
+                          ? '계약일'
+                          : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
                     ),
                   ),
                   width(16),
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
-                      backgroundColor:
-                          endDate != null
-                              ? colorScheme.surfaceVariant
-                              : colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
+                      backgroundColor: endDate != null
+                          ? colorScheme.primary
+                          : colorScheme.surfaceContainerHigh,
+                      foregroundColor: endDate != null
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -243,14 +244,14 @@ class PolicyPart extends StatelessWidget {
                           onEndDateChanged(selected);
                         }
                       },
-                      text:
-                          endDate == null
-                              ? '만기일'
-                              : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
+                      text: endDate == null
+                          ? '만기일'
+                          : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
                     ),
                   ),
                 ],
-              ),
+              )
+,
             ],
           ),
         ),

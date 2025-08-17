@@ -4,6 +4,11 @@ import '../../domain/enum/sort_type.dart';
 import '../../domain/enum/sort_status.dart';
 import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
+import 'package:flutter/material.dart';
+import '../../ui/core_ui_import.dart';
+import '../core_presentation_import.dart';
+import '../../domain/enum/sort_type.dart';
+import '../../domain/enum/sort_status.dart';
 
 class SmallFab extends StatefulWidget {
   final bool fabVisibleLocal;
@@ -13,7 +18,7 @@ class SmallFab extends StatefulWidget {
   final void Function()? onSortByBirth;
   final void Function()? onSortByInsuredDate;
   final void Function()? onSortByManage;
-  final SortStatus? selectedSortStatus; // ViewModel로부터 받은 현재 정렬 상태
+  final SortStatus? selectedSortStatus;
 
   const SmallFab({
     super.key,
@@ -65,33 +70,24 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
       curve: Curves.easeInOut,
     );
 
-    // 초기 상태에 따라 애니메이션 컨트롤러 설정
-    if (widget.fabVisibleLocal) {
-      _visibilityController.forward();
-    }
-    if (widget.fabExpanded) {
-      _expandController.forward();
-    }
+    if (widget.fabVisibleLocal) _visibilityController.forward();
+    if (widget.fabExpanded) _expandController.forward();
   }
 
   @override
   void didUpdateWidget(covariant SmallFab oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // fabExpanded 상태 변경 감지 및 애니메이션 실행
     if (widget.fabExpanded != oldWidget.fabExpanded) {
       widget.fabExpanded
           ? _expandController.forward()
           : _expandController.reverse();
     }
 
-    // fabVisibleLocal 상태 변경 감지 및 애니메이션 실행
     if (widget.fabVisibleLocal != oldWidget.fabVisibleLocal) {
-      if (widget.fabVisibleLocal) {
-        _visibilityController.forward();
-      } else {
-        _visibilityController.reverse();
-      }
+      widget.fabVisibleLocal
+          ? _visibilityController.forward()
+          : _visibilityController.reverse();
     }
   }
 
@@ -104,6 +100,9 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: ScaleTransition(
@@ -122,33 +121,29 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
                     begin: const Offset(0, 0.2),
                     end: Offset.zero,
                   ).animate(_expandAnimation),
-                  child: _buildSortActions(),
+                  child: _buildSortActions(colorScheme, textTheme),
                 ),
               ),
             ),
-            // 정렬 옵션과 메인 FAB 사이 간격
             if (widget.fabExpanded) const SizedBox(height: 4),
-
             // 메인 FAB 버튼
             FloatingActionButton.small(
               key: const ValueKey('mainSmallFab'),
               heroTag: 'mainSmallFab',
-              backgroundColor: ColorStyles.fabColor,
-              onPressed: () {
-                widget.overlaySetState?.call(() {});
-              },
+              backgroundColor: colorScheme.surfaceTint,
+              foregroundColor: colorScheme.onPrimary,
+              onPressed: () => widget.overlaySetState?.call(() {}),
               child: AnimatedSwitcher(
-                // 아이콘 전환 애니메이션
                 duration: AppDurations.duration300,
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(scale: animation, child: child);
-                },
+                transitionBuilder:
+                    (child, animation) =>
+                        ScaleTransition(scale: animation, child: child),
                 child: Icon(
                   widget.fabExpanded
                       ? Icons.close
                       : Icons.sort_by_alpha_outlined,
-                  key: ValueKey(widget.fabExpanded), // 키를 변경하여 애니메이션 트리거
-                  color: Colors.black87,
+                  key: ValueKey(widget.fabExpanded),
+                  color: colorScheme.onPrimary,
                 ),
               ),
             ),
@@ -158,8 +153,8 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildSortActions() {
-    final status = widget.selectedSortStatus; // ViewModel에서 전달받은 현재 정렬 상태
+  Widget _buildSortActions(ColorScheme colorScheme, TextTheme textTheme) {
+    final status = widget.selectedSortStatus;
     final actions = <Map<String, dynamic>>[];
 
     if (widget.onSortByName != null) {
@@ -197,14 +192,14 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
       children: [
         for (var action in actions)
           GestureDetector(
-            onTap: action['onTap'] as void Function()?, // 정렬 액션 실행
+            onTap: action['onTap'] as void Function()?,
             child: _buildMiniAction(
               action['label'] as String,
-              isSelected: status?.type == action['type'], // 현재 정렬 타입과 일치하는지 확인
+              isSelected: status?.type == action['type'],
               isAscending:
-                  status?.type == action['type']
-                      ? status?.isAscending
-                      : null, // 일치하면 정렬 방향 전달
+                  status?.type == action['type'] ? status?.isAscending : null,
+              colorScheme: colorScheme,
+              textTheme: textTheme,
             ),
           ),
       ],
@@ -215,9 +210,10 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
     String label, {
     required bool isSelected,
     bool? isAscending,
+    required ColorScheme colorScheme,
+    required TextTheme textTheme,
   }) {
     IconData? icon;
-    // 선택된 상태이고, 정렬 방향 정보가 있을 때만 화살표 아이콘 설정
     if (isSelected && isAscending != null) {
       icon = isAscending ? Icons.arrow_downward : Icons.arrow_upward;
     }
@@ -227,8 +223,10 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
       height: 32,
       margin: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
-        // 선택 여부에 따라 배경색 변경
-        color: isSelected ? ColorStyles.selectedFabColor : ColorStyles.fabColor,
+        color:
+            isSelected
+                ? colorScheme.primaryContainer
+                : colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -236,16 +234,17 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
         children: [
           Text(
             label,
-            style: TextStyle(
-              // 선택 여부에 따라 텍스트 색상 변경 (명암비 개선)
-              color: isSelected ? Colors.black87 : Colors.black54,
+            style: textTheme.bodySmall?.copyWith(
+              color:
+                  isSelected
+                      ? colorScheme.onPrimaryContainer
+                      : colorScheme.onSurfaceVariant,
               fontSize: 13,
             ),
           ),
           if (icon != null) ...[
-            // 화살표 아이콘이 있을 때만 표시
             const SizedBox(width: 4),
-            Icon(icon, size: 14, color: Colors.black54), // 화살표 아이콘 색상
+            Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
           ],
         ],
       ),

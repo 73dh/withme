@@ -8,102 +8,106 @@ Future<void> showCycleEditDialog(
   required int initNumber, // 현재 주기를 인자로 받도록 변경
   required ValueChanged<int> onUpdate, // 업데이트 콜백 추가
 }) async {
-  final controller = TextEditingController(
-    text: initNumber.toString(), // 현재 주기를 초기값으로 설정
-  );
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+  final textTheme = theme.textTheme;
+
+  final controller = TextEditingController(text: initNumber.toString());
 
   await showDialog(
     context: context,
     builder: (dialogContext) {
-      // 다이얼로그 내부의 BuildContext를 명확히 구분
       return Dialog(
-        backgroundColor: Colors.transparent, // CommonConfirmDialog와 동일한 투명 배경
+        backgroundColor: Colors.transparent,
         child: SizedBox(
           width: 180,
           child: Stack(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100, // CommonConfirmDialog와 동일한 배경색
-                  border: Border.all(color: Colors.grey.shade500, width: 1.2),
-                  borderRadius: BorderRadius.circular(
-                    10,
-                  ), // CommonConfirmDialog와 동일한 둥근 모서리
+                  color: colorScheme.surface, // Theme 적용
+                  border: Border.all(color: colorScheme.outline, width: 1.2),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // 내용에 따라 높이 조절
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    // 제목 + 입력
                     Padding(
-                      padding: const EdgeInsets.only(
-                        top: 20.0,
-                        left: 12,
-                        right: 12,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 20,
                       ),
                       child: Column(
-                        // 제목과 내용을 세로로 배치하기 위한 Column
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             title,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              color: colorScheme.onSurface,
                             ),
                           ),
-                          height(10), // 제목과 TextField 사이 간격
+                          height(10),
                           TextField(
                             controller: controller,
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: '(예: 60)',
                               hintText: '1 이상의 숫자를 입력하세요',
-                              // 힌트 텍스트 추가
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                               isDense: true,
-                              // 입력 필드 높이 조절
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 vertical: 12,
                                 horizontal: 10,
                               ),
+                              labelStyle: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              hintStyle: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
                             autofocus: true,
-                            // 다이얼로그 열릴 때 자동으로 키보드 올리기
-                            textAlign: TextAlign.center, // 텍스트 중앙 정렬
+                            textAlign: TextAlign.center,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    height(20), // 내용과 버튼 사이 간격
+                    height(20),
+                    // 버튼
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      // 버튼들을 중앙에 정렬
                       children: [
                         // 취소 버튼
                         FilledButton(
                           onPressed: () => Navigator.of(dialogContext).pop(),
                           style: FilledButton.styleFrom(
-                            backgroundColor: Colors.grey, // 취소 버튼은 회색
-                            minimumSize: const Size(80, 40), // 버튼 최소 크기 지정
+                            backgroundColor: colorScheme.onSurface.withOpacity(
+                              0.12,
+                            ),
+                            foregroundColor: colorScheme.onSurface,
+                            minimumSize: const Size(80, 40),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // 둥근 모서리
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text('취소'),
+                          child: Text('취소', style: textTheme.bodyMedium),
                         ),
-                        width(10), // 버튼 사이 간격
+                        width(10),
                         // 저장 버튼
                         FilledButton(
                           onPressed: () {
-                            final input = int.tryParse(
-                              controller.text.trim(),
-                            ); // 공백 제거
+                            final input = int.tryParse(controller.text.trim());
                             if (input != null && input > 0) {
-                              onUpdate(input); // 콜백을 통해 새로운 값을 전달
-
+                              onUpdate(input);
                               if (dialogContext.mounted) {
-                                Navigator.of(dialogContext).pop(); // 다이얼로그 닫기
+                                Navigator.of(dialogContext).pop();
                                 showOverlaySnackBar(context, '설정이 저장되었습니다.');
                               }
                             } else {
@@ -114,16 +118,23 @@ Future<void> showCycleEditDialog(
                             }
                           },
                           style: FilledButton.styleFrom(
-                            minimumSize: const Size(80, 40), // 버튼 최소 크기 지정
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            minimumSize: const Size(80, 40),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // 둥근 모서리
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text('저장'),
+                          child: Text(
+                            '저장',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    height(10), // 하단 여백
+                    height(10),
                   ],
                 ),
               ),

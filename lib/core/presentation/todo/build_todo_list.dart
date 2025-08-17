@@ -2,6 +2,7 @@ import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../domain/domain_import.dart';
+import '../../../domain/model/customer_model.dart';
 import '../../../domain/model/todo_model.dart';
 import '../../presentation/core_presentation_import.dart';
 import 'todo_view_model.dart';
@@ -89,13 +90,14 @@ class _BuildTodoListState extends State<BuildTodoList> {
   }
 
   Widget _buildTodoText(Color textColor) {
+    print('todoList: ${widget.viewModel.todoList}');
     return Flexible(
       child: SizedBox(
         width: 100,
         child: StreamTodoText(
-          todoList: todoList,
+          todoList: widget.viewModel.todoList,
+          // todoList,
           sex: widget.customer?.sex ?? '',
-          textColor: textColor, // 외부에서 전달한 theme/colorScheme 기반 색상
         ),
       ),
     );
@@ -122,7 +124,8 @@ class _BuildTodoListState extends State<BuildTodoList> {
           widget.onSelected?.call(selected);
         }
       },
-      child: TodoCountIcon(todos: todoList, sex: widget.customer?.sex ?? ''),
+      // child: TodoCountIcon(todos: todoList, sex: widget.customer?.sex ?? ''),
+      child: TodoCountIcon(todos: widget.viewModel.todoList, sex: widget.customer?.sex ?? ''),
     );
   }
 

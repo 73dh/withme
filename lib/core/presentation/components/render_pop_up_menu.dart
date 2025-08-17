@@ -2,12 +2,17 @@ import 'package:go_router/go_router.dart';
 
 import '../../ui/color/color_style.dart';
 import '../core_presentation_import.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../core_presentation_import.dart';
 class RenderPopUpMenu extends StatelessWidget {
   final String label;
   final List<dynamic> items;
   final void Function(dynamic) onSelect;
   final IconData? icon;
+  final Color? textColor;
+  final Color? iconColor;
 
   const RenderPopUpMenu({
     super.key,
@@ -15,40 +20,62 @@ class RenderPopUpMenu extends StatelessWidget {
     required this.items,
     required this.onSelect,
     this.icon,
+    this.textColor,
+    this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        PopupMenuButton<dynamic>(
-          padding: EdgeInsets.zero, // 버튼 바깥 padding 제거
-          constraints: const BoxConstraints(), // 메뉴 항목의 기본 크기 제한 제거
-          child: Icon(
-            icon ?? Icons.more_vert,
-            size: 18,
-            color: ColorStyles.menuButtonColor,
-          ), // 작고 간단한 버튼 UI
-          itemBuilder: (context) {
-            return items
-                .map(
-                  (e) => PopupMenuItem<dynamic>(
-                    child: GestureDetector(
-                      onTap: () {
-                        onSelect(e);
-                        context.pop();
-                      },
-                      child: Text(e.toString()),
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Flexible(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PopupMenuButton<dynamic>(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: Icon(
+              icon ?? Icons.more_vert,
+              size: 18,
+              color: iconColor ?? colorScheme.primary,
+            ),
+            itemBuilder: (context) {
+              return items
+                  .map(
+                    (e) => PopupMenuItem<dynamic>(
+                  child: GestureDetector(
+                    onTap: () {
+                      onSelect(e);
+                      context.pop();
+                    },
+                    child: Text(
+                      e.toString(),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: textColor ?? colorScheme.onSurface,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                )
-                .toList();
-          },
-        ),
-        width(5),
-        Text(label),
-      ],
+                ),
+              )
+                  .toList();
+            },
+          ),
+          // const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              label,
+              style: textTheme.bodySmall?.copyWith(
+                color: textColor ?? colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

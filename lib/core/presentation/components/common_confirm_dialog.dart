@@ -1,5 +1,9 @@
 import '../core_presentation_import.dart';
 import '../core_presentation_import.dart';
+import '../core_presentation_import.dart';
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
@@ -7,6 +11,11 @@ class CommonConfirmDialog extends StatelessWidget {
   final String confirmButtonText;
   final String cancelButtonText;
   final Future<void> Function() onConfirm;
+  final Color backgroundColor;
+  final Color confirmButtonColor;
+  final Color cancelButtonColor;
+  final Color confirmTextColor;
+  final Color cancelTextColor;
 
   const CommonConfirmDialog({
     super.key,
@@ -15,89 +24,52 @@ class CommonConfirmDialog extends StatelessWidget {
     required this.confirmButtonText,
     required this.cancelButtonText,
     required this.onConfirm,
+    required this.backgroundColor,
+    required this.confirmButtonColor,
+    required this.cancelButtonColor,
+    required this.confirmTextColor,
+    required this.cancelTextColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
+    final textTheme = Theme.of(context).textTheme;
 
-    return Dialog(
-      // backgroundColor: Colors.transparent,
-      child: Container(
-        // color: colorScheme.surface,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          border: Border.all(color: colorScheme.outline, width: 1.2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if(textSpans.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(children: textSpans),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Cancel Button
-                if (cancelButtonText.isNotEmpty)
-                  FilledButton(
-                    onPressed: () {
-                      if (context.mounted) {
-                        Navigator.of(context).pop(false);
-                      }
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.surfaceContainerHighest,
-                      foregroundColor: colorScheme.onSurfaceVariant,
-                    ),
-                    child: Text(cancelButtonText, style: textTheme.labelLarge),
-                  ),
-                const SizedBox(width: 12),
-                // Confirm Button
-                FilledButton(
-                  onPressed: () async {
-                    await onConfirm();
-                    if (context.mounted) {
-                      Navigator.of(context).pop(true);
-                    }
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.surfaceContainerHighest,
-                  ),
-                  child: Text(
-                    confirmButtonText,
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.surfaceContainerHighest,
+    return AlertDialog(
+      backgroundColor: backgroundColor,
+      content: textSpans.isNotEmpty
+          ? RichText(text: TextSpan(children: textSpans))
+          : Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+                    text,
+                    style: textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                ),
-              ],
+          ),
+      actions: [
+        if (cancelButtonText.isNotEmpty)
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: cancelTextColor,
+              backgroundColor: cancelButtonColor,
+
             ),
-            const SizedBox(height: 12),
-          ],
+            child: Text(cancelButtonText),
+          ),
+        ElevatedButton(
+          onPressed: () async {
+            await onConfirm();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: confirmButtonColor,
+            foregroundColor: confirmTextColor,
+          ),
+          child: Text(confirmButtonText),
         ),
-      ),
+      ],
     );
   }
 }

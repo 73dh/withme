@@ -5,9 +5,49 @@ import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/todo_model.dart';
 import '../../di/setup.dart';
 import '../../utils/core_utils_import.dart';
 import '../core_presentation_import.dart';
+import '../todo/todo_view_model.dart';
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
+import 'package:withme/core/ui/core_ui_import.dart';
+import 'package:withme/domain/model/history_model.dart';
+import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
+
+import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/todo_model.dart';
+import '../../di/setup.dart';
+import '../../utils/core_utils_import.dart';
+import '../core_presentation_import.dart';
+import '../todo/todo_view_model.dart';
+
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
+import 'package:withme/core/ui/core_ui_import.dart';
+import 'package:withme/domain/model/history_model.dart';
+import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
+
+import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/todo_model.dart';
+import '../../di/setup.dart';
+import '../../utils/core_utils_import.dart';
+import '../core_presentation_import.dart';
+import '../todo/todo_view_model.dart';
+
+import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/todo_count_icon.dart';
+import 'package:withme/core/ui/core_ui_import.dart';
+import 'package:withme/domain/model/history_model.dart';
+import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
+
+import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/todo_model.dart';
+import '../../di/setup.dart';
+import '../../utils/core_utils_import.dart';
+import '../core_presentation_import.dart';
+import '../todo/todo_view_model.dart';
 
 class ProspectItem extends StatelessWidget {
   final String userKey;
@@ -26,157 +66,142 @@ class ProspectItem extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
-    final DateTime? birthDate = customer.birth?.toLocal();
     final info = customer.insuranceInfo;
 
-    return IntrinsicHeight(
-      child: StreamBuilder<List<HistoryModel>>(
-        stream: getIt<HistoryUseCase>().call(
-          usecase: GetHistoriesUseCase(
-            userKey: userKey,
-            customerKey: customer.customerKey,
-          ),
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            debugPrint(snapshot.error.toString());
-          }
-          if (!snapshot.hasData) return const SizedBox.shrink();
-
-          final histories =
-              snapshot.data!
-                ..sort((a, b) => a.contactDate.compareTo(b.contactDate));
-
-          return ItemContainer(
-            backgroundColor:
-                info.isUrgent
-                    ? colorScheme.errorContainer
-                    : colorScheme.surface,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildProfileColumn(context, customer, textTheme, colorScheme),
-                width(12),
-                _buildNamePart(
-                  context,
-                  birthDate: birthDate,
-                  difference: info.difference,
-                  isUrgent: info.isUrgent,
-                  insuranceChangeDate: info.insuranceChangeDate,
-                  textTheme: textTheme,
-                  colorScheme: colorScheme,
-                ),
-                width(10),
-                Expanded(
-                  child: HistoryPartWidget(
-                    histories: histories,
-                    onTap: onTap,
-                    sex: customer.sex,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+    // TodoViewModel에서 고객별 실시간 todo 구독
+    final todoViewModel = getIt<TodoViewModel>();
+    todoViewModel.initializeTodos(
+      userKey: userKey,
+      customerKey: customer.customerKey,
     );
-  }
 
-  Widget _buildProfileColumn(
-    BuildContext context,
-    CustomerModel customer,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text(
-          customer.registeredDate.formattedYearAndMonth,
-          style: textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        height(3),
-        SexIconWithBirthday(
-          birth: customer.birth,
-          sex: customer.sex,
-          backgroundImagePath:
-              customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,
-        ),
-      ],
-    );
-  }
+    return StreamBuilder<List<TodoModel>>(
+      stream: todoViewModel.todoStream,
+      builder: (context, todoSnapshot) {
+        final todos = todoSnapshot.data ?? customer.todos;
 
-  Widget _buildNamePart(
-    BuildContext context, {
-    required DateTime? birthDate,
-    required int? difference,
-    required bool isUrgent,
-    required DateTime? insuranceChangeDate,
-    required TextTheme textTheme,
-    required ColorScheme colorScheme,
-  }) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                shortenedNameText(customer.name, length: 6),
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-              width(6),
-              if (birthDate != null)
-                Text(
-                  '${birthDate.formattedBirth} (${calculateAge(birthDate)}세)',
-                  style: textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              if (customer.todos.isNotEmpty) ...[
-                width(3),
-                SizedBox(
-                  width: 50,
-                  child: StreamTodoText(
-                    todoList: customer.todos,
-                    sex: customer.sex,
-                  ),
-                ),
-                TodoCountIcon(
-                  todos: customer.todos,
-                  sex: customer.sex,
-                  iconSize: 18,
-                ),
-              ],
-            ],
+        return StreamBuilder<List<HistoryModel>>(
+          stream: getIt<HistoryUseCase>().call(
+            usecase: GetHistoriesUseCase(
+              userKey: userKey,
+              customerKey: customer.customerKey,
+            ),
           ),
-          height(6),
-          if (birthDate != null &&
-              difference != null &&
-              insuranceChangeDate != null)
-            InsuranceAgeWidget(
-              difference: difference,
-              isUrgent: isUrgent,
-              insuranceChangeDate: insuranceChangeDate,
-            ),
-          if (customer.recommended.isNotEmpty) ...[
-            height(2),
-            Text(
-              '소개자: ${customer.recommended}',
-              style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+          builder: (context, historySnapshot) {
+            final histories = historySnapshot.data ?? [];
+
+            return ItemContainer(
+              backgroundColor: info.isUrgent
+                  ? colorScheme.errorContainer
+                  : colorScheme.surface,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 등록일 + 성별 아이콘
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        customer.registeredDate.formattedYearAndMonth,
+                        style: textTheme.labelMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      SexIconWithBirthday(
+                        birth: customer.birth,
+                        sex: customer.sex,
+                        backgroundImagePath:
+                        customer.sex == '남'
+                            ? IconsPath.manIcon
+                            : IconsPath.womanIcon,
+                        size: 35,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // 이름, 생년월일, 상령일, 할일
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 이름 + 할일 Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                shortenedNameText(customer.name, length: 6),
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (todos.isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              SizedBox(
+                                width: 30,
+                                child: StreamTodoText(
+                                  todoList: todos,
+                                  sex: customer.sex,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              TodoCountIcon(
+                                todos: todos,
+                                sex: customer.sex,
+                                iconSize: 18,
+                              ),
+                            ],
+                          ],
+                        ),
+
+                        const SizedBox(height: 2),
+
+                        // 생년월일
+                        if (customer.birth != null)
+                          Text(
+                            '${customer.birth!.formattedBirth} (${calculateAge(customer.birth!)}세)',
+                            style: textTheme.labelMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                        // 상령일
+                        if (info.difference != null &&
+                            info.insuranceChangeDate != null)
+                          InsuranceAgeWidget(
+                            difference: info.difference!,
+                            isUrgent: info.isUrgent,
+                            insuranceChangeDate: info.insuranceChangeDate!,
+                            colorScheme: colorScheme,
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // HistoryPartWidget은 남는 공간 차지
+                  SizedBox(
+                    width: 80,
+                    child: HistoryPartWidget(
+                      histories: histories,
+                      onTap: onTap,
+                      sex: customer.sex,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ],
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
+

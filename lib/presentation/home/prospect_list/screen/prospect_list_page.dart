@@ -11,7 +11,6 @@ import 'package:withme/presentation/home/prospect_list/components/prospect_list_
 
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/components/temporary/text_theme_font_size_pop_up.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../registration/screen/registration_screen.dart';
 
@@ -193,6 +192,7 @@ class _ProspectListPageState extends State<ProspectListPage>
           stream: viewModel.cachedProspects,
           builder: (context, snapshot) {
             final customers = snapshot.data ?? [];
+
             return Scaffold(
               backgroundColor: theme.scaffoldBackgroundColor,
               appBar: _buildAppBar(customers),
@@ -203,9 +203,6 @@ class _ProspectListPageState extends State<ProspectListPage>
                   Expanded(child: _buildProspectList(customers)),
                 ],
               ),
-              floatingActionButton: _buildDebugFab(),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.startFloat,
             );
           },
         ),
@@ -255,6 +252,7 @@ class _ProspectListPageState extends State<ProspectListPage>
       itemCount: customers.length,
       itemBuilder: (context, index) {
         final customer = customers[index];
+
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: GestureDetector(
@@ -276,24 +274,6 @@ class _ProspectListPageState extends State<ProspectListPage>
           ),
         );
       },
-    );
-  }
-
-  Widget _buildDebugFab() {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-      ),
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => TextThemeFontSizePopup(textTheme: textTheme),
-        );
-      },
-      child: const Text('FontSize 보기'),
     );
   }
 }

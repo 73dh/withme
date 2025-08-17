@@ -1,5 +1,7 @@
 import '../../../../core/presentation/core_presentation_import.dart';
 
+import '../../../../core/presentation/core_presentation_import.dart';
+
 class DraggableFilterSheet extends StatefulWidget {
   final ScrollController? scrollController;
   final bool isLoadingAllData;
@@ -23,6 +25,9 @@ class _DraggableFilterSheetState extends State<DraggableFilterSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
         if (notification.extent < 0.2) {
@@ -43,18 +48,25 @@ class _DraggableFilterSheetState extends State<DraggableFilterSheet> {
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
+                decoration: BoxDecoration(
+                  color: colorScheme.surface, // 다크/라이트 대응
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 10,
+                      color: colorScheme.shadow.withValues(alpha: 0.2), // 투명도 조정
+                    ),
+                  ],
                 ),
                 child: widget.buildFilterOptions(scrollController),
               ),
               if (widget.isLoadingAllData)
-                const Positioned(
+                Positioned(
                   top: 13,
                   right: 20,
-                  child: LoadingIndicatorRow(),
+                  child: LoadingIndicatorRow(colorScheme: colorScheme),
                 ),
             ],
           );
@@ -65,15 +77,22 @@ class _DraggableFilterSheetState extends State<DraggableFilterSheet> {
 }
 
 class LoadingIndicatorRow extends StatelessWidget {
-  const LoadingIndicatorRow({super.key});
+  final ColorScheme colorScheme;
+
+  const LoadingIndicatorRow({super.key, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       children: [
-        Text('Loading'),
-        SizedBox(width: 5),
-        MyCircularIndicator(size: 10),
+        Text(
+          'Loading',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurface, // 배경 대비 자동
+          ),
+        ),
+        const SizedBox(width: 5),
+        const MyCircularIndicator(size: 10),
       ],
     );
   }

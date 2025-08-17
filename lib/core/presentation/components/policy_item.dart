@@ -3,6 +3,13 @@ import '../../domain/enum/policy_state.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
 import '../core_presentation_import.dart';
+
+import '../../../domain/model/policy_model.dart';
+import '../../domain/enum/policy_state.dart';
+import '../../utils/core_utils_import.dart';
+import '../../utils/extension/number_format.dart';
+import '../core_presentation_import.dart';
+
 class PolicyItem extends StatelessWidget {
   final PolicyModel policy;
 
@@ -12,15 +19,18 @@ class PolicyItem extends StatelessWidget {
 
   bool get isLapsed => policy.policyState == PolicyState.lapsed.label;
 
+  /// 상태별 컬러 반환
   Color statusColor(ColorScheme colorScheme) {
-    if (isLapsed) return colorScheme.error; // 기존 Colors.red
-    if (isCancelled) return colorScheme.tertiary; // 기존 Colors.orange
-    return colorScheme.onSurface; // 기존 Colors.black87
+    if (isLapsed) return colorScheme.error;
+    if (isCancelled) return colorScheme.tertiary;
+    return colorScheme.primary; // 기존 onSurface → 주요 색상으로 변경
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return ItemContainer(
       height: 240,
@@ -30,40 +40,42 @@ class PolicyItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _titleRow(context),
+            _titleRow(textTheme, colorScheme),
             height(3),
-            _personInfoRow(context, colorScheme),
+            _personInfoRow(textTheme, colorScheme),
             const DashedDivider(),
-            _insuranceInfoRow(context, colorScheme),
+            _insuranceInfoRow(textTheme, colorScheme),
             height(4),
             Text(
               '상품명: ${policy.productName}',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
             const DashedDivider(),
-            _contractDateRow(context, colorScheme),
+            _contractDateRow(textTheme, colorScheme),
             const DashedDivider(),
-            _premiumAndStateRow(colorScheme),
+            _premiumAndStateRow(textTheme, colorScheme),
           ],
         ),
       ),
     );
   }
 
-  Widget _titleRow(BuildContext context) => Row(
+  Widget _titleRow(TextTheme textTheme, ColorScheme colorScheme) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      _labelValue(context, '계약자', ''),
-      _labelValue(context, '피보험자', ''),
+      _labelValue('계약자', '', textTheme, colorScheme),
+      _labelValue('피보험자', '', textTheme, colorScheme),
     ],
   );
 
-  Widget _personInfoRow(BuildContext context, ColorScheme colorScheme) => Row(
+  Widget _personInfoRow(TextTheme textTheme, ColorScheme colorScheme) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       _personDetail(
-        context,
+        textTheme,
         sexIcon: sexIcon(policy.policyHolderSex, colorScheme),
         name: shortenedNameText(policy.policyHolder, length: 5),
         age: calculateAge(policy.policyHolderBirth!),
@@ -71,7 +83,7 @@ class PolicyItem extends StatelessWidget {
         colorScheme: colorScheme,
       ),
       _personDetail(
-        context,
+        textTheme,
         sexIcon: sexIcon(policy.insuredSex, colorScheme),
         name: shortenedNameText(policy.insured, length: 5),
         age: calculateAge(policy.insuredBirth!),
@@ -81,28 +93,42 @@ class PolicyItem extends StatelessWidget {
     ],
   );
 
-  Widget _insuranceInfoRow(BuildContext context, ColorScheme colorScheme) => Row(
+  Widget _insuranceInfoRow(TextTheme textTheme, ColorScheme colorScheme) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      _labelValue(context, '보험사', policy.insuranceCompany, colorScheme: colorScheme),
-      _labelValue(context, '종류', policy.productCategory, colorScheme: colorScheme),
+      _labelValue('보험사', policy.insuranceCompany, textTheme, colorScheme),
+      _labelValue('종류', policy.productCategory, textTheme, colorScheme),
     ],
   );
 
-  Widget _contractDateRow(BuildContext context, ColorScheme colorScheme) => Row(
+  Widget _contractDateRow(TextTheme textTheme, ColorScheme colorScheme) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      _labelValue(context, '계약일', policy.startDate?.formattedBirth ?? '-', colorScheme: colorScheme),
-      _labelValue(context, '만기일', policy.endDate?.formattedBirth ?? '-', colorScheme: colorScheme),
+      _labelValue(
+        '계약일',
+        policy.startDate?.formattedBirth ?? '-',
+        textTheme,
+        colorScheme,
+      ),
+      _labelValue(
+        '만기일',
+        policy.endDate?.formattedBirth ?? '-',
+        textTheme,
+        colorScheme,
+      ),
     ],
   );
 
-  Widget _premiumAndStateRow(ColorScheme colorScheme) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [Expanded(child: _premiumText(colorScheme)), _statusBadge(colorScheme)],
-  );
+  Widget _premiumAndStateRow(TextTheme textTheme, ColorScheme colorScheme) =>
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: _premiumText(textTheme, colorScheme)),
+          _statusBadge(textTheme, colorScheme),
+        ],
+      );
 
-  Widget _premiumText(ColorScheme colorScheme) {
+  Widget _premiumText(TextTheme textTheme, ColorScheme colorScheme) {
     final formattedPremium = numFormatter.format(
       int.parse(policy.premium.replaceAll(',', '')),
     );
@@ -110,74 +136,96 @@ class PolicyItem extends StatelessWidget {
     return Text.rich(
       TextSpan(
         children: [
-          const TextSpan(text: '보험료: '),
           TextSpan(
-            text: '$formattedPremium원',
-            style: TextStyle(
-              color: statusColor(colorScheme),
-              fontWeight: FontWeight.w500,
-              decoration:
-              (isCancelled || isLapsed) ? TextDecoration.lineThrough : TextDecoration.none,
+            text: '보험료: ',
+            style: textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
-          TextSpan(text: ' (${policy.paymentMethod})'),
+          TextSpan(
+            text: '$formattedPremium원',
+            style: textTheme.labelMedium?.copyWith(
+              color: statusColor(colorScheme),
+              fontWeight: FontWeight.w600,
+              decoration:
+                  (isCancelled || isLapsed)
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
+            ),
+          ),
+          TextSpan(
+            text: ' (${policy.paymentMethod})',
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _statusBadge(ColorScheme colorScheme) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(
-      color: statusColor(colorScheme).withOpacity(0.2),
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Text(
-      policy.policyState,
-      style: TextStyle(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w500,
+  Widget _statusBadge(TextTheme textTheme, ColorScheme colorScheme) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: statusColor(colorScheme).withOpacity(0.2),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          policy.policyState,
+          style: textTheme.labelMedium?.copyWith(
+            color: statusColor(colorScheme),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+
+  Widget _labelValue(
+    String label,
+    String value,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: textTheme.labelLarge?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
       ),
-    ),
+      if (value.isNotEmpty) ...[
+        height(2),
+        Text(
+          value,
+          style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface),
+        ),
+      ],
+    ],
   );
 
-  Widget _labelValue(BuildContext context, String label, String value,
-      {ColorScheme? colorScheme}) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .labelMedium
-                ?.copyWith(color: colorScheme?.onSurfaceVariant ?? Colors.grey),
-          ),
-          if (value.isNotEmpty) ...[
-            height(2),
-            Text(value, style: Theme.of(context).textTheme.headlineMedium),
-          ],
-        ],
-      );
-
   Widget _personDetail(
-      BuildContext context, {
-        required String name,
-        required Widget sexIcon,
-        required int age,
-        required String birth,
-        ColorScheme? colorScheme,
-      }) =>
-      Row(
-        children: [
-          sexIcon,
-          width(4),
-          Text(name, style: Theme.of(context).textTheme.headlineMedium),
-          width(6),
-          Text('$birth ($age세)',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: colorScheme?.onSurfaceVariant,
-              )),
-        ],
-      );
+    TextTheme textTheme, {
+    required String name,
+    required Widget sexIcon,
+    required int age,
+    required String birth,
+    ColorScheme? colorScheme,
+  }) => Row(
+    children: [
+      sexIcon,
+      width(4),
+      Text(
+        name,
+        style: textTheme.bodyLarge?.copyWith(color: colorScheme?.onSurface),
+      ),
+      width(6),
+      Text(
+        '$birth ($age세)',
+        style: textTheme.labelSmall?.copyWith(
+          color: colorScheme?.onSurfaceVariant,
+        ),
+      ),
+    ],
+  );
 }

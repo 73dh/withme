@@ -92,7 +92,7 @@ class CustomerInfo extends StatelessWidget {
                   InsuranceAgeWidget(
                     difference: difference!,
                     isUrgent: isUrgent,
-                    insuranceChangeDate: insuranceChangeDate!,
+                    insuranceChangeDate: insuranceChangeDate!, colorScheme: colorScheme,
                   ),
 
                 /// 소개자

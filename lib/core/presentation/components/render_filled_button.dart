@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/search/enum/coming_birth.dart';
 import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
 import 'package:withme/presentation/home/search/enum/upcoming_insurance_age.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/presentation/home/search/enum/coming_birth.dart';
+import 'package:withme/presentation/home/search/enum/no_contact_month.dart';
+import 'package:withme/presentation/home/search/enum/upcoming_insurance_age.dart';
 
 class RenderFilledButton extends StatelessWidget {
   final void Function()? onPressed;
@@ -19,7 +23,7 @@ class RenderFilledButton extends StatelessWidget {
   final List<PopupMenuEntry<dynamic>>? menuItems;
   final void Function(dynamic)? onMenuSelected;
   final String? selectedMenu;
-  final double? width; // 추가 옵션
+  final double? width;
 
   const RenderFilledButton({
     super.key,
@@ -46,9 +50,12 @@ class RenderFilledButton extends StatelessWidget {
   }
 
   Widget _buildButton(BuildContext context, ColorScheme colorScheme) {
+    final bgColor = backgroundColor ?? colorScheme.primary;
+    final fgColor = foregroundColor ?? colorScheme.onPrimary;
+
     final style = FilledButton.styleFrom(
-      backgroundColor: backgroundColor ?? colorScheme.primary,
-      foregroundColor: foregroundColor ?? colorScheme.onPrimary,
+      backgroundColor: bgColor,
+      foregroundColor: fgColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
       ),
@@ -77,7 +84,7 @@ class RenderFilledButton extends StatelessWidget {
               ),
             ),
             if (icon != null) ...[
-              Icon(icon, size: 18),
+              Icon(icon, size: 18, color: fgColor),
               const SizedBox(width: 2),
             ],
             Expanded(
@@ -88,7 +95,7 @@ class RenderFilledButton extends StatelessWidget {
                   selectedMenu ?? text,
                   style: TextStyle(
                     fontSize: 14,
-                    color: foregroundColor ?? colorScheme.onPrimary,
+                    color: fgColor,
                   ),
                 ),
               ),
@@ -106,10 +113,7 @@ class RenderFilledButton extends StatelessWidget {
         textAlign: TextAlign.center,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
-        style: TextStyle(
-          fontSize: 14,
-          color: foregroundColor ?? colorScheme.onPrimary,
-        ),
+        style: TextStyle(fontSize: 14, color: fgColor),
       ),
     );
   }
@@ -119,11 +123,11 @@ class RenderFilledButton extends StatelessWidget {
       final firstItem = menuItems!.first;
 
       if (firstItem is PopupMenuItem<NoContactMonth>) {
-        return Icon(Icons.schedule, size: 22, color: colorScheme.onPrimary);
+        return Icon(Icons.schedule, size: 16, color: colorScheme.onSurface);
       } else if (firstItem is PopupMenuItem<ComingBirth>) {
-        return Icon(Icons.cake_outlined, size: 22, color: colorScheme.onPrimary);
+        return Icon(Icons.cake_outlined, size: 16, color: colorScheme.onSurface);
       } else if (firstItem is PopupMenuItem<UpcomingInsuranceAge>) {
-        return Icon(Icons.calendar_today, size: 22, color: colorScheme.onPrimary);
+        return Icon(Icons.calendar_today, size: 16, color: colorScheme.onSurface);
       }
     }
     return Icon(Icons.arrow_drop_down, size: 25, color: colorScheme.onPrimary);

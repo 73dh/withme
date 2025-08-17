@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 class PartBox extends StatelessWidget {
   final Widget child;
@@ -8,18 +9,24 @@ class PartBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: color ?? Colors.grey.shade100,
-        border: Border.all(color: Colors.grey.shade500, width: 1.2),
+        color: color ?? colorScheme.surface, // Theme 기반 배경
+        border: Border.all(
+          color: colorScheme.outline, // Theme 기반 테두리
+          width: 1.2,
+        ),
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5), // 그림자 색상
-            offset: const Offset(3, 3), // x, y 방향 으로 이동 (오른쪽 아래)
-            blurRadius: 6, // 흐림 정도
-            spreadRadius: 1, // 퍼짐 정도
+            color: colorScheme.shadow.withValues(alpha: 0.25), // Theme 그림자 색
+            offset: const Offset(3, 3),
+            blurRadius: 6,
+            spreadRadius: 1,
           ),
         ],
       ),

@@ -1,26 +1,35 @@
 import '../../../../core/presentation/core_presentation_import.dart';
+import 'package:flutter/material.dart';
+import '../../../../core/presentation/core_presentation_import.dart';
 
 class MembershipExpiredBox extends StatelessWidget {
   const MembershipExpiredBox({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final warningColor = colorScheme.error;
+
     return Container(
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
+        color: warningColor.withOpacity(0.1), // 연한 배경
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.shade300),
+        border: Border.all(color: warningColor.withOpacity(0.5)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.warning, color: Colors.red),
-          SizedBox(width: 8),
+          Icon(Icons.warning, color: warningColor),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               '유료회원 서비스가 만료되어 고객 추가 등록이 불가합니다.\n멤버십을 갱신해주세요.',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: warningColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

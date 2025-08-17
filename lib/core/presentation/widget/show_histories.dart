@@ -19,9 +19,9 @@ class CommonDialog {
   CommonDialog({required this.menuController, required this.textController});
 
   Future<String?> showHistories(
-      BuildContext context,
-      List<HistoryModel> histories,
-      ) async {
+    BuildContext context,
+    List<HistoryModel> histories,
+  ) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -112,9 +112,10 @@ class CommonDialog {
                                     ),
                                     child: Text(
                                       e.content,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: colorScheme.onSurface,
-                                      ),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: colorScheme.onSurface,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -137,7 +138,7 @@ class CommonDialog {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: _inputArea(context, setState, colorScheme),
                       ),
-                      height(20),
+                      height(60),
                     ],
                   ),
                 ),
@@ -149,7 +150,11 @@ class CommonDialog {
     );
   }
 
-  Widget _inputArea(BuildContext context, StateSetter setState, ColorScheme colorScheme) {
+  Widget _inputArea(
+    BuildContext context,
+    StateSetter setState,
+    ColorScheme colorScheme,
+  ) {
     final showTextField = textController.text.isEmpty;
 
     return Row(
@@ -168,6 +173,7 @@ class CommonDialog {
               onCompleted: () => setState(() => textController.text.trim()),
             ),
           )
+
         else
           const Spacer(),
         width(5),
@@ -191,10 +197,10 @@ class CommonDialog {
           ),
           child: const Text('추가'),
         ),
+
       ],
     );
   }
-
 
   HistoryButton _historyButton(StateSetter setState, BuildContext context) {
     return HistoryButton(
@@ -213,5 +219,4 @@ class CommonDialog {
       },
     );
   }
-
 }
