@@ -125,8 +125,9 @@ class DashBoardPage extends StatelessWidget {
                           monthlyData: processedData.flattenedMonthly,
                           prospectBarColor: colorScheme.primary,
                           contractBarColor: colorScheme.secondary,
-                          labelStyle: textTheme.bodyMedium?.copyWith(
+                          labelStyle: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurface,
+                            fontSize: 12, // ✅ X축 텍스트 크기 지정
                           ),
                         ),
                         height(10),

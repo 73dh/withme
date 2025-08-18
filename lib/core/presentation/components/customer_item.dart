@@ -131,7 +131,15 @@ class CustomerItem extends StatelessWidget {
         if (customer.todos.isNotEmpty) ...[
           SizedBox(
             width: 30,
-            child: StreamTodoText(todoList: customer.todos, sex: customer.sex),
+            child:
+    StreamTodoText(
+    todoList: customer.todos.map((t) => t.content).toList(),
+    style: theme.textTheme.bodySmall?.copyWith(
+    color: getSexIconColor(customer.sex, colorScheme),
+    fontWeight: FontWeight.bold,
+    ),
+    )
+            // StreamTodoText(todoList: customer.todos, sex: customer.sex),
           ),
           const SizedBox(width: 2),
           TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 18),
@@ -155,12 +163,17 @@ class CustomerItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showPrev)
-          Text(
-            '...prev',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontStyle: FontStyle.italic,
-            ),
+          Row(
+            children: [
+              width(5),
+              Text(
+                '...prev',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
           ),
         height(2),
         ...recentPolicies.map((policy) {
@@ -175,6 +188,7 @@ class CustomerItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              width(5),
               Text(
                 policy.startDate?.formattedBirth ?? '',
                 style: theme.textTheme.bodySmall?.copyWith(

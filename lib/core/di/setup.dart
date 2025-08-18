@@ -8,6 +8,7 @@ import 'package:withme/presentation/home/dash_board/dash_board_view_model.dart';
 import 'package:withme/presentation/home/search/search_page_view_model.dart';
 
 import '../../presentation/registration/registration_view_model.dart';
+import '../data/fire_base/firestore_keys.dart';
 import '../presentation/todo/todo_view_model.dart';
 import '../router/router.dart';
 import 'di_setup_import.dart';
@@ -64,8 +65,8 @@ Future<void> diSetup() async {
     params,
     _,
   ) {
-    final userKey = params?['userKey'];
-    final customerKey = params?['customerKey'];
+    final userKey = params?[keyUserKey];
+    final customerKey = params?[keyCustomerKey];
     if (userKey == null || customerKey == null) {
       throw ArgumentError('userKey와 customerKey는 필수입니다.');
     }

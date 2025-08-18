@@ -71,38 +71,4 @@ class RegistrationViewModel with ChangeNotifier {
       ),
     );
   }
-
-  // Future<void> _addTodo({
-  //   required String userKey,
-  //   required String customerKey,
-  //   required Map<String, dynamic> todoData,
-  // }) async {
-  //   _isLoading = true;
-  //   notifyListeners();
-  //
-  //   await _todoUseCase.execute(
-  //     usecase: AddTodoUseCase(
-  //       userKey: userKey,
-  //       customerKey: customerKey,
-  //       todoData: todoData,
-  //     ),
-  //   );
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
-  //
-  // Future<void> _onDeleteTodo({
-  //   required String userKey,
-  //   required String customerKey,
-  //   required String todoId,
-  // }) async {
-  //   await _todoUseCase.execute(
-  //     usecase: DeleteTodoUseCase(
-  //       userKey: userKey,
-  //       customerKey: customerKey,
-  //       todoId: todoId,
-  //     ),
-  //   );
-  //   notifyListeners();
-  // }
 }

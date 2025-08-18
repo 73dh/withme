@@ -87,7 +87,7 @@ class _CustomBarChartState extends State<CustomBarChart> {
         widget.contractBarColor ?? colorScheme.secondary.withValues(alpha: 0.8);
     final labelStyle =
         widget.labelStyle ??
-        textTheme.bodySmall?.copyWith(color: colorScheme.onSurface);
+        textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface,);
 
     return SizedBox(
       height: 300,
@@ -171,6 +171,7 @@ class _CustomBarChartState extends State<CustomBarChart> {
                           topTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false),
                           ),
+
                         ),
                         gridData: FlGridData(
                           show: true,

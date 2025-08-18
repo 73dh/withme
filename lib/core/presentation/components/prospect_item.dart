@@ -56,7 +56,7 @@ class ProspectItem extends StatelessWidget {
             return ItemContainer(
               backgroundColor:
                   info.isUrgent
-                      ? colorScheme.errorContainer
+                      ? colorScheme.secondaryContainer
                       : colorScheme.surface,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,11 +106,11 @@ class ProspectItem extends StatelessWidget {
                             ),
                             if (todos.isNotEmpty) ...[
                               const SizedBox(width: 6),
-                              SizedBox(
-                                width: 30,
-                                child: StreamTodoText(
-                                  todoList: todos,
-                                  sex: customer.sex,
+                              StreamTodoText(
+                                todoList: todos.map((t) => t.content).toList(),
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: getSexIconColor(customer.sex, colorScheme),
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(width: 4),

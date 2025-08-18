@@ -76,11 +76,11 @@ class _ManageTodoListState extends State<ManageTodoList> {
         Flexible(
           child: Row(
             children: [
-              SizedBox(
-                width: 100,
-                child: StreamTodoText(
-                  todoList: todoList,
-                  sex: widget.customerSex, // 성별 기반 색상 적용
+              StreamTodoText(
+                todoList: todoList.map((t) => t.content).toList(),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: getSexIconColor(widget.customerSex, colorScheme),
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(width: 4),

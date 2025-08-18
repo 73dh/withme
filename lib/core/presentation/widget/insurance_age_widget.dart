@@ -43,12 +43,12 @@ class InsuranceAgeWidget extends StatelessWidget {
           ),
         ),
         if (isFuture && isUrgent) ...[
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           SizedBox(
-            width: 18,
-            height: 18,
+            width: 20,
+            height: 20,
             child: RotatingDots(
-              size: 15,
+              size: 17,
               dotBaseSize: 4,
               dotPulseRange: 2,
               colors: [colorScheme.error, colorScheme.primary],

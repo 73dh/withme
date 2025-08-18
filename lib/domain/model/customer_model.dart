@@ -67,31 +67,51 @@ class CustomerModel {
   }
 
   CustomerModel.fromMap(
-    Map<String, dynamic> map,
-    this.userKey, {
-    this.documentReference,
-  }) : customerKey = map[keyCustomerKey] ?? '',
-       name = map[keyCustomerName] ?? '',
-       sex = map[keyCustomerSex] ?? '',
-       birth =
-           map[keyCustomerBirth] != ''
-               ? (map[keyCustomerBirth] as Timestamp).toDate()
-               : null,
-       policies = [],
-       // (map[keyIsPolicy] as List<dynamic>? ?? [])
-       //     .map((e) => PolicyModel.fromMap(e as Map<String, dynamic>))
-       //     .toList(),
-       recommended = map[keyRecommendByWho] ?? '',
-       registeredDate = (map[keyRegisteredDate] as Timestamp).toDate(),
-       histories =
-           (map[keyCustomerHistory] as List<dynamic>? ?? [])
-               .map((e) => HistoryModel.fromMap(e as Map<String, dynamic>))
-               .toList(),
-       todos =
-           (map[keyCustomerTodo] as List<dynamic>? ?? [])
-               .map((e) => TodoModel.fromMap(e as Map<String, dynamic>))
-               .toList(),
-       memo = map[keyCustomerMemo] ?? '';
+      Map<String, dynamic> map,
+      String snapshotId, {
+        this.documentReference,
+      })  : customerKey = map[keyCustomerKey] ?? snapshotId, // ✅ 필드 없으면 doc.id 사용
+        userKey = map[keyUserKey] ?? '',
+        name = map[keyCustomerName] ?? '',
+        sex = map[keyCustomerSex] ?? '',
+        birth = map[keyCustomerBirth] != ''
+            ? (map[keyCustomerBirth] as Timestamp).toDate()
+            : null,
+        policies = [],
+        recommended = map[keyRecommendByWho] ?? '',
+        registeredDate = (map[keyRegisteredDate] as Timestamp).toDate(),
+        histories = (map[keyCustomerHistory] as List<dynamic>? ?? [])
+            .map((e) => HistoryModel.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        todos = (map[keyCustomerTodo] as List<dynamic>? ?? [])
+            .map((e) => TodoModel.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        memo = map[keyCustomerMemo] ?? '';
+
+
+  // CustomerModel.fromMap(
+  //   Map<String, dynamic> map,
+  //   this.userKey, {
+  //   this.documentReference,
+  // }) : customerKey = map[keyCustomerKey] ?? '',
+  //      name = map[keyCustomerName] ?? '',
+  //      sex = map[keyCustomerSex] ?? '',
+  //      birth =
+  //          map[keyCustomerBirth] != ''
+  //              ? (map[keyCustomerBirth] as Timestamp).toDate()
+  //              : null,
+  //      policies = [],
+  //      recommended = map[keyRecommendByWho] ?? '',
+  //      registeredDate = (map[keyRegisteredDate] as Timestamp).toDate(),
+  //      histories =
+  //          (map[keyCustomerHistory] as List<dynamic>? ?? [])
+  //              .map((e) => HistoryModel.fromMap(e as Map<String, dynamic>))
+  //              .toList(),
+  //      todos =
+  //          (map[keyCustomerTodo] as List<dynamic>? ?? [])
+  //              .map((e) => TodoModel.fromMap(e as Map<String, dynamic>))
+  //              .toList(),
+  //      memo = map[keyCustomerMemo] ?? '';
 
   CustomerModel.fromSnapshot(DocumentSnapshot snapshot)
     : this.fromMap(

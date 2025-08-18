@@ -39,7 +39,12 @@ class CustomMonthlyTable extends StatelessWidget {
       fontWeight: FontWeight.w600,
     );
 
-    final rowTextStyle = textStyle ?? theme.textTheme.bodyMedium;
+    final prospectTextStyle =
+        textStyle ??
+        theme.textTheme.bodyMedium?.copyWith(color: colorScheme.primary);
+    final contractTextStyle =
+        textStyle ??
+        theme.textTheme.bodyMedium?.copyWith(color: colorScheme.secondary);
 
     final rows = <TableRow>[
       // 헤더 행
@@ -52,15 +57,15 @@ class CustomMonthlyTable extends StatelessWidget {
       // 가망고객 행
       renderTableRow(
         cells: ['가망고객', ...prospectData],
-        textStyle: rowTextStyle,
-        backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+        textStyle: prospectTextStyle,
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
         isBarProspect: true,
       ),
       // 총 계약건수 행
       renderTableRow(
         cells: ['총 계약건수', ...contractData],
-        textStyle: rowTextStyle,
-        backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+        textStyle: contractTextStyle,
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
         isBarContract: true,
       ),
     ];

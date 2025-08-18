@@ -33,7 +33,11 @@ class CustomerListView extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     // 하단 여백 설정 (FAB와 겹치지 않도록)
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 100;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bottomSheetMaxHeight = screenHeight * 0.1;
+
+    final bottomPadding =
+        MediaQuery.of(context).padding.bottom + bottomSheetMaxHeight;
 
     // 고객 키들을 문자열로 결합하여 리스트 상태 키로 사용
     final customersKey = customers.map((e) => e.customerKey).join(',');
@@ -59,7 +63,7 @@ class CustomerListView extends StatelessWidget {
                 ),
               )
               : Padding(
-                padding: const EdgeInsets.only(bottom: 90.0),
+                padding:  EdgeInsets.only(bottom:bottomPadding),
                 child: ListView.builder(
                   key: ValueKey(
                     'option-${viewModel.state.currentSearchOption}-$customersKey',
@@ -97,10 +101,18 @@ class CustomerListView extends StatelessWidget {
 
   /// 잠재 고객(보험 없음) 아이템 생성
   Widget _buildProspectItem(BuildContext context, CustomerModel customer) {
+    final userKey = UserSession.userId;
+    final customerKey = customer.customerKey??'';
+
+    if (customerKey.isEmpty) {
+      debugPrint("🚨 userKey 또는 customerKey가 비어 있음");
+      return const SizedBox.shrink(); // 혹은 기본 위젯
+    }
+
     final todoViewModel = getIt<TodoViewModel>(
       param1: {
-        keyUserKey: UserSession.userId,
-        keyCustomerKey: customer.customerKey,
+        keyUserKey: userKey,
+        keyCustomerKey: customerKey,
       },
     );
     return GestureDetector(
