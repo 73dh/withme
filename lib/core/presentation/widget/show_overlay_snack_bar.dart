@@ -1,7 +1,5 @@
 import '../core_presentation_import.dart';
 import 'overlay_snack_bar.dart';
-import '../core_presentation_import.dart';
-import 'overlay_snack_bar.dart';
 
 void showOverlaySnackBar(
   BuildContext context,

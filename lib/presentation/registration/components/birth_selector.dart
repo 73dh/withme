@@ -1,5 +1,4 @@
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/core_utils_import.dart';
 
 class BirthSelector extends StatelessWidget {

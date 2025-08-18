@@ -99,7 +99,7 @@ class CustomerItem extends StatelessWidget {
           size: 23,
           isShowDay: true,
         ),
-width(5),
+        width(5),
         // 이름 (아이콘과 바로 붙음)
         Text(
           shortenedNameText(customer.name, length: 6),

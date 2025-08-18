@@ -1,15 +1,8 @@
+import 'package:flutter/material.dart';
+
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../domain/domain_import.dart';
 import '../../../../domain/model/customer_model.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
 
@@ -44,10 +37,14 @@ class CustomSummeryTable extends StatelessWidget {
 
     // 데이터행 색상
     final rowColor = colorScheme.surface.withValues(alpha: 0.8);
-    final defaultTextStyle = textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface);
+    final defaultTextStyle =
+        textStyle ??
+        theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface);
 
     return RenderTable(
-      columnWidths: {for (int i = 0; i < 5; i++) i: FixedColumnWidth(cellWidth)},
+      columnWidths: {
+        for (int i = 0; i < 5; i++) i: FixedColumnWidth(cellWidth),
+      },
       tableRows: [
         // 헤더 행
         TableRow(

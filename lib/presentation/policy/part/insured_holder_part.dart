@@ -2,12 +2,12 @@ import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/core_ui_import.dart';
+
 class InsuredHolderPart extends StatelessWidget {
   final TextEditingController insuredNameController;
   final String? insuredSex;
   final DateTime? insuredBirth;
-  // final void Function(String) onInsuredNameChanged;
+
   final void Function(String) onManChanged;
   final void Function(String) onWomanChanged;
   final void Function(DateTime?) onBirthChanged;
@@ -18,7 +18,6 @@ class InsuredHolderPart extends StatelessWidget {
     required this.insuredNameController,
     required this.insuredSex,
     this.insuredBirth,
-    // required this.onInsuredNameChanged,
     required this.onManChanged,
     required this.onWomanChanged,
     required this.onBirthChanged,
@@ -45,16 +44,18 @@ class InsuredHolderPart extends StatelessWidget {
                   child: TextFormField(
                     controller: insuredNameController,
                     textAlign: TextAlign.center,
-                    style: textStyle ??
+                    style:
+                        textStyle ??
                         theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface,
                         ),
                     decoration: InputDecoration(
                       hintText: '피보험자',
-                      hintStyle: theme.textTheme.bodyMedium
-                          ?.copyWith(color: colorScheme.onSurfaceVariant),
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       filled: true,
-                      fillColor: colorScheme.surfaceVariant,
+                      fillColor: colorScheme.surfaceContainerHighest,
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 10,
@@ -85,7 +86,7 @@ class InsuredHolderPart extends StatelessWidget {
                     }
                   },
                   selectedColor: colorScheme.primary,
-                  fillColor: colorScheme.primary.withOpacity(0.12),
+                  fillColor: colorScheme.primary.withValues(alpha: 0.12),
                   color: colorScheme.onSurfaceVariant,
                   children: const [
                     Padding(
@@ -113,12 +114,14 @@ class InsuredHolderPart extends StatelessWidget {
                         vertical: 12,
                         horizontal: 10,
                       ),
-                      backgroundColor: insuredBirth != null
-                          ? colorScheme.surfaceVariant
-                          : colorScheme.primary,
-                      foregroundColor: insuredBirth != null
-                          ? colorScheme.onSurfaceVariant
-                          : colorScheme.onPrimary,
+                      backgroundColor:
+                          insuredBirth != null
+                              ? colorScheme.surfaceContainerHighest
+                              : colorScheme.primary,
+                      foregroundColor:
+                          insuredBirth != null
+                              ? colorScheme.onSurfaceVariant
+                              : colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -128,9 +131,10 @@ class InsuredHolderPart extends StatelessWidget {
                     label: Text(
                       insuredBirth?.formattedBirth ?? '생년월일',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: insuredBirth != null
-                            ? colorScheme.onSurfaceVariant
-                            : colorScheme.onPrimary,
+                        color:
+                            insuredBirth != null
+                                ? colorScheme.onSurfaceVariant
+                                : colorScheme.onPrimary,
                       ),
                     ),
                   ),

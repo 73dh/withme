@@ -2,27 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../ui/core_ui_import.dart';
 
-
-import 'package:flutter/material.dart';
-import '../../ui/core_ui_import.dart';
-import 'package:flutter/material.dart';
-import '../../ui/core_ui_import.dart';
-
 /// 성별 색상 세트 (통일성 유지)
 class SexColors {
   final Color icon;
   final Color background;
 
-  const SexColors({
-    required this.icon,
-    required this.background,
-  });
+  const SexColors({required this.icon, required this.background});
 
   static SexColors fromSex(String? sex, ColorScheme scheme) {
     switch (sex) {
       case '남':
         return SexColors(
-          icon:ColorStyles.manColor,
+          icon: ColorStyles.manColor,
           // icon: scheme.primary,
           background: scheme.primaryContainer.withValues(alpha: 0.3),
         );
@@ -34,7 +25,7 @@ class SexColors {
       default:
         return SexColors(
           icon: scheme.onSurfaceVariant,
-          background: scheme.surfaceVariant,
+          background: scheme.surfaceContainerHighest,
         );
     }
   }

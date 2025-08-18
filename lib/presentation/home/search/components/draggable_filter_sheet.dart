@@ -1,7 +1,5 @@
 import '../../../../core/presentation/core_presentation_import.dart';
 
-import '../../../../core/presentation/core_presentation_import.dart';
-
 class DraggableFilterSheet extends StatefulWidget {
   final ScrollController? scrollController;
   final bool isLoadingAllData;
@@ -56,7 +54,9 @@ class _DraggableFilterSheetState extends State<DraggableFilterSheet> {
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      color: colorScheme.shadow.withValues(alpha: 0.2), // 투명도 조정
+                      color: colorScheme.shadow.withValues(
+                        alpha: 0.2,
+                      ), // 투명도 조정
                     ),
                   ],
                 ),

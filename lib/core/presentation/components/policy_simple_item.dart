@@ -1,18 +1,5 @@
 import '../../../domain/model/policy_model.dart';
 import '../../domain/enum/policy_state.dart';
-import '../../ui/core_ui_import.dart';
-import '../../utils/core_utils_import.dart';
-import '../../utils/extension/number_format.dart';
-import '../core_presentation_import.dart';
-import '../../../domain/model/policy_model.dart';
-import '../../domain/enum/policy_state.dart';
-import '../../ui/core_ui_import.dart';
-import '../../utils/core_utils_import.dart';
-import '../../utils/extension/number_format.dart';
-import '../core_presentation_import.dart';
-import '../../../domain/model/policy_model.dart';
-import '../../domain/enum/policy_state.dart';
-import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
 import '../core_presentation_import.dart';
@@ -30,29 +17,30 @@ class PolicySimpleItem extends StatelessWidget {
 
     final notKeepPolicyState =
         policy.policyState == PolicyState.cancelled.label ||
-            policy.policyState == PolicyState.lapsed.label;
+        policy.policyState == PolicyState.lapsed.label;
 
     // 보험료 텍스트 스타일
-    final premiumStyle = notKeepPolicyState
-        ? textTheme.labelLarge?.copyWith(
-      color: colorScheme.error,
-      decoration: TextDecoration.lineThrough,
-    )
-        : textTheme.labelLarge?.copyWith(
-      color: colorScheme.onSurface,
-    );
+    final premiumStyle =
+        notKeepPolicyState
+            ? textTheme.labelLarge?.copyWith(
+              color: colorScheme.error,
+              decoration: TextDecoration.lineThrough,
+            )
+            : textTheme.labelLarge?.copyWith(color: colorScheme.onSurface);
 
     // 상태 배경 색상
-    final stateBgColor = notKeepPolicyState
-        ? colorScheme.errorContainer.withOpacity(0.3)
-        : colorScheme.tertiaryContainer.withOpacity(0.2);
+    final stateBgColor =
+        notKeepPolicyState
+            ? colorScheme.errorContainer.withValues(alpha: 0.3)
+            : colorScheme.tertiaryContainer.withValues(alpha: 0.2);
 
     // 상태 텍스트 색상
-    final stateTextColor = notKeepPolicyState
-        ? colorScheme.error
-        : colorScheme.onTertiaryContainer;
+    final stateTextColor =
+        notKeepPolicyState
+            ? colorScheme.error
+            : colorScheme.onTertiaryContainer;
 
-    return  ItemContainer(
+    return ItemContainer(
       height: 120,
       backgroundColor: colorScheme.surface,
       child: Padding(
@@ -68,14 +56,18 @@ class PolicySimpleItem extends StatelessWidget {
                 Flexible(
                   child: Text(
                     '계약자: ${shortenedNameText(policy.policyHolder)}',
-                    style: textTheme.labelLarge?.copyWith(color: colorScheme.onSurface),
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Flexible(
                   child: Text(
                     '피보험자: ${shortenedNameText(policy.insured)}',
-                    style: textTheme.labelLarge?.copyWith(color: colorScheme.onSurface),
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -84,7 +76,9 @@ class PolicySimpleItem extends StatelessWidget {
             height(4),
             Text(
               '상품명: ${policy.productName}',
-              style: textTheme.labelLarge?.copyWith(color: colorScheme.onSurfaceVariant),
+              style: textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -98,30 +92,39 @@ class PolicySimpleItem extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: '보험료: ',
-                          style: textTheme.labelLarge?.copyWith(color: colorScheme.onSurface),
+                          style: textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                         TextSpan(
                           text:
-                          '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
+                              '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
                           style: premiumStyle,
                         ),
                         TextSpan(
                           text: ' (${policy.paymentMethod})',
-                          style: textTheme.labelLarge?.copyWith(color: colorScheme.onSurfaceVariant),
+                          style: textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: stateBgColor,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     policy.policyState,
-                    style: textTheme.labelSmall?.copyWith(color: stateTextColor),
+                    style: textTheme.labelSmall?.copyWith(
+                      color: stateTextColor,
+                    ),
                   ),
                 ),
               ],
@@ -130,6 +133,5 @@ class PolicySimpleItem extends StatelessWidget {
         ),
       ),
     );
-
   }
 }

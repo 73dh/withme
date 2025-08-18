@@ -42,7 +42,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
     final manageDays = getIt<UserSession>().managePeriodDays;
     final urgentDays = getIt<UserSession>().urgentThresholdDays;
 
-    final bgColor = backgroundColor ?? theme.colorScheme.surfaceVariant;
+    final bgColor = backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
     final txtColor = textColor ?? theme.colorScheme.onSurfaceVariant;
     final icColor = iconColor ?? theme.colorScheme.primary;
 
@@ -101,7 +101,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: isActive ? activeColor.withOpacity(0.1) : bgColor,
+        color: isActive ? activeColor.withValues(alpha: 0.1) : bgColor,
         border: Border.all(
           color: isActive ? activeColor : Colors.grey[300]!,
           width: 1.2,
@@ -109,7 +109,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             offset: const Offset(1, 1),
             blurRadius: 1.5,
           ),

@@ -11,32 +11,6 @@ import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_reauth_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../dash_board_view_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:withme/core/domain/error_handling/signout_error.dart';
-import 'package:withme/core/presentation/widget/show_inquiry_confirm_dialog.dart';
-import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
-import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
-import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
-
-import '../../../../core/di/setup.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/presentation/widget/show_reauth_dialog.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../dash_board_view_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/core_presentation_import.dart';
-import 'package:withme/core/presentation/widget/show_reauth_dialog.dart';
-import 'package:withme/core/presentation/widget/show_inquiry_confirm_dialog.dart';
-import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/core/domain/error_handling/signout_error.dart';
-import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
-import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
-import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../dash_board_view_model.dart';
 
 class DashBoardRoot extends StatefulWidget {
   const DashBoardRoot({super.key});
@@ -101,7 +75,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
           return Stack(
             children: [
               Container(
-                color: colorScheme.background,
+                color: colorScheme.surface,
                 child: DashBoardPage(
                   viewModel: viewModel,
                   animationController: _animationController,
@@ -130,7 +104,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
       title: 'Logout',
       content: 'Logout 하시겠습니까?',
     );
-    if (result == true && mounted) {
+    if (result == true && context.mounted) {
       viewModel.logout(context);
     }
   }
@@ -156,17 +130,17 @@ class _DashBoardRootState extends State<DashBoardRoot>
       ],
       confirmButtonText: '회원탈퇴',
       onConfirm: () async {
-        final credentials = await showReauthDialog(
+        final credentials = await showReAuthDialog(
           context,
           email: viewModel.state.userInfo?.email ?? '',
         );
         if (credentials == null) return;
 
         try {
-          if (mounted) {
+          if (context.mounted) {
             await viewModel.signOut(context, credentials);
           }
-          if (mounted) {
+          if (context.mounted) {
             showOverlaySnackBar(
               context,
               '계정이 삭제되었습니다.',
@@ -176,7 +150,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
           }
         } on FirebaseAuthException catch (e) {
           final error = SignOutError.fromCode(e.code);
-          if (mounted) {
+          if (context.mounted) {
             showOverlaySnackBar(
               context,
               error.toString(),
@@ -196,7 +170,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
       title: '유료회원 문의',
       content: '문의 메일을 보내시겠습니까?',
     );
-    if (result == true && mounted) {
+    if (result == true && context.mounted) {
       viewModel.sendInquiryEmail(context);
     }
   }

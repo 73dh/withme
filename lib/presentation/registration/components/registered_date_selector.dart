@@ -1,11 +1,6 @@
 import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/core_ui_import.dart';
-import 'package:withme/core/utils/core_utils_import.dart';
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/core_ui_import.dart';
-import 'package:flutter/material.dart';
 
 class RegisteredDateSelector extends StatelessWidget {
   final bool isReadOnly;
@@ -41,12 +36,14 @@ class RegisteredDateSelector extends StatelessWidget {
               width: 120,
               child: RenderFilledButton(
                 width: 100,
-                backgroundColor: isReadOnly
-                    ? colorScheme.surfaceContainerHighest
-                    : colorScheme.primary,
-                foregroundColor: isReadOnly
-                    ? colorScheme.onSurfaceVariant
-                    : colorScheme.onPrimary,
+                backgroundColor:
+                    isReadOnly
+                        ? colorScheme.surfaceContainerHighest
+                        : colorScheme.primary,
+                foregroundColor:
+                    isReadOnly
+                        ? colorScheme.onSurfaceVariant
+                        : colorScheme.onPrimary,
                 borderRadius: 5,
                 onPressed: isReadOnly ? null : onPressed,
                 text: registeredDate.formattedBirth,

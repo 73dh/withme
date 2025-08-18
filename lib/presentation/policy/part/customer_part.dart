@@ -38,7 +38,7 @@ class CustomerPart extends StatelessWidget {
 
     return ItemContainer(
       height: 130,
-      backgroundColor: colorScheme.surfaceVariant, // 테마 기반 배경색
+      backgroundColor: colorScheme.surfaceContainerHighest, // 테마 기반 배경색
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

@@ -88,7 +88,7 @@ Future<void> showCycleEditDialog(
                         FilledButton(
                           onPressed: () => Navigator.of(dialogContext).pop(),
                           style: FilledButton.styleFrom(
-                            backgroundColor: colorScheme.onSurface.withOpacity(
+                            backgroundColor: colorScheme.onSurface.withValues(alpha:
                               0.12,
                             ),
                             foregroundColor: colorScheme.onSurface,

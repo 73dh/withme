@@ -25,7 +25,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
     TodoDialogType.complete => '완료',
   };
 
-  Widget _buildTextField() => TextField(
+  Widget buildTextField() => TextField(
     controller: controller,
     cursorColor: colorScheme.primary,
     style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurface),
@@ -42,7 +42,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
     ),
   );
 
-  Widget _buildDatePicker() => Row(
+  Widget buildDatePicker() => Row(
     children: [
       Text('날짜:', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
       const SizedBox(width: 6),
@@ -72,7 +72,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
     ],
   );
 
-  Widget _buildActionButton({required String label, required VoidCallback onPressed, Color? bg, Color? fg}) {
+  Widget buildActionButton({required String label, required VoidCallback onPressed, Color? bg, Color? fg}) {
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(
@@ -110,9 +110,9 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                         ?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                   ),
                   const SizedBox(height: 20),
-                  _buildTextField(),
+                  buildTextField(),
                   const SizedBox(height: 12),
-                  _buildDatePicker(),
+                  buildDatePicker(),
                 ],
               ),
             ),
@@ -120,14 +120,14 @@ Future<TodoModel?> showAddOrEditTodoDialog(
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildActionButton(
+                buildActionButton(
                   label: '취소',
                   bg: colorScheme.surfaceContainerHighest,
                   fg: colorScheme.onSurfaceVariant,
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(width: 10),
-                _buildActionButton(
+                buildActionButton(
                   label: confirmText,
                   onPressed: () {
                     final todoText = controller.text.trim();

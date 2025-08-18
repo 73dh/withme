@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
 
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
-
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
@@ -72,7 +60,11 @@ class ProductCategorySummaryTable extends StatelessWidget {
       TableRow(
         decoration: BoxDecoration(color: headerColor),
         children: [
-          RenderTableCellText('상품 카테고리', isHeader: true, style: headerTextStyle),
+          RenderTableCellText(
+            '상품 카테고리',
+            isHeader: true,
+            style: headerTextStyle,
+          ),
           RenderTableCellText('고객 수', isHeader: true, style: headerTextStyle),
           RenderTableCellText('계약 건수', isHeader: true, style: headerTextStyle),
         ],
@@ -97,8 +89,14 @@ class ProductCategorySummaryTable extends StatelessWidget {
             decoration: BoxDecoration(color: rowColor),
             children: [
               RenderTableCellText(category, style: defaultTextStyle),
-              RenderTableCellText('${categoryStats[category]!.customerCount}명', style: defaultTextStyle),
-              RenderTableCellText('${categoryStats[category]!.contractCount}건', style: defaultTextStyle),
+              RenderTableCellText(
+                '${categoryStats[category]!.customerCount}명',
+                style: defaultTextStyle,
+              ),
+              RenderTableCellText(
+                '${categoryStats[category]!.contractCount}건',
+                style: defaultTextStyle,
+              ),
             ],
           ),
         );
@@ -120,7 +118,3 @@ class _CategoryStats {
   int customerCount = 0;
   int contractCount = 0;
 }
-
-
-
-

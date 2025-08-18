@@ -1,8 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/presentation/todo/todo_view_model.dart';
+import 'package:withme/core/presentation/widget/show_add_todo_dialog.dart';
 
 import '../../../domain/domain_import.dart';
-import '../../../domain/model/todo_model.dart';
 import '../../../presentation/home/customer_list/customer_list_view_model.dart';
 import '../../../presentation/home/prospect_list/prospect_list_view_model.dart';
 import '../../../presentation/registration/components/add_policy_button.dart';
@@ -14,11 +14,7 @@ import '../../di/setup.dart';
 import '../../ui/core_ui_import.dart';
 import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
-import '../todo/common_todo_list.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/todo/todo_view_model.dart';
-import 'package:withme/domain/domain_import.dart';
-import '../todo/common_todo_list.dart';
+import '../todo/manage_todo_list.dart';
 
 class CustomerRegistrationAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -28,7 +24,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
   final VoidCallback? onEditToggle;
   final VoidCallback? onHistoryTap;
   final bool isNeedNewHistory;
-  final RegistrationViewModel? registrationViewModel; // ← 추가
+  final RegistrationViewModel? registrationViewModel;
   final Color? backgroundColor;
   final Color? foregroundColor;
 
@@ -40,7 +36,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
     this.onEditToggle,
     this.onHistoryTap,
     this.isNeedNewHistory = false,
-    this.registrationViewModel, // ← 추가
+    this.registrationViewModel,
     this.backgroundColor,
     this.foregroundColor,
   });
@@ -81,20 +77,19 @@ class CustomerRegistrationAppBar extends StatelessWidget
             customer!.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,
       ),
       actions: [
-        StreamBuilder<List<TodoModel>>(
-          stream: todoViewModel.todoStream,
-          initialData: todoViewModel.todoList, // ✅ 초기값 제공
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final todos = snapshot.data ?? [];
-            return CommonTodoList(
-              customer: customer!,
-              viewModel: todoViewModel,
-              textColor: fgColor,
-            );
-          },
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: ManageTodoList(
+            viewModel: todoViewModel,
+            customerSex: customer!.sex,
+            textColor: fgColor,
+            onAddPressed: () async {
+              final newTodo = await showAddOrEditTodoDialog(context);
+              if (newTodo != null) {
+                await todoViewModel.addOrUpdateTodo(newTodo: newTodo);
+              }
+            },
+          ),
         ),
         const SizedBox(width: 8),
         if (onHistoryTap != null)
@@ -154,9 +149,9 @@ class CustomerRegistrationAppBar extends StatelessWidget
               await getIt<CustomerListViewModel>().fetchData();
             }
           },
-          iconColor: fgColor, // AddPolicyButton 내부에서 theme 기반 색상
+          iconColor: fgColor,
         ),
-        width(8),
+        const SizedBox(width: 8),
       ],
     );
   }

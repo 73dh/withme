@@ -36,7 +36,7 @@ Future<DateTime?> selectDate(BuildContext context, {DateTime? initial}) {
           ),
           textSelectionTheme: TextSelectionThemeData(
             cursorColor: colorScheme.primary,
-            selectionColor: colorScheme.primary.withOpacity(0.3),
+            selectionColor: colorScheme.primary.withValues(alpha: 0.3),
             selectionHandleColor: colorScheme.primary,
           ),
           textTheme: theme.textTheme.apply(

@@ -4,7 +4,6 @@ import 'package:withme/core/router/router.dart';
 
 import 'core/ui/theme/theme.dart';
 import 'core/ui/theme/theme_components.dart';
-import 'core/ui/theme/theme_controller.dart';
 
 class App extends StatelessWidget {
   const App({super.key});

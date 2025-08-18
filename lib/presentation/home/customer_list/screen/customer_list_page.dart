@@ -139,7 +139,7 @@ class _CustomerListPageState extends State<CustomerListPage>
                         SizeTransitionFilterBar(
                           heightFactor: heightFactor,
                           child: InactiveAndUrgentFilterBar(
-                            backgroundColor: colorScheme.surfaceVariant,
+                            backgroundColor: colorScheme.surfaceContainerHighest,
                             iconColor: colorScheme.primary,
                             textColor: colorScheme.onSurfaceVariant,
                             showInactiveOnly: _showInactiveOnly,

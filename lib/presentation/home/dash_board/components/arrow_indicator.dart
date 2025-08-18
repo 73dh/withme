@@ -16,8 +16,8 @@ class ArrowIndicator extends StatelessWidget {
             begin: isRight ? Alignment.centerLeft : Alignment.centerRight,
             end: isRight ? Alignment.centerRight : Alignment.centerLeft,
             colors: [
-              Colors.white.withOpacity(0.0),
-              Colors.white.withOpacity(0.8),
+              Colors.white.withValues(alpha: 0.0),
+              Colors.white.withValues(alpha: 0.8),
             ],
           ),
         ),

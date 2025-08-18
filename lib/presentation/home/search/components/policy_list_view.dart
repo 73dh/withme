@@ -1,20 +1,10 @@
-import '../../../../core/domain/enum/policy_state.dart';
-import '../../../../core/presentation/components/policy_item.dart';
-import '../../../../core/presentation/components/policy_simple_item.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../domain/model/policy_model.dart';
-import '../../../../core/domain/enum/policy_state.dart';
-import '../../../../core/presentation/components/policy_item.dart';
-import '../../../../core/presentation/components/policy_simple_item.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../domain/model/policy_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+
 import '../../../../core/domain/enum/policy_state.dart';
 import '../../../../core/presentation/components/policy_item.dart';
 import '../../../../core/presentation/components/policy_simple_item.dart';
-import '../../../../domain/model/policy_model.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../domain/model/policy_model.dart';
 
 class PolicyListView extends StatefulWidget {
   final List<PolicyModel> policies;
@@ -79,20 +69,24 @@ class _PolicyListViewState extends State<PolicyListView> {
                 final isExpanded = expandedIndex == index;
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: GestureDetector(
                     onTap: () => toggleExpansion(index),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
-                      child: isExpanded
-                          ? PolicyItem(
-                        key: ValueKey('expanded_$index'),
-                        policy: policy,
-                      )
-                          : PolicySimpleItem(
-                        key: ValueKey('simple_$index'),
-                        policy: policy,
-                      ),
+                      child:
+                          isExpanded
+                              ? PolicyItem(
+                                key: ValueKey('expanded_$index'),
+                                policy: policy,
+                              )
+                              : PolicySimpleItem(
+                                key: ValueKey('simple_$index'),
+                                policy: policy,
+                              ),
                     ),
                   ),
                 );
@@ -104,7 +98,10 @@ class _PolicyListViewState extends State<PolicyListView> {
     );
   }
 
-  Widget _buildStateFilterButtons(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildStateFilterButtons(
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -112,7 +109,8 @@ class _PolicyListViewState extends State<PolicyListView> {
         children: [
           _buildFilterChip(null, '전체', colorScheme, textTheme),
           ...PolicyState.values.map(
-                (state) => _buildFilterChip(state, state.label, colorScheme, textTheme),
+            (state) =>
+                _buildFilterChip(state, state.label, colorScheme, textTheme),
           ),
         ],
       ),
@@ -120,13 +118,18 @@ class _PolicyListViewState extends State<PolicyListView> {
   }
 
   Widget _buildFilterChip(
-      PolicyState? state, String label, ColorScheme colorScheme, TextTheme textTheme) {
+    PolicyState? state,
+    String label,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     final isSelected = selectedState == state;
 
     // 각 상태에 해당하는 계약 수 계산
-    final count = state == null
-        ? widget.policies.length
-        : widget.policies.where((p) => p.policyState == state.label).length;
+    final count =
+        state == null
+            ? widget.policies.length
+            : widget.policies.where((p) => p.policyState == state.label).length;
 
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
@@ -134,10 +137,12 @@ class _PolicyListViewState extends State<PolicyListView> {
         key: ValueKey(state ?? 'all'),
         label: Text('$label ($count)'),
         labelStyle: textTheme.labelLarge?.copyWith(
-          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+          color:
+              isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
         ),
         selected: isSelected,
-        showCheckmark: false, // 체크 표시 제거
+        showCheckmark: false,
+        // 체크 표시 제거
         selectedColor: colorScheme.primary,
         backgroundColor: colorScheme.surfaceContainerHighest,
         onSelected: (_) {

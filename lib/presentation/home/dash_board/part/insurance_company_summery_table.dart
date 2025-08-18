@@ -1,22 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
 
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import '../components/render_table.dart';
-import '../components/render_table_cell_text.dart';
-
-import 'package:flutter/material.dart';
-import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 import '../components/render_table.dart';
 import '../components/render_table_cell_text.dart';
@@ -101,8 +84,14 @@ class InsuranceCompanySummaryTable extends StatelessWidget {
             decoration: BoxDecoration(color: rowColor),
             children: [
               RenderTableCellText(company, style: defaultTextStyle),
-              RenderTableCellText('${statsMap[company]!.customerCount}명', style: defaultTextStyle),
-              RenderTableCellText('${statsMap[company]!.contractCount}건', style: defaultTextStyle),
+              RenderTableCellText(
+                '${statsMap[company]!.customerCount}명',
+                style: defaultTextStyle,
+              ),
+              RenderTableCellText(
+                '${statsMap[company]!.contractCount}건',
+                style: defaultTextStyle,
+              ),
             ],
           ),
         );
@@ -124,5 +113,3 @@ class _InsuranceCompanyStats {
   int customerCount = 0;
   int contractCount = 0;
 }
-
-

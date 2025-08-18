@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 enum AppThemeMode { light, dark }
 
 class ThemeController extends ChangeNotifier {
@@ -21,7 +18,9 @@ class ThemeController extends ChangeNotifier {
 
   void toggleTheme() {
     _themeMode =
-    _themeMode == AppThemeMode.light ? AppThemeMode.dark : AppThemeMode.light;
+        _themeMode == AppThemeMode.light
+            ? AppThemeMode.dark
+            : AppThemeMode.light;
     _saveThemeToPrefs();
     notifyListeners();
   }
@@ -43,4 +42,3 @@ class ThemeController extends ChangeNotifier {
 
 // 전역 인스턴스 (main.dart 등에서 import 후 사용)
 final ThemeController themeController = ThemeController();
-

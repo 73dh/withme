@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
 class TitleWidget extends StatelessWidget {
   final String title;
   final TextStyle? textStyle; // 추가
@@ -16,7 +12,8 @@ class TitleWidget extends StatelessWidget {
 
     return Text(
       title,
-      style: textStyle ??
+      style:
+          textStyle ??
           theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
@@ -24,5 +21,3 @@ class TitleWidget extends StatelessWidget {
     );
   }
 }
-
-

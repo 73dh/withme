@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
@@ -66,7 +60,9 @@ class CustomTextFormField extends StatelessWidget {
       autofocus: autoFocus,
       focusNode: focusNode,
       textAlign: textAlign ?? TextAlign.start,
-      style: textStyle ?? theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+      style:
+          textStyle ??
+          theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
       keyboardType: inputType,
       inputFormatters: inputFormatters,
       onEditingComplete: onCompleted,
@@ -76,10 +72,12 @@ class CustomTextFormField extends StatelessWidget {
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         hintText: hintText,
-        hintStyle: hintStyle ?? theme.textTheme.labelMedium?.copyWith(
-          fontStyle: FontStyle.italic,
-          color: colorScheme.onSurfaceVariant,
-        ),
+        hintStyle:
+            hintStyle ??
+            theme.textTheme.labelMedium?.copyWith(
+              fontStyle: FontStyle.italic,
+              color: colorScheme.onSurfaceVariant,
+            ),
         labelText: labelText,
         labelStyle: theme.textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurfaceVariant,

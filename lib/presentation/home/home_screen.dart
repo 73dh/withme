@@ -1,4 +1,3 @@
-import 'package:withme/core/ui/color/color_style.dart';
 import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/ui/const/size.dart';
 
@@ -72,17 +71,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       menu.iconPath,
                       width: AppSizes.bottomNavIconSize,
                       height: AppSizes.bottomNavIconSize,
-                      color: menu.index == _currentIndex
-                          ? (Theme.of(context).brightness == Brightness.light
-                          ? Colors.black87
-                          : Colors.white)
-                          : (Theme.of(context).brightness == Brightness.light
-                          ? Colors.black38
-                          : Colors.white54),
+                      color:
+                          menu.index == _currentIndex
+                              ? (Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Colors.black87
+                                  : Colors.white)
+                              : (Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Colors.black38
+                                  : Colors.white54),
                     ),
                     label: '',
                   );
-
                 }).toList(),
           ),
         ),

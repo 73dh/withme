@@ -55,7 +55,7 @@ class CustomerInfoPart extends StatelessWidget {
 
     return ItemContainer(
       height: 352,
-      backgroundColor: backgroundColor ?? colorScheme.surfaceVariant,
+      backgroundColor: backgroundColor ?? colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         child: Column(

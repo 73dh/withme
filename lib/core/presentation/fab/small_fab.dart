@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart'; // 필수 import 확인
 
-import '../../domain/enum/sort_type.dart';
 import '../../domain/enum/sort_status.dart';
+import '../../domain/enum/sort_type.dart';
 import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
-import 'package:flutter/material.dart';
-import '../../ui/core_ui_import.dart';
-import '../core_presentation_import.dart';
-import '../../domain/enum/sort_type.dart';
-import '../../domain/enum/sort_status.dart';
 
 class SmallFab extends StatefulWidget {
   final bool fabVisibleLocal;
@@ -226,7 +221,7 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
         color:
             isSelected
                 ? colorScheme.primaryContainer
-                : colorScheme.surfaceVariant,
+                : colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

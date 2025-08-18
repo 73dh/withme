@@ -1,9 +1,6 @@
 import '../../../../core/presentation/components/blinking_toggle_icon.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
-import '../../../../core/presentation/components/blinking_toggle_icon.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
 
 class CustomerListAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -44,9 +41,7 @@ class CustomerListAppBar extends StatelessWidget
           const SizedBox(width: 5),
           Text(
             '$count명',
-            style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.primary,
-            ),
+            style: textTheme.titleMedium?.copyWith(color: colorScheme.primary),
           ),
           width(5),
           BlinkingToggleIcon(
@@ -63,14 +58,18 @@ class CustomerListAppBar extends StatelessWidget
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Image.asset(IconsPath.folderIcon, width: 45, color: colorScheme.secondary.withOpacity(0.7)),
+        Image.asset(
+          IconsPath.folderIcon,
+          width: 45,
+          color: colorScheme.secondary.withValues(alpha: 0.7),
+        ),
         Positioned(
           left: -12,
           top: -2,
           child: Image.asset(
             IconsPath.folderIcon,
             width: 35,
-            color: colorScheme.tertiary.withOpacity(0.5),
+            color: colorScheme.tertiary.withValues(alpha: 0.5),
           ),
         ),
       ],

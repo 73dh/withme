@@ -12,8 +12,8 @@ import 'package:withme/presentation/policy/part/policy_part.dart';
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/model/customer_model.dart';
+
 class PolicyScreen extends StatefulWidget {
   final CustomerModel customer;
 
@@ -109,8 +109,9 @@ class _PolicyScreenState extends State<PolicyScreen> {
                 children: [
                   TitleWidget(
                     title: '계약 정보 등록',
-                    textStyle: theme.textTheme.headlineSmall
-                        ?.copyWith(color: colorScheme.onSurface),
+                    textStyle: theme.textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   height(40),
                   PartTitle(
@@ -134,9 +135,10 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     insuredNameController: _insuredNameController,
                     insuredSex: _insuredSex,
                     insuredBirth: _insuredBirth,
-                    onManChanged: (value) => setState(() => _insuredSex = value),
-                    onWomanChanged: (value) =>
-                        setState(() => _insuredSex = value),
+                    onManChanged:
+                        (value) => setState(() => _insuredSex = value),
+                    onWomanChanged:
+                        (value) => setState(() => _insuredSex = value),
                     onBirthChanged: (_) async {
                       final birth = await selectDate(context);
                       if (birth != null) setState(() => _insuredBirth = birth);
@@ -145,29 +147,35 @@ class _PolicyScreenState extends State<PolicyScreen> {
                   height(20),
                   PartTitle(
                     text: '보험계약 정보',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(color: colorScheme.onSurface),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   PolicyPart(
                     productCategory: _productCategory,
                     insuranceCompany: _insuranceCompany,
-                    onCategoryTap: (value) =>
-                        setState(() => _productCategory = value.toString()),
-                    onCompanyTap: (value) =>
-                        setState(() => _insuranceCompany = value.toString()),
+                    onCategoryTap:
+                        (value) =>
+                            setState(() => _productCategory = value.toString()),
+                    onCompanyTap:
+                        (value) => setState(
+                          () => _insuranceCompany = value.toString(),
+                        ),
                     productNameController: _productNameController,
                     paymentMethod: _paymentMethod,
                     premiumController: _premiumController,
-                    onPremiumMonthTap: (value) =>
-                        setState(() => _paymentMethod = value),
-                    onPremiumSingleTap: (value) =>
-                        setState(() => _paymentMethod = value),
+                    onPremiumMonthTap:
+                        (value) => setState(() => _paymentMethod = value),
+                    onPremiumSingleTap:
+                        (value) => setState(() => _paymentMethod = value),
                     onProductNameTap: (_) {},
-                    onInputPremiumTap: (value) =>
-                        setState(() => _premiumController.text = value),
+                    onInputPremiumTap:
+                        (value) =>
+                            setState(() => _premiumController.text = value),
                     startDate: _startDate,
                     endDate: _endDate,
-                    onStartDateChanged: (date) => setState(() => _startDate = date),
+                    onStartDateChanged:
+                        (date) => setState(() => _startDate = date),
                     onEndDateChanged: (date) => setState(() => _endDate = date),
                   ),
                 ],
@@ -206,11 +214,12 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
     final result = await showModalBottomSheet<bool>(
       context: context,
-      builder: (_) => SizedBox(
-        height: 360,
-        width: double.infinity,
-        child: _buildConfirmBox(),
-      ),
+      builder:
+          (_) => SizedBox(
+            height: 360,
+            width: double.infinity,
+            child: _buildConfirmBox(),
+          ),
     );
 
     if (result == true && mounted) context.pop(true);
@@ -247,13 +256,14 @@ class _PolicyScreenState extends State<PolicyScreen> {
 
     final customerKey = widget.customer.customerKey;
     final userId = UserSession.userId;
-    final policyRef = FirebaseFirestore.instance
-        .collection(collectionUsers)
-        .doc(userId)
-        .collection(collectionCustomers)
-        .doc(customerKey)
-        .collection(collectionPolicies)
-        .doc();
+    final policyRef =
+        FirebaseFirestore.instance
+            .collection(collectionUsers)
+            .doc(userId)
+            .collection(collectionCustomers)
+            .doc(customerKey)
+            .collection(collectionPolicies)
+            .doc();
 
     final policyMap = PolicyModel.toMapForCreatePolicy(
       policyHolder: _policyHolderName,
@@ -288,7 +298,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
         );
         await getIt<CustomerListViewModel>().refresh();
 
-        if (context.mounted) Navigator.pop(context, true);
+        if (mounted) Navigator.pop(context, true);
       },
     );
   }

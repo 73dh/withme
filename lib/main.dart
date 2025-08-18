@@ -6,7 +6,6 @@ import 'package:withme/core/di/setup.dart';
 import 'app.dart';
 import 'core/data/fire_base/firebase_options.dart';
 import 'core/router/router.dart';
-import 'core/ui/theme/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

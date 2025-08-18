@@ -15,6 +15,7 @@ import '../../presentation/auth/verity_email/verify_email_screen.dart';
 import '../../presentation/policy/screen/policy_screen.dart';
 import '../../presentation/registration/screen/registration_screen.dart';
 import '../di/setup.dart';
+import '../presentation/todo/todo_view_model.dart';
 
 final authChangeNotifier = AuthChangeNotifier();
 
@@ -81,12 +82,19 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.registration,
       pageBuilder:
-          (context, state) => _fadePage(
-            child: RegistrationScreen(
-              customer: state.extra as CustomerModel?,
-            ),
+          (context, state) {
+            final customer = state.extra as CustomerModel?;
+            final todoViewModel = getIt<TodoViewModel>(); // ⚡ 반드시 주입
+            return _fadePage(
+              child: RegistrationScreen(
+                customer: customer,
+                scrollController: ScrollController(), // 필요 시 기본 ScrollController
+                // outerContext: context,
+                todoViewModel: todoViewModel,
+              ),
             state: state,
-          ),
+          );
+          },
     ),
     GoRoute(
       path: RoutePath.signUp,

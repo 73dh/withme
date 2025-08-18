@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../ui/core_ui_import.dart';
-// add_policy_widget.dart
-import 'package:flutter/material.dart';
-// add_policy_widget.dart
-import 'package:flutter/material.dart';
-
 class AddPolicyWidget extends StatefulWidget {
   final void Function() onTap;
   final double size;
@@ -74,7 +68,7 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.3),
+                      color: colorScheme.shadow.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

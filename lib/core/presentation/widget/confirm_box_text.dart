@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/color/color_style.dart';
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 
 class ConfirmBoxText extends StatelessWidget {
   final String? text;
@@ -29,10 +25,7 @@ class ConfirmBoxText extends StatelessWidget {
         text: TextSpan(
           style: baseStyle?.copyWith(fontSize: size),
           children: [
-            TextSpan(
-              text: text,
-              style: baseStyle,
-            ),
+            TextSpan(text: text, style: baseStyle),
             TextSpan(
               text: text2,
               style: baseStyle?.copyWith(

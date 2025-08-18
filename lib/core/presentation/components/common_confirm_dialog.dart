@@ -1,9 +1,6 @@
-import '../core_presentation_import.dart';
-import '../core_presentation_import.dart';
-import '../core_presentation_import.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
+import '../core_presentation_import.dart';
 
 class CommonConfirmDialog extends StatelessWidget {
   final String text;
@@ -37,17 +34,18 @@ class CommonConfirmDialog extends StatelessWidget {
 
     return AlertDialog(
       backgroundColor: backgroundColor,
-      content: textSpans.isNotEmpty
-          ? RichText(text: TextSpan(children: textSpans))
-          : Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-                    text,
-                    style: textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-                    ),
+      content:
+          textSpans.isNotEmpty
+              ? RichText(text: TextSpan(children: textSpans))
+              : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  text,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
-          ),
+                ),
+              ),
       actions: [
         if (cancelButtonText.isNotEmpty)
           TextButton(
@@ -55,7 +53,6 @@ class CommonConfirmDialog extends StatelessWidget {
             style: TextButton.styleFrom(
               foregroundColor: cancelTextColor,
               backgroundColor: cancelButtonColor,
-
             ),
             child: Text(cancelButtonText),
           ),

@@ -33,9 +33,7 @@ Future<void> diSetup() async {
   getIt.registerSingleton<PolicyRepository>(
     PolicyRepositoryImpl(fBase: getIt()),
   );
-  getIt.registerSingleton<TodoRepository>(
-    TodoRepositoryImpl(fBase: getIt()),
-  );
+  getIt.registerSingleton<TodoRepository>(TodoRepositoryImpl(fBase: getIt()));
 
   // use_case
   getIt.registerSingleton<CustomerUseCase>(
@@ -47,9 +45,7 @@ Future<void> diSetup() async {
   getIt.registerSingleton<PolicyUseCase>(
     PolicyUseCase(policyRepository: getIt()),
   );
-  getIt.registerSingleton<TodoUseCase>(
-    TodoUseCase(todoRepository: getIt()),
-  );
+  getIt.registerSingleton<TodoUseCase>(TodoUseCase(todoRepository: getIt()));
   // viewModel
   getIt.registerLazySingleton<ProspectListViewModel>(
     () => ProspectListViewModel(),
@@ -64,5 +60,15 @@ Future<void> diSetup() async {
   getIt.registerFactory<CustomerViewModel>(() => CustomerViewModel());
   getIt.registerSingleton<SearchPageViewModel>(SearchPageViewModel());
   getIt.registerSingleton<DashBoardViewModel>(DashBoardViewModel());
-  getIt.registerSingleton<TodoViewModel>(TodoViewModel());
+  getIt.registerFactoryParam<TodoViewModel, Map<String, String>?, void>((
+    params,
+    _,
+  ) {
+    final userKey = params?['userKey'];
+    final customerKey = params?['customerKey'];
+    if (userKey == null || customerKey == null) {
+      throw ArgumentError('userKey와 customerKey는 필수입니다.');
+    }
+    return TodoViewModel(userKey: userKey, customerKey: customerKey);
+  });
 }

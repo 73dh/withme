@@ -1,51 +1,12 @@
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
+import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../../domain/model/customer_model.dart';
-import '../../../domain/model/todo_model.dart';
 import '../../di/setup.dart';
-import '../../utils/core_utils_import.dart';
-import '../core_presentation_import.dart';
-import '../todo/todo_view_model.dart';
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/ui/core_ui_import.dart';
-import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
-
-import '../../../domain/model/customer_model.dart';
-import '../../../domain/model/todo_model.dart';
-import '../../di/setup.dart';
-import '../../utils/core_utils_import.dart';
-import '../core_presentation_import.dart';
-import '../todo/todo_view_model.dart';
-
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/ui/core_ui_import.dart';
-import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
-
-import '../../../domain/model/customer_model.dart';
-import '../../../domain/model/todo_model.dart';
-import '../../di/setup.dart';
-import '../../utils/core_utils_import.dart';
-import '../core_presentation_import.dart';
-import '../todo/todo_view_model.dart';
-
-import 'package:withme/core/di/di_setup_import.dart';
-import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/ui/core_ui_import.dart';
-import 'package:withme/domain/model/history_model.dart';
-import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
-
-import '../../../domain/model/customer_model.dart';
-import '../../../domain/model/todo_model.dart';
-import '../../di/setup.dart';
-import '../../utils/core_utils_import.dart';
 import '../core_presentation_import.dart';
 import '../todo/todo_view_model.dart';
 
@@ -68,17 +29,19 @@ class ProspectItem extends StatelessWidget {
     final textTheme = theme.textTheme;
     final info = customer.insuranceInfo;
 
-    // TodoViewModel에서 고객별 실시간 todo 구독
-    final todoViewModel = getIt<TodoViewModel>();
-    todoViewModel.initializeTodos(
+    // TodoViewModel을 고객별로 생성 (Provider로 관리 추천)
+    final todoViewModel = TodoViewModel(
       userKey: userKey,
       customerKey: customer.customerKey,
     );
 
-    return StreamBuilder<List<TodoModel>>(
-      stream: todoViewModel.todoStream,
-      builder: (context, todoSnapshot) {
-        final todos = todoSnapshot.data ?? customer.todos;
+    // 초기 Firestore todos 넣어주기 (없으면 빈 리스트)
+    todoViewModel.loadTodos(customer.todos);
+
+    return AnimatedBuilder(
+      animation: todoViewModel,
+      builder: (context, _) {
+        final todos = todoViewModel.todoList;
 
         return StreamBuilder<List<HistoryModel>>(
           stream: getIt<HistoryUseCase>().call(
@@ -91,9 +54,10 @@ class ProspectItem extends StatelessWidget {
             final histories = historySnapshot.data ?? [];
 
             return ItemContainer(
-              backgroundColor: info.isUrgent
-                  ? colorScheme.errorContainer
-                  : colorScheme.surface,
+              backgroundColor:
+                  info.isUrgent
+                      ? colorScheme.errorContainer
+                      : colorScheme.surface,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -112,9 +76,9 @@ class ProspectItem extends StatelessWidget {
                         birth: customer.birth,
                         sex: customer.sex,
                         backgroundImagePath:
-                        customer.sex == '남'
-                            ? IconsPath.manIcon
-                            : IconsPath.womanIcon,
+                            customer.sex == '남'
+                                ? IconsPath.manIcon
+                                : IconsPath.womanIcon,
                         size: 35,
                       ),
                     ],
@@ -204,4 +168,3 @@ class ProspectItem extends StatelessWidget {
     );
   }
 }
-

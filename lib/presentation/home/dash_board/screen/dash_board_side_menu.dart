@@ -13,19 +13,6 @@ import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/model/user_model.dart';
 import '../components/build_menu_item.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/size.dart';
-import 'package:withme/core/ui/const/free_count.dart';
-import 'package:withme/core/presentation/widget/show_cycle_edit_dialog.dart';
-import '../../../../core/data/fire_base/user_session.dart';
-import '../../../../core/di/setup.dart';
-import '../../../../core/domain/core_domain_import.dart';
-import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/model/user_model.dart';
-import '../components/build_icon_row.dart';
-import '../components/build_menu_item.dart';
-import '../components/membership_expired_box.dart';
 
 class DashBoardSideMenu extends StatelessWidget {
   final DashBoardViewModel viewModel;
@@ -148,7 +135,7 @@ class DashBoardSideMenu extends StatelessWidget {
             BuildIconRow(
               icon: Icons.date_range,
               iconColor: colorScheme.primary,
-              text: '가입일시: ${currentUser.agreedDate.formattedBirth ?? '-'}',
+              text: '가입일시: ${currentUser.agreedDate.formattedBirth}',
               textStyle: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurface,
               ),

@@ -4,12 +4,6 @@ import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
 import '../core_presentation_import.dart';
 
-import '../../../domain/model/policy_model.dart';
-import '../../domain/enum/policy_state.dart';
-import '../../utils/core_utils_import.dart';
-import '../../utils/extension/number_format.dart';
-import '../core_presentation_import.dart';
-
 class PolicyItem extends StatelessWidget {
   final PolicyModel policy;
 
@@ -168,7 +162,7 @@ class PolicyItem extends StatelessWidget {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: statusColor(colorScheme).withOpacity(0.2),
+          color: statusColor(colorScheme).withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(

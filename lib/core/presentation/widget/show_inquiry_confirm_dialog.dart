@@ -66,7 +66,7 @@ Future<bool?> showInquiryConfirmDialog(
                           onPressed:
                               () => Navigator.of(dialogContext).pop(false),
                           style: FilledButton.styleFrom(
-                            backgroundColor: colorScheme.onSurface.withOpacity(
+                            backgroundColor: colorScheme.onSurface.withValues(alpha:
                               0.12,
                             ),
                             minimumSize: const Size(80, 40),

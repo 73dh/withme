@@ -73,7 +73,7 @@ class ProspectListAppBar extends StatelessWidget
         Image.asset(
           IconsPath.womanIcon,
           width: 40,
-          color: colorScheme.secondary.withOpacity(0.7),
+          color: colorScheme.secondary.withValues(alpha: 0.7),
         ),
         Positioned(
           left: -13,
@@ -81,7 +81,7 @@ class ProspectListAppBar extends StatelessWidget
           child: Image.asset(
             IconsPath.manIcon,
             width: 35,
-            color: colorScheme.tertiary.withOpacity(0.5),
+            color: colorScheme.tertiary.withValues(alpha: 0.5),
           ),
         ),
       ],

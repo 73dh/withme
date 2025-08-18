@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/ui/const/duration.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/duration.dart';
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/duration.dart';
 
 class EditToggleIcon extends StatelessWidget {
   final bool isReadOnly;
@@ -34,10 +29,8 @@ class EditToggleIcon extends StatelessWidget {
             key: ValueKey(isReadOnly),
             color: iconColor, // 전달된 color 적용
           ),
-          transitionBuilder: (child, anim) => RotationTransition(
-            turns: anim,
-            child: child,
-          ),
+          transitionBuilder:
+              (child, anim) => RotationTransition(turns: anim, child: child),
         ),
       ),
     );

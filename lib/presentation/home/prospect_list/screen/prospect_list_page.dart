@@ -12,6 +12,7 @@ import 'package:withme/presentation/home/prospect_list/components/prospect_list_
 import '../../../../core/di/setup.dart';
 import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
+import '../../../../core/presentation/todo/todo_view_model.dart';
 import '../../../registration/screen/registration_screen.dart';
 
 class ProspectListPage extends StatefulWidget {
@@ -162,14 +163,19 @@ class _ProspectListPageState extends State<ProspectListPage>
   Future<void> _openRegistrationSheet({CustomerModel? customer}) async {
     setIsProcessActive(true);
     setFabCanBeShown(false);
-
+    final todoViewModel =  TodoViewModel(
+      userKey: UserSession.userId,
+      customerKey: customer?.customerKey ??
+          'new_${DateTime.now().millisecondsSinceEpoch}',
+    );
     await showBottomSheetWithDraggable(
       context: context,
       builder:
           (scrollController) => RegistrationScreen(
             customer: customer,
             scrollController: scrollController,
-            outerContext: context,
+            // outerContext: context,
+            todoViewModel: todoViewModel,
           ),
       onClosed: () async {
         setIsProcessActive(false);

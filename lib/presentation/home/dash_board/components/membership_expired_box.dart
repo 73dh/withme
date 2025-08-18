@@ -1,5 +1,5 @@
-import '../../../../core/presentation/core_presentation_import.dart';
 import 'package:flutter/material.dart';
+
 import '../../../../core/presentation/core_presentation_import.dart';
 
 class MembershipExpiredBox extends StatelessWidget {
@@ -15,9 +15,9 @@ class MembershipExpiredBox extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: warningColor.withOpacity(0.1), // 연한 배경
+        color: warningColor.withValues(alpha: 0.1), // 연한 배경
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: warningColor.withOpacity(0.5)),
+        border: Border.all(color: warningColor.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [

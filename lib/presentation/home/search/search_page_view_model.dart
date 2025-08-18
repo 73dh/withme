@@ -20,31 +20,10 @@ import 'enum/coming_birth.dart';
 import 'enum/no_contact_month.dart';
 import 'enum/search_option.dart';
 import 'enum/upcoming_insurance_age.dart';
-import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/domain/enum/insurance_company.dart';
-import 'package:withme/core/domain/enum/product_category.dart';
-import 'package:withme/domain/use_case/search/filter_coming_birth_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_no_recent_history_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_policy_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_policy_by_name_use_case.dart';
-import 'package:withme/domain/use_case/search/filter_upcoming_insurance_use_case.dart';
-import 'package:withme/presentation/home/search/search_page_event.dart';
-import 'package:withme/presentation/home/search/search_page_state.dart';
-import '../../../core/data/fire_base/user_session.dart';
-import '../../../core/di/setup.dart';
-import '../../../domain/domain_import.dart';
-import '../../../domain/model/customer_model.dart';
-import '../../../domain/model/history_model.dart';
-import '../../../domain/model/policy_model.dart';
-import 'enum/coming_birth.dart';
-import 'enum/no_contact_month.dart';
-import 'enum/search_option.dart';
-import 'enum/upcoming_insurance_age.dart';
 
 class SearchPageViewModel with ChangeNotifier {
   SearchPageState _state = SearchPageState();
+
   SearchPageState get state => _state;
 
   /// 이벤트 처리
@@ -120,7 +99,7 @@ class SearchPageViewModel with ChangeNotifier {
     notifyListeners();
     debugPrint(
       '[getAllData time: ${stopwatch.elapsedMilliseconds}ms]\n'
-          'currentOption: ${state.currentSearchOption}',
+      'currentOption: ${state.currentSearchOption}',
     );
   }
 
@@ -229,31 +208,36 @@ List<HistoryModel> _extractHistories(List<CustomerModel> customers) =>
     customers.expand((e) => e.histories).toList();
 
 List<String> _extractContractMonths(List<CustomerModel> customers) {
-  final months = customers
-      .expand((e) => e.policies)
-      .map((policy) => policy.startDate)
-      .whereType<DateTime>()
-      .map((date) => '${date.year}-${date.month.toString().padLeft(2, '0')}')
-      .toSet()
-      .toList();
+  final months =
+      customers
+          .expand((e) => e.policies)
+          .map((policy) => policy.startDate)
+          .whereType<DateTime>()
+          .map(
+            (date) => '${date.year}-${date.month.toString().padLeft(2, '0')}',
+          )
+          .toSet()
+          .toList();
   months.sort();
   return months;
 }
 
 List<String> _extractProductCategories(List<PolicyModel> policies) {
-  final categories = policies
-      .map((policy) => policy.productCategory.toString())
-      .toSet()
-      .toList();
+  final categories =
+      policies
+          .map((policy) => policy.productCategory.toString())
+          .toSet()
+          .toList();
   categories.sort();
   return categories;
 }
 
 List<String> _extractInsuranceCompanies(List<PolicyModel> policies) {
-  final companies = policies
-      .map((policy) => policy.insuranceCompany.toString())
-      .toSet()
-      .toList();
+  final companies =
+      policies
+          .map((policy) => policy.insuranceCompany.toString())
+          .toSet()
+          .toList();
   companies.sort();
   return companies;
 }

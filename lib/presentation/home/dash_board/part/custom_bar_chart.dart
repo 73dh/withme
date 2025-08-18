@@ -2,44 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
 
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-import '../../../../core/ui/core_ui_import.dart';
-import '../../../../domain/domain_import.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/presentation/home/dash_board/components/arrow_indicator.dart';
-
-import '../../../../core/ui/core_ui_import.dart';
 import '../../../../domain/domain_import.dart';
 
 class CustomBarChart extends StatefulWidget {
@@ -88,14 +50,17 @@ class _CustomBarChartState extends State<CustomBarChart> {
   }
 
   Map<String, Map<String, int>> _convertToStats(
-      Map<String, List<CustomerModel>> monthlyData) {
+    Map<String, List<CustomerModel>> monthlyData,
+  ) {
     final Map<String, Map<String, int>> stats = {};
     for (final entry in monthlyData.entries) {
       final month = entry.key;
       final customers = entry.value;
       final prospectCount = customers.where((c) => c.policies.isEmpty).length;
-      final contractCount =
-      customers.fold(0, (sum, c) => sum + c.policies.length);
+      final contractCount = customers.fold(
+        0,
+        (sum, c) => sum + c.policies.length,
+      );
       stats[month] = {'prospect': prospectCount, 'contract': contractCount};
     }
     return stats;
@@ -110,17 +75,19 @@ class _CustomBarChartState extends State<CustomBarChart> {
     final stats = _convertToStats(widget.monthlyData);
     final keys = stats.keys.toList()..sort();
 
-    final maxY = stats.values
-        .expand((map) => map.values)
-        .fold<int>(0, (prev, e) => e > prev ? e : prev)
-        .toDouble();
+    final maxY =
+        stats.values
+            .expand((map) => map.values)
+            .fold<int>(0, (prev, e) => e > prev ? e : prev)
+            .toDouble();
 
     final prospectColor =
-        widget.prospectBarColor ?? colorScheme.primary.withOpacity(0.8);
+        widget.prospectBarColor ?? colorScheme.primary.withValues(alpha: 0.8);
     final contractColor =
-        widget.contractBarColor ?? colorScheme.secondary.withOpacity(0.8);
+        widget.contractBarColor ?? colorScheme.secondary.withValues(alpha: 0.8);
     final labelStyle =
-        widget.labelStyle ?? textTheme.bodySmall?.copyWith(color: colorScheme.onSurface);
+        widget.labelStyle ??
+        textTheme.bodySmall?.copyWith(color: colorScheme.onSurface);
 
     return SizedBox(
       height: 300,
@@ -133,10 +100,7 @@ class _CustomBarChartState extends State<CustomBarChart> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(5, (i) {
                 final step = (maxY / 4).ceil();
-                return Text(
-                  '${step * (4 - i)}',
-                  style: labelStyle,
-                );
+                return Text('${step * (4 - i)}', style: labelStyle);
               }),
             ),
           ),
@@ -198,19 +162,23 @@ class _CustomBarChartState extends State<CustomBarChart> {
                               },
                             ),
                           ),
-                          leftTitles:
-                          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          rightTitles:
-                          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          topTitles:
-                          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          leftTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
                         ),
                         gridData: FlGridData(
                           show: true,
-                          getDrawingHorizontalLine: (value) => FlLine(
-                            color: colorScheme.outline.withOpacity(0.3),
-                            strokeWidth: 0.5,
-                          ),
+                          getDrawingHorizontalLine:
+                              (value) => FlLine(
+                                color: colorScheme.outline.withValues(alpha: 0.3),
+                                strokeWidth: 0.5,
+                              ),
                         ),
                         borderData: FlBorderData(
                           show: true,
@@ -226,10 +194,18 @@ class _CustomBarChartState extends State<CustomBarChart> {
                 ),
                 if (showLeftArrow)
                   const Positioned(
-                      left: 0, top: 0, bottom: 0, child: ArrowIndicator(isRight: false)),
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: ArrowIndicator(isRight: false),
+                  ),
                 if (showRightArrow)
                   const Positioned(
-                      right: 0, top: 0, bottom: 0, child: ArrowIndicator(isRight: true)),
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: ArrowIndicator(isRight: true),
+                  ),
               ],
             ),
           ),

@@ -82,7 +82,7 @@ class CustomerItemIcon extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       offset: const Offset(1, 1),
                       blurRadius: 2,
                     ),
@@ -111,10 +111,10 @@ class CustomerItemIcon extends StatelessWidget {
       height: circleSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withOpacity(0.9),
+        color: color.withValues(alpha: 0.9),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             offset: const Offset(1, 1),
             blurRadius: 2,
           ),

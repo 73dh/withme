@@ -1,18 +1,9 @@
-import 'dart:async';
-
-import '../../../domain/model/todo_model.dart';
-import '../../ui/core_ui_import.dart';
-import '../core_presentation_import.dart';
-import 'dart:async';
-
-import '../../../domain/model/todo_model.dart';
-import '../../ui/core_ui_import.dart';
-import '../core_presentation_import.dart';
 // stream_todo_text.dart
 import 'package:flutter/material.dart';
+
 import '../../../domain/model/todo_model.dart';
-
-
+import '../../ui/core_ui_import.dart';
+import '../core_presentation_import.dart';
 
 class StreamTodoText extends StatefulWidget {
   final List<TodoModel> todoList;
@@ -95,12 +86,13 @@ class _StreamTodoTextState extends State<StreamTodoText>
     final currentTodo = widget.todoList[_currentIndex];
 
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     // 성별에 맞는 색상 지정 (ColorStyles 또는 colorScheme 활용)
-    final Color textColor = widget.textColor ??
+    final Color textColor =
+        widget.textColor ??
         (widget.sex == '남'
-            ? ColorStyles.manColor // 예: 파랑
+            ? ColorStyles
+                .manColor // 예: 파랑
             : ColorStyles.womanColor); // 예: 핑크
 
     return ClipRect(

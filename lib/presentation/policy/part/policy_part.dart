@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
+
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/ui/const/size.dart';
-import '../../../core/ui/core_ui_import.dart';
 
 class PolicyPart extends StatelessWidget {
   final String productCategory;
@@ -53,7 +53,7 @@ class PolicyPart extends StatelessWidget {
 
     return ItemContainer(
       height: 220,
-      backgroundColor: colorScheme.surfaceVariant, // theme 적용
+      backgroundColor: colorScheme.surfaceContainerHighest, // theme 적용
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: IntrinsicWidth(
@@ -205,12 +205,14 @@ class PolicyPart extends StatelessWidget {
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
-                      backgroundColor: startDate != null
-                          ? colorScheme.primary
-                          : colorScheme.surfaceContainerHigh,
-                      foregroundColor: startDate != null
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSurfaceVariant,
+                      backgroundColor:
+                          startDate != null
+                              ? colorScheme.primary
+                              : colorScheme.surfaceContainerHigh,
+                      foregroundColor:
+                          startDate != null
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurfaceVariant,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -220,21 +222,24 @@ class PolicyPart extends StatelessWidget {
                           onStartDateChanged(selected);
                         }
                       },
-                      text: startDate == null
-                          ? '계약일'
-                          : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
+                      text:
+                          startDate == null
+                              ? '계약일'
+                              : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
                     ),
                   ),
                   width(16),
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
-                      backgroundColor: endDate != null
-                          ? colorScheme.primary
-                          : colorScheme.surfaceContainerHigh,
-                      foregroundColor: endDate != null
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSurfaceVariant,
+                      backgroundColor:
+                          endDate != null
+                              ? colorScheme.primary
+                              : colorScheme.surfaceContainerHigh,
+                      foregroundColor:
+                          endDate != null
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurfaceVariant,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -244,14 +249,14 @@ class PolicyPart extends StatelessWidget {
                           onEndDateChanged(selected);
                         }
                       },
-                      text: endDate == null
-                          ? '만기일'
-                          : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
+                      text:
+                          endDate == null
+                              ? '만기일'
+                              : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
                     ),
                   ),
                 ],
-              )
-,
+              ),
             ],
           ),
         ),

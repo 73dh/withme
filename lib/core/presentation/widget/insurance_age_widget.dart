@@ -1,9 +1,6 @@
 import '../../utils/core_utils_import.dart';
 import '../core_presentation_import.dart';
 
-import '../../utils/core_utils_import.dart';
-import '../core_presentation_import.dart';
-
 class InsuranceAgeWidget extends StatelessWidget {
   final int difference;
   final bool isUrgent;
@@ -29,10 +26,7 @@ class InsuranceAgeWidget extends StatelessWidget {
         Flexible(
           child: Text(
             '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
             overflow: TextOverflow.ellipsis,
           ),
         ),

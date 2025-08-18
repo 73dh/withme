@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
 class PartTitle extends StatelessWidget {
   final String text;
   final double verticalPadding;
@@ -30,7 +26,8 @@ class PartTitle extends StatelessWidget {
         children: [
           Text(
             text,
-            style: style ??
+            style:
+                style ??
                 textTheme.titleMedium?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: color ?? colorScheme.onSurface,

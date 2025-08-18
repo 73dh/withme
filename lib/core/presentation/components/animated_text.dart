@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 
 class AnimatedText extends StatefulWidget {
   final String text;
@@ -50,7 +49,8 @@ class _AnimatedTextState extends State<AnimatedText>
     final theme = Theme.of(context);
 
     // 외부에서 style 전달 시 사용, 없으면 기본값
-    final textStyle = widget.style ??
+    final textStyle =
+        widget.style ??
         theme.textTheme.titleMedium?.copyWith(
           color: theme.colorScheme.primary,
           fontWeight: FontWeight.bold,
@@ -65,10 +65,7 @@ class _AnimatedTextState extends State<AnimatedText>
             child: Transform.scale(scale: _sizeAnimation.value, child: child),
           );
         },
-        child: Text(
-          widget.text,
-          style: textStyle,
-        ),
+        child: Text(widget.text, style: textStyle),
       ),
     );
   }

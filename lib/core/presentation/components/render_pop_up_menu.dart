@@ -1,11 +1,8 @@
-import 'package:go_router/go_router.dart';
-
-import '../../ui/color/color_style.dart';
-import '../core_presentation_import.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core_presentation_import.dart';
+
 class RenderPopUpMenu extends StatelessWidget {
   final String label;
   final List<dynamic> items;
@@ -45,21 +42,21 @@ class RenderPopUpMenu extends StatelessWidget {
               return items
                   .map(
                     (e) => PopupMenuItem<dynamic>(
-                  child: GestureDetector(
-                    onTap: () {
-                      onSelect(e);
-                      context.pop();
-                    },
-                    child: Text(
-                      e.toString(),
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: textColor ?? colorScheme.onSurface,
+                      child: GestureDetector(
+                        onTap: () {
+                          onSelect(e);
+                          context.pop();
+                        },
+                        child: Text(
+                          e.toString(),
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: textColor ?? colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ),
-              )
+                  )
                   .toList();
             },
           ),

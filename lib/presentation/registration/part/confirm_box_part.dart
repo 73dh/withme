@@ -39,7 +39,7 @@ class ConfirmBoxPart extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final effectiveTextColor = textColor ?? theme.colorScheme.onSurface;
-    final effectiveBackground = backgroundColor ?? theme.colorScheme.surfaceVariant;
+    final effectiveBackground = backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
 
     return Stack(
       children: [
@@ -103,7 +103,7 @@ class ConfirmBoxPart extends StatelessWidget {
               children: [
                 Text(
                   '저장중',
-                  style: textTheme.bodyMedium?.copyWith(color: effectiveTextColor.withOpacity(0.7)),
+                  style: textTheme.bodyMedium?.copyWith(color: effectiveTextColor.withValues(alpha: 0.7)),
                 ),
                 width(5),
                 const MyCircularIndicator(size: 10),
@@ -128,7 +128,7 @@ class ConfirmBoxPart extends StatelessWidget {
             TextSpan(
               text: '$label ',
               style: textTheme.bodyMedium?.copyWith(
-                color: textColor.withOpacity(0.7),
+                color: textColor.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),

@@ -1,29 +1,16 @@
 import 'dart:developer';
 
 import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/presentation/widget/customerRegistrationAppBar.dart';
+import 'package:withme/core/presentation/widget/customer_registration_app_bar.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/presentation/todo/todo_view_model.dart';
 import '../../../core/presentation/widget/show_edit_policy_dialog.dart';
 import '../../../domain/model/customer_model.dart';
-import '../../../core/presentation/todo/todo_view_model.dart';
-import '../components/customer_info.dart';
-import 'dart:developer';
-import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/presentation/widget/customerRegistrationAppBar.dart';
-import 'package:withme/domain/model/policy_model.dart';
-import 'package:withme/presentation/customer/customer_view_model.dart';
-
-import '../../../core/data/fire_base/user_session.dart';
-import '../../../core/di/setup.dart';
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/presentation/widget/show_edit_policy_dialog.dart';
-import '../../../domain/model/customer_model.dart';
-import '../../../core/presentation/todo/todo_view_model.dart';
 import '../components/customer_info.dart';
 
 class CustomerScreen extends StatefulWidget {
@@ -37,19 +24,19 @@ class CustomerScreen extends StatefulWidget {
 
 class _CustomerScreenState extends State<CustomerScreen> {
   final viewModel = getIt<CustomerViewModel>();
-  final todoViewModel = getIt<TodoViewModel>();
+  late final TodoViewModel todoViewModel;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final customerKey = widget.customer.customerKey;
+    // TodoViewModel 생성 시 userKey/customerKey 바로 주입
+    todoViewModel = TodoViewModel(
+      userKey: UserSession.userId,
+      customerKey: widget.customer.customerKey,
+    );
 
-      todoViewModel.initializeTodos(
-        userKey: UserSession.userId,
-        customerKey: customerKey,
-      );
-    });
+    // Firestore 초기값이 있다면 loadTodos 호출
+    todoViewModel.loadTodos(widget.customer.todos);
   }
 
   @override

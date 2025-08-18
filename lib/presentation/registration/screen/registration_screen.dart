@@ -13,7 +13,7 @@ import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/presentation/fab/fab_overlay_manager_mixin.dart';
 import '../../../core/presentation/todo/todo_view_model.dart';
-import '../../../core/presentation/widget/customerRegistrationAppBar.dart';
+import '../../../core/presentation/widget/customer_registration_app_bar.dart';
 import '../../../core/utils/is_need_new_history.dart';
 import '../../home/customer_list/components/customer_list_app_bar.dart';
 import '../part/confirm_box_part.dart';
@@ -24,14 +24,14 @@ import '../registration_view_model.dart';
 class RegistrationScreen extends StatefulWidget {
   final CustomerModel? customer;
   final ScrollController? scrollController;
-  final BuildContext? outerContext;
+  final TodoViewModel todoViewModel; // 생성자에서 안전하게 주입
   final void Function(bool)? onFabVisibilityChanged;
 
   const RegistrationScreen({
     super.key,
     this.customer,
     this.scrollController,
-    this.outerContext,
+    required this.todoViewModel,
     this.onFabVisibilityChanged,
   });
 
@@ -48,65 +48,60 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _memoController = TextEditingController();
   final _registeredDateController = TextEditingController();
 
-  final viewModel = getIt<RegistrationViewModel>();
-  final todoViewModel = getIt<TodoViewModel>();
   ScrollController? _internalController;
+  bool _isReadOnly = false;
+  bool _isRecommended = false;
+  bool _isNeedNewHistory = false;
+  DateTime? _birth;
+  String? _sex;
 
   ScrollController get _effectiveController =>
       widget.scrollController ?? _internalController!;
 
-  bool _isReadOnly = false;
-  bool _isRecommended = false;
-  DateTime? _birth;
-  String? _sex;
-  bool _isRegistering = false;
-  bool _isNeedNewHistory = false;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final customerKey = widget.customer?.customerKey;
+    if (widget.scrollController == null)
+      _internalController = ScrollController();
+  }
 
-      todoViewModel.initializeTodos(
-        userKey: UserSession.userId,
-        customerKey: customerKey!,
-      );
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // context 기반 초기화 안전하게 수행
     _initializeCustomer();
     _isNeedNewHistory = isNeedNewHistory(widget.customer?.histories ?? []);
-
-    if (widget.scrollController == null) {
-      _internalController = ScrollController();
+    if (widget.customer?.todos != null) {
+      widget.todoViewModel.loadTodos(widget.customer!.todos);
     }
   }
 
   void _initializeCustomer() {
     final customer = widget.customer;
-    _registeredDateController.text = DateTime.now().formattedBirth;
+    _registeredDateController.text =
+        customer?.registeredDate.formattedBirth ??
+        DateTime.now().formattedBirth;
     if (customer != null) {
       _isReadOnly = true;
       _nameController.text = customer.name;
       _sex = customer.sex;
       _birth = customer.birth;
       _birthController.text = customer.birth.toString();
-      _registeredDateController.text = customer.registeredDate.formattedBirth;
       _memoController.text = customer.memo;
       if (customer.recommended.isNotEmpty) {
         _isRecommended = true;
         _recommendedController.text = customer.recommended;
       }
-
     }
   }
 
   @override
   void dispose() {
+    _internalController?.dispose();
     _nameController.dispose();
     _recommendedController.dispose();
     _historyController.dispose();
     _birthController.dispose();
-    _internalController?.dispose();
     _memoController.dispose();
     _registeredDateController.dispose();
     super.dispose();
@@ -121,38 +116,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return SafeArea(
       child: SingleChildScrollView(
         controller: _effectiveController,
-        physics: const ClampingScrollPhysics(),
         child: Container(
-          color: colorScheme.surfaceContainerHighest,
+          color: colorScheme.surface, // 전체 배경 테마 적용
           child: Column(
             children: [
               CustomerRegistrationAppBar(
                 customer: widget.customer,
-                todoViewModel: todoViewModel,
+                todoViewModel: widget.todoViewModel,
+                isReadOnly: _isReadOnly,
+                onEditToggle: () {
+                  setState(() => _isReadOnly = !_isReadOnly);
+                  widget.onFabVisibilityChanged?.call(!_isReadOnly);
+                },
+                onHistoryTap: _onAddHistory,
+                isNeedNewHistory: _isNeedNewHistory,
+                registrationViewModel: getIt<RegistrationViewModel>(),
+                backgroundColor: colorScheme.surface,
+                foregroundColor: colorScheme.onSurface,
               ),
-              // CustomerRegistrationAppBar(
-              //   customer: widget.customer,
-              //   todoViewModel: todoViewModel,
-              //   isReadOnly: _isReadOnly,
-              //   onEditToggle: () {
-              //     setState(() => _isReadOnly = !_isReadOnly);
-              //     final fabMixin =
-              //         context.findAncestorStateOfType<FabOverlayManagerMixin>();
-              //     fabMixin?.setFabCanBeShown(false);
-              //   },
-              //   onHistoryTap: () async {
-              //     await onAddHistory();
-              //     if (isNeedNewHistory(widget.customer?.histories ?? [])) {
-              //       setState(() {
-              //         _isNeedNewHistory = !_isNeedNewHistory;
-              //       });
-              //     }
-              //   },
-              //   isNeedNewHistory: _isNeedNewHistory,
-              //   registrationViewModel: viewModel,
-              //   backgroundColor: colorScheme.surface,
-              //   foregroundColor: colorScheme.onSurface,
-              // ),
               Form(
                 key: _formKey,
                 child: CustomerInfoPart(
@@ -176,9 +157,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     });
                   },
                   onRegisteredDatePressed: (date) {
-                    setState(() {
-                      _registeredDateController.text = date.formattedBirth;
-                    });
+                    setState(
+                      () =>
+                          _registeredDateController.text = date.formattedBirth,
+                    );
                   },
                   isRecommended: _isRecommended,
                   recommendedController: _recommendedController,
@@ -191,26 +173,38 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   memoController: _memoController,
                   titleTextStyle: textTheme.titleMedium?.copyWith(
                     color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
                   ),
                   subtitleTextStyle: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface.withAlpha(180),
                   ),
-                  backgroundColor: colorScheme.surface,
+                  backgroundColor:
+                      colorScheme.surfaceVariant, // Card/Container 배경
                 ),
               ),
               if (!_isReadOnly)
-                Container(
-                  color: colorScheme.surface,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 20,
-                  ),
-                  child: RenderFilledButton(
-                    text: widget.customer == null ? '등록' : '수정',
-                    foregroundColor: colorScheme.onPrimary,
-                    backgroundColor: colorScheme.primary,
-                    onPressed: _onSubmitPressed,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity, // 화면 폭만큼 확장
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        // 높이 여유
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // 모서리 둥글게
+                        ),
+                      ),
+                      onPressed: _onSubmitPressed,
+                      child: Text(
+                        widget.customer == null ? '등록' : '수정',
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -220,7 +214,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Future<void> onAddHistory() async {
+  Future<void> _onAddHistory() async {
     final newHistory = await popupAddHistory(
       context: context,
       histories: widget.customer?.histories ?? [],
@@ -229,130 +223,65 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
     if (newHistory != null) {
       setState(() {
-        final histories = widget.customer!.histories;
-        histories.add(newHistory);
-        histories.sort((a, b) => b.contactDate.compareTo(a.contactDate));
-        _isNeedNewHistory = isNeedNewHistory(histories);
+        widget.customer?.histories.add(newHistory);
+        widget.customer?.histories.sort(
+          (a, b) => b.contactDate.compareTo(a.contactDate),
+        );
+        _isNeedNewHistory = isNeedNewHistory(widget.customer?.histories ?? []);
       });
     }
   }
 
   void _onSubmitPressed() async {
-    if (!_tryValidation()) return;
-
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: colorScheme.surface,
-      builder:
-          (modalContext) => StatefulBuilder(
-            builder:
-                (context, setModalState) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
-                  ),
-                  child: ConfirmBoxPart(
-                    customerModel: widget.customer,
-                    nameController: _nameController,
-                    recommendedController: _recommendedController,
-                    historyController: _historyController,
-                    birthController: _birthController,
-                    registeredDateController: _registeredDateController,
-                    isRegistering: _isRegistering,
-                    onPressed: () async {
-                      setModalState(() => _isRegistering = true);
-                      final success = await _submitForm();
-                      setModalState(() => _isRegistering = false);
-                      if (modalContext.mounted) {
-                        Navigator.of(modalContext).pop();
-                      }
-                      if (success && mounted && context.mounted) {
-                        context.pop(true);
-                      }
-                    },
-                    sex: _sex,
-                    birth: _birth,
-                    textColor: colorScheme.onSurface,
-                    backgroundColor: colorScheme.surfaceContainerLowest
-                        .withAlpha(20),
-                  ),
-                ),
-          ),
-    );
-  }
-
-  bool _tryValidation() {
-    final isValid = _formKey.currentState?.validate() ?? false;
-    final name = _nameController.text.trim();
-    final recommenderName = _recommendedController.text.trim();
-    final nameRegex = RegExp(r'^[a-zA-Z가-힣]+$');
-
-    if (name.isEmpty) {
-      showOverlaySnackBar(context, '고객 이름을 입력하세요');
-      return false;
-    }
-    if (!nameRegex.hasMatch(name)) {
-      showOverlaySnackBar(context, '이름은 한글 또는 영문만 입력 가능합니다');
-      return false;
-    }
-    if (_sex == null) {
-      showOverlaySnackBar(context, '성별을 선택 하세요');
-      return false;
-    }
-    if (_isRecommended && recommenderName.isEmpty) {
-      showOverlaySnackBar(context, '소개자 이름을 입력 하세요');
-      return false;
-    }
-    if (_isRecommended && !nameRegex.hasMatch(recommenderName)) {
-      showOverlaySnackBar(context, '이름은 한글 또는 영문만 입력 가능합니다');
-      return false;
-    }
-    if (isValid) _formKey.currentState!.save();
-    return isValid;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final success = await _submitForm();
+    if (success && mounted) Navigator.of(context).pop(true);
   }
 
   Future<bool> _submitForm() async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
+      // ✅ 필수값 검증
+      if (_nameController.text.trim().isEmpty) {
+        if (mounted) showOverlaySnackBar(context, '이름을 입력하세요.');
+        return false;
+      }
+      if (_sex == null || _sex!.isEmpty) {
+        if (mounted) showOverlaySnackBar(context, '성별을 입력하세요.');
+        return false;
+      }
+
+      final userKey = UserSession.userId;
       final customerMap = CustomerModel.toMapForCreateCustomer(
-        userKey: currentUser?.uid ?? '',
-        customerKey:
-            widget.customer?.customerKey ??
-            generateCustomerKey('${currentUser?.email}'),
-        name: _nameController.text,
+        userKey: userKey,
+        customerKey: widget.customer?.customerKey ??
+            'new_${DateTime.now().millisecondsSinceEpoch}',
+        name: _nameController.text.trim(),
         sex: _sex!,
-        recommender: _recommendedController.text,
+        recommender: _recommendedController.text.trim(),
         birth: _birth,
-        registeredDate: DateFormat(
-          'yy/MM/dd',
-        ).parseStrict(_registeredDateController.text),
+        registeredDate: DateFormat('yy/MM/dd')
+            .parseStrict(_registeredDateController.text),
         memo: _memoController.text.trim(),
       );
 
       if (widget.customer == null) {
         final historyMap = HistoryModel.toMapForHistory(
-          registeredDate: DateFormat(
-            'yy/MM/dd',
-          ).parseStrict(_registeredDateController.text),
+          registeredDate: DateFormat('yy/MM/dd')
+              .parseStrict(_registeredDateController.text),
           content: _historyController.text,
         );
-        Map<String, dynamic> todoMap = {};
-        await viewModel.onEvent(
+        await getIt<RegistrationViewModel>().onEvent(
           RegistrationEvent.registerCustomer(
-            userKey: currentUser!.uid,
+            userKey: userKey,
             customerData: customerMap,
             historyData: historyMap,
-            todoData: todoMap,
+            todoData: {},
           ),
         );
       } else {
-        await viewModel.onEvent(
+        await getIt<RegistrationViewModel>().onEvent(
           RegistrationEvent.updateCustomer(
-            userKey: UserSession.userId,
+            userKey: userKey,
             customerData: customerMap,
           ),
         );
@@ -360,7 +289,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       return true;
     } catch (e) {
       debugPrint('submitForm error: $e');
-      if (mounted) showOverlaySnackBar(context, '등록에 실패했습니다. 다시 시도해주세요.');
+      if (mounted) showOverlaySnackBar(context, '등록에 실패했습니다.');
       return false;
     }
   }
