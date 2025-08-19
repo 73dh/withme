@@ -12,8 +12,7 @@ import '../../../core/domain/enum/sort_status.dart';
 import '../../../core/presentation/fab/fab_view_model_interface.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
-
-
+import '../../../domain/model/history_model.dart';
 
 class ProspectListViewModel
     with ChangeNotifier
@@ -25,7 +24,6 @@ class ProspectListViewModel
 
   List<CustomerModel> allCustomers = [];
   bool _isFabVisible = true; // 기본값 설정
-
   @override
   bool get isFabVisible => _isFabVisible;
 
@@ -182,7 +180,7 @@ class ProspectListViewModel
         .length;
   }
 
-  int get inactiveCount {
+  int get managePeriodCount {
     final now = DateTime.now();
     final threshold = getIt<UserSession>().managePeriodDays;
 
@@ -215,4 +213,15 @@ class ProspectListViewModel
 
   int get totalProspectCount =>
       allCustomers.where((e) => e.policies.isEmpty).length;
+
+  // History 추가 메서드
+  void addHistoryForCustomer(HistoryModel history, CustomerModel customer) {
+    final idx = allCustomers.indexWhere(
+      (c) => c.customerKey == customer.customerKey,
+    );
+    if (idx == -1) return;
+
+    allCustomers[idx].histories.add(history);
+    _applyFilterAndSort();
+  }
 }

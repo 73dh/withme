@@ -131,14 +131,13 @@ class CustomerItem extends StatelessWidget {
         if (customer.todos.isNotEmpty) ...[
           SizedBox(
             width: 30,
-            child:
-    StreamTodoText(
-    todoList: customer.todos.map((t) => t.content).toList(),
-    style: theme.textTheme.bodySmall?.copyWith(
-    color: getSexIconColor(customer.sex, colorScheme),
-    fontWeight: FontWeight.bold,
-    ),
-    )
+            child: StreamTodoText(
+              todoList: customer.todos.map((t) => t.content).toList(),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: getSexIconColor(customer.sex, colorScheme),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             // StreamTodoText(todoList: customer.todos, sex: customer.sex),
           ),
           const SizedBox(width: 2),

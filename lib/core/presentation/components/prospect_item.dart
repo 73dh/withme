@@ -54,15 +54,15 @@ class ProspectItem extends StatelessWidget {
             final histories = historySnapshot.data ?? [];
 
             return ItemContainer(
-              backgroundColor:
-                  info.isUrgent
-                      ? colorScheme.secondaryContainer
-                      : colorScheme.surface,
+              backgroundColor: info.isUrgent
+                  ? colorScheme.secondaryContainer
+                  : colorScheme.surface,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 등록일 + 성별 아이콘
                   Column(
+                    mainAxisSize: MainAxisSize.min, // ✅ 높이 자식만큼만
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
@@ -75,10 +75,9 @@ class ProspectItem extends StatelessWidget {
                       SexIconWithBirthday(
                         birth: customer.birth,
                         sex: customer.sex,
-                        backgroundImagePath:
-                            customer.sex == '남'
-                                ? IconsPath.manIcon
-                                : IconsPath.womanIcon,
+                        backgroundImagePath: customer.sex == '남'
+                            ? IconsPath.manIcon
+                            : IconsPath.womanIcon,
                         size: 35,
                       ),
                     ],
@@ -89,8 +88,10 @@ class ProspectItem extends StatelessWidget {
                   // 이름, 생년월일, 상령일, 할일
                   Expanded(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min, // ✅ Column 높이 최소화
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // 이름 + 할일 Row
                         // 이름 + 할일 Row
                         Row(
                           children: [
@@ -106,6 +107,7 @@ class ProspectItem extends StatelessWidget {
                             ),
                             if (todos.isNotEmpty) ...[
                               const SizedBox(width: 6),
+                              // ✅ 고정폭 Container로 텍스트 위치 고정
                               StreamTodoText(
                                 todoList: todos.map((t) => t.content).toList(),
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -114,14 +116,51 @@ class ProspectItem extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              TodoCountIcon(
-                                todos: todos,
-                                sex: customer.sex,
-                                iconSize: 18,
+                              // TodoCountIcon 위치 고정
+                              SizedBox(
+                                width: 18,
+                                child: TodoCountIcon(
+                                  todos: todos,
+                                  sex: customer.sex,
+                                  iconSize: 18,
+                                ),
                               ),
                             ],
                           ],
                         ),
+
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: Text(
+                        //         shortenedNameText(customer.name, length: 6),
+                        //         style: textTheme.bodyMedium?.copyWith(
+                        //           color: colorScheme.onSurface,
+                        //           fontWeight: FontWeight.bold,
+                        //         ),
+                        //         overflow: TextOverflow.ellipsis,
+                        //       ),
+                        //     ),
+                        //     if (todos.isNotEmpty) ...[
+                        //       const SizedBox(width: 6),
+                        //       Flexible( // ✅ todo 텍스트 폭 제한
+                        //         child: StreamTodoText(
+                        //           todoList: todos.map((t) => t.content).toList(),
+                        //           style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        //             color: getSexIconColor(customer.sex, colorScheme),
+                        //             fontWeight: FontWeight.bold,
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       const SizedBox(width: 4),
+                        //       TodoCountIcon(
+                        //         todos: todos,
+                        //         sex: customer.sex,
+                        //         iconSize: 18,
+                        //       ),
+                        //     ],
+                        //   ],
+                        // ),
 
                         const SizedBox(height: 2),
 
@@ -136,8 +175,7 @@ class ProspectItem extends StatelessWidget {
                           ),
 
                         // 상령일
-                        if (info.difference != null &&
-                            info.insuranceChangeDate != null)
+                        if (info.difference != null && info.insuranceChangeDate != null)
                           InsuranceAgeWidget(
                             difference: info.difference!,
                             isUrgent: info.isUrgent,
@@ -162,6 +200,7 @@ class ProspectItem extends StatelessWidget {
                 ],
               ),
             );
+
           },
         );
       },

@@ -1,5 +1,6 @@
 import '../../../domain/model/policy_model.dart';
 import '../../domain/enum/policy_state.dart';
+import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
 import '../core_presentation_import.dart';
@@ -70,7 +71,16 @@ class PolicyItem extends StatelessWidget {
     children: [
       _personDetail(
         textTheme,
-        sexIcon: sexIcon(policy.policyHolderSex, colorScheme),
+        // sexIcon:  sexIcon(policy.policyHolderSex, colorScheme),
+        sexIcon: SexIconWithBirthday(
+          birth: policy.policyHolderBirth,
+          sex: policy.policyHolderSex,
+          backgroundImagePath:
+              policy.policyHolderSex == '남'
+                  ? IconsPath.manIcon
+                  : IconsPath.womanIcon,
+          size: 20,
+        ),
         name: shortenedNameText(policy.policyHolder, length: 5),
         age: calculateAge(policy.policyHolderBirth!),
         birth: policy.policyHolderBirth?.formattedBirth ?? '-',
@@ -78,7 +88,16 @@ class PolicyItem extends StatelessWidget {
       ),
       _personDetail(
         textTheme,
-        sexIcon: sexIcon(policy.insuredSex, colorScheme),
+        // sexIcon: sexIcon(policy.insuredSex, colorScheme),
+        sexIcon: SexIconWithBirthday(
+          birth: policy.insuredBirth,
+          sex: policy.insuredSex,
+          backgroundImagePath:
+          policy.insuredSex == '남'
+              ? IconsPath.manIcon
+              : IconsPath.womanIcon,
+          size: 20,
+        ),
         name: shortenedNameText(policy.insured, length: 5),
         age: calculateAge(policy.insuredBirth!),
         birth: policy.insuredBirth?.formattedBirth ?? '-',

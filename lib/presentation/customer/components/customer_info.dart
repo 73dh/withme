@@ -3,6 +3,7 @@ import 'package:withme/domain/model/customer_model.dart';
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/ui/core_ui_import.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
@@ -45,8 +46,13 @@ class CustomerInfo extends StatelessWidget {
                 /// 이름 + 성별 아이콘
                 Row(
                   children: [
-                    sexIcon(customer.sex, colorScheme),
-                    // ColorScheme 기반 sexIcon
+                    SexIconWithBirthday(
+                      birth: customer.birth,
+                      sex: customer.sex,
+                      backgroundImagePath:
+                          customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,size: 24,
+                    ),
+                    // sexIcon(customer.sex, colorScheme),
                     width(6),
                     Text(
                       shortenedNameText(customer.name),
@@ -63,11 +69,15 @@ class CustomerInfo extends StatelessWidget {
                 /// 생년월일
                 Row(
                   children: [
-                    Icon(
-                      Icons.cake,
-                      size: 16,
+                    Text('[생년월일]',style: TextStyle(
+                      fontSize: 12,
                       color: colorScheme.onSurfaceVariant,
-                    ),
+                    ),),
+                    // Icon(
+                    //   Icons.cake,
+                    //   size: 16,
+                    //   color: colorScheme.onSurfaceVariant,
+                    // ),
                     width(4),
                     Text(
                       birthDate != null

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/presentation/components/customer_item_icon.dart';
 import 'package:withme/core/presentation/todo/todo_view_model.dart';
 import 'package:withme/core/presentation/widget/show_add_todo_dialog.dart';
 
@@ -70,12 +71,17 @@ class CustomerRegistrationAppBar extends StatelessWidget
       elevation: 0,
       backgroundColor: bgColor,
       foregroundColor: fgColor,
-      title: SexIconWithBirthday(
+      title:
+         registrationViewModel != null?
+
+      SexIconWithBirthday(
         birth: customer!.birth,
         sex: customer!.sex,
         backgroundImagePath:
             customer!.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,
-      ),
+      )
+     : CustomerItemIcon(customer: customer!),
+
       actions: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
