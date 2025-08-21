@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/di/setup.dart';
 import 'package:withme/domain/use_case/todo_use_case.dart';
 
@@ -10,6 +11,27 @@ import '../../../domain/use_case/todo/add_todo_use_case.dart';
 import '../../../domain/use_case/todo/complete_todo_use_case.dart';
 import '../../../domain/use_case/todo/delete_todo_use_case.dart';
 import '../../../domain/use_case/todo/update_todo_use_case.dart';
+
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../domain/model/todo_model.dart';
+import '../../../domain/model/history_model.dart';
+import 'package:withme/core/di/setup.dart';
+import '../../../domain/use_case/todo_use_case.dart';
+import '../../../domain/use_case/todo/add_todo_use_case.dart';
+import '../../../domain/use_case/todo/update_todo_use_case.dart';
+import '../../../domain/use_case/todo/delete_todo_use_case.dart';
+import '../../../domain/use_case/todo/complete_todo_use_case.dart';
+
+import 'package:flutter/material.dart';
+import 'package:withme/core/di/setup.dart';
+import 'package:withme/domain/use_case/todo_use_case.dart';
+import '../../../domain/model/todo_model.dart';
+import '../../../domain/model/history_model.dart';
+import '../../../domain/use_case/todo/add_todo_use_case.dart';
+import '../../../domain/use_case/todo/update_todo_use_case.dart';
+import '../../../domain/use_case/todo/delete_todo_use_case.dart';
+import '../../../domain/use_case/todo/complete_todo_use_case.dart';
 
 class TodoViewModel with ChangeNotifier {
   final String userKey;
@@ -55,7 +77,7 @@ class TodoViewModel with ChangeNotifier {
             );
 
     await _todoUseCase.execute(usecase: useCase);
-    // 로컬 리스트 반영
+
     if (currentTodo == null) {
       _todoList.add(newTodo);
     } else {
@@ -66,7 +88,7 @@ class TodoViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  /// 삭제
+  /// 삭제 (Firestore + 로컬)
   Future<void> deleteTodo(TodoModel todo) async {
     await _todoUseCase.execute(
       usecase: DeleteTodoUseCase(
@@ -75,17 +97,20 @@ class TodoViewModel with ChangeNotifier {
         todoId: todo.docId,
       ),
     );
+
     _todoList.removeWhere((t) => t.docId == todo.docId);
     notifyListeners();
   }
 
   /// 완료 처리 + History 등록
   Future<void> completeTodo(TodoModel currentTodo, TodoModel editedTodo) async {
+    // 1) 수정된 내용으로 History 생성
     final newHistory = HistoryModel(
       contactDate: editedTodo.dueDate,
       content: editedTodo.content,
     );
 
+    // 2) Firestore 처리 (완료 = History 추가 + Todo 삭제)
     await _todoUseCase.execute(
       usecase: CompleteTodoUseCase(
         userKey: userKey,
@@ -94,51 +119,8 @@ class TodoViewModel with ChangeNotifier {
         newHistory: newHistory,
       ),
     );
-    // 완료된 Todo 삭제
-    _todoList.removeWhere((t) => t.docId == currentTodo.docId);
 
-    notifyListeners();
+    // 3) 로컬 리스트에서 제거
+    await deleteTodo(currentTodo); // ✅ deleteTodo 호출로 일관성 유지
   }
 }
-
-//
-// class TodoViewModel with ChangeNotifier {
-//   final _fbase = FBase();
-//
-//   Stream<List<TodoModel>>? _todoStream;
-//
-//   Stream<List<TodoModel>>? get todoStream => _todoStream;
-//
-//   final List<TodoModel> _todoList = [];
-//
-//   List<TodoModel> get todoList => _todoList;
-//
-//   final bool _isLoading = false;
-//
-//   bool get isLoading => _isLoading;
-//
-//   StreamSubscription<List<TodoModel>>? _subscription;
-//
-//   /// 초기화 및 실시간 데이터 수신 시작
-//   Future<void> initializeTodos({
-//     required String userKey,
-//     required String customerKey,
-//   }) async {
-//     _todoStream = _fbase
-//         .getTodos(userKey: userKey, customerKey: customerKey)
-//         .map((snapshot) {
-//           return snapshot.docs
-//               .map((doc) => TodoModel.fromSnapshot(doc))
-//               .toList();
-//         });
-//
-//     _subscription?.cancel();
-//
-//     _subscription = _todoStream!.listen((todos) {
-//       _todoList
-//         ..clear()
-//         ..addAll(todos);
-//       notifyListeners();
-//     });
-//   }
-// }

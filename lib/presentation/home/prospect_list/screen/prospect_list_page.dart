@@ -142,7 +142,20 @@ class _ProspectListPageState extends State<ProspectListPage>
     );
   }
 
-  void _toggleFilterBar() => toggleFilterBarAnimation();
+  void _toggleFilterBar() {
+    final newValue = !viewModel.isFilterBarExpanded;
+    setFilterBarExpanded(newValue);
+  }
+
+  @override
+  void setFilterBarExpanded(bool expanded) {
+    if (expanded) {
+      filterBarController.forward();
+    } else {
+      filterBarController.reverse();
+    }
+    viewModel.setFilterBarExpanded(expanded); // 🔗 ViewModel과 동기화
+  }
 
   @override
   void onSortActionLogic(Function() sortFn) {
@@ -223,7 +236,8 @@ class _ProspectListPageState extends State<ProspectListPage>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       viewModel: viewModel,
       customers: customers,
-      filterBarExpanded: filterBarExpanded,
+      filterBarExpanded: viewModel.isFilterBarExpanded,
+      // 🔗 VM 상태 참조,
       onToggleFilterBar: _toggleFilterBar,
     );
   }
@@ -237,14 +251,18 @@ class _ProspectListPageState extends State<ProspectListPage>
 
           final hasFilterItems =
               viewModel.todoCount > 0 || viewModel.managePeriodCount > 0;
-          // 👇 자동은 최초 1회만 적용
+
           if (!_autoFilterHandled) {
-            if (hasFilterItems) {
-              setFilterBarExpanded(true);
-            } else {
-              setFilterBarExpanded(false);
-            }
+            // 최초 진입 시 자동 열림/닫힘
+            setFilterBarExpanded(hasFilterItems);
             _autoFilterHandled = true;
+          } else {
+            // 👇 수동 토글된 경우는 자동 닫기 로직 무시
+            if (!viewModel.isFilterBarToggledManually) {
+              if (!hasFilterItems && viewModel.isFilterBarExpanded) {
+                viewModel.setFilterBarExpanded(false);
+              }
+            }
           }
         });
 
@@ -261,79 +279,26 @@ class _ProspectListPageState extends State<ProspectListPage>
             onInactiveToggle: (val) {
               setState(() => _showInactiveOnly = val);
               viewModel.updateFilter(inactiveOnly: val);
+              viewModel.setFilterBarExpanded(
+                true,
+                manual: true,
+              ); // 👈 수동 토글 시 강제 유지
             },
             onUrgentToggle: (val) {
               setState(() => _showUrgentOnly = val);
               viewModel.updateFilter(urgentOnly: val);
+              viewModel.setFilterBarExpanded(true, manual: true); // 👈 닫히지 않게
             },
             onTodoToggle: (val) {
               setState(() => _showTodoOnly = val);
               viewModel.updateFilter(todoOnly: val);
+              viewModel.setFilterBarExpanded(true, manual: true); // 👈 닫히지 않게
             },
           ),
         );
       },
     );
   }
-
-  // Widget _buildFilterBar() {
-  //   return StreamBuilder<List<CustomerModel>>(
-  //     stream: viewModel.cachedProspects,
-  //     builder: (context, snapshot) {
-  //       // final customers = snapshot.data ?? [];
-  //
-  //       // 자동 열림/닫힘 처리 (단, 수동 제어 시에는 무시)
-  //       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //         final hasFilterItems =
-  //             viewModel.todoCount > 0 ||
-  //             viewModel.managePeriodCount > 0 ||
-  //             viewModel.urgentCount > 0;
-  //
-  //         if (!mounted) return;
-  //
-  //         // 자동 열림/닫힘은 수동 제어 아닐 때만 실행
-  //         if (!viewModel.isFilterBarToggledManually) {
-  //           if (hasFilterItems && !filterBarExpanded) {
-  //             setState(() {
-  //               filterBarExpanded = true;
-  //               filterBarController.forward();
-  //             });
-  //           } else if (!hasFilterItems && filterBarExpanded) {
-  //             setState(() {
-  //               filterBarExpanded = false;
-  //               filterBarController.reverse();
-  //             });
-  //           }
-  //         }
-  //       });
-  //
-  //       return SizeTransition(
-  //         sizeFactor: heightFactor,
-  //         axisAlignment: -1.0,
-  //         child: InactiveAndUrgentFilterBar(
-  //           showInactiveOnly: _showInactiveOnly,
-  //           showUrgentOnly: _showUrgentOnly,
-  //           showTodoOnly: _showTodoOnly,
-  //           inactiveCount: viewModel.managePeriodCount,
-  //           urgentCount: viewModel.urgentCount,
-  //           todoCount: viewModel.todoCount,
-  //           onInactiveToggle: (val) {
-  //             setState(() => _showInactiveOnly = val);
-  //             viewModel.updateFilter(inactiveOnly: val);
-  //           },
-  //           onUrgentToggle: (val) {
-  //             setState(() => _showUrgentOnly = val);
-  //             viewModel.updateFilter(urgentOnly: val);
-  //           },
-  //           onTodoToggle: (val) {
-  //             setState(() => _showTodoOnly = val);
-  //             viewModel.updateFilter(todoOnly: val);
-  //           },
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Widget _buildProspectList(List<CustomerModel> customers) {
     return ListView.builder(

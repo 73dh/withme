@@ -27,6 +27,19 @@ class ProspectListViewModel
   @override
   bool get isFabVisible => _isFabVisible;
 
+  bool _isFilterBarExpanded = false;
+
+  bool get isFilterBarExpanded => _isFilterBarExpanded;
+  bool isFilterBarToggledManually = false;
+
+  void setFilterBarExpanded(bool expanded, {bool manual = false}) {
+    _isFilterBarExpanded = expanded;
+    if (manual) {
+      isFilterBarToggledManually = true;
+    }
+    notifyListeners();
+  }
+
   @override
   void showFab() {
     if (!_isFabVisible) {

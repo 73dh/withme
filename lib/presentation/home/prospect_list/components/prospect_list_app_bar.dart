@@ -45,7 +45,6 @@ class ProspectListAppBar extends StatelessWidget
             '${customers.length}명',
             style: textTheme.titleMedium?.copyWith(
               color: colorScheme.primary, // 강조색
-
             ),
           ),
           width(5),
@@ -121,4 +120,3 @@ class ProspectListAppBar extends StatelessWidget
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
-

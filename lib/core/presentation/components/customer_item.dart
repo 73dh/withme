@@ -125,6 +125,7 @@ class CustomerItem extends StatelessWidget {
             isUrgent: isUrgent,
             insuranceChangeDate: insuranceChangeDate,
             colorScheme: colorScheme,
+            isCustomerItem: true,
           ),
 
         // 할일

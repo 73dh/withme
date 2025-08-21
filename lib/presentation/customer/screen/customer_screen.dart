@@ -53,6 +53,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
+        resizeToAvoidBottomInset: true, // 기본값 true지만 명시
         appBar: CustomerRegistrationAppBar(
           customer: widget.customer,
           todoViewModel: todoViewModel,

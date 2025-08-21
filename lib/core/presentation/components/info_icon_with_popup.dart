@@ -1,13 +1,15 @@
 import '../core_presentation_import.dart';
 
+import '../core_presentation_import.dart';
+
 class InfoIconWithPopup extends StatefulWidget {
   final String message;
-  final Color color;
+  final Color? color; // nullable로 두고 기본은 theme 색상 사용
 
   const InfoIconWithPopup({
     super.key,
     required this.message,
-    required this.color,
+    this.color,
   });
 
   @override
@@ -19,32 +21,43 @@ class _InfoIconWithPopupState extends State<InfoIconWithPopup> {
   final LayerLink _layerLink = LayerLink();
 
   void _showOverlay() {
-    if (_overlayEntry != null) return; // 중복 방지
+    if (_overlayEntry != null) return;
     final overlay = Overlay.of(context);
     RenderBox box = context.findRenderObject() as RenderBox;
     Offset position = box.localToGlobal(Offset.zero);
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        left: position.dx, // 버튼 왼쪽 기준
-        top: position.dy + box.size.height + 4, // 버튼 아래쪽 + 약간 여백
+        left: position.dx,
+        top: position.dy + box.size.height + 4,
         child: Material(
           color: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColorDark,
-              borderRadius: BorderRadius.circular(6),
+              color: colorScheme.surfaceVariant, // 팝업 배경
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withOpacity(0.2),
+                  blurRadius: 6,
+                  offset: const Offset(2, 2),
+                ),
+              ],
             ),
             child: Text(
               widget.message,
-              style: Theme.of(context).textTheme.labelSmall,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant, // 대비 색상
+              ),
             ),
           ),
         ),
       ),
     );
-
 
     overlay.insert(_overlayEntry!);
   }
@@ -70,12 +83,20 @@ class _InfoIconWithPopupState extends State<InfoIconWithPopup> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return CompositedTransformTarget(
       link: _layerLink,
       child: GestureDetector(
         onTap: _toggleOverlay,
-        child: Icon(Icons.info_outline, size: 15, color: widget.color),
+        child: Icon(
+          Icons.info_outline,
+          size: 16,
+          color: widget.color ?? colorScheme.primary, // 기본 아이콘 색상은 primary
+        ),
       ),
     );
   }
 }
+

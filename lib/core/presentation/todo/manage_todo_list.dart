@@ -25,12 +25,10 @@ class ManageTodoList extends StatefulWidget {
 }
 
 class _ManageTodoListState extends State<ManageTodoList> {
-  late List<TodoModel> todoList;
-
   @override
   void initState() {
     super.initState();
-    todoList = widget.viewModel.todoList;
+    // ViewModel 변경시 UI 갱신
     widget.viewModel.addListener(_onTodoChanged);
   }
 
@@ -42,17 +40,15 @@ class _ManageTodoListState extends State<ManageTodoList> {
 
   void _onTodoChanged() {
     if (!mounted) return;
-    setState(() {
-      todoList = widget.viewModel.todoList;
-    });
+    setState(() {}); // ViewModel.todoList를 직접 참조
   }
 
   @override
   Widget build(BuildContext context) {
+    final todoList = widget.viewModel.todoList; // ✅ 직접 참조
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // 성별 기반 색상 지정
     final effectiveTextColor =
         widget.textColor ??
         (widget.customerSex == '남'
@@ -97,7 +93,11 @@ class _ManageTodoListState extends State<ManageTodoList> {
                       position & const Size(40, 40),
                       Offset.zero & overlay.size,
                     ),
-                    items: _buildTodoMenuItems(effectiveTextColor, colorScheme),
+                    items: _buildTodoMenuItems(
+                      effectiveTextColor,
+                      colorScheme,
+                      todoList,
+                    ),
                     elevation: 8,
                   );
 
@@ -105,10 +105,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
                     widget.onAddPressed();
                   }
                 },
-                child: TodoCountIcon(
-                  todos: todoList,
-                  sex: widget.customerSex, // 성별 기반 색상
-                ),
+                child: TodoCountIcon(todos: todoList, sex: widget.customerSex),
               ),
             ],
           ),
@@ -120,6 +117,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
   List<PopupMenuEntry<String>> _buildTodoMenuItems(
     Color textColor,
     ColorScheme colorScheme,
+    List<TodoModel> todoList,
   ) {
     final items = <PopupMenuEntry<String>>[];
 
@@ -143,9 +141,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
                       newTodo: edited,
                     );
                   }
-                  if (mounted) {
-                    Navigator.pop(context); // ✅ 메뉴 자동 닫기
-                  }
+                  if (mounted) Navigator.pop(context);
                 },
                 child: Text.rich(
                   TextSpan(
@@ -182,9 +178,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
                       if (edited != null) {
                         await widget.viewModel.completeTodo(todo, edited);
                       }
-                      if (mounted) {
-                        Navigator.pop(context); // ✅ 메뉴 닫기
-                      }
+                      if (mounted) Navigator.pop(context);
                     },
                     icon: Icon(
                       Icons.check_circle_outline,
@@ -202,9 +196,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
                   TextButton.icon(
                     onPressed: () async {
                       await widget.viewModel.deleteTodo(todo);
-                      if (mounted) {
-                        Navigator.pop(context); // ✅ 메뉴 닫기
-                      }
+                      if (mounted) Navigator.pop(context);
                     },
                     icon: Icon(
                       Icons.delete_outline,

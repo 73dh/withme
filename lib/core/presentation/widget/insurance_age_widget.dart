@@ -6,6 +6,7 @@ class InsuranceAgeWidget extends StatelessWidget {
   final bool isUrgent;
   final DateTime insuranceChangeDate;
   final ColorScheme colorScheme;
+  final bool isCustomerItem;
 
   const InsuranceAgeWidget({
     super.key,
@@ -13,6 +14,7 @@ class InsuranceAgeWidget extends StatelessWidget {
     required this.isUrgent,
     required this.insuranceChangeDate,
     required this.colorScheme,
+    this.isCustomerItem=true,
   });
 
   @override
@@ -31,6 +33,7 @@ class InsuranceAgeWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
+        if(!isCustomerItem)
         Flexible(
           child: Text(
             isFuture ? '(D-$difference)' : '(D+${difference.abs()})',
