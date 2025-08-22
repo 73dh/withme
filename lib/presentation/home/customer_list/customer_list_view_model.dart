@@ -13,38 +13,36 @@ import '../../../core/presentation/fab/fab_view_model_interface.dart';
 import '../../../core/utils/core_utils_import.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/policy_model.dart';
-import '../../../domain/use_case/customer/apply_current_sort_use_case.dart';
+
+// ==================== CustomerListViewModel ====================
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/fab/fab_view_model_interface.dart';
-import 'package:withme/domain/domain_import.dart';
-import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart';
 import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
 import 'package:withme/domain/use_case/policy_use_case.dart';
 import '../../../core/domain/enum/sort_status.dart';
 import '../../../core/domain/enum/sort_type.dart';
+import '../../../core/presentation/fab/fab_view_model_interface.dart';
+import '../../../domain/domain_import.dart';
+import '../../../domain/model/customer_model.dart';
+import '../../../domain/model/policy_model.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/setup.dart';
-import 'package:withme/core/presentation/fab/fab_view_model_interface.dart';
-import 'package:withme/domain/domain_import.dart';
-import 'package:withme/domain/model/customer_model.dart';
-import 'package:withme/domain/model/policy_model.dart';
-import 'package:withme/domain/use_case/customer/apply_current_sort_use_case.dart';
-import 'package:withme/domain/use_case/policy/get_policies_use_case.dart';
-import 'package:withme/domain/use_case/policy_use_case.dart';
-import '../../../core/domain/enum/sort_status.dart';
-import '../../../core/domain/enum/sort_type.dart';
 
-class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface {
+
+class CustomerListViewModel
+    with ChangeNotifier
+    implements FabViewModelInterface {
+  // ================= Stream =================
+  final BehaviorSubject<List<CustomerModel>> _cachedCustomers =
+      BehaviorSubject.seeded([]);
+
+  Stream<List<CustomerModel>> get cachedCustomers => _cachedCustomers.stream;
+
+  List<CustomerModel> _allCustomers = [];
+
   // ================= FAB =================
   bool _isFabVisible = true;
 
@@ -67,14 +65,15 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     }
   }
 
-  Future<void> onMainFabPressedLogic() async {
-    // CustomerListPage에서는 FAB 기본 동작 없음
-  }
+  Future<void> onMainFabPressedLogic() async {}
 
   // ================= FilterBar =================
   bool _isFilterBarExpanded = false;
+
   bool get isFilterBarExpanded => _isFilterBarExpanded;
+
   bool isFilterBarToggledManually = false;
+  bool _autoFilterHandled = false;
 
   void setFilterBarExpanded(bool expanded, {bool manual = false}) {
     _isFilterBarExpanded = expanded;
@@ -82,36 +81,10 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     notifyListeners();
   }
 
-  void toggleFilterBar() => setFilterBarExpanded(!_isFilterBarExpanded, manual: true);
+  void toggleFilterBar() =>
+      setFilterBarExpanded(!_isFilterBarExpanded, manual: true);
 
-  // ================= 정렬 =================
-  SortStatus _sortStatus = SortStatus(type: SortType.name);
-  @override
-  SortStatus get sortStatus => _sortStatus;
-
-  void _sort(SortType type) {
-    final ascending = (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
-    _sortStatus = SortStatus(type: type, isAscending: ascending);
-    _applyFilterAndSort();
-    notifyListeners();
-  }
-
-  @override
-  void sortByName() => _sort(SortType.name);
-  @override
-  void sortByBirth() => _sort(SortType.birth);
-  @override
-  void sortByInsuranceAgeDate() => _sort(SortType.insuredDate);
-  @override
-  void sortByHistoryCount() => _sort(SortType.manage);
-
-  // ================= 고객 데이터 =================
-  final BehaviorSubject<List<CustomerModel>> _cachedCustomers = BehaviorSubject.seeded([]);
-  Stream<List<CustomerModel>> get cachedCustomers => _cachedCustomers.stream;
-
-  List<CustomerModel> _allCustomers = [];
-
-  // 필터 상태
+  // ================= 필터 상태 =================
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
   bool _showTodoOnly = false;
@@ -119,12 +92,15 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
   bool _showInsuranceAgeUrgentOnly = false;
 
   bool get showInactiveOnly => _showInactiveOnly;
+
   bool get showUrgentOnly => _showUrgentOnly;
+
   bool get showTodoOnly => _showTodoOnly;
+
   bool get todoWithin10DaysOnly => _todoWithin10DaysOnly;
+
   bool get showInsuranceAgeUrgentOnly => _showInsuranceAgeUrgentOnly;
 
-  // ================= 필터 업데이트 =================
   void updateFilter({
     bool? inactiveOnly,
     bool? urgentOnly,
@@ -134,7 +110,10 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     if (inactiveOnly != null) _showInactiveOnly = inactiveOnly;
     if (urgentOnly != null) _showUrgentOnly = urgentOnly;
     if (todoOnly != null) _showTodoOnly = todoOnly;
-    if (insuranceAgeUrgentOnly != null) _showInsuranceAgeUrgentOnly = insuranceAgeUrgentOnly;
+    if (insuranceAgeUrgentOnly != null) {
+      _showInsuranceAgeUrgentOnly = insuranceAgeUrgentOnly;
+    }
+
     _applyFilterAndSort();
     notifyListeners();
   }
@@ -151,16 +130,49 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     notifyListeners();
   }
 
+  // ================= 정렬 =================
+  SortStatus _sortStatus = SortStatus(type: SortType.name);
+
+  @override
+  SortStatus get sortStatus => _sortStatus;
+
+  void _sort(SortType type) {
+    final ascending =
+        (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
+    _sortStatus = SortStatus(type: type, isAscending: ascending);
+    _applyFilterAndSort();
+    notifyListeners();
+  }
+
+  @override
+  void sortByName() => _sort(SortType.name);
+
+  @override
+  void sortByBirth() => _sort(SortType.birth);
+
+  @override
+  void sortByInsuranceAgeDate() => _sort(SortType.insuredDate);
+
+  @override
+  void sortByHistoryCount() => _sort(SortType.manage);
+
   // ================= 데이터 로드 =================
   Future<void> fetchData({bool force = false}) async {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final List<CustomerModel> allCustomers = await getIt<CustomerUseCase>().execute(
-      usecase: GetAllDataUseCase(userKey: uid),
-    );
+    final List<CustomerModel> allCustomers = await getIt<CustomerUseCase>()
+        .execute(usecase: GetAllDataUseCase(userKey: uid));
 
     _allCustomers = allCustomers.where((e) => e.policies.isNotEmpty).toList();
     _applyFilterAndSort();
-    notifyListeners();
+
+    // 최초 데이터 자동 열기
+    if (!_autoFilterHandled &&
+        (managePeriodCount > 0 ||
+            todoCount > 0 ||
+            insuranceAgeUrgentCount > 0)) {
+      setFilterBarExpanded(true);
+      _autoFilterHandled = true;
+    }
   }
 
   Future<void> refresh() async => await fetchData(force: true);
@@ -170,49 +182,64 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     final now = DateTime.now();
     var filtered = List<CustomerModel>.from(_allCustomers);
 
-    // Todo 필터
     if (_showTodoOnly) {
       filtered = filtered.where((c) => c.todos.isNotEmpty).toList();
-
-      if (_todoWithin10DaysOnly) {
-        final threshold = now.add(const Duration(days: 10));
-        filtered = filtered.where((c) {
-          return c.todos.any((todo) => todo.dueDate.isAfter(now) && todo.dueDate.isBefore(threshold));
-        }).toList();
-      }
+    }
+    if (_todoWithin10DaysOnly) {
+      final threshold = now.add(const Duration(days: 10));
+      filtered =
+          filtered
+              .where(
+                (c) => c.todos.any(
+                  (t) =>
+                      t.dueDate.isAfter(now) && t.dueDate.isBefore(threshold),
+                ),
+              )
+              .toList();
     }
 
-    // 관리주기 / 긴급 필터
     final manageDays = getIt<UserSession>().managePeriodDays;
     final urgentDays = getIt<UserSession>().urgentThresholdDays;
 
     if (_showInactiveOnly) {
-      filtered = filtered.where((c) {
-        final latest = c.histories.map((h) => h.contactDate).fold<DateTime?>(null, (prev, date) => prev == null || date.isAfter(prev) ? date : prev);
-        if (latest == null) return true;
-        return latest.add(Duration(days: manageDays)).isBefore(now);
-      }).toList();
+      filtered =
+          filtered.where((c) {
+            final latest = c.histories
+                .map((h) => h.contactDate)
+                .fold<DateTime?>(
+                  null,
+                  (prev, d) => prev == null || d.isAfter(prev) ? d : prev,
+                );
+            if (latest == null) return true;
+            return latest.add(Duration(days: manageDays)).isBefore(now);
+          }).toList();
     }
 
     if (_showUrgentOnly) {
-      filtered = filtered.where((c) {
-        final latest = c.histories.map((h) => h.contactDate).fold<DateTime?>(null, (prev, date) => prev == null || date.isAfter(prev) ? date : prev);
-        if (latest == null) return false;
-        return latest.add(Duration(days: urgentDays)).isBefore(now);
-      }).toList();
+      filtered =
+          filtered.where((c) {
+            final latest = c.histories
+                .map((h) => h.contactDate)
+                .fold<DateTime?>(
+                  null,
+                  (prev, d) => prev == null || d.isAfter(prev) ? d : prev,
+                );
+            if (latest == null) return false;
+            return latest.add(Duration(days: urgentDays)).isBefore(now);
+          }).toList();
     }
 
     if (_showInsuranceAgeUrgentOnly) {
-      filtered = filtered.where((c) {
-        final birth = c.birth;
-        if (birth == null) return false;
-        final changeDate = getInsuranceAgeChangeDate(birth);
-        final diff = changeDate.difference(now).inDays;
-        return diff >= 0 && diff <= urgentDays;
-      }).toList();
+      filtered =
+          filtered.where((c) {
+            final birth = c.birth;
+            if (birth == null) return false;
+            final changeDate = getInsuranceAgeChangeDate(birth);
+            final diff = changeDate.difference(now).inDays;
+            return diff >= 0 && diff <= urgentDays;
+          }).toList();
     }
 
-    // 정렬 적용
     filtered = ApplyCurrentSortUseCase(
       isAscending: _sortStatus.isAscending,
       currentSortType: _sortStatus.type,
@@ -221,35 +248,21 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     _cachedCustomers.add(List<CustomerModel>.from(filtered));
   }
 
-  // ================= 카운트 =================
-  int get todoCount {
-    final now = DateTime.now();
-    if (_todoWithin10DaysOnly) {
-      final threshold = now.add(const Duration(days: 10));
-      return _allCustomers.where((c) {
-        return c.todos.any((todo) => todo.dueDate.isAfter(now) && todo.dueDate.isBefore(threshold));
-      }).length;
-    }
-    return _allCustomers.where((c) => c.todos.isNotEmpty).length;
-  }
+  // ================= 필터 카운트 =================
+  int get todoCount => _allCustomers.where((c) => c.todos.isNotEmpty).length;
 
   int get managePeriodCount {
-    final thresholdDays = getIt<UserSession>().managePeriodDays;
     final now = DateTime.now();
+    final threshold = getIt<UserSession>().managePeriodDays;
     return _allCustomers.where((c) {
-      final latest = c.histories.map((h) => h.contactDate).fold<DateTime?>(null, (prev, date) => prev == null || date.isAfter(prev) ? date : prev);
+      final latest = c.histories
+          .map((h) => h.contactDate)
+          .fold<DateTime?>(
+            null,
+            (prev, d) => prev == null || d.isAfter(prev) ? d : prev,
+          );
       if (latest == null) return true;
-      return latest.add(Duration(days: thresholdDays)).isBefore(now);
-    }).length;
-  }
-
-  int get urgentCount {
-    final thresholdDays = getIt<UserSession>().urgentThresholdDays;
-    final now = DateTime.now();
-    return _allCustomers.where((c) {
-      final latest = c.histories.map((h) => h.contactDate).fold<DateTime?>(null, (prev, date) => prev == null || date.isAfter(prev) ? date : prev);
-      if (latest == null) return false;
-      return latest.add(Duration(days: thresholdDays)).isBefore(now);
+      return latest.add(Duration(days: threshold)).isBefore(now);
     }).length;
   }
 
@@ -267,7 +280,9 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
 
   // ================= 고객 업데이트 =================
   void updateCustomerInList(CustomerModel updatedCustomer) {
-    final index = _allCustomers.indexWhere((c) => c.userKey == updatedCustomer.userKey);
+    final index = _allCustomers.indexWhere(
+      (c) => c.userKey == updatedCustomer.userKey,
+    );
     if (index != -1) {
       _allCustomers[index] = updatedCustomer;
       _applyFilterAndSort();
@@ -288,321 +303,3 @@ class CustomerListViewModel with ChangeNotifier implements FabViewModelInterface
     super.dispose();
   }
 }
-
-
-//
-// class CustomerListViewModel
-//     with ChangeNotifier
-//     implements FabViewModelInterface {
-//   // =============== FAB 관련 ===============
-//   bool _isFabVisible = true;
-//
-//   @override
-//   bool get isFabVisible => _isFabVisible;
-//
-//   @override
-//   void showFab() {
-//     if (!_isFabVisible) {
-//       _isFabVisible = true;
-//       notifyListeners();
-//     }
-//   }
-//
-//   @override
-//   void hideFab() {
-//     if (_isFabVisible) {
-//       _isFabVisible = false;
-//       notifyListeners();
-//     }
-//   }
-//
-//   Future<void> onMainFabPressedLogic() async {
-//     // CustomerListPage에서는 별도 로직 없음
-//   }
-//
-//   // ================== filterBar 관련 ==================
-//   bool _isFilterBarExpanded = false;
-//
-//   bool get isFilterBarExpanded => _isFilterBarExpanded;
-//   bool isFilterBarToggledManually = false;
-//
-//   void setFilterBarExpanded(bool expanded, {bool manual = false}) {
-//     _isFilterBarExpanded = expanded;
-//     if (manual) {
-//       isFilterBarToggledManually = true;
-//     }
-//     notifyListeners();
-//   }
-//
-//   void toggleFilterBar() =>
-//       setFilterBarExpanded(!_isFilterBarExpanded, manual: true);
-//
-//   // =============== 정렬 관련 ===============
-//   SortStatus _sortStatus = SortStatus(type: SortType.name);
-//
-//   @override
-//   SortStatus get sortStatus => _sortStatus;
-//
-//   void _sort(SortType type) {
-//     final ascending =
-//         (_sortStatus.type == type) ? !_sortStatus.isAscending : true;
-//     _sortStatus = SortStatus(type: type, isAscending: ascending);
-//     _applyFilterAndSort();
-//     notifyListeners();
-//   }
-//
-//   @override
-//   void sortByName() => _sort(SortType.name);
-//
-//   @override
-//   void sortByBirth() => _sort(SortType.birth);
-//
-//   @override
-//   void sortByInsuranceAgeDate() => _sort(SortType.insuredDate);
-//
-//   @override
-//   void sortByHistoryCount() => _sort(SortType.manage);
-//
-//   // =============== 고객 데이터 ===============
-//   final BehaviorSubject<List<CustomerModel>> _cachedCustomers =
-//       BehaviorSubject.seeded([]);
-//
-//   Stream<List<CustomerModel>> get cachedCustomers => _cachedCustomers.stream;
-//
-//   List<CustomerModel> _allCustomers = [];
-//
-//   // 필터 상태
-//   bool _showInactiveOnly = false;
-//   bool _showUrgentOnly = false; // 기존: 히스토리 기반
-//   bool _showTodoOnly = false;
-//   bool _todoWithin10DaysOnly = false;
-//
-//   /// 새로 추가된 상령일 도래 필터
-//   bool _showInsuranceAgeUrgentOnly = false;
-//
-//   bool get showInactiveOnly => _showInactiveOnly;
-//
-//   bool get showUrgentOnly => _showUrgentOnly;
-//
-//   bool get showTodoOnly => _showTodoOnly;
-//
-//   bool get todoWithin10DaysOnly => _todoWithin10DaysOnly;
-//
-//   bool get showInsuranceAgeUrgentOnly => _showInsuranceAgeUrgentOnly;
-//
-//   // =============== 필터 업데이트 ===============
-//   void updateFilter({
-//     bool? inactiveOnly,
-//     bool? urgentOnly,
-//     bool? todoOnly,
-//     bool? insuranceAgeUrgentOnly,
-//   }) {
-//     if (inactiveOnly != null) _showInactiveOnly = inactiveOnly;
-//     if (urgentOnly != null) _showUrgentOnly = urgentOnly;
-//     if (todoOnly != null) _showTodoOnly = todoOnly;
-//     if (insuranceAgeUrgentOnly != null) {
-//       _showInsuranceAgeUrgentOnly = insuranceAgeUrgentOnly;
-//     }
-//
-//     _applyFilterAndSort();
-//     notifyListeners();
-//   }
-//
-//   void updateShowTodoOnly(bool value) {
-//     _showTodoOnly = value;
-//     _applyFilterAndSort();
-//     notifyListeners();
-//   }
-//
-//   void updateTodoWithin10DaysOnly(bool value) {
-//     _todoWithin10DaysOnly = value;
-//     _applyFilterAndSort();
-//     notifyListeners();
-//   }
-//
-//   // =============== 데이터 로드 / 새로고침 ===============
-//   Future<void> fetchData({bool force = false}) async {
-//     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-//     final List<CustomerModel> allCustomers = await getIt<CustomerUseCase>()
-//         .execute(usecase: GetAllDataUseCase(userKey: uid));
-//
-//     _allCustomers = allCustomers.where((e) => e.policies.isNotEmpty).toList();
-//
-//     _applyFilterAndSort();
-//     notifyListeners();
-//   }
-//
-//   Future<void> refresh() async {
-//     await fetchData(force: true);
-//     notifyListeners();
-//   }
-//
-//   // =============== 필터링 + 정렬 ===============
-//   void _applyFilterAndSort() {
-//     final now = DateTime.now();
-//     var filtered = List<CustomerModel>.from(_allCustomers);
-//
-//     // Todo 필터
-//     if (_showTodoOnly) {
-//       filtered = filtered.where((c) => c.todos.isNotEmpty).toList();
-//
-//       if (_todoWithin10DaysOnly) {
-//         final threshold = now.add(const Duration(days: 10));
-//         filtered =
-//             filtered.where((c) {
-//               return c.todos.any(
-//                 (todo) =>
-//                     todo.dueDate.isAfter(now) &&
-//                     todo.dueDate.isBefore(threshold),
-//               );
-//             }).toList();
-//       }
-//     }
-//
-//     // 관리주기 / 긴급 필터
-//     final managePeriodDays = getIt<UserSession>().managePeriodDays;
-//     final urgentThresholdDays = getIt<UserSession>().urgentThresholdDays;
-//
-//     if (_showInactiveOnly) {
-//       filtered =
-//           filtered.where((c) {
-//             final latest = c.histories
-//                 .map((h) => h.contactDate)
-//                 .fold<DateTime?>(
-//                   null,
-//                   (prev, date) =>
-//                       prev == null || date.isAfter(prev) ? date : prev,
-//                 );
-//             if (latest == null) return true;
-//             return latest.add(Duration(days: managePeriodDays)).isBefore(now);
-//           }).toList();
-//     }
-//
-//     // 기존 urgent (히스토리 기반)
-//     if (_showUrgentOnly) {
-//       filtered =
-//           filtered.where((c) {
-//             final latest = c.histories
-//                 .map((h) => h.contactDate)
-//                 .fold<DateTime?>(
-//                   null,
-//                   (prev, date) =>
-//                       prev == null || date.isAfter(prev) ? date : prev,
-//                 );
-//             if (latest == null) return false;
-//             return latest
-//                 .add(Duration(days: urgentThresholdDays))
-//                 .isBefore(now);
-//           }).toList();
-//     }
-//
-//     // ✅ 상령일 도래 urgent 필터
-//     if (_showInsuranceAgeUrgentOnly) {
-//       filtered =
-//           filtered.where((c) {
-//             final birth = c.birth;
-//             if (birth == null) return false;
-//             final changeDate = getInsuranceAgeChangeDate(birth);
-//             final diff = changeDate.difference(now).inDays;
-//             return diff >= 0 && diff <= urgentThresholdDays;
-//           }).toList();
-//     }
-//
-//     // 정렬 적용
-//     filtered = ApplyCurrentSortUseCase(
-//       isAscending: _sortStatus.isAscending,
-//       currentSortType: _sortStatus.type,
-//     ).call(filtered);
-//
-//     _cachedCustomers.add(List<CustomerModel>.from(filtered));
-//   }
-//
-//   // =============== 카운트 ===============
-//   int get todoCount {
-//     final now = DateTime.now();
-//     if (_todoWithin10DaysOnly) {
-//       final threshold = now.add(const Duration(days: 10));
-//       return _allCustomers.where((c) {
-//         return c.todos.any(
-//           (todo) =>
-//               todo.dueDate.isAfter(now) && todo.dueDate.isBefore(threshold),
-//         );
-//       }).length;
-//     } else {
-//       return _allCustomers.where((c) => c.todos.isNotEmpty).length;
-//     }
-//   }
-//
-//   int get managePeriodCount {
-//     final thresholdDays = getIt<UserSession>().managePeriodDays;
-//     final now = DateTime.now();
-//
-//     return _allCustomers.where((c) {
-//       final latest = c.histories
-//           .map((h) => h.contactDate)
-//           .fold<DateTime?>(
-//             null,
-//             (prev, date) => prev == null || date.isAfter(prev) ? date : prev,
-//           );
-//       if (latest == null) return true;
-//       return latest.add(Duration(days: thresholdDays)).isBefore(now);
-//     }).length;
-//   }
-//
-//   /// 기존 urgent (히스토리 기반)
-//   int get urgentCount {
-//     final thresholdDays = getIt<UserSession>().urgentThresholdDays;
-//     final now = DateTime.now();
-//
-//     return _allCustomers.where((c) {
-//       final latest = c.histories
-//           .map((h) => h.contactDate)
-//           .fold<DateTime?>(
-//             null,
-//             (prev, date) => prev == null || date.isAfter(prev) ? date : prev,
-//           );
-//       if (latest == null) return false;
-//       return latest.add(Duration(days: thresholdDays)).isBefore(now);
-//     }).length;
-//   }
-//
-//   /// ✅ 상령일 도래 urgent 카운트
-//   int get insuranceAgeUrgentCount {
-//     final now = DateTime.now();
-//     final urgentDays = getIt<UserSession>().urgentThresholdDays;
-//
-//     return _allCustomers.where((c) {
-//       final birth = c.birth;
-//       if (birth == null) return false;
-//       final changeDate = getInsuranceAgeChangeDate(birth);
-//       final diff = changeDate.difference(now).inDays;
-//       return diff >= 0 && diff <= urgentDays;
-//     }).length;
-//   }
-//
-//   // =============== 고객 업데이트 ===============
-//   void updateCustomerInList(CustomerModel updatedCustomer) {
-//     final index = _allCustomers.indexWhere(
-//       (c) => c.userKey == updatedCustomer.userKey,
-//     );
-//
-//     if (index != -1) {
-//       _allCustomers[index] = updatedCustomer;
-//       _applyFilterAndSort();
-//       notifyListeners();
-//     }
-//   }
-//
-//   // =============== 계약 관련 ===============
-//   Stream<List<PolicyModel>> getPolicies({required String customerKey}) {
-//     return getIt<PolicyUseCase>().call(
-//       usecase: GetPoliciesUseCase(customerKey: customerKey),
-//     );
-//   }
-//
-//   @override
-//   void dispose() {
-//     _cachedCustomers.close();
-//     super.dispose();
-//   }
-// }

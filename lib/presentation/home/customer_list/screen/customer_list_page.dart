@@ -1,6 +1,5 @@
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
-import 'package:withme/core/ui/const/fab_position.dart';
 import 'package:withme/domain/model/customer_model.dart';
 
 import '../../../../../core/di/setup.dart';
@@ -15,6 +14,8 @@ import '../../../../domain/model/history_model.dart';
 import '../../../customer/screen/customer_screen.dart';
 import '../components/customer_list_app_bar.dart';
 import '../customer_list_view_model.dart';
+
+
 
 class CustomerListPage extends StatefulWidget {
   const CustomerListPage({super.key});
@@ -35,12 +36,14 @@ class _CustomerListPageState extends State<CustomerListPage>
   final CustomerListViewModel viewModel = getIt<CustomerListViewModel>();
 
   String _searchText = '';
-  bool _autoFilterHandled = false;
+  bool _showTodoOnly = false;
+  bool _showInactiveOnly = false;
+  bool _showUrgentOnly = false;
+  bool _autoFilterHandled = false; // 최초 1회 자동 제어
 
   @override
   void initState() {
     super.initState();
-    smallFabBottomPosition = FabPosition.bottomFabBottomHeight;
     initFilterBarAnimation(vsync: this);
     viewModel.fetchData(force: true);
   }
@@ -60,8 +63,18 @@ class _CustomerListPageState extends State<CustomerListPage>
   }
 
   void _toggleFilterBar() {
-    viewModel.toggleFilterBar();
-    toggleFilterBarAnimation();
+    final newValue = !viewModel.isFilterBarExpanded;
+    setFilterBarExpanded(newValue);
+  }
+
+  @override
+  void setFilterBarExpanded(bool expanded) {
+    if (expanded) {
+      filterBarController.forward();
+    } else {
+      filterBarController.reverse();
+    }
+    viewModel.setFilterBarExpanded(expanded);
   }
 
   @override
@@ -90,19 +103,6 @@ class _CustomerListPageState extends State<CustomerListPage>
           stream: viewModel.cachedCustomers,
           builder: (context, snapshot) {
             final customers = snapshot.data ?? [];
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
-              _checkFilterBarAutoClose(); // 카운트 변화 감지 후 체크
-            });
-
-            // WidgetsBinding.instance.addPostFrameCallback((_) {
-            //   if (!_autoFilterHandled && mounted) {
-            //     final hasFilterItems =
-            //         viewModel.managePeriodCount > 0 || viewModel.todoCount > 0;
-            //     setFilterBarExpanded(hasFilterItems);
-            //     _autoFilterHandled = true;
-            //   }
-            // });
 
             return Scaffold(
               backgroundColor: colorScheme.surface,
@@ -111,44 +111,22 @@ class _CustomerListPageState extends State<CustomerListPage>
                 foregroundColor: colorScheme.onSurface,
                 count: customers.length,
                 onSearch: (text) => setState(() => _searchText = text),
-                filterBarExpanded: filterBarExpanded,
+                filterBarExpanded: viewModel.isFilterBarExpanded,
                 onToggleFilterBar: _toggleFilterBar,
               ),
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizeTransition(
-                    sizeFactor: heightFactor,
-                    axisAlignment: -1.0,
-                    child: InactiveAndUrgentFilterBar(
-                      backgroundColor: colorScheme.surface,
-                      iconColor: colorScheme.primary,
-                      textColor: colorScheme.onSurfaceVariant,
-                      showInactiveOnly: viewModel.showInactiveOnly,
-                      inactiveCount: viewModel.managePeriodCount,
-                      showTodoOnly: viewModel.showTodoOnly,
-                      todoCount: viewModel.todoCount,
-                      showUrgentOnly: viewModel.showInsuranceAgeUrgentOnly,
-                      urgentCount: viewModel.insuranceAgeUrgentCount,
-                      onInactiveToggle:
-                          (val) => viewModel.updateFilter(inactiveOnly: val),
-                      onTodoToggle: (val) => viewModel.updateShowTodoOnly(val),
-                      onUrgentToggle:
-                          (val) => viewModel.updateFilter(
-                            insuranceAgeUrgentOnly: val,
-                          ),
-                    ),
-                  ),
+                  _buildFilterBar(), // ProspectListPage와 동일 구조
                   const SizedBox(height: 5),
                   Expanded(
                     child: _CustomerListView(
                       customers:
                           customers
-                              .where((e) => e.policies.isNotEmpty)
                               .where(
-                                (e) =>
+                                (c) =>
                                     _searchText.isEmpty ||
-                                    e.name.contains(_searchText.trim()),
+                                    c.name.contains(_searchText.trim()),
                               )
                               .toList(),
                       viewModel: viewModel,
@@ -165,24 +143,58 @@ class _CustomerListPageState extends State<CustomerListPage>
     );
   }
 
-  void _checkFilterBarAutoClose() {
-    final hasFilterItems =
-        viewModel.managePeriodCount > 0 ||
-            viewModel.todoCount > 0 ||
-            viewModel.insuranceAgeUrgentCount > 0;
+  Widget _buildFilterBar() {
+    return StreamBuilder<List<CustomerModel>>(
+      stream: viewModel.cachedCustomers,
+      builder: (context, snapshot) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
 
-    if (!viewModel.isFilterBarToggledManually) {
-      // 수동 토글 안 된 경우 → 자동 열기/닫기
-      viewModel.setFilterBarExpanded(hasFilterItems);
-    }
+          final hasFilterItems =
+              viewModel.todoCount > 0 ||
+              viewModel.managePeriodCount > 0 ||
+              viewModel.insuranceAgeUrgentCount > 0;
 
-    // 수동 토글 되었더라도 모든 값 0이면 닫기 + 수동 플래그 초기화
-    if (viewModel.isFilterBarToggledManually && !hasFilterItems) {
-      viewModel.isFilterBarToggledManually = false; // ← 추가
-      viewModel.setFilterBarExpanded(false);
-    }
+          if (!_autoFilterHandled) {
+            setFilterBarExpanded(hasFilterItems);
+            _autoFilterHandled = true;
+          } else if (!viewModel.isFilterBarToggledManually) {
+            if (!hasFilterItems && viewModel.isFilterBarExpanded) {
+              viewModel.setFilterBarExpanded(false);
+            }
+          }
+        });
+
+        return SizeTransition(
+          sizeFactor: heightFactor,
+          axisAlignment: -1.0,
+          child: InactiveAndUrgentFilterBar(
+            showInactiveOnly: _showInactiveOnly,
+            showTodoOnly: _showTodoOnly,
+            showUrgentOnly: _showUrgentOnly,
+            inactiveCount: viewModel.managePeriodCount,
+            todoCount: viewModel.todoCount,
+            urgentCount: viewModel.insuranceAgeUrgentCount,
+            onInactiveToggle: (val) {
+              setState(() => _showInactiveOnly = val);
+              viewModel.updateFilter(inactiveOnly: val);
+              viewModel.setFilterBarExpanded(true, manual: true);
+            },
+            onTodoToggle: (val) {
+              setState(() => _showTodoOnly = val);
+              viewModel.updateShowTodoOnly(val);
+              viewModel.setFilterBarExpanded(true, manual: true);
+            },
+            onUrgentToggle: (val) {
+              setState(() => _showUrgentOnly = val);
+              viewModel.updateFilter(insuranceAgeUrgentOnly: val);
+              viewModel.setFilterBarExpanded(true, manual: true);
+            },
+          ),
+        );
+      },
+    );
   }
-
 }
 
 class _CustomerListView extends StatelessWidget {

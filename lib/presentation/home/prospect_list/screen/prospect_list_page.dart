@@ -5,7 +5,6 @@ import 'package:withme/core/presentation/fab/fab_overlay_manager_mixin.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
 import 'package:withme/core/presentation/widget/inactive_and_urgent_filter_bar.dart';
 import 'package:withme/core/presentation/widget/show_bottom_sheet_with_draggable.dart';
-import 'package:withme/core/presentation/widget/size_transition_filter_bar.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/presentation/home/prospect_list/components/prospect_list_app_bar.dart';
 
@@ -36,23 +35,18 @@ class _ProspectListPageState extends State<ProspectListPage>
   bool _showTodoOnly = false;
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
-  bool _hasCheckedAgreement = false;
-  bool _autoFilterHandled = false; // 👈 자동 제어는 최초 1회만 반영
 
   @override
   void initState() {
     super.initState();
     initFilterBarAnimation(vsync: this);
-    _maybeShowAgreementPopup();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final modalRoute = ModalRoute.of(context);
-    if (modalRoute is PageRoute) {
-      _routeObserver.subscribe(this, modalRoute);
-    }
+    if (modalRoute is PageRoute) _routeObserver.subscribe(this, modalRoute);
   }
 
   @override
@@ -62,99 +56,18 @@ class _ProspectListPageState extends State<ProspectListPage>
     super.dispose();
   }
 
-  Future<void> _maybeShowAgreementPopup() async {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (_hasCheckedAgreement) return;
-      _hasCheckedAgreement = true;
-
-      final userSession = getIt<UserSession>();
-      await userSession.loadAgreementCheckFromPrefs();
-
-      if (userSession.isFirstLogin && mounted) {
-        await _showAgreementDialog(userSession);
-      }
-    });
-  }
-
-  Future<void> _showAgreementDialog(UserSession userSession) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    return showConfirmDialog(
-      context,
-      textSpans: [
-        TextSpan(
-          text: '= 현재 설정 =\n\n',
-          style: textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        _settingsText(
-          '고객 관리주기',
-          '${userSession.managePeriodDays}일',
-          textTheme,
-          colorScheme,
-        ),
-        _settingsText(
-          '상령일 알림',
-          '${userSession.urgentThresholdDays}일',
-          textTheme,
-          colorScheme,
-        ),
-        _settingsText(
-          '목표 고객수',
-          '${userSession.targetProspectCount}명',
-          textTheme,
-          colorScheme,
-          highlight: true,
-        ),
-        TextSpan(text: '\n'),
-        TextSpan(
-          text: '[변경] DashBoard 우측상단 ⚙️',
-          style: textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.primary,
-          ),
-        ),
-      ],
-      onConfirm: () async {
-        await userSession.markAgreementSeen();
-        if (mounted) Navigator.of(context).maybePop();
-      },
-      cancelButtonText: '',
-    );
-  }
-
-  TextSpan _settingsText(
-    String label,
-    String value,
-    TextTheme textTheme,
-    ColorScheme colorScheme, {
-    bool highlight = false,
-  }) {
-    return TextSpan(
-      text: '$label: $value\n',
-      style: textTheme.bodyLarge?.copyWith(
-        color: highlight ? colorScheme.secondary : colorScheme.onSurfaceVariant,
-      ),
-    );
-  }
-
   void _toggleFilterBar() {
     final newValue = !viewModel.isFilterBarExpanded;
-    setFilterBarExpanded(newValue);
+    setFilterBarExpanded(newValue, manual: true);
   }
 
-  @override
-  void setFilterBarExpanded(bool expanded) {
+  void setFilterBarExpanded(bool expanded, {bool manual = false}) {
     if (expanded) {
       filterBarController.forward();
     } else {
       filterBarController.reverse();
     }
-    viewModel.setFilterBarExpanded(expanded); // 🔗 ViewModel과 동기화
+    viewModel.setFilterBarExpanded(expanded, manual: manual);
   }
 
   @override
@@ -166,12 +79,6 @@ class _ProspectListPageState extends State<ProspectListPage>
   @override
   Future<void> onMainFabPressedLogic(ProspectListViewModel viewModel) async {
     if (!mounted) return;
-    final isLimited = await FreeLimitDialog.checkAndShow(
-      context: context,
-      viewModel: viewModel,
-    );
-    if (isLimited) return;
-
     await _openRegistrationSheet();
   }
 
@@ -213,7 +120,6 @@ class _ProspectListPageState extends State<ProspectListPage>
           stream: viewModel.cachedProspects,
           builder: (context, snapshot) {
             final customers = snapshot.data ?? [];
-
             return Scaffold(
               backgroundColor: theme.scaffoldBackgroundColor,
               appBar: _buildAppBar(customers),
@@ -237,7 +143,6 @@ class _ProspectListPageState extends State<ProspectListPage>
       viewModel: viewModel,
       customers: customers,
       filterBarExpanded: viewModel.isFilterBarExpanded,
-      // 🔗 VM 상태 참조,
       onToggleFilterBar: _toggleFilterBar,
     );
   }
@@ -247,22 +152,13 @@ class _ProspectListPageState extends State<ProspectListPage>
       stream: viewModel.cachedProspects,
       builder: (context, snapshot) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
+          // ✅ 수동으로 토글된 상태면 자동 로직 실행하지 않음
+          if (viewModel.isFilterBarToggledManually) return;
 
-          final hasFilterItems =
-              viewModel.todoCount > 0 || viewModel.managePeriodCount > 0;
-
-          if (!_autoFilterHandled) {
-            // 최초 진입 시 자동 열림/닫힘
-            setFilterBarExpanded(hasFilterItems);
-            _autoFilterHandled = true;
+          if (viewModel.shouldAutoExpandFilterBar()) {
+            setFilterBarExpanded(true);
           } else {
-            // 👇 수동 토글된 경우는 자동 닫기 로직 무시
-            if (!viewModel.isFilterBarToggledManually) {
-              if (!hasFilterItems && viewModel.isFilterBarExpanded) {
-                viewModel.setFilterBarExpanded(false);
-              }
-            }
+            viewModel.resetManualFilterIfEmpty();
           }
         });
 
@@ -279,20 +175,17 @@ class _ProspectListPageState extends State<ProspectListPage>
             onInactiveToggle: (val) {
               setState(() => _showInactiveOnly = val);
               viewModel.updateFilter(inactiveOnly: val);
-              viewModel.setFilterBarExpanded(
-                true,
-                manual: true,
-              ); // 👈 수동 토글 시 강제 유지
+              setFilterBarExpanded(true, manual: true);
             },
             onUrgentToggle: (val) {
               setState(() => _showUrgentOnly = val);
               viewModel.updateFilter(urgentOnly: val);
-              viewModel.setFilterBarExpanded(true, manual: true); // 👈 닫히지 않게
+              setFilterBarExpanded(true, manual: true);
             },
             onTodoToggle: (val) {
               setState(() => _showTodoOnly = val);
               viewModel.updateFilter(todoOnly: val);
-              viewModel.setFilterBarExpanded(true, manual: true); // 👈 닫히지 않게
+              setFilterBarExpanded(true, manual: true);
             },
           ),
         );
@@ -306,7 +199,6 @@ class _ProspectListPageState extends State<ProspectListPage>
       itemCount: customers.length,
       itemBuilder: (context, index) {
         final customer = customers[index];
-
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: GestureDetector(
