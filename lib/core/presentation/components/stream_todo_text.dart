@@ -33,7 +33,26 @@ class _StreamTodoTextState extends State<StreamTodoText> {
   @override
   void initState() {
     super.initState();
-    if (widget.todoList.isNotEmpty) _startAnimation();
+    if (widget.todoList.isNotEmpty) {
+      _startAnimation();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant StreamTodoText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.todoList.isEmpty) {
+      _timer?.cancel();
+      setState(() {
+        _currentIndex = 0;
+      });
+    } else if (oldWidget.todoList != widget.todoList) {
+      _timer?.cancel();
+      setState(() {
+        _currentIndex = 0;
+      });
+      _startAnimation();
+    }
   }
 
   void _calculateWidths(String text) {
@@ -44,27 +63,25 @@ class _StreamTodoTextState extends State<StreamTodoText> {
     )..layout();
 
     _textWidth = painter.width;
-
-    // 보이는 폭: 글자 길이 기반, 최대 70px
     _clipWidth = _textWidth < widget.maxWidth ? _textWidth : widget.maxWidth;
   }
 
   void _startAnimation() {
+    if (widget.todoList.isEmpty) return;
+
     _timer?.cancel();
     final currentText = widget.todoList[_currentIndex];
     _calculateWidths(currentText);
 
-    // 오른쪽 끝에서 시작
     _offsetX = _clipWidth;
 
     _timer = Timer.periodic(widget.stepDelay, (timer) {
-      if (!mounted) return;
+      if (!mounted || widget.todoList.isEmpty) return;
 
       setState(() {
-        _offsetX -= 1; // 한 스텝씩 왼쪽으로 이동
+        _offsetX -= 1;
       });
 
-      // 전체 텍스트가 왼쪽 끝을 지나가면
       if (_offsetX <= -_textWidth) {
         timer.cancel();
         Future.delayed(const Duration(milliseconds: 300), _nextTodo);
@@ -91,15 +108,17 @@ class _StreamTodoTextState extends State<StreamTodoText> {
   @override
   Widget build(BuildContext context) {
     if (widget.todoList.isEmpty) return const SizedBox.shrink();
+    if (_currentIndex >= widget.todoList.length) return const SizedBox.shrink();
+
     final currentText = widget.todoList[_currentIndex];
 
     return ClipRect(
       child: SizedBox(
-        width: _clipWidth, // 글자 길이에 맞춘 폭, 최대 70
+        width: _clipWidth,
         child: Transform.translate(
-          offset: Offset(_offsetX, 0), // 오른쪽 → 왼쪽
+          offset: Offset(_offsetX, 0),
           child: SizedBox(
-            width: _textWidth, // 텍스트 전체 폭
+            width: _textWidth,
             child: Text(
               currentText,
               style: widget.style,

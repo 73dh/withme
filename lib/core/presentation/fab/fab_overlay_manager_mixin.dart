@@ -23,18 +23,15 @@ mixin FabOverlayManagerMixin<
   bool _fabCanBeShown = false;
   bool _isProcessActive = false;
   bool _isRouteTransitioning = false;
-  bool _isBottomSheetOpen = false;
+  bool _isBottomSheetOpen = false; // BottomSheet + Dialog 공용
 
   void Function(void Function())? _overlaySetState;
   double smallFabBottomPosition = FabPosition.topFabBottomHeight;
 
-  /// ViewModel을 State 클래스에서 주입
   VM get viewModel;
 
-  /// 정렬 로직
   void onSortActionLogic(Function() sortFn);
 
-  /// FAB 메인 버튼 클릭 시 로직
   Future<void> onMainFabPressedLogic(VM viewModel);
 
   bool get canShowFabOverlay =>
@@ -44,25 +41,34 @@ mixin FabOverlayManagerMixin<
       !_isBottomSheetOpen &&
       mounted;
 
-  void setOverlaySetState(void Function(void Function())? setter) {
-    _overlaySetState = setter;
+  void setOverlaySetState(void Function(void Function())? setter) =>
+      _overlaySetState = setter;
+
+  void callOverlaySetState() => _overlaySetState?.call(() {});
+
+  void clearOverlaySetState() => _overlaySetState = null;
+
+  void setIsProcessActive(bool active) {
+    _isProcessActive = active;
+    _updateFabOverlayVisibility();
   }
 
-  void callOverlaySetState() {
-    _overlaySetState?.call(() {});
+  void setFabCanBeShown(bool canShow) {
+    if (_fabCanBeShown == canShow) return;
+    _fabCanBeShown = canShow;
+    _updateFabOverlayVisibility();
   }
 
-  void clearOverlaySetState() {
-    _overlaySetState = null;
+  void setIsModalOpen(bool open) {
+    _isBottomSheetOpen = open;
+    _updateFabOverlayVisibility();
   }
 
   @protected
   Widget buildMainFab() {
     return MainFab(
       fabVisibleLocal: _fabVisibleInOverlay,
-      onPressed: () async {
-        await onMainFabPressedLogic(viewModel);
-      },
+      onPressed: () async => await onMainFabPressedLogic(viewModel),
     );
   }
 
@@ -95,15 +101,13 @@ mixin FabOverlayManagerMixin<
     viewModel.fetchData(force: true);
   }
 
-  void setFabCanBeShown(bool canShow) {
-    if (_fabCanBeShown == canShow) return;
-    _fabCanBeShown = canShow;
-    _updateFabOverlayVisibility();
-  }
-
-  void setIsProcessActive(bool active) {
-    _isProcessActive = active;
-    _updateFabOverlayVisibility();
+  void handleVisibilityChange(VisibilityInfo info) {
+    if (_isProcessActive || _isRouteTransitioning) return;
+    if (info.visibleFraction < 0.4 || _isBottomSheetOpen) {
+      setFabCanBeShown(false);
+    } else {
+      setFabCanBeShown(true);
+    }
   }
 
   void _updateFabOverlayVisibility() {
@@ -114,26 +118,15 @@ mixin FabOverlayManagerMixin<
     }
   }
 
-  void handleVisibilityChange(VisibilityInfo info) {
-    if (_isProcessActive || _isRouteTransitioning) return;
-    if (info.visibleFraction < 0.4 || _isBottomSheetOpen) {
-      setFabCanBeShown(false);
-    } else {
-      setFabCanBeShown(true);
-    }
-  }
-
   void _insertFabOverlayIfAllowed() {
     if (!canShowFabOverlay || _fabOverlayIsInserted) return;
 
     _removeFabOverlay();
-
     _fabExpanded = false;
     _fabVisibleInOverlay = false;
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (!canShowFabOverlay) return;
-
       final overlay = Navigator.of(context).overlay;
       if (overlay == null) return;
 

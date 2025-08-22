@@ -72,15 +72,16 @@ class CustomerRegistrationAppBar extends StatelessWidget
       backgroundColor: bgColor,
       foregroundColor: fgColor,
       title:
-         registrationViewModel != null?
-
-      SexIconWithBirthday(
-        birth: customer!.birth,
-        sex: customer!.sex,
-        backgroundImagePath:
-            customer!.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,
-      )
-     : CustomerItemIcon(customer: customer!),
+          registrationViewModel != null
+              ? SexIconWithBirthday(
+                birth: customer!.birth,
+                sex: customer!.sex,
+                backgroundImagePath:
+                    customer!.sex == '남'
+                        ? IconsPath.manIcon
+                        : IconsPath.womanIcon,
+              )
+              : CustomerItemIcon(customer: customer!),
 
       actions: [
         Padding(

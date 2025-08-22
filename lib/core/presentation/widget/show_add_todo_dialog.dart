@@ -103,174 +103,106 @@ Future<TodoModel?> showAddOrEditTodoDialog(
 
   return await showDialog<TodoModel>(
     context: context,
-    builder: (_) => Dialog(
-      backgroundColor: Colors.transparent,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final maxHeight = MediaQuery.of(context).size.height * 0.8; // 화면 80% 최대
-          return SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom, // 키보드 높이만큼 패딩
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: maxHeight,
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline,
-                    width: 1.2,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
+    builder:
+        (_) => Dialog(
+          backgroundColor: Colors.transparent,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final maxHeight =
+                  MediaQuery.of(context).size.height * 0.8; // 화면 80% 최대
+              return SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom, // 키보드 높이만큼 패딩
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 20,
-                        horizontal: 12,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: maxHeight),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline,
+                        width: 1.2,
                       ),
-                      child: Column(
-                        children: [
-                          Text(
-                            confirmText,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          buildTextField(),
-                          const SizedBox(height: 12),
-                          buildDatePicker(),
-                        ],
-                      ),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        buildActionButton(
-                          label: '취소',
-                          bg: Theme.of(context).colorScheme.surfaceContainerHighest,
-                          fg: Theme.of(context).colorScheme.onSurfaceVariant,
-                          onPressed: () => Navigator.of(context).pop(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 12,
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                confirmText,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              buildTextField(),
+                              const SizedBox(height: 12),
+                              buildDatePicker(),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: 10),
-                        buildActionButton(
-                          label: confirmText,
-                          onPressed: () {
-                            final todoText = controller.text.trim();
-                            if (todoText.isEmpty) {
-                              showOverlaySnackBar(context, '할 일을 입력하세요');
-                              return;
-                            }
-                            final newTodo = isEditMode
-                                ? currentTodo!.copyWith(
-                              content: todoText,
-                              dueDate: selectedDate,
-                            )
-                                : TodoModel(
-                              content: todoText,
-                              dueDate: selectedDate,
-                            );
-                            Navigator.of(context).pop(newTodo);
-                          },
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            buildActionButton(
+                              label: '취소',
+                              bg:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainerHighest,
+                              fg:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            const SizedBox(width: 10),
+                            buildActionButton(
+                              label: confirmText,
+                              onPressed: () {
+                                final todoText = controller.text.trim();
+                                if (todoText.isEmpty) {
+                                  showOverlaySnackBar(context, '할 일을 입력하세요');
+                                  return;
+                                }
+                                final newTodo =
+                                    isEditMode
+                                        ? currentTodo.copyWith(
+                                          content: todoText,
+                                          dueDate: selectedDate,
+                                        )
+                                        : TodoModel(
+                                          content: todoText,
+                                          dueDate: selectedDate,
+                                        );
+                                Navigator.of(context).pop(newTodo);
+                              },
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 10),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
-    ),
+              );
+            },
+          ),
+        ),
   );
-
-
-  // return await showDialog<TodoModel>(
-  //   context: context,
-  //   builder:
-  //       (_) => Dialog(
-  //         backgroundColor: Colors.transparent,
-  //         child: Container(
-  //           padding: const EdgeInsets.all(6),
-  //           decoration: BoxDecoration(
-  //             color: colorScheme.surface,
-  //             border: Border.all(color: colorScheme.outline, width: 1.2),
-  //             borderRadius: BorderRadius.circular(10),
-  //           ),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Padding(
-  //                 padding: const EdgeInsets.symmetric(
-  //                   vertical: 20,
-  //                   horizontal: 12,
-  //                 ),
-  //                 child: Column(
-  //                   children: [
-  //                     Text(
-  //                       confirmText,
-  //                       textAlign: TextAlign.center,
-  //                       style: theme.textTheme.titleLarge?.copyWith(
-  //                         fontWeight: FontWeight.bold,
-  //                         color: colorScheme.onSurface,
-  //                       ),
-  //                     ),
-  //                     const SizedBox(height: 20),
-  //                     buildTextField(),
-  //                     const SizedBox(height: 12),
-  //                     buildDatePicker(),
-  //                   ],
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 20),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.center,
-  //                 children: [
-  //                   buildActionButton(
-  //                     label: '취소',
-  //                     bg: colorScheme.surfaceContainerHighest,
-  //                     fg: colorScheme.onSurfaceVariant,
-  //                     onPressed: () => Navigator.of(context).pop(),
-  //                   ),
-  //                   const SizedBox(width: 10),
-  //                   buildActionButton(
-  //                     label: confirmText,
-  //                     onPressed: () {
-  //                       final todoText = controller.text.trim();
-  //                       if (todoText.isEmpty) {
-  //                         showOverlaySnackBar(context, '할 일을 입력하세요');
-  //                         return;
-  //                       }
-  //                       final newTodo =
-  //                           isEditMode
-  //                               ? currentTodo.copyWith(
-  //                                 content: todoText,
-  //                                 dueDate: selectedDate,
-  //                               )
-  //                               : TodoModel(
-  //                                 content: todoText,
-  //                                 dueDate: selectedDate,
-  //                               );
-  //                       Navigator.of(context).pop(newTodo);
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //               const SizedBox(height: 10),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  // );
 }
