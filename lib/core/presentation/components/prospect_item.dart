@@ -1,12 +1,13 @@
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../../domain/model/customer_model.dart';
 import '../../di/setup.dart';
+import '../../utils/is_birthday_within_7days.dart';
 import '../core_presentation_import.dart';
 import '../todo/todo_view_model.dart';
 
@@ -34,6 +35,11 @@ class ProspectItem extends StatelessWidget {
       userKey: userKey,
       customerKey: customer.customerKey,
     );
+    final bool hasUpcomingBirthday =
+        customer.birth != null && isBirthdayWithin7Days(customer.birth!);
+    final int countdown =
+        customer.birth != null ? getBirthdayCountdown(customer.birth!) : -1;
+    final Color cakeColor = Colors.redAccent;
 
     // 초기 Firestore todos 넣어주기 (없으면 빈 리스트)
     todoViewModel.loadTodos(customer.todos);
@@ -54,9 +60,10 @@ class ProspectItem extends StatelessWidget {
             final histories = historySnapshot.data ?? [];
 
             return ItemContainer(
-              backgroundColor: info.isUrgent
-                  ? colorScheme.secondaryContainer
-                  : colorScheme.surface,
+              backgroundColor:
+                  info.isUrgent
+                      ? colorScheme.secondaryContainer
+                      : colorScheme.surface,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -72,14 +79,7 @@ class ProspectItem extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      SexIconWithBirthday(
-                        birth: customer.birth,
-                        sex: customer.sex,
-                        backgroundImagePath: customer.sex == '남'
-                            ? IconsPath.manIcon
-                            : IconsPath.womanIcon,
-                        size: 35,
-                      ),
+                      ProspectItemIcon(customer: customer),
                     ],
                   ),
 
@@ -92,26 +92,53 @@ class ProspectItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 이름 + 할일 Row
-                        // 이름 + 할일 Row
                         Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                shortenedNameText(customer.name, length: 6),
-                                style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    shortenedNameText(customer.name, length: 6),
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onSurface,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (hasUpcomingBirthday)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.cake_rounded,
+                                          color: cakeColor,
+                                          size: 35 * 0.5,
+                                        ),
+                                        Text(
+                                          countdown != 0 ? '-$countdown' : '오늘',
+                                          style: textTheme.bodyMedium?.copyWith(
+                                            color: cakeColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
                               ),
                             ),
+
                             if (todos.isNotEmpty) ...[
                               const SizedBox(width: 6),
                               // ✅ 고정폭 Container로 텍스트 위치 고정
                               StreamTodoText(
                                 todoList: todos.map((t) => t.content).toList(),
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: getSexIconColor(customer.sex, colorScheme),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.copyWith(
+                                  color: getSexIconColor(
+                                    customer.sex,
+                                    colorScheme,
+                                  ),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -129,39 +156,6 @@ class ProspectItem extends StatelessWidget {
                           ],
                         ),
 
-                        // Row(
-                        //   children: [
-                        //     Expanded(
-                        //       child: Text(
-                        //         shortenedNameText(customer.name, length: 6),
-                        //         style: textTheme.bodyMedium?.copyWith(
-                        //           color: colorScheme.onSurface,
-                        //           fontWeight: FontWeight.bold,
-                        //         ),
-                        //         overflow: TextOverflow.ellipsis,
-                        //       ),
-                        //     ),
-                        //     if (todos.isNotEmpty) ...[
-                        //       const SizedBox(width: 6),
-                        //       Flexible( // ✅ todo 텍스트 폭 제한
-                        //         child: StreamTodoText(
-                        //           todoList: todos.map((t) => t.content).toList(),
-                        //           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        //             color: getSexIconColor(customer.sex, colorScheme),
-                        //             fontWeight: FontWeight.bold,
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       const SizedBox(width: 4),
-                        //       TodoCountIcon(
-                        //         todos: todos,
-                        //         sex: customer.sex,
-                        //         iconSize: 18,
-                        //       ),
-                        //     ],
-                        //   ],
-                        // ),
-
                         const SizedBox(height: 2),
 
                         // 생년월일
@@ -175,7 +169,8 @@ class ProspectItem extends StatelessWidget {
                           ),
 
                         // 상령일
-                        if (info.difference != null && info.insuranceChangeDate != null)
+                        if (info.difference != null &&
+                            info.insuranceChangeDate != null)
                           InsuranceAgeWidget(
                             difference: info.difference!,
                             isUrgent: info.isUrgent,
@@ -200,7 +195,6 @@ class ProspectItem extends StatelessWidget {
                 ],
               ),
             );
-
           },
         );
       },

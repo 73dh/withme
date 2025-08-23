@@ -13,22 +13,6 @@ import '../../../core/presentation/widget/show_edit_policy_dialog.dart';
 import '../../../domain/model/customer_model.dart';
 import '../components/customer_info.dart';
 
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/policy_item.dart';
-import 'package:withme/core/presentation/widget/customer_registration_app_bar.dart';
-import 'package:withme/domain/model/policy_model.dart';
-import 'package:withme/presentation/customer/customer_view_model.dart';
-
-import '../../../core/data/fire_base/user_session.dart';
-import '../../../core/di/setup.dart';
-import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/presentation/todo/todo_view_model.dart';
-import '../../../core/presentation/widget/show_edit_policy_dialog.dart';
-import '../../../domain/model/customer_model.dart';
-import '../components/customer_info.dart';
-
 class CustomerScreen extends StatefulWidget {
   final CustomerModel customer;
 
@@ -136,6 +120,8 @@ class _CustomerScreenState extends State<CustomerScreen> {
     );
   }
 }
+
+
 
 //
 // class CustomerScreen extends StatefulWidget {

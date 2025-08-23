@@ -45,6 +45,7 @@ class CustomerItem extends StatelessWidget {
           backgroundColor:
               isUrgent ? colorScheme.errorContainer : colorScheme.surface,
           child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomerItemIcon(customer: customer),
               width(6),
@@ -127,23 +128,20 @@ class CustomerItem extends StatelessWidget {
             colorScheme: colorScheme,
             isCustomerItem: true,
           ),
-
+        const Spacer(),
         // 할일
         if (customer.todos.isNotEmpty) ...[
-          SizedBox(
-            width: 30,
-            child: StreamTodoText(
-              todoList: customer.todos.map((t) => t.content).toList(),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: getSexIconColor(customer.sex, colorScheme),
-                fontWeight: FontWeight.bold,
-              ),
+          StreamTodoText(
+            todoList: customer.todos.map((t) => t.content).toList(),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: getSexIconColor(customer.sex, colorScheme),
+              fontWeight: FontWeight.bold,
             ),
-            // StreamTodoText(todoList: customer.todos, sex: customer.sex),
           ),
           const SizedBox(width: 2),
           TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 18),
         ],
+        width(10),
       ],
     );
   }

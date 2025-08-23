@@ -102,7 +102,7 @@ class CustomerListView extends StatelessWidget {
   /// 잠재 고객(보험 없음) 아이템 생성
   Widget _buildProspectItem(BuildContext context, CustomerModel customer) {
     final userKey = UserSession.userId;
-    final customerKey = customer.customerKey??'';
+    final customerKey = customer.customerKey;
 
     if (customerKey.isEmpty) {
       debugPrint("🚨 userKey 또는 customerKey가 비어 있음");

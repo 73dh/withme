@@ -18,7 +18,8 @@ class RegistrationFormController {
 
   void initialize(CustomerModel? customer) {
     registeredDate.text =
-        customer?.registeredDate.formattedBirth ?? DateTime.now().formattedBirth;
+        customer?.registeredDate.formattedBirth ??
+        DateTime.now().formattedBirth;
     if (customer != null) {
       name.text = customer.name;
       sex = customer.sex;
@@ -32,6 +33,7 @@ class RegistrationFormController {
   }
 
   void setSex(String? val) => sex = val;
+
   void clearBirth() {
     birth = null;
     birthCtrl.clear();

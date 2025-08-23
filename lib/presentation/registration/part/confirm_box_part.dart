@@ -2,6 +2,7 @@ import 'package:withme/core/utils/core_utils_import.dart';
 
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../domain/domain_import.dart';
+
 class ConfirmBoxPart extends StatelessWidget {
   final bool isRegistering;
   final CustomerModel? customerModel;
@@ -39,7 +40,8 @@ class ConfirmBoxPart extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final effectiveTextColor = textColor ?? theme.colorScheme.onSurface;
-    final effectiveBackground = backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
+    final effectiveBackground =
+        backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
 
     return Stack(
       children: [
@@ -63,16 +65,25 @@ class ConfirmBoxPart extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInfoRow('등록자:', '${nameController.text} ($sex)', textTheme, effectiveTextColor),
+                  _buildInfoRow(
+                    '등록자:',
+                    '${nameController.text} ($sex)',
+                    textTheme,
+                    effectiveTextColor,
+                  ),
                   _buildInfoRow(
                     '생년월일:',
-                    birthController.text.isEmpty ? '추후입력' : birth?.formattedBirth ?? '',
+                    birthController.text.isEmpty
+                        ? '추후입력'
+                        : birth?.formattedBirth ?? '',
                     textTheme,
                     effectiveTextColor,
                   ),
                   _buildInfoRow(
                     '소개자:',
-                    recommendedController.text.isEmpty ? '없음' : recommendedController.text,
+                    recommendedController.text.isEmpty
+                        ? '없음'
+                        : recommendedController.text,
                     textTheme,
                     effectiveTextColor,
                   ),
@@ -103,7 +114,9 @@ class ConfirmBoxPart extends StatelessWidget {
               children: [
                 Text(
                   '저장중',
-                  style: textTheme.bodyMedium?.copyWith(color: effectiveTextColor.withValues(alpha: 0.7)),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: effectiveTextColor.withValues(alpha: 0.7),
+                  ),
                 ),
                 width(5),
                 const MyCircularIndicator(size: 10),
@@ -115,11 +128,11 @@ class ConfirmBoxPart extends StatelessWidget {
   }
 
   Widget _buildInfoRow(
-      String label,
-      String value,
-      TextTheme textTheme,
-      Color textColor,
-      ) {
+    String label,
+    String value,
+    TextTheme textTheme,
+    Color textColor,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: RichText(

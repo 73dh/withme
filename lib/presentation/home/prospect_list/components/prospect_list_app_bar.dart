@@ -11,7 +11,6 @@ class ProspectListAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final ProspectListViewModel viewModel;
   final List<CustomerModel> customers;
-  final bool filterBarExpanded;
   final VoidCallback onToggleFilterBar;
   final Color backgroundColor; // ← 추가
 
@@ -19,7 +18,6 @@ class ProspectListAppBar extends StatelessWidget
     super.key,
     required this.viewModel,
     required this.customers,
-    required this.filterBarExpanded,
     required this.onToggleFilterBar,
     required this.backgroundColor, // ← 추가
   });
@@ -48,9 +46,14 @@ class ProspectListAppBar extends StatelessWidget
             ),
           ),
           width(5),
-          BlinkingToggleIcon(
-            expanded: filterBarExpanded,
-            onTap: onToggleFilterBar,
+          AnimatedBuilder(
+            animation: viewModel,
+            builder: (BuildContext context, Widget? child) {
+              return BlinkingToggleIcon(
+                expanded: viewModel.isFilterBarExpanded,
+                onTap: onToggleFilterBar,
+              );
+            },
           ),
           Expanded(child: _buildProgressBar(viewModel, colorScheme, textTheme)),
         ],
@@ -101,7 +104,7 @@ class ProspectListAppBar extends StatelessWidget
       children: [
         AnimatedProgressBar(
           progress: ratio,
-          height: 18,
+          height: 20,
           progressColor: colorScheme.primary.withValues(alpha: 0.5),
           backgroundColor: colorScheme.surfaceContainerHighest,
         ),

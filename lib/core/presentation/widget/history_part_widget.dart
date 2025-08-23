@@ -43,7 +43,7 @@ class HistoryPartWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
+        // mainAxisAlignment: MainAxisAlignment.start,
         children: [
           for (var i = 0; i < displayHistories.length; i++)
             _buildHistoryBox(

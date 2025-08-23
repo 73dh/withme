@@ -1,3 +1,5 @@
+import 'package:withme/core/di/di_setup_import.dart';
+
 import '../../../../core/presentation/components/blinking_toggle_icon.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
@@ -6,7 +8,7 @@ class CustomerListAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final int count;
   final ValueChanged<String> onSearch;
-  final bool filterBarExpanded;
+  final CustomerListViewModel viewModel;
   final VoidCallback onToggleFilterBar;
   final Color? backgroundColor; // 추가
   final Color? foregroundColor; // 추가
@@ -15,7 +17,7 @@ class CustomerListAppBar extends StatelessWidget
     super.key,
     required this.count,
     required this.onSearch,
-    required this.filterBarExpanded,
+    required this.viewModel,
     required this.onToggleFilterBar,
     this.backgroundColor, // 추가
     this.foregroundColor, // 추가
@@ -44,9 +46,12 @@ class CustomerListAppBar extends StatelessWidget
             style: textTheme.titleMedium?.copyWith(color: colorScheme.primary),
           ),
           width(5),
-          BlinkingToggleIcon(
-            expanded: filterBarExpanded,
-            onTap: onToggleFilterBar,
+          AnimatedBuilder(
+            animation: viewModel,
+            builder: (BuildContext context, Widget? child) { return BlinkingToggleIcon(
+              expanded: viewModel.isFilterBarExpanded,
+              onTap: onToggleFilterBar,
+            );}
           ),
         ],
       ),

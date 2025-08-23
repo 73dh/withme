@@ -3,17 +3,6 @@ import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/setup.dart';
 
 import '../components/info_icon_with_popup.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/setup.dart';
-
-import '../components/info_icon_with_popup.dart';
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/di/setup.dart';
-
-import '../components/info_icon_with_popup.dart';
 
 class InactiveAndUrgentFilterBar extends StatelessWidget {
   final bool showTodoOnly;
@@ -111,34 +100,30 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
     required Color txtColor,
     required Color activeColor,
   }) {
-    return Material(
-      color: isActive ? activeColor.withValues(alpha: 0.1) : bgColor,
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isActive ? activeColor : Colors.grey[400]!,
-              width: 1.2,
-            ),
-            borderRadius: BorderRadius.circular(6),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                offset: const Offset(1, 1),
-                blurRadius: 1.5,
-              ),
-            ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isActive ? activeColor : Colors.grey[400]!,
+            width: 1.2,
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isActive ? activeColor : txtColor,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              offset: const Offset(1, 1),
+              blurRadius: 1.5,
             ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? activeColor : txtColor,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ),

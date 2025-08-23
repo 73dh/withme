@@ -36,8 +36,15 @@ class ProspectListViewModel
   bool _isFilterBarToggledManually = false;
 
   bool get isFilterBarToggledManually => _isFilterBarToggledManually;
+
+  /// 최초 자동 처리 여부
+  bool _autoHandledOnce = false;
+
+  /// 상령일까지 체크?
+  // bool get _allCountsZero =>
+  //     todoCount == 0 && urgentCount == 0 && managePeriodCount == 0;
   bool get _allCountsZero =>
-      todoCount == 0 && urgentCount == 0 && managePeriodCount == 0;
+      todoCount == 0 && urgentCount == 0;
 
   void setFilterBarExpanded(bool expanded, {bool manual = false}) {
     _isFilterBarExpanded = expanded;
@@ -47,9 +54,9 @@ class ProspectListViewModel
     notifyListeners();
   }
 
-  /// 자동으로 닫을 때도 수동이면 무시
+  /// counts=0일 때는 무조건 닫기
   void resetManualFilterIfEmpty() {
-    if (_allCountsZero) {
+    if (_allCountsZero && _isFilterBarToggledManually) {
       _isFilterBarExpanded = false;
       _isFilterBarToggledManually = false; // 수동 상태 해제
       notifyListeners();
@@ -62,14 +69,20 @@ class ProspectListViewModel
       // ✅ 수동 상태여도 아이템이 전부 0이면 자동으로 닫힘
       if (_allCountsZero) {
         _isFilterBarExpanded = false;
-        _isFilterBarToggledManually = false; // 수동 상태도 해제
+        _isFilterBarToggledManually = false; // 수동 상태 해제
         notifyListeners();
       }
       return false;
     }
-    return !_allCountsZero; }
 
+    // ✅ 최초 실행일 때만 자동 적용
+    if (!_autoHandledOnce) {
+      _autoHandledOnce = true;
+      return !_allCountsZero;
+    }
 
+    return false; // 이후에는 자동 동작 안 함
+  }
 
   @override
   void showFab() {
@@ -133,10 +146,12 @@ class ProspectListViewModel
     final now = DateTime.now();
     var filtered = allCustomers.where((e) => e.policies.isEmpty).toList();
 
-    if (_searchText.isNotEmpty)
+    if (_searchText.isNotEmpty) {
       filtered = filtered.where((e) => e.name.contains(_searchText)).toList();
-    if (_todoOnly)
+    }
+    if (_todoOnly) {
       filtered = filtered.where((c) => c.todos.isNotEmpty).toList();
+    }
     if (_inactiveOnly) {
       final threshold = getIt<UserSession>().managePeriodDays;
       filtered =
@@ -167,6 +182,9 @@ class ProspectListViewModel
       isAscending: _sortStatus.isAscending,
       currentSortType: _sortStatus.type,
     ).call(filtered);
+
+    // 수동 상태에서 아이템 모두 0이면 자동으로 닫힘
+    resetManualFilterIfEmpty();
     _cachedProspects.add(List.from(sorted));
     notifyListeners();
   }
@@ -241,4 +259,10 @@ class ProspectListViewModel
 
   @override
   void sortByHistoryCount() => _sort(SortType.manage);
+
+  @override
+  bool get hasMainFab => true;
+
+  @override
+  bool get hasSmallFab =>true;
 }

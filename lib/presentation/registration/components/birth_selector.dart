@@ -5,7 +5,8 @@ class BirthSelector extends StatelessWidget {
   final bool isReadOnly;
   final DateTime? birth;
   final void Function()? onInitPressed;
-  final void Function()? onSetPressed;
+  final void Function(DateTime)? onSetPressed;
+  final TextStyle? textStyle;
 
   const BirthSelector({
     super.key,
@@ -13,6 +14,7 @@ class BirthSelector extends StatelessWidget {
     this.birth,
     required this.onInitPressed,
     required this.onSetPressed,
+    this.textStyle,
   });
 
   @override
@@ -28,7 +30,7 @@ class BirthSelector extends StatelessWidget {
           children: [
             Text(
               '생년월일 ${isReadOnly ? '' : '(선택)'}',
-              style: textTheme.bodyMedium?.copyWith(
+              style: textStyle ?? textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
@@ -50,20 +52,21 @@ class BirthSelector extends StatelessWidget {
               width: 120,
               child: RenderFilledButton(
                 width: 100,
-                backgroundColor:
-                    birth != null
-                        ? colorScheme.surfaceContainerHighest
-                        : colorScheme.primary,
-                foregroundColor:
-                    isReadOnly
-                        ? colorScheme
-                            .onSurfaceVariant // 읽기 전용
-                        : (birth != null
-                            ? colorScheme.onSurfaceVariant
-                            : colorScheme.onPrimary),
-                // 활성 상태
+                backgroundColor: birth != null
+                    ? colorScheme.surfaceContainerHighest
+                    : colorScheme.primary,
+                foregroundColor: isReadOnly
+                    ? colorScheme.onSurfaceVariant
+                    : (birth != null
+                    ? colorScheme.onSurfaceVariant
+                    : colorScheme.onPrimary),
                 borderRadius: 5,
-                onPressed: isReadOnly ? null : onSetPressed,
+                onPressed: isReadOnly
+                    ? null
+                    : () async {
+                  final date = await selectDate(context);
+                  if (date != null) onSetPressed?.call(date);
+                },
                 text: birth?.formattedBirth ?? '선택',
               ),
             ),
@@ -85,3 +88,4 @@ class BirthSelector extends StatelessWidget {
     );
   }
 }
+

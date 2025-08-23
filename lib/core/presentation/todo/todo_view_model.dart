@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:withme/core/data/fire_base/firestore_keys.dart';
 import 'package:withme/core/di/setup.dart';
 import 'package:withme/domain/use_case/todo_use_case.dart';
 
@@ -11,27 +10,6 @@ import '../../../domain/use_case/todo/add_todo_use_case.dart';
 import '../../../domain/use_case/todo/complete_todo_use_case.dart';
 import '../../../domain/use_case/todo/delete_todo_use_case.dart';
 import '../../../domain/use_case/todo/update_todo_use_case.dart';
-
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../domain/model/todo_model.dart';
-import '../../../domain/model/history_model.dart';
-import 'package:withme/core/di/setup.dart';
-import '../../../domain/use_case/todo_use_case.dart';
-import '../../../domain/use_case/todo/add_todo_use_case.dart';
-import '../../../domain/use_case/todo/update_todo_use_case.dart';
-import '../../../domain/use_case/todo/delete_todo_use_case.dart';
-import '../../../domain/use_case/todo/complete_todo_use_case.dart';
-
-import 'package:flutter/material.dart';
-import 'package:withme/core/di/setup.dart';
-import 'package:withme/domain/use_case/todo_use_case.dart';
-import '../../../domain/model/todo_model.dart';
-import '../../../domain/model/history_model.dart';
-import '../../../domain/use_case/todo/add_todo_use_case.dart';
-import '../../../domain/use_case/todo/update_todo_use_case.dart';
-import '../../../domain/use_case/todo/delete_todo_use_case.dart';
-import '../../../domain/use_case/todo/complete_todo_use_case.dart';
 
 class TodoViewModel with ChangeNotifier {
   final String userKey;

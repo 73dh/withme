@@ -15,6 +15,11 @@ class SmallFab extends StatefulWidget {
   final void Function()? onSortByManage;
   final SortStatus? selectedSortStatus;
 
+  // Theme 관련 옵션
+  final Color? fabBackgroundColor;
+  final Color? fabForegroundColor;
+  final Color? expandedBackgroundColor;
+
   const SmallFab({
     super.key,
     required this.fabVisibleLocal,
@@ -25,6 +30,9 @@ class SmallFab extends StatefulWidget {
     this.onSortByInsuredDate,
     this.onSortByManage,
     this.selectedSortStatus,
+    this.fabBackgroundColor,
+    this.fabForegroundColor,
+    this.expandedBackgroundColor,
   });
 
   @override
@@ -98,6 +106,12 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final fabBgColor =
+        widget.fabExpanded
+            ? widget.expandedBackgroundColor ?? colorScheme.primaryContainer
+            : widget.fabBackgroundColor ?? colorScheme.surface;
+    final fabFgColor = widget.fabForegroundColor ?? colorScheme.onSurface;
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: ScaleTransition(
@@ -125,8 +139,8 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
             FloatingActionButton.small(
               key: const ValueKey('mainSmallFab'),
               heroTag: 'mainSmallFab',
-              backgroundColor: colorScheme.surfaceTint,
-              foregroundColor: colorScheme.onPrimary,
+              backgroundColor: fabBgColor,
+              foregroundColor: fabFgColor,
               onPressed: () => widget.overlaySetState?.call(() {}),
               child: AnimatedSwitcher(
                 duration: AppDurations.duration300,
@@ -138,7 +152,7 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
                       ? Icons.close
                       : Icons.sort_by_alpha_outlined,
                   key: ValueKey(widget.fabExpanded),
-                  color: colorScheme.onPrimary,
+                  color: fabFgColor,
                 ),
               ),
             ),

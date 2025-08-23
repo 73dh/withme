@@ -1,6 +1,8 @@
 import '../../domain/enum/sort_status.dart';
 
 abstract class FabViewModelInterface {
+  bool get hasMainFab => true; // 기본값 true
+  bool get hasSmallFab => true; // 기본값 true
   /// FAB 표시 여부
   bool get isFabVisible;
 

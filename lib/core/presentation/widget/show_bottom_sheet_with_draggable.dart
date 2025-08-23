@@ -45,7 +45,6 @@ class _KeyboardResponsiveBottomSheet extends StatefulWidget {
     this.builder,
     this.child,
     this.backgroundColor,
-    super.key,
   });
 
   @override
@@ -114,13 +113,15 @@ class _KeyboardResponsiveBottomSheetState
                   color: backgroundColor,
                   child: DefaultTextStyle(
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
-                    child: widget.builder != null
-                        ? widget.builder!(scrollController)
-                        : SingleChildScrollView(
-                      controller: scrollController,
-                      child: widget.child!,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
+                    child:
+                        widget.builder != null
+                            ? widget.builder!(scrollController)
+                            : SingleChildScrollView(
+                              controller: scrollController,
+                              child: widget.child!,
+                            ),
                   ),
                 ),
               );

@@ -35,6 +35,7 @@ class _ProspectListPageState extends State<ProspectListPage>
   bool _showTodoOnly = false;
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
+  bool _firstEnter = true;
 
   @override
   void initState() {
@@ -57,10 +58,10 @@ class _ProspectListPageState extends State<ProspectListPage>
   }
 
   void _toggleFilterBar() {
-    final newValue = !viewModel.isFilterBarExpanded;
-    setFilterBarExpanded(newValue, manual: true);
+    setFilterBarExpanded(!viewModel.isFilterBarExpanded, manual: true);
   }
 
+  @override
   void setFilterBarExpanded(bool expanded, {bool manual = false}) {
     if (expanded) {
       filterBarController.forward();
@@ -120,6 +121,27 @@ class _ProspectListPageState extends State<ProspectListPage>
           stream: viewModel.cachedProspects,
           builder: (context, snapshot) {
             final customers = snapshot.data ?? [];
+
+            // 최초 진입 시 자동 필터 적용
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+
+              if (_firstEnter) {
+                if (viewModel.shouldAutoExpandFilterBar()) {
+                  setFilterBarExpanded(true);
+                }
+                _firstEnter = false;
+                return;
+              }
+
+              // 이후 rebuild 시 AnimationController 동기화
+              if (viewModel.isFilterBarExpanded) {
+                filterBarController.forward();
+              } else {
+                filterBarController.reverse();
+              }
+            });
+
             return Scaffold(
               backgroundColor: theme.scaffoldBackgroundColor,
               appBar: _buildAppBar(customers),
@@ -142,7 +164,6 @@ class _ProspectListPageState extends State<ProspectListPage>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       viewModel: viewModel,
       customers: customers,
-      filterBarExpanded: viewModel.isFilterBarExpanded,
       onToggleFilterBar: _toggleFilterBar,
     );
   }
@@ -151,17 +172,6 @@ class _ProspectListPageState extends State<ProspectListPage>
     return StreamBuilder<List<CustomerModel>>(
       stream: viewModel.cachedProspects,
       builder: (context, snapshot) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          // ✅ 수동으로 토글된 상태면 자동 로직 실행하지 않음
-          if (viewModel.isFilterBarToggledManually) return;
-
-          if (viewModel.shouldAutoExpandFilterBar()) {
-            setFilterBarExpanded(true);
-          } else {
-            viewModel.resetManualFilterIfEmpty();
-          }
-        });
-
         return SizeTransition(
           sizeFactor: heightFactor,
           axisAlignment: -1.0,

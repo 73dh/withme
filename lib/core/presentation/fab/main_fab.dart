@@ -6,8 +6,16 @@ import '../core_presentation_import.dart';
 class MainFab extends StatefulWidget {
   final bool fabVisibleLocal;
   final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
-  const MainFab({super.key, required this.fabVisibleLocal, this.onPressed});
+  const MainFab({
+    super.key,
+    required this.fabVisibleLocal,
+    this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+  });
 
   @override
   State<MainFab> createState() => _MainFabState();
@@ -52,6 +60,8 @@ class _MainFabState extends State<MainFab> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final bgColor = widget.backgroundColor ?? colorScheme.primary;
+    final fgColor = widget.foregroundColor ?? colorScheme.onPrimary;
 
     return FadeTransition(
       opacity: _opacity,
@@ -60,16 +70,14 @@ class _MainFabState extends State<MainFab> with SingleTickerProviderStateMixin {
         child: FloatingActionButton(
           heroTag: 'fabMain',
           onPressed: widget.onPressed,
-          backgroundColor: colorScheme.primary,
-          // FAB 배경색
-          foregroundColor: colorScheme.onPrimary,
-          // FAB 아이콘 색
+          backgroundColor: bgColor,
+          foregroundColor: fgColor,
           child: SizedBox(
             width: 24,
             height: 24,
             child: Image.asset(
               IconsPath.personAdd,
-              color: colorScheme.onPrimary, // 이미지 tint 적용
+              color: fgColor, // tint 적용
             ),
           ),
         ),

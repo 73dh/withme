@@ -66,8 +66,13 @@ mixin FabOverlayManagerMixin<
 
   @protected
   Widget buildMainFab() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return MainFab(
       fabVisibleLocal: _fabVisibleInOverlay,
+      backgroundColor: colorScheme.primary, // MainFab 배경
+      foregroundColor: colorScheme.onPrimary, // 아이콘 색상
       onPressed: () async => await onMainFabPressedLogic(viewModel),
     );
   }
@@ -119,6 +124,7 @@ mixin FabOverlayManagerMixin<
   }
 
   void _insertFabOverlayIfAllowed() {
+    final colorScheme = Theme.of(context).colorScheme;
     if (!canShowFabOverlay || _fabOverlayIsInserted) return;
 
     _removeFabOverlay();
@@ -146,35 +152,48 @@ mixin FabOverlayManagerMixin<
                   ignoring: !_fabVisibleInOverlay,
                   child: Stack(
                     children: [
-                      AnimatedFabContainer(
-                        fabVisibleLocal: _fabVisibleInOverlay,
-                        rightPosition: 16,
-                        bottomPosition: smallFabBottomPosition,
-                        child: SmallFab(
-                          fabExpanded: _fabExpanded,
+                      // SmallFab 내부 색상 적용 (AnimatedFabContainer 포함)
+                      if (viewModel.hasSmallFab)
+                        AnimatedFabContainer(
                           fabVisibleLocal: _fabVisibleInOverlay,
-                          overlaySetState: (_) => _toggleFabExpanded(),
-                          onSortByName:
-                              () => onSortActionLogic(viewModel.sortByName),
-                          onSortByBirth:
-                              () => onSortActionLogic(viewModel.sortByBirth),
-                          onSortByInsuredDate:
-                              () => onSortActionLogic(
-                                viewModel.sortByInsuranceAgeDate,
-                              ),
-                          onSortByManage:
-                              () => onSortActionLogic(
-                                viewModel.sortByHistoryCount,
-                              ),
-                          selectedSortStatus: viewModel.sortStatus,
+                          rightPosition: 16,
+                          bottomPosition:
+                              viewModel.hasMainFab
+                                  ? FabPosition.topFabBottomHeight
+                                  : FabPosition.bottomFabBottomHeight,
+                          child: SmallFab(
+                            fabExpanded: _fabExpanded,
+                            fabVisibleLocal: _fabVisibleInOverlay,
+                            overlaySetState: (_) => _toggleFabExpanded(),
+                            onSortByName:
+                                () => onSortActionLogic(viewModel.sortByName),
+                            onSortByBirth:
+                                () => onSortActionLogic(viewModel.sortByBirth),
+                            onSortByInsuredDate:
+                                () => onSortActionLogic(
+                                  viewModel.sortByInsuranceAgeDate,
+                                ),
+                            onSortByManage:
+                                () => onSortActionLogic(
+                                  viewModel.sortByHistoryCount,
+                                ),
+                            selectedSortStatus: viewModel.sortStatus,
+                            fabBackgroundColor: colorScheme.surface,
+                            // SmallFab 기본 배경
+                            fabForegroundColor: colorScheme.onSurface,
+                            // SmallFab 아이콘 색
+                            expandedBackgroundColor:
+                                colorScheme.primaryContainer, // 확장 시 배경색
+                          ),
                         ),
-                      ),
-                      AnimatedFabContainer(
-                        fabVisibleLocal: _fabVisibleInOverlay,
-                        rightPosition: 16,
-                        bottomPosition: FabPosition.bottomFabBottomHeight,
-                        child: buildMainFab(),
-                      ),
+                      // ✅ MainFab 위치 (조건적으로 배치)
+                      if (viewModel.hasMainFab)
+                        AnimatedFabContainer(
+                          fabVisibleLocal: _fabVisibleInOverlay,
+                          rightPosition: 16,
+                          bottomPosition: FabPosition.bottomFabBottomHeight,
+                          child: buildMainFab(),
+                        ),
                     ],
                   ),
                 ),
