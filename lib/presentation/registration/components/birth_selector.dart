@@ -1,4 +1,5 @@
 import '../../../core/presentation/core_presentation_import.dart';
+import '../../../core/ui/const/shared_pref_value.dart';
 import '../../../core/utils/core_utils_import.dart';
 
 class BirthSelector extends StatelessWidget {
@@ -23,31 +24,37 @@ class BirthSelector extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
+    final urgentThresholdDays = SharedPrefValue.urgentThresholdDays;
+    final daysLeft =
+    birth != null ? daysUntilInsuranceAgeChange(birth!) : null;
+    final isUrgent = daysLeft != null && daysLeft <= urgentThresholdDays;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               '생년월일 ${isReadOnly ? '' : '(선택)'}',
-              style: textStyle ?? textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
+              style: textStyle ??
+                  textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
             const Spacer(),
             if (birth != null && !isReadOnly)
               ElevatedButton(
+                onPressed: onInitPressed,
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(10),
                   backgroundColor: colorScheme.secondaryContainer,
                   foregroundColor: colorScheme.onSecondaryContainer,
                 ),
-                onPressed: onInitPressed,
                 child: const Icon(Icons.refresh, size: 18),
               ),
-            width(5),
+            const SizedBox(width: 5),
             SizedBox(
               width: 120,
               child: RenderFilledButton(
@@ -73,14 +80,48 @@ class BirthSelector extends StatelessWidget {
           ],
         ),
         if (birth != null) ...[
-          height(5),
+          const SizedBox(height: 5),
           Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              '${calculateAge(birth!)}세 (보험나이: ${calculateInsuranceAge(birth!)}세), 상령일까지 ${daysUntilInsuranceAgeChange(birth!)}일',
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 상령일 텍스트
+                Text.rich(
+                  TextSpan(
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    children: [
+                      TextSpan(
+                        text:
+                        '${calculateAge(birth!)}세 (보험나이: ${calculateInsuranceAge(birth!)}세), 상령일까지 ',
+                      ),
+                      TextSpan(
+                        text: '$daysLeft일',
+                        style: isUrgent
+                            ? TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.error,
+                        )
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+                if (isUrgent) ...[
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: RotatingDots(
+                      size: 17,
+                      dotBaseSize: 4,
+                      dotPulseRange: 2,
+                      colors: [colorScheme.error, colorScheme.primary],
+                    ),
+                  ),
+                ]
+              ],
             ),
           ),
         ],
@@ -88,4 +129,3 @@ class BirthSelector extends StatelessWidget {
     );
   }
 }
-

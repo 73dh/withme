@@ -43,7 +43,7 @@ class CustomerItem extends StatelessWidget {
         final policies = snapshot.data!;
         return ItemContainer(
           backgroundColor:
-              isUrgent ? colorScheme.errorContainer : colorScheme.surface,
+              isUrgent ? colorScheme.tertiaryContainer : colorScheme.surface,
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
             children: [

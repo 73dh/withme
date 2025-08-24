@@ -32,8 +32,8 @@ class CustomerInfo extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return ItemContainer(
-      height: customer.recommended.isEmpty ? 90 : 110,
-      backgroundColor: isUrgent ? colorScheme.errorContainer : null,
+      height: customer.recommended.isEmpty ? 90 : 112,
+      backgroundColor: isUrgent ? colorScheme.tertiaryContainer : null,
       // 기존 isUrgentColor
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -55,7 +55,6 @@ class CustomerInfo extends StatelessWidget {
                               : IconsPath.womanIcon,
                       size: 24,
                     ),
-                    // sexIcon(customer.sex, colorScheme),
                     width(6),
                     Text(
                       shortenedNameText(customer.name),

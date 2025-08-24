@@ -89,7 +89,7 @@ class CustomerInfoPart extends StatelessWidget {
                 ),
               ],
             ),
-          height(8),
+            height(8),
             // 생년월일
             BirthSelector(
               birth: birth,
@@ -115,7 +115,7 @@ class CustomerInfoPart extends StatelessWidget {
                         }
                       },
             ),
-          height(8),
+            height(8),
             // 메모
             TextFormField(
               controller: memoController,
@@ -130,22 +130,32 @@ class CustomerInfoPart extends StatelessWidget {
                         : colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color:isReadOnly
+                      ? colorScheme.surfaceContainerHighest
+                      : colorScheme.surface,),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8), // ✅ radius 유지
+                  borderSide: BorderSide.none,            // ✅ 테두리 선 제거
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: colorScheme.outline),
                 ),
               ),
             ),
-          height(8),
+            height(8),
             // 소개 여부 + 소개자
             Row(
               children: [
                 Text('소개 여부', style: effectiveTitleStyle),
-              width(8),
+                width(8),
                 Switch(
                   value: isRecommended,
                   onChanged: isReadOnly ? null : onRecommendedChanged,
                   activeColor: colorScheme.primary,
                 ),
-              width(20),
+                width(20),
                 if (isRecommended)
                   Expanded(
                     child: TextFormField(
@@ -165,6 +175,11 @@ class CustomerInfoPart extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(color: colorScheme.outline),
+
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8), // ✅ radius 유지
+                          borderSide: BorderSide.none,            // ✅ 테두리 선 제거
                         ),
                       ),
                     ),

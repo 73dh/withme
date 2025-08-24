@@ -62,7 +62,7 @@ class ProspectItem extends StatelessWidget {
             return ItemContainer(
               backgroundColor:
                   info.isUrgent
-                      ? colorScheme.secondaryContainer
+                      ? colorScheme.tertiaryContainer
                       : colorScheme.surface,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,7 @@ class ProspectItem extends StatelessWidget {
                                         ),
                                         Text(
                                           countdown != 0 ? '-$countdown' : '오늘',
-                                          style: textTheme.bodyMedium?.copyWith(
+                                          style: textTheme.bodySmall?.copyWith(
                                             color: cakeColor,
                                             fontWeight: FontWeight.bold,
                                           ),

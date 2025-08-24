@@ -21,6 +21,7 @@ class RegisteredDateSelector extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // ✅ BirthSelector와 동일하게
       children: [
         Row(
           children: [
@@ -36,14 +37,12 @@ class RegisteredDateSelector extends StatelessWidget {
               width: 120,
               child: RenderFilledButton(
                 width: 100,
-                backgroundColor:
-                    isReadOnly
-                        ? colorScheme.surfaceContainerHighest
-                        : colorScheme.primary,
-                foregroundColor:
-                    isReadOnly
-                        ? colorScheme.onSurfaceVariant
-                        : colorScheme.onPrimary,
+                backgroundColor: isReadOnly
+                    ? colorScheme.surfaceContainerHighest
+                    : colorScheme.primary,
+                foregroundColor: isReadOnly
+                    ? colorScheme.onSurfaceVariant
+                    : colorScheme.onPrimary,
                 borderRadius: 5,
                 onPressed: isReadOnly ? null : onPressed,
                 text: registeredDate.formattedBirth,
@@ -51,7 +50,75 @@ class RegisteredDateSelector extends StatelessWidget {
             ),
           ],
         ),
+        // ✅ BirthSelector처럼 추가 정보 줄도 붙일 수 있음 (예: 등록일 D-Day)
+        // if (!isReadOnly) ...[
+        //   const SizedBox(height: 5),
+        //   Align(
+        //     alignment: Alignment.centerRight,
+        //     child: Text(
+        //       '등록한 지 ${daysBetween(registeredDate, DateTime.now())}일',
+        //       style: textTheme.bodySmall?.copyWith(
+        //         color: colorScheme.onSurfaceVariant,
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ],
     );
   }
 }
+
+//
+// class RegisteredDateSelector extends StatelessWidget {
+//   final bool isReadOnly;
+//   final DateTime registeredDate;
+//   final void Function()? onPressed;
+//
+//   const RegisteredDateSelector({
+//     super.key,
+//     required this.isReadOnly,
+//     required this.registeredDate,
+//     this.onPressed,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+//     final colorScheme = theme.colorScheme;
+//     final textTheme = theme.textTheme;
+//
+//     return Column(
+//       children: [
+//         Row(
+//           children: [
+//             Text(
+//               '등록일 ${isReadOnly ? '' : '(선택)'}',
+//               style: textTheme.bodyMedium?.copyWith(
+//                 color: colorScheme.onSurface,
+//                 fontWeight: FontWeight.w500,
+//               ),
+//             ),
+//             const Spacer(),
+//             SizedBox(
+//               width: 120,
+//               child: RenderFilledButton(
+//                 width: 100,
+//                 backgroundColor:
+//                     isReadOnly
+//                         ? colorScheme.surfaceContainerHighest
+//                         : colorScheme.primary,
+//                 foregroundColor:
+//                     isReadOnly
+//                         ? colorScheme.onSurfaceVariant
+//                         : colorScheme.onPrimary,
+//                 borderRadius: 5,
+//                 onPressed: isReadOnly ? null : onPressed,
+//                 text: registeredDate.formattedBirth,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ],
+//     );
+//   }
+// }

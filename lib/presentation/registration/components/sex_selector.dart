@@ -27,7 +27,7 @@ class SexSelector extends StatelessWidget {
           isSelected: sex == '남',
           onTap: () => onChanged?.call('남'),
         ),
-    width(8),
+        width(8),
         _buildToggle(
           context,
           label: '여',
@@ -55,16 +55,16 @@ class SexSelector extends StatelessWidget {
             ? (isSelected
                 ? colorScheme.surfaceContainerHighest
                 : colorScheme.surface)
-            : (isSelected ? colorScheme.primaryContainer : colorScheme.surface);
+            : (isSelected ? colorScheme.primary : colorScheme.surface);
 
     final borderColor =
-        isSelected ? colorScheme.primary : colorScheme.outlineVariant;
+        isSelected ? colorScheme.outlineVariant : colorScheme.outlineVariant;
 
     final textColor =
         isReadOnly
             ? colorScheme.onSurfaceVariant
             : (isSelected
-                ? colorScheme.onPrimaryContainer
+                ? colorScheme.onPrimary
                 : colorScheme.onSurfaceVariant);
 
     return GestureDetector(
@@ -84,7 +84,7 @@ class SexSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 18, color: textColor),
-          width(4),
+            width(4),
             Text(
               label,
               style: textTheme.bodyMedium?.copyWith(color: textColor),
