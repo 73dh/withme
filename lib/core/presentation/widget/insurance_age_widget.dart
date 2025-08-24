@@ -14,7 +14,7 @@ class InsuranceAgeWidget extends StatelessWidget {
     required this.isUrgent,
     required this.insuranceChangeDate,
     required this.colorScheme,
-    this.isCustomerItem=true,
+    this.isCustomerItem = true,
   });
 
   @override
@@ -32,21 +32,21 @@ class InsuranceAgeWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(width: 4),
-        if(!isCustomerItem)
-        Flexible(
-          child: Text(
-            isFuture ? '(D-$difference)' : '(D+${difference.abs()})',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.normal,
-              color: isFuture ? colorScheme.primary : colorScheme.onSurface,
+        width(4),
+        if (!isCustomerItem)
+          Flexible(
+            child: Text(
+              isFuture ? '(D-$difference)' : '(D+${difference.abs()})',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: isFuture ? colorScheme.primary : colorScheme.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
           ),
-        ),
         if (isFuture && isUrgent) ...[
-          const SizedBox(width: 6),
+          width(6),
           SizedBox(
             width: 20,
             height: 20,

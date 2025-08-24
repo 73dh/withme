@@ -1,7 +1,8 @@
 import '../../../domain/model/policy_model.dart';
-import '../../domain/enum/policy_state.dart';
+import '../../ui/icon/const.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
+import '../../utils/policy_status_helper.dart';
 import '../core_presentation_import.dart';
 
 class PolicySimpleItem extends StatelessWidget {
@@ -15,31 +16,23 @@ class PolicySimpleItem extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final notKeepPolicyState =
-        policy.policyState == PolicyState.cancelled.label ||
-        policy.policyState == PolicyState.lapsed.label;
-
     // 보험료 텍스트 스타일
-    final premiumStyle =
-        notKeepPolicyState
-            ? textTheme.labelLarge?.copyWith(
-              color: colorScheme.error,
-              decoration: TextDecoration.lineThrough,
-            )
-            : textTheme.labelLarge?.copyWith(color: colorScheme.onSurface);
-
+    final premiumStyle = PolicyStatusHelper.premiumTextStyle(
+      policy,
+      textTheme,
+      colorScheme,
+    );
     // 상태 배경 색상
-    final stateBgColor =
-        notKeepPolicyState
-            ? colorScheme.errorContainer.withValues(alpha: 0.3)
-            : colorScheme.tertiaryContainer.withValues(alpha: 0.2);
+    final stateBgColor = PolicyStatusHelper.statusBackgroundColor(
+      policy,
+      colorScheme,
+    );
 
     // 상태 텍스트 색상
-    final stateTextColor =
-        notKeepPolicyState
-            ? colorScheme.error
-            : colorScheme.onTertiaryContainer;
-
+    final stateTextColor = PolicyStatusHelper.statusTextColor(
+      policy,
+      colorScheme,
+    );
     return ItemContainer(
       height: 120,
       backgroundColor: colorScheme.surface,
@@ -51,24 +44,54 @@ class PolicySimpleItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Text(
-                    '계약자: ${shortenedNameText(policy.policyHolder)}',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Row(
+                    children: [
+                      SexIconWithBirthday(
+                        birth: policy.policyHolderBirth,
+                        sex: policy.policyHolderSex,
+                        backgroundImagePath:
+                            policy.policyHolderSex == '남'
+                                ? IconsPath.manIcon
+                                : IconsPath.womanIcon,
+                        size: 20,
+                      ),
+                      width(5),
+                      Text(
+                        '계약자: ${shortenedNameText(policy.policyHolder)}',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-                Flexible(
-                  child: Text(
-                    '피보험자: ${shortenedNameText(policy.insured)}',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                width(8), // 약간의 간격
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SexIconWithBirthday(
+                        birth: policy.insuredBirth,
+                        sex: policy.insuredSex,
+                        backgroundImagePath:
+                            policy.insuredSex == '남'
+                                ? IconsPath.manIcon
+                                : IconsPath.womanIcon,
+                        size: 20,
+                      ),
+                      width(5),
+                      Text(
+                        '피보험자: ${shortenedNameText(policy.insured)}',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               ],

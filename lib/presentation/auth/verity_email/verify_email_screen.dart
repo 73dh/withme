@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/theme/theme.dart';
 
@@ -81,14 +82,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 12),
+            height(12),
             Text(
               '회원가입 시 입력한 이메일 주소로 인증 메일을 보냈습니다.',
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface80,
               ),
             ),
-            const SizedBox(height: 4),
+            height(4),
             Text(
               '📬 $email',
               style: textTheme.bodyLarge?.copyWith(
@@ -96,14 +97,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 24),
+            height(24),
             Text(
               '이메일의 링크를 클릭한 후 아래 버튼을 눌러주세요.',
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface80,
               ),
             ),
-            const SizedBox(height: 32),
+            height(32),
 
             // 이메일 인증 완료 버튼
             SizedBox(
@@ -123,7 +124,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                         : const Text('이메일 인증 완료'),
               ),
             ),
-            const SizedBox(height: 16),
+            height(16),
 
             // 인증 메일 재전송
             SizedBox(

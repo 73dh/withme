@@ -91,7 +91,7 @@ class LoadingIndicatorRow extends StatelessWidget {
             color: colorScheme.onSurface, // 배경 대비 자동
           ),
         ),
-        const SizedBox(width: 5),
+        width(5),
         const MyCircularIndicator(size: 10),
       ],
     );

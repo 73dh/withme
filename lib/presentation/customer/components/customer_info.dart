@@ -50,7 +50,10 @@ class CustomerInfo extends StatelessWidget {
                       birth: customer.birth,
                       sex: customer.sex,
                       backgroundImagePath:
-                          customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon,size: 24,
+                          customer.sex == '남'
+                              ? IconsPath.manIcon
+                              : IconsPath.womanIcon,
+                      size: 24,
                     ),
                     // sexIcon(customer.sex, colorScheme),
                     width(6),
@@ -69,15 +72,13 @@ class CustomerInfo extends StatelessWidget {
                 /// 생년월일
                 Row(
                   children: [
-                    Text('[생년월일]',style: TextStyle(
-                      fontSize: 12,
-                      color: colorScheme.onSurfaceVariant,
-                    ),),
-                    // Icon(
-                    //   Icons.cake,
-                    //   size: 16,
-                    //   color: colorScheme.onSurfaceVariant,
-                    // ),
+                    Text(
+                      '[생년월일]',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                     width(4),
                     Text(
                       birthDate != null
@@ -131,7 +132,7 @@ class CustomerInfo extends StatelessWidget {
                   return const MyCircularIndicator();
                 }
                 final histories = snapshot.data!;
-                return HistoryPartWidget(
+                  return HistoryPartWidget(
                   histories: histories,
                   onTap: (histories) async {
                     await popupAddHistory(

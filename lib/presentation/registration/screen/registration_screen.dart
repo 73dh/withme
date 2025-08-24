@@ -90,12 +90,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return SafeArea(
       child: SingleChildScrollView(
         controller: _effectiveController,
         child: Container(
-          color: theme.colorScheme.surface,
+          color: colorScheme.surface,
           child: Column(
             children: [
               CustomerRegistrationAppBar(
@@ -109,8 +110,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onHistoryTap: _onAddHistory,
                 isNeedNewHistory: _isNeedNewHistory,
                 registrationViewModel: _registrationViewModel,
-                backgroundColor: theme.colorScheme.surface,
-                foregroundColor: theme.colorScheme.onSurface,
+                backgroundColor: colorScheme.surface,
+                foregroundColor: colorScheme.onSurface,
               ),
               Form(
                 key: _formCtrl.formKey,
@@ -137,15 +138,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     });
                   },
                   titleTextStyle: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurface,
+                    color: colorScheme.onSurface,
                   ),
                   subtitleTextStyle: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(180),
+                    color: colorScheme.onSurfaceVariant,
                   ),
-                  backgroundColor: theme.colorScheme.surface,
+                  backgroundColor: colorScheme.surface,
                 ),
               ),
-              if (!_isReadOnly) _buildSubmitButton(context),
+              if (!_isReadOnly) _buildSubmitButton(context, colorScheme),
             ],
           ),
         ),
@@ -153,7 +154,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context) {
+  Widget _buildSubmitButton(BuildContext context, ColorScheme colorScheme) {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -161,8 +162,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         width: double.infinity,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -172,7 +173,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           child: Text(
             widget.customer == null ? '등록' : '수정',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onPrimary,
+              color: colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -200,10 +201,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Future<void> _onSubmitPressed() async {
-    // 🔹 validate (formCtrl 기반)
     if (!_formCtrl.validate(context, isRecommended: _isRecommended)) return;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+
+    final colorScheme = Theme.of(context).colorScheme;
 
     await showModalBottomSheet(
       context: context,
@@ -220,15 +220,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 nameController: _formCtrl.name,
                 recommendedController: _formCtrl.recommended,
                 historyController: _formCtrl.history,
-                // ✅ 되살림
                 birthController: _formCtrl.birthCtrl,
                 registeredDateController: _formCtrl.registeredDate,
                 sex: _formCtrl.sex,
                 birth: _formCtrl.birth,
                 textColor: colorScheme.onSurface,
-                backgroundColor: colorScheme.surfaceContainerLowest.withAlpha(
-                  20,
-                ),
+                backgroundColor: colorScheme.surfaceContainerLowest,
                 onPressed: () async {
                   setModalState(() => _isRegistering = true);
 
@@ -273,7 +270,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (widget.customer == null) {
-        // 신규 등록
         final historyMap = HistoryModel.toMapForHistory(
           registeredDate: DateFormat(
             'yy/MM/dd',
@@ -283,7 +279,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
         final todoMap = <String, dynamic>{};
 
-        await getIt<RegistrationViewModel>().onEvent(
+        await _registrationViewModel.onEvent(
           RegistrationEvent.registerCustomer(
             userKey: currentUser.uid,
             customerData: customerMap,
@@ -292,8 +288,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           ),
         );
       } else {
-        // 수정
-        await getIt<RegistrationViewModel>().onEvent(
+        await _registrationViewModel.onEvent(
           RegistrationEvent.updateCustomer(
             userKey: UserSession.userId,
             customerData: customerMap,

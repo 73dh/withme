@@ -11,7 +11,6 @@ class CustomerPart extends StatelessWidget {
   final String insuredSex;
   final DateTime? insuredBirth;
   final void Function(DateTime?) onBirthPressed;
-  // final void Function(String) onInsuredNameChanged;
   final void Function(String) onManChanged;
   final void Function(String) onWomanChanged;
   final void Function(DateTime?) onBirthChanged;
@@ -24,7 +23,6 @@ class CustomerPart extends StatelessWidget {
     required this.onBirthPressed,
     required this.insuredNameController,
     required this.insuredSex,
-    // required this.onInsuredNameChanged,
     required this.onManChanged,
     required this.onWomanChanged,
     required this.onBirthChanged,
@@ -56,7 +54,6 @@ class CustomerPart extends StatelessWidget {
             insuredNameController: insuredNameController,
             insuredSex: insuredSex,
             insuredBirth: insuredBirth,
-            // onInsuredNameChanged: onInsuredNameChanged,
             onManChanged: (value) => onManChanged(value),
             onWomanChanged: (value) => onWomanChanged(value),
             onBirthChanged: (value) => onBirthChanged(value),

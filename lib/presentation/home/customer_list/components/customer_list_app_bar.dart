@@ -40,7 +40,7 @@ class CustomerListAppBar extends StatelessWidget
       title: Row(
         children: [
           _buildIconStack(colorScheme),
-          const SizedBox(width: 5),
+          width(5),
           Text(
             '$count명',
             style: textTheme.titleMedium?.copyWith(color: colorScheme.primary),
@@ -48,10 +48,12 @@ class CustomerListAppBar extends StatelessWidget
           width(5),
           AnimatedBuilder(
             animation: viewModel,
-            builder: (BuildContext context, Widget? child) { return BlinkingToggleIcon(
-              expanded: viewModel.isFilterBarExpanded,
-              onTap: onToggleFilterBar,
-            );}
+            builder: (BuildContext context, Widget? child) {
+              return BlinkingToggleIcon(
+                expanded: viewModel.isFilterBarExpanded,
+                onTap: onToggleFilterBar,
+              );
+            },
           ),
         ],
       ),

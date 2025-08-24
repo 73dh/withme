@@ -3,6 +3,14 @@ import '../../domain/enum/policy_state.dart';
 import '../../ui/core_ui_import.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
+import '../../utils/policy_status_helper.dart';
+import '../core_presentation_import.dart';
+
+import '../../../domain/model/policy_model.dart';
+import '../../domain/enum/policy_state.dart';
+import '../../ui/core_ui_import.dart';
+import '../../utils/core_utils_import.dart';
+import '../../utils/extension/number_format.dart';
 import '../core_presentation_import.dart';
 
 class PolicyItem extends StatelessWidget {
@@ -10,15 +18,14 @@ class PolicyItem extends StatelessWidget {
 
   const PolicyItem({super.key, required this.policy});
 
-  bool get isCancelled => policy.policyState == PolicyState.cancelled.label;
-
-  bool get isLapsed => policy.policyState == PolicyState.lapsed.label;
+  bool get isCancelled => policy.policyState == PolicyStatus.cancelled.label;
+  bool get isLapsed => policy.policyState == PolicyStatus.lapsed.label;
 
   /// 상태별 컬러 반환
   Color statusColor(ColorScheme colorScheme) {
     if (isLapsed) return colorScheme.error;
     if (isCancelled) return colorScheme.tertiary;
-    return colorScheme.primary; // 기존 onSurface → 주요 색상으로 변경
+    return colorScheme.primary;
   }
 
   @override
@@ -28,19 +35,18 @@ class PolicyItem extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return ItemContainer(
-      height: 240,
+      height: 220,
       child: Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: const EdgeInsets.all(6.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _titleRow(textTheme, colorScheme),
-            height(3),
             _personInfoRow(textTheme, colorScheme),
             const DashedDivider(),
             _insuranceInfoRow(textTheme, colorScheme),
-            height(4),
+            const DashedDivider(),
             Text(
               '상품명: ${policy.productName}',
               style: textTheme.labelMedium?.copyWith(
@@ -71,14 +77,12 @@ class PolicyItem extends StatelessWidget {
     children: [
       _personDetail(
         textTheme,
-        // sexIcon:  sexIcon(policy.policyHolderSex, colorScheme),
         sexIcon: SexIconWithBirthday(
           birth: policy.policyHolderBirth,
           sex: policy.policyHolderSex,
-          backgroundImagePath:
-              policy.policyHolderSex == '남'
-                  ? IconsPath.manIcon
-                  : IconsPath.womanIcon,
+          backgroundImagePath: policy.policyHolderSex == '남'
+              ? IconsPath.manIcon
+              : IconsPath.womanIcon,
           size: 20,
         ),
         name: shortenedNameText(policy.policyHolder, length: 5),
@@ -88,12 +92,10 @@ class PolicyItem extends StatelessWidget {
       ),
       _personDetail(
         textTheme,
-        // sexIcon: sexIcon(policy.insuredSex, colorScheme),
         sexIcon: SexIconWithBirthday(
           birth: policy.insuredBirth,
           sex: policy.insuredSex,
-          backgroundImagePath:
-          policy.insuredSex == '남'
+          backgroundImagePath: policy.insuredSex == '남'
               ? IconsPath.manIcon
               : IconsPath.womanIcon,
           size: 20,
@@ -161,9 +163,7 @@ class PolicyItem extends StatelessWidget {
               color: statusColor(colorScheme),
               fontWeight: FontWeight.w600,
               decoration:
-                  (isCancelled || isLapsed)
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
+              (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
             ),
           ),
           TextSpan(
@@ -177,68 +177,62 @@ class PolicyItem extends StatelessWidget {
     );
   }
 
-  Widget _statusBadge(TextTheme textTheme, ColorScheme colorScheme) =>
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: statusColor(colorScheme).withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          policy.policyState,
-          style: textTheme.labelMedium?.copyWith(
-            color: statusColor(colorScheme),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
+  _statusBadge(TextTheme textTheme, ColorScheme colorScheme) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: PolicyStatusHelper.statusBackgroundColor(policy, colorScheme),
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Text(
+      policy.policyState,
+      style: textTheme.labelMedium?.copyWith(
+        color: PolicyStatusHelper.statusTextColor(policy, colorScheme),
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
 
   Widget _labelValue(
-    String label,
-    String value,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: textTheme.labelLarge?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      if (value.isNotEmpty) ...[
-        height(2),
-        Text(
-          value,
-          style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface),
-        ),
-      ],
-    ],
-  );
+      String label, String value, TextTheme textTheme, ColorScheme colorScheme) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+          if (value.isNotEmpty) ...[
+            height(2),
+            Text(
+              value,
+              style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface),
+            ),
+          ],
+        ],
+      );
 
   Widget _personDetail(
-    TextTheme textTheme, {
-    required String name,
-    required Widget sexIcon,
-    required int age,
-    required String birth,
-    ColorScheme? colorScheme,
-  }) => Row(
-    children: [
-      sexIcon,
-      width(4),
-      Text(
-        name,
-        style: textTheme.bodyLarge?.copyWith(color: colorScheme?.onSurface),
-      ),
-      width(6),
-      Text(
-        '$birth ($age세)',
-        style: textTheme.labelSmall?.copyWith(
-          color: colorScheme?.onSurfaceVariant,
-        ),
-      ),
-    ],
-  );
+      TextTheme textTheme, {
+        required String name,
+        required Widget sexIcon,
+        required int age,
+        required String birth,
+        required ColorScheme colorScheme,
+      }) =>
+      Row(
+        children: [
+          sexIcon,
+          width(4),
+          Text(
+            name,
+            style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface,fontWeight: FontWeight.bold),
+          ),
+          width(6),
+          Text(
+            '$birth ($age세)',
+            style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+        ],
+      );
 }
+

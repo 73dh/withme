@@ -41,7 +41,7 @@ class SexIconWithBirthday extends StatelessWidget {
           ),
         ),
         if (hasUpcomingBirthday && isShowDay) ...[
-          const SizedBox(width: 2),
+        width(2),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -205,14 +205,14 @@ class PolicyPart extends StatelessWidget {
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
-                      backgroundColor:
-                          startDate != null
-                              ? colorScheme.primary
-                              : colorScheme.surfaceContainerHigh,
-                      foregroundColor:
-                          startDate != null
-                              ? colorScheme.onPrimary
-                              : colorScheme.onSurfaceVariant,
+                      backgroundColor: startDate == null
+                          ? colorScheme.primary
+                          : colorScheme.surfaceContainerHighest,
+                      foregroundColor: startDate == null
+                          ? colorScheme.onPrimary
+                          : colorScheme.brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -222,24 +222,23 @@ class PolicyPart extends StatelessWidget {
                           onStartDateChanged(selected);
                         }
                       },
-                      text:
-                          startDate == null
-                              ? '계약일'
-                              : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
+                      text: startDate == null
+                          ? '계약일'
+                          : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
                     ),
                   ),
                   width(16),
                   Expanded(
                     child: RenderFilledButton(
                       borderRadius: 5,
-                      backgroundColor:
-                          endDate != null
-                              ? colorScheme.primary
-                              : colorScheme.surfaceContainerHigh,
-                      foregroundColor:
-                          endDate != null
-                              ? colorScheme.onPrimary
-                              : colorScheme.onSurfaceVariant,
+                      backgroundColor: endDate == null
+                          ? colorScheme.primary
+                          : colorScheme.surfaceContainerHighest,
+                      foregroundColor: endDate == null
+                          ? colorScheme.onPrimary
+                          : colorScheme.brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
                       onPressed: () async {
                         DateTime? selected = await selectDate(
                           context,
@@ -249,14 +248,71 @@ class PolicyPart extends StatelessWidget {
                           onEndDateChanged(selected);
                         }
                       },
-                      text:
-                          endDate == null
-                              ? '만기일'
-                              : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
+                      text: endDate == null
+                          ? '만기일'
+                          : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
                     ),
                   ),
                 ],
-              ),
+              )
+
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: RenderFilledButton(
+              //         borderRadius: 5,
+              //         backgroundColor:
+              //             startDate != null
+              //                 ? colorScheme.primary
+              //                 : colorScheme.surfaceContainerHigh,
+              //         foregroundColor:
+              //             startDate != null
+              //                 ? colorScheme.onPrimary
+              //                 : colorScheme.onSurfaceVariant,
+              //         onPressed: () async {
+              //           DateTime? selected = await selectDate(
+              //             context,
+              //             initial: startDate,
+              //           );
+              //           if (selected != null) {
+              //             onStartDateChanged(selected);
+              //           }
+              //         },
+              //         text:
+              //             startDate == null
+              //                 ? '계약일'
+              //                 : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
+              //       ),
+              //     ),
+              //     width(16),
+              //     Expanded(
+              //       child: RenderFilledButton(
+              //         borderRadius: 5,
+              //         backgroundColor:
+              //             endDate != null
+              //                 ? colorScheme.primary
+              //                 : colorScheme.surfaceContainerHigh,
+              //         foregroundColor:
+              //             endDate != null
+              //                 ? colorScheme.onPrimary
+              //                 : colorScheme.onSurfaceVariant,
+              //         onPressed: () async {
+              //           DateTime? selected = await selectDate(
+              //             context,
+              //             initial: endDate,
+              //           );
+              //           if (selected != null) {
+              //             onEndDateChanged(selected);
+              //           }
+              //         },
+              //         text:
+              //             endDate == null
+              //                 ? '만기일'
+              //                 : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),

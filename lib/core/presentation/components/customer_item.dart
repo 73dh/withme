@@ -138,7 +138,7 @@ class CustomerItem extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(width: 2),
+         width(2),
           TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 18),
         ],
         width(10),
@@ -176,8 +176,8 @@ class CustomerItem extends StatelessWidget {
         height(2),
         ...recentPolicies.map((policy) {
           final isCancelled =
-              policy.policyState == PolicyState.cancelled.label ||
-              policy.policyState == PolicyState.lapsed.label;
+              policy.policyState == PolicyStatus.cancelled.label ||
+              policy.policyState == PolicyStatus.lapsed.label;
           final premiumText = numFormatter.format(
             int.tryParse(policy.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
           );

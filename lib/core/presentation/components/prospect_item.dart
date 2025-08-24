@@ -78,12 +78,12 @@ class ProspectItem extends StatelessWidget {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      height(4),
                       ProspectItemIcon(customer: customer),
                     ],
                   ),
 
-                  const SizedBox(width: 12),
+                  width(12),
 
                   // 이름, 생년월일, 상령일, 할일
                   Expanded(
@@ -128,7 +128,7 @@ class ProspectItem extends StatelessWidget {
                             ),
 
                             if (todos.isNotEmpty) ...[
-                              const SizedBox(width: 6),
+                              width(6),
                               // ✅ 고정폭 Container로 텍스트 위치 고정
                               StreamTodoText(
                                 todoList: todos.map((t) => t.content).toList(),
@@ -142,7 +142,7 @@ class ProspectItem extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 4),
+                              width(4),
                               // TodoCountIcon 위치 고정
                               SizedBox(
                                 width: 18,
@@ -156,7 +156,7 @@ class ProspectItem extends StatelessWidget {
                           ],
                         ),
 
-                        const SizedBox(height: 2),
+                        height(2),
 
                         // 생년월일
                         if (customer.birth != null)
@@ -181,7 +181,7 @@ class ProspectItem extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  width(8),
 
                   // HistoryPartWidget은 남는 공간 차지
                   SizedBox(

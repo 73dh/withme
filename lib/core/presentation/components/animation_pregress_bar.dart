@@ -33,7 +33,7 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar>
     super.initState();
     _blinkController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
   }
 

@@ -53,7 +53,7 @@ class _CommonPolicyStateDialogState extends State<CommonPolicyStateDialog> {
                 height(10),
                 Column(
                   children:
-                      PolicyState.values.map((state) {
+                      PolicyStatus.values.map((state) {
                         return RadioListTile<String>(
                           title: Text(state.label),
                           value: state.label,

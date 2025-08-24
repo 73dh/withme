@@ -63,7 +63,7 @@ class DashBoardSideMenu extends StatelessWidget {
                         child: _buildTopSection(textTheme, colorScheme),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    height(10),
                     // 하단 고정 메뉴
                     Column(
                       mainAxisSize: MainAxisSize.min,

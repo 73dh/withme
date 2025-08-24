@@ -96,7 +96,12 @@ class PolicyHolderPart extends StatelessWidget {
                   label: Text(
                     policyHolderBirth?.formattedBirth ?? '생년월일',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
+                      color:
+                          policyHolderBirth == null
+                              ? colorScheme.onPrimary
+                              : colorScheme.brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -111,7 +116,7 @@ class PolicyHolderPart extends StatelessWidget {
                     foregroundColor:
                         policyHolderBirth == null
                             ? colorScheme.onPrimary
-                            : colorScheme.onSurfaceVariant,
+                            : colorScheme.onSurface,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),

@@ -72,7 +72,7 @@ class PolicyModel {
           map[keyEndDate] is Timestamp
               ? (map[keyEndDate] as Timestamp).toDate()
               : DateTime.now().toUtc(),
-      policyState: map[keyPolicyState] ?? PolicyState.keep.label,
+      policyState: map[keyPolicyState] ?? PolicyStatus.keep.label,
       customerKey: map[keyCustomerKey] ?? '',
       // policyKey:  map[keyPolicyKey] ?? reference?.id ?? '',
       policyKey: map[keyPolicyKey] ?? '',
@@ -123,7 +123,7 @@ class PolicyModel {
     map[keyPremium] = premium;
     map[keyStartDate] = startDate;
     map[keyEndDate] = endDate;
-    map[keyPolicyState] = PolicyState.keep.label;
+    map[keyPolicyState] = PolicyStatus.keep.label;
     map[keyCustomerKey] = customerKey;
     map[keyPolicyKey] = policyKey;
 
@@ -131,11 +131,17 @@ class PolicyModel {
   }
 
   // ✅ copyWith 추가
-  PolicyModel copyWith({String? premium, String? policyState}) {
+  PolicyModel copyWith({
+    String? premium,
+    String? policyState,
+    String? policyHolder,
+    DateTime? policyHolderBirth,
+    String? policyHolderSex,
+  }) {
     return PolicyModel(
-      policyHolder: policyHolder,
+      policyHolder:policyHolder?? this.policyHolder,
       policyHolderBirth: policyHolderBirth,
-      policyHolderSex: policyHolderSex,
+      policyHolderSex: policyHolderSex?? this.policyHolderSex,
       insured: insured,
       insuredBirth: insuredBirth,
       insuredSex: insuredSex,

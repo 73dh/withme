@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/todo_model.dart';
@@ -50,7 +49,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
           color: colorScheme.onSurface,
         ),
       ),
-      const SizedBox(width: 6),
+      width(6),
       Text(
         selectedDate.formattedBirth,
         style: theme.textTheme.bodyMedium?.copyWith(
@@ -148,14 +147,14 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                                       Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              height(20),
                               buildTextField(),
-                              const SizedBox(height: 12),
+                              height(12),
                               buildDatePicker(),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        height(20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -171,7 +170,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                                   ).colorScheme.onSurfaceVariant,
                               onPressed: () => Navigator.of(context).pop(),
                             ),
-                            const SizedBox(width: 10),
+                          width(10),
                             buildActionButton(
                               label: confirmText,
                               onPressed: () {
@@ -195,7 +194,7 @@ Future<TodoModel?> showAddOrEditTodoDialog(
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                      height(10),
                       ],
                     ),
                   ),

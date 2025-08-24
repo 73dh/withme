@@ -79,7 +79,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 4),
+              width(4),
               GestureDetector(
                 onTapDown: (details) async {
                   final overlay =
@@ -227,7 +227,7 @@ class _ManageTodoListState extends State<ManageTodoList> {
               size: 18,
               color: colorScheme.primary,
             ),
-            const SizedBox(width: 6),
+           width(6),
             Text(
               '할 일 추가',
               style: TextStyle(fontSize: 14, color: colorScheme.primary),

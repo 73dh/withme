@@ -17,7 +17,7 @@ class PolicyListView extends StatefulWidget {
 
 class _PolicyListViewState extends State<PolicyListView> {
   int? expandedIndex;
-  PolicyState? selectedState;
+  PolicyStatus? selectedState;
 
   void toggleExpansion(int index) {
     setState(() {
@@ -108,7 +108,7 @@ class _PolicyListViewState extends State<PolicyListView> {
       child: Row(
         children: [
           _buildFilterChip(null, '전체', colorScheme, textTheme),
-          ...PolicyState.values.map(
+          ...PolicyStatus.values.map(
             (state) =>
                 _buildFilterChip(state, state.label, colorScheme, textTheme),
           ),
@@ -118,7 +118,7 @@ class _PolicyListViewState extends State<PolicyListView> {
   }
 
   Widget _buildFilterChip(
-    PolicyState? state,
+    PolicyStatus? state,
     String label,
     ColorScheme colorScheme,
     TextTheme textTheme,

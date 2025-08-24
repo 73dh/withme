@@ -32,7 +32,7 @@ void showAgreementDialog(
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
+                height(16),
                 // 내용
                 Flexible(
                   child: SingleChildScrollView(
@@ -49,7 +49,7 @@ void showAgreementDialog(
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+              height(24),
                 FilledButton(
                   onPressed: onPressed,
                   style: FilledButton.styleFrom(

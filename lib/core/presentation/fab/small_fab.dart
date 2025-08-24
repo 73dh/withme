@@ -134,7 +134,7 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
                 ),
               ),
             ),
-            if (widget.fabExpanded) const SizedBox(height: 4),
+            if (widget.fabExpanded) height(4),
             // 메인 FAB 버튼
             FloatingActionButton.small(
               key: const ValueKey('mainSmallFab'),
@@ -252,7 +252,7 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
             ),
           ),
           if (icon != null) ...[
-            const SizedBox(width: 4),
+          width(4),
             Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
           ],
         ],

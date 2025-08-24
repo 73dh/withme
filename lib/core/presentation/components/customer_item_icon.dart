@@ -62,7 +62,7 @@ class CustomerItemIcon extends StatelessWidget {
           for (int i = 0; i < displayCount; i++)
             Positioned(
               left: positions[i].dx,
-              top: positions[i].dy + (circleSize / 2), // 세로 중앙
+              top: positions[i].dy + ( circleSize / 2), // 세로 중앙
               child: _buildCircle(
                 policies[i].insured.characters.firstOrNull ?? '?',
                 circleSize,

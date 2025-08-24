@@ -65,7 +65,7 @@ class CustomerInfoPart extends StatelessWidget {
 
     return ItemContainer(
       height: 352,
-      backgroundColor: backgroundColor ?? colorScheme.surfaceContainerHighest,
+      backgroundColor: backgroundColor ?? colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         child: Column(
@@ -81,7 +81,7 @@ class CustomerInfoPart extends StatelessWidget {
                     textStyle: effectiveTitleStyle,
                   ),
                 ),
-                const SizedBox(width: 20),
+                width(20),
                 SexSelector(
                   sex: sex,
                   isReadOnly: isReadOnly,
@@ -89,7 +89,7 @@ class CustomerInfoPart extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+          height(8),
             // 생년월일
             BirthSelector(
               birth: birth,
@@ -98,7 +98,7 @@ class CustomerInfoPart extends StatelessWidget {
               onSetPressed: isReadOnly ? null : onBirthSetPressed,
               textStyle: effectiveSubtitleStyle,
             ),
-            const SizedBox(height: 8),
+            height(8),
             // 등록일
             RegisteredDateSelector(
               isReadOnly: isReadOnly,
@@ -115,7 +115,7 @@ class CustomerInfoPart extends StatelessWidget {
                         }
                       },
             ),
-            const SizedBox(height: 8),
+          height(8),
             // 메모
             TextFormField(
               controller: memoController,
@@ -134,18 +134,18 @@ class CustomerInfoPart extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+          height(8),
             // 소개 여부 + 소개자
             Row(
               children: [
                 Text('소개 여부', style: effectiveTitleStyle),
-                const SizedBox(width: 8),
+              width(8),
                 Switch(
                   value: isRecommended,
                   onChanged: isReadOnly ? null : onRecommendedChanged,
                   activeColor: colorScheme.primary,
                 ),
-                const SizedBox(width: 20),
+              width(20),
                 if (isRecommended)
                   Expanded(
                     child: TextFormField(

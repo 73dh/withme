@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/presentation/components/width_height.dart';
 
 import '../../../core/ui/const/size.dart';
 
@@ -26,7 +27,7 @@ class SexSelector extends StatelessWidget {
           isSelected: sex == '남',
           onTap: () => onChanged?.call('남'),
         ),
-        const SizedBox(width: 8),
+    width(8),
         _buildToggle(
           context,
           label: '여',
@@ -83,7 +84,7 @@ class SexSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 18, color: textColor),
-            const SizedBox(width: 4),
+          width(4),
             Text(
               label,
               style: textTheme.bodyMedium?.copyWith(color: textColor),

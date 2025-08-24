@@ -74,7 +74,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 8),
+              height(8),
                   CustomerInfo(
                     customer: widget.customer,
                     viewModel: viewModel,
@@ -82,7 +82,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     difference: difference,
                     insuranceChangeDate: insuranceChangeDate,
                   ),
-                  const SizedBox(height: 20),
+                height(20),
                   Text(
                     '보험계약 정보',
                     style: textTheme.titleMedium?.copyWith(
@@ -90,12 +90,12 @@ class _CustomerScreenState extends State<CustomerScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                height(12),
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: policies.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) => height(10),
                     itemBuilder: (context, index) {
                       final policy = policies[index];
                       return InkWell(
@@ -120,112 +120,3 @@ class _CustomerScreenState extends State<CustomerScreen> {
     );
   }
 }
-
-
-
-//
-// class CustomerScreen extends StatefulWidget {
-//   final CustomerModel customer;
-//
-//   const CustomerScreen({super.key, required this.customer});
-//
-//   @override
-//   State<CustomerScreen> createState() => _CustomerScreenState();
-// }
-//
-// class _CustomerScreenState extends State<CustomerScreen> {
-//   final viewModel = getIt<CustomerViewModel>();
-//   late final TodoViewModel todoViewModel;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     // TodoViewModel 생성 시 userKey/customerKey 바로 주입
-//     todoViewModel = TodoViewModel(
-//       userKey: UserSession.userId,
-//       customerKey: widget.customer.customerKey,
-//     );
-//
-//     // Firestore 초기값이 있다면 loadTodos 호출
-//     todoViewModel.loadTodos(widget.customer.todos);
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-//     final colorScheme = theme.colorScheme;
-//     final textTheme = theme.textTheme;
-//
-//     final info = widget.customer.insuranceInfo;
-//     final difference = info.difference;
-//     final isUrgent = info.isUrgent;
-//     final insuranceChangeDate = info.insuranceChangeDate;
-//
-//     return SafeArea(
-//       child: Scaffold(
-//         backgroundColor: theme.scaffoldBackgroundColor,
-//         resizeToAvoidBottomInset: true, // 기본값 true지만 명시
-//         appBar: CustomerRegistrationAppBar(
-//           customer: widget.customer,
-//           todoViewModel: todoViewModel,
-//         ),
-//         body: Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 12.0),
-//           // theme.spacing 가 없으니 base spacing 고정
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               const SizedBox(height: 8),
-//               CustomerInfo(
-//                 customer: widget.customer,
-//                 viewModel: viewModel,
-//                 isUrgent: isUrgent,
-//                 difference: difference,
-//                 insuranceChangeDate: insuranceChangeDate,
-//               ),
-//               const SizedBox(height: 20),
-//               Text(
-//                 '보험계약 정보',
-//                 style: textTheme.titleMedium?.copyWith(
-//                   color: colorScheme.onSurface,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//               const SizedBox(height: 12),
-//               Expanded(
-//                 child: StreamBuilder<List<PolicyModel>>(
-//                   stream: viewModel.getPolicies(widget.customer.customerKey),
-//                   builder: (context, snapshot) {
-//                     if (snapshot.hasError) {
-//                       log(snapshot.error.toString());
-//                     }
-//                     if (!snapshot.hasData) {
-//                       return const Center(child: MyCircularIndicator());
-//                     }
-//                     final policies = snapshot.data!;
-//                     return ListView.separated(
-//                       itemCount: policies.length,
-//                       separatorBuilder: (_, __) => const SizedBox(height: 10),
-//                       itemBuilder:
-//                           (context, index) => InkWell(
-//                             borderRadius: BorderRadius.circular(12),
-//                             onTap: () async {
-//                               await showEditPolicyDialog(
-//                                 context: context,
-//                                 policy: policies[index],
-//                                 viewModel: viewModel,
-//                               );
-//                             },
-//                             child: PolicyItem(policy: policies[index]),
-//                           ),
-//                     );
-//                   },
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

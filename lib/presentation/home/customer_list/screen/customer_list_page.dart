@@ -122,7 +122,7 @@ class _CustomerListPageState extends State<CustomerListPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFilterBar(),
-                  const SizedBox(height: 5),
+                  height(5),
                   Expanded(
                     child: _CustomerListView(
                       customers:

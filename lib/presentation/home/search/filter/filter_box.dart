@@ -33,7 +33,7 @@ class FilterBox extends StatelessWidget {
       controller: controller,
       children: [
         _buildDragHandle(colorScheme),
-        const SizedBox(height: 17),
+        height(17),
         PartTitle(
           text: '고객조회',
           verticalPadding: 6,
@@ -48,16 +48,16 @@ class FilterBox extends StatelessWidget {
           child: Row(
             children: [
               Expanded(child: NoContactFilterButton(viewModel: viewModel)),
-              const SizedBox(width: 5),
+              width(5),
               Expanded(child: ComingBirthFilterButton(viewModel: viewModel)),
-              const SizedBox(width: 5),
+              width(5),
               Expanded(
                 child: UpcomingInsuranceAgeFilterButton(viewModel: viewModel),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 14),
+        height(14),
         _buildSearchByName(context, colorScheme, textTheme),
         ItemContainer(
           height: 60,

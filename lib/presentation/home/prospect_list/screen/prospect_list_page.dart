@@ -148,7 +148,7 @@ class _ProspectListPageState extends State<ProspectListPage>
               body: Column(
                 children: [
                   _buildFilterBar(),
-                  const SizedBox(height: 5),
+                height(5),
                   Expanded(child: _buildProspectList(customers)),
                 ],
               ),

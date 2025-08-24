@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/presentation/components/customer_item_icon.dart';
+import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/todo/todo_view_model.dart';
 import 'package:withme/core/presentation/widget/show_add_todo_dialog.dart';
 
@@ -73,15 +74,10 @@ class CustomerRegistrationAppBar extends StatelessWidget
       foregroundColor: fgColor,
       title:
           registrationViewModel != null
-              ? SexIconWithBirthday(
-                birth: customer!.birth,
-                sex: customer!.sex,
-                backgroundImagePath:
-                    customer!.sex == '남'
-                        ? IconsPath.manIcon
-                        : IconsPath.womanIcon,
-              )
-              : CustomerItemIcon(customer: customer!),
+              ? ProspectItemIcon(customer: customer!)
+              : Column(
+                children: [CustomerItemIcon(customer: customer!), height(15)],
+              ),
 
       actions: [
         Padding(
@@ -98,7 +94,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
             },
           ),
         ),
-        const SizedBox(width: 8),
+       width(8),
         if (onHistoryTap != null)
           GestureDetector(
             onTap: onHistoryTap,
@@ -117,14 +113,14 @@ class CustomerRegistrationAppBar extends StatelessWidget
             ),
           ),
         if (onEditToggle != null) ...[
-          const SizedBox(width: 10),
+       width(10),
           EditToggleIcon(
             isReadOnly: isReadOnly,
             onPressed: onEditToggle!,
             color: fgColor,
           ),
         ],
-        const SizedBox(width: 5),
+      width(5),
         if (registrationViewModel != null)
           GestureDetector(
             onTap: () async {
@@ -147,7 +143,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
             },
             child: Image.asset(IconsPath.deleteIcon, width: 22, color: fgColor),
           ),
-        const SizedBox(width: 10),
+      width(10),
         AddPolicyButton(
           customerModel: customer!,
           onRegistered: (bool result) async {
@@ -158,7 +154,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
           },
           iconColor: fgColor,
         ),
-        const SizedBox(width: 8),
+       width(8),
       ],
     );
   }
