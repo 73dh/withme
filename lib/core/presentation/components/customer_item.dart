@@ -46,7 +46,7 @@ class CustomerItem extends StatelessWidget {
           backgroundColor:
               isUrgent ? colorScheme.tertiaryContainer : colorScheme.surface,
           child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InsuredMembersIcon(customer: customer),
               width(6),
@@ -94,11 +94,7 @@ class CustomerItem extends StatelessWidget {
     return Row(
       children: [
         // 성별 + 생일 아이콘
-        SexIcon(
-          sex: customer.sex,
-          backgroundImagePath: iconPath,
-          size: 23,
-        ),
+        SexIcon(sex: customer.sex, backgroundImagePath: iconPath, size: 23),
         width(5),
         // 이름 (아이콘과 바로 붙음)
         Text(
@@ -118,10 +114,12 @@ class CustomerItem extends StatelessWidget {
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSurface,
                 ),
-              ),width(3),BirthdayBadge(birth: customer.birth,iconSize: 14,textSize: 13,),
+              ),
+              width(3),
+              BirthdayBadge(birth: customer.birth, iconSize: 14, textSize: 13),
             ],
           ),
-width(4),
+        width(4),
         // 보험나이 / 상령일
         if (difference != null && insuranceChangeDate != null)
           InsuranceAgeWidget(
@@ -141,7 +139,7 @@ width(4),
               fontWeight: FontWeight.bold,
             ),
           ),
-         width(2),
+          width(2),
           TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 18),
         ],
         width(10),

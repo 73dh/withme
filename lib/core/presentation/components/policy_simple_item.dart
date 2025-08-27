@@ -1,3 +1,5 @@
+import 'package:withme/core/presentation/components/birthday_badge.dart';
+
 import '../../../domain/model/policy_model.dart';
 import '../../ui/icon/const.dart';
 import '../../utils/core_utils_import.dart';
@@ -64,7 +66,8 @@ class PolicySimpleItem extends StatelessWidget {
                           color: colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
-                      ),
+                      ),  width(3),
+                      BirthdayBadge(birth: policy.policyHolderBirth,iconSize: 14,textSize: 14,),
                     ],
                   ),
                 ),
@@ -89,6 +92,8 @@ class PolicySimpleItem extends StatelessWidget {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
+                      width(3),
+                      BirthdayBadge(birth: policy.insuredBirth,iconSize: 14,textSize: 14,),
                     ],
                   ),
                 ),

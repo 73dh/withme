@@ -58,10 +58,8 @@ class InsuredMembersIcon extends StatelessWidget {
 
     // ✅ birthday 여부 체크
     final bool hasUpcomingBirthday = policies.any(
-          (p) => p.insuredBirth != null && isBirthdayWithin7Days(p.insuredBirth!),
+      (p) => p.insuredBirth != null && isBirthdayWithin7Days(p.insuredBirth!),
     );
-    print('$hasUpcomingBirthday, ${policies.length}');
-
 
     return SizedBox(
       width: size,
@@ -73,7 +71,7 @@ class InsuredMembersIcon extends StatelessWidget {
           for (int i = 0; i < displayCount; i++)
             Positioned(
               left: positions[i].dx,
-              top: positions[i].dy + ( circleSize / 2), // 세로 중앙
+              top: positions[i].dy + (circleSize / 2), // 세로 중앙
               child: _buildCircle(
                 policies[i].insured.characters.firstOrNull ?? '?',
                 circleSize,
@@ -116,7 +114,11 @@ class InsuredMembersIcon extends StatelessWidget {
             Positioned(
               top: 4,
               left: -2,
-              child:  BirthdayBadge(iconSize: 18,isShowDate: false, birth: getEarliestUpcomingBirthday(policies),), // size는 원하는 값으로 조정
+              child: BirthdayBadge(
+                iconSize: 18,
+                isShowDate: false,
+                birth: getEarliestUpcomingBirthday(policies),
+              ), // size는 원하는 값으로 조정
             ),
         ],
       ),

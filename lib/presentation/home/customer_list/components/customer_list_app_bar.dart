@@ -43,7 +43,10 @@ class CustomerListAppBar extends StatelessWidget
           width(5),
           Text(
             '$count명',
-            style: textTheme.titleMedium?.copyWith(color: colorScheme.primary,fontWeight: FontWeight.bold),
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           width(5),
           AnimatedBuilder(
