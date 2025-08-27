@@ -1,3 +1,4 @@
+import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/domain/model/customer_model.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
@@ -46,8 +47,7 @@ class CustomerInfo extends StatelessWidget {
                 /// 이름 + 성별 아이콘
                 Row(
                   children: [
-                    SexIconWithBirthday(
-                      birth: customer.birth,
+                    SexIcon(
                       sex: customer.sex,
                       backgroundImagePath:
                           customer.sex == '남'
@@ -64,6 +64,8 @@ class CustomerInfo extends StatelessWidget {
                         color: colorScheme.onSurface, // 다크/라이트 대응
                       ),
                     ),
+                    width(6),
+                    BirthdayBadge(birth: customer.birth,iconSize: 18,textSize: 14,),
                   ],
                 ),
                 height(6),

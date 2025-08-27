@@ -71,59 +71,60 @@ final router = GoRouter(
       path: RoutePath.splash,
       pageBuilder:
           (context, state) =>
-              _fadePage(child: const SplashScreen(), state: state),
+          _fadePage(child: const SplashScreen(), state: state),
     ),
     GoRoute(
       path: RoutePath.home,
       pageBuilder:
           (context, state) =>
-              _fadePage(child: const HomeScreen(), state: state),
+          _fadePage(child: const HomeScreen(), state: state),
     ),
     GoRoute(
       path: RoutePath.registration,
       pageBuilder:
           (context, state) {
-            final customer = state.extra as CustomerModel?;
-            final todoViewModel = getIt<TodoViewModel>(); // ⚡ 반드시 주입
-            return _fadePage(
-              child: RegistrationScreen(
-                customer: customer,
-                scrollController: ScrollController(), // 필요 시 기본 ScrollController
-                // outerContext: context,
-                todoViewModel: todoViewModel,
-              ),
-            state: state,
-          );
-          },
+        final customer = state.extra as CustomerModel?;
+        final todoViewModel = getIt<TodoViewModel>(); // ⚡ 반드시 주입
+        return _fadePage(
+          child: RegistrationScreen(
+            customer: customer,
+            scrollController: ScrollController(), // 필요 시 기본 ScrollController
+            // outerContext: context,
+            todoViewModel: todoViewModel,
+          ),
+          state: state,
+        );
+      },
     ),
     GoRoute(
       path: RoutePath.signUp,
       pageBuilder:
           (context, state) =>
-              _fadePage(child: const SignUpScreen(), state: state),
+          _fadePage(child: const SignUpScreen(), state: state),
     ),
     GoRoute(
       path: RoutePath.login,
       pageBuilder:
           (context, state) =>
-              _fadePage(child: const LoginScreen(), state: state),
+          _fadePage(child: const LoginScreen(), state: state),
     ),
     GoRoute(
       path: RoutePath.verifyEmail,
       pageBuilder:
           (context, state) =>
-              _fadePage(child: const VerifyEmailScreen(), state: state),
+          _fadePage(child: const VerifyEmailScreen(), state: state),
     ),
     GoRoute(
       path: RoutePath.onboarding,
       pageBuilder:
           (context, state) =>
-              _fadePage(child: const OnboardingScreen(), state: state),
+          _fadePage(child: const OnboardingScreen(), state: state),
     ),
     GoRoute(
       path: RoutePath.policy,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) =>
+          _fadePage(
             child: PolicyScreen(customer: state.extra as CustomerModel),
             state: state,
           ),
@@ -131,7 +132,8 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.customer,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) =>
+          _fadePage(
             child: CustomerScreen(customer: state.extra as CustomerModel),
             state: state,
           ),

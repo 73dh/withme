@@ -1,3 +1,5 @@
+import 'package:withme/core/presentation/components/birthday_badge.dart';
+
 import '../../../domain/model/policy_model.dart';
 import '../../domain/enum/policy_state.dart';
 import '../../ui/core_ui_import.dart';
@@ -6,19 +8,13 @@ import '../../utils/extension/number_format.dart';
 import '../../utils/policy_status_helper.dart';
 import '../core_presentation_import.dart';
 
-import '../../../domain/model/policy_model.dart';
-import '../../domain/enum/policy_state.dart';
-import '../../ui/core_ui_import.dart';
-import '../../utils/core_utils_import.dart';
-import '../../utils/extension/number_format.dart';
-import '../core_presentation_import.dart';
-
 class PolicyItem extends StatelessWidget {
   final PolicyModel policy;
 
   const PolicyItem({super.key, required this.policy});
 
   bool get isCancelled => policy.policyState == PolicyStatus.cancelled.label;
+
   bool get isLapsed => policy.policyState == PolicyStatus.lapsed.label;
 
   /// 상태별 컬러 반환
@@ -77,32 +73,32 @@ class PolicyItem extends StatelessWidget {
     children: [
       _personDetail(
         textTheme,
-        sexIcon: SexIconWithBirthday(
-          birth: policy.policyHolderBirth,
+        sexIcon: SexIcon(
           sex: policy.policyHolderSex,
-          backgroundImagePath: policy.policyHolderSex == '남'
-              ? IconsPath.manIcon
-              : IconsPath.womanIcon,
+          backgroundImagePath:
+              policy.policyHolderSex == '남'
+                  ? IconsPath.manIcon
+                  : IconsPath.womanIcon,
           size: 20,
         ),
         name: shortenedNameText(policy.policyHolder, length: 5),
         age: calculateAge(policy.policyHolderBirth!),
-        birth: policy.policyHolderBirth?.formattedBirth ?? '-',
+        birth: policy.policyHolderBirth,
         colorScheme: colorScheme,
       ),
       _personDetail(
         textTheme,
-        sexIcon: SexIconWithBirthday(
-          birth: policy.insuredBirth,
+        sexIcon: SexIcon(
           sex: policy.insuredSex,
-          backgroundImagePath: policy.insuredSex == '남'
-              ? IconsPath.manIcon
-              : IconsPath.womanIcon,
+          backgroundImagePath:
+              policy.insuredSex == '남'
+                  ? IconsPath.manIcon
+                  : IconsPath.womanIcon,
           size: 20,
         ),
         name: shortenedNameText(policy.insured, length: 5),
         age: calculateAge(policy.insuredBirth!),
-        birth: policy.insuredBirth?.formattedBirth ?? '-',
+        birth: policy.insuredBirth,
         colorScheme: colorScheme,
       ),
     ],
@@ -163,7 +159,7 @@ class PolicyItem extends StatelessWidget {
               color: statusColor(colorScheme),
               fontWeight: FontWeight.w600,
               decoration:
-              (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
+                  (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
             ),
           ),
           TextSpan(
@@ -193,30 +189,35 @@ class PolicyItem extends StatelessWidget {
   );
 
   Widget _labelValue(
-      String label, String value, TextTheme textTheme, ColorScheme colorScheme) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-          ),
-          if (value.isNotEmpty) ...[
-            height(2),
-            Text(
-              value,
-              style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface),
-            ),
-          ],
-        ],
-      );
+    String label,
+    String value,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: textTheme.labelMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+      if (value.isNotEmpty) ...[
+        height(2),
+        Text(
+          value,
+          style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface),
+        ),
+      ],
+    ],
+  );
 
   Widget _personDetail(
       TextTheme textTheme, {
         required String name,
         required Widget sexIcon,
         required int age,
-        required String birth,
+        required DateTime? birth, // <-- nullable DateTime으로
         required ColorScheme colorScheme,
       }) =>
       Row(
@@ -225,14 +226,19 @@ class PolicyItem extends StatelessWidget {
           width(4),
           Text(
             name,
-            style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurface,fontWeight: FontWeight.bold),
-          ),
-          width(6),
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ) ,width(3), BirthdayBadge(birth: birth,iconSize: 10,textSize: 10,),
+          width(3),
           Text(
-            '$birth ($age세)',
-            style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+            '${birth?.formattedBirth ?? '-'} ($age세)', // 여기서 변환
+            style: textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       );
-}
 
+}

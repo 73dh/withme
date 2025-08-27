@@ -1,12 +1,16 @@
+import 'package:withme/core/utils/get_earliest_upcoming_birthday.dart';
+
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/policy_model.dart';
+import '../../utils/is_birthday_within_7days.dart';
 import '../core_presentation_import.dart';
+import 'birthday_badge.dart';
 
-class CustomerItemIcon extends StatelessWidget {
+class InsuredMembersIcon extends StatelessWidget {
   final CustomerModel customer;
   final double size;
 
-  const CustomerItemIcon({super.key, required this.customer, this.size = 32});
+  const InsuredMembersIcon({super.key, required this.customer, this.size = 32});
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,13 @@ class CustomerItemIcon extends StatelessWidget {
           Offset(size * 0.5, size * 0.5),
         ];
     }
+
+    // ✅ birthday 여부 체크
+    final bool hasUpcomingBirthday = policies.any(
+          (p) => p.insuredBirth != null && isBirthdayWithin7Days(p.insuredBirth!),
+    );
+    print('$hasUpcomingBirthday, ${policies.length}');
+
 
     return SizedBox(
       width: size,
@@ -99,6 +110,13 @@ class CustomerItemIcon extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+            ),
+          // ✅ 생일 배지 (우측 하단)
+          if (hasUpcomingBirthday)
+            Positioned(
+              top: 4,
+              left: -2,
+              child:  BirthdayBadge(iconSize: 18,isShowDate: false, birth: getEarliestUpcomingBirthday(policies),), // size는 원하는 값으로 조정
             ),
         ],
       ),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/sex_widget.dart';
+import 'package:withme/core/utils/get_sex_icon_color.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../utils/is_birthday_within_7days.dart';
 import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/sex_widget.dart';
+import 'package:withme/core/utils/get_sex_icon_color.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../utils/is_birthday_within_7days.dart';
 import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/sex_widget.dart';
+import 'package:withme/core/utils/get_sex_icon_color.dart';
 import '../../../domain/model/customer_model.dart';
 import '../../utils/is_birthday_within_7days.dart';
 import 'package:flutter/material.dart';
-import 'package:withme/core/presentation/components/sex_widget.dart';
+import 'package:withme/core/utils/get_sex_icon_color.dart';
 import '../../../domain/model/customer_model.dart';
 
 class ProspectItemIcon extends StatelessWidget {
@@ -33,7 +33,7 @@ class ProspectItemIcon extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.6),
+        color: iconColor.withValues(alpha: 0.6),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,

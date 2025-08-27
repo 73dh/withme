@@ -1,4 +1,5 @@
 import 'package:withme/core/di/di_setup_import.dart';
+import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
@@ -35,11 +36,6 @@ class ProspectItem extends StatelessWidget {
       userKey: userKey,
       customerKey: customer.customerKey,
     );
-    final bool hasUpcomingBirthday =
-        customer.birth != null && isBirthdayWithin7Days(customer.birth!);
-    final int countdown =
-        customer.birth != null ? getBirthdayCountdown(customer.birth!) : -1;
-    final Color cakeColor = Colors.redAccent;
 
     // 초기 Firestore todos 넣어주기 (없으면 빈 리스트)
     todoViewModel.loadTodos(customer.todos);
@@ -105,24 +101,8 @@ class ProspectItem extends StatelessWidget {
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (hasUpcomingBirthday)
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.cake_rounded,
-                                          color: cakeColor,
-                                          size: 35 * 0.5,
-                                        ),
-                                        Text(
-                                          countdown != 0 ? '-$countdown' : '오늘',
-                                          style: textTheme.bodySmall?.copyWith(
-                                            color: cakeColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  width(5),
+                                  BirthdayBadge(birth: customer.birth,iconSize: 16,textSize: 14,),
                                 ],
                               ),
                             ),

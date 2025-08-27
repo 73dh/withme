@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:withme/core/domain/enum/policy_state.dart';
+import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
@@ -14,7 +15,7 @@ import '../../di/setup.dart';
 import '../../utils/calculate_age.dart';
 import '../../utils/shortened_text.dart';
 import '../core_presentation_import.dart';
-import 'customer_item_icon.dart';
+import 'insured_members_icon.dart';
 
 class CustomerItem extends StatelessWidget {
   final CustomerModel customer;
@@ -47,7 +48,7 @@ class CustomerItem extends StatelessWidget {
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomerItemIcon(customer: customer),
+              InsuredMembersIcon(customer: customer),
               width(6),
               Expanded(
                 child: Column(
@@ -93,12 +94,10 @@ class CustomerItem extends StatelessWidget {
     return Row(
       children: [
         // 성별 + 생일 아이콘
-        SexIconWithBirthday(
-          birth: birthDate,
+        SexIcon(
           sex: customer.sex,
           backgroundImagePath: iconPath,
           size: 23,
-          isShowDay: true,
         ),
         width(5),
         // 이름 (아이콘과 바로 붙음)
@@ -112,13 +111,17 @@ class CustomerItem extends StatelessWidget {
 
         // 나이
         if (birthDate != null)
-          Text(
-            ' ${calculateAge(birthDate)}세',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurface,
-            ),
+          Row(
+            children: [
+              Text(
+                ' ${calculateAge(birthDate)}세',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),width(3),BirthdayBadge(birth: customer.birth,iconSize: 14,textSize: 13,),
+            ],
           ),
-
+width(4),
         // 보험나이 / 상령일
         if (difference != null && insuranceChangeDate != null)
           InsuranceAgeWidget(

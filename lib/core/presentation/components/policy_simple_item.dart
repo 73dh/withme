@@ -49,8 +49,7 @@ class PolicySimpleItem extends StatelessWidget {
                 Expanded(
                   child: Row(
                     children: [
-                      SexIconWithBirthday(
-                        birth: policy.policyHolderBirth,
+                      SexIcon(
                         sex: policy.policyHolderSex,
                         backgroundImagePath:
                             policy.policyHolderSex == '남'
@@ -74,8 +73,7 @@ class PolicySimpleItem extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      SexIconWithBirthday(
-                        birth: policy.insuredBirth,
+                      SexIcon(
                         sex: policy.insuredSex,
                         backgroundImagePath:
                             policy.insuredSex == '남'

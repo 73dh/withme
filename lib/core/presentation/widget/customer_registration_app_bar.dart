@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/presentation/components/birthday_badge.dart';
-import 'package:withme/core/presentation/components/customer_item_icon.dart';
+import 'package:withme/core/presentation/components/insured_members_icon.dart';
 import 'package:withme/core/presentation/components/prospect_item_icon.dart';
 import 'package:withme/core/presentation/todo/todo_view_model.dart';
 import 'package:withme/core/presentation/widget/show_add_todo_dialog.dart';
@@ -15,7 +15,6 @@ import '../../../presentation/registration/registration_view_model.dart';
 import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
 import '../../ui/core_ui_import.dart';
-import '../../utils/is_birthday_within_7days.dart';
 import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
 import '../todo/manage_todo_list.dart';
@@ -52,19 +51,9 @@ class CustomerRegistrationAppBar extends StatelessWidget
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme=theme.textTheme;
 
     final bgColor = backgroundColor ?? colorScheme.surface;
     final fgColor = foregroundColor ?? colorScheme.onSurface;
-
-
-    final bool hasUpcomingBirthday =
-        customer?.birth != null && isBirthdayWithin7Days(customer!.birth!);
-
-    final int countdown =
-    customer?.birth != null ? getBirthdayCountdown(customer!.birth!) : -1;
-
-    final Color cakeColor = Colors.redAccent;
 
     if (customer == null) {
       return AppBar(
@@ -88,30 +77,17 @@ class CustomerRegistrationAppBar extends StatelessWidget
           registrationViewModel != null
               ? Row(
                 children: [
-                  ProspectItemIcon(customer: customer!),
-                  BirthdayBadge(birth: customer!.birth!,textSize: 24,),
-                  // if (hasUpcomingBirthday)
-                  //   Row(
-                  //     mainAxisSize: MainAxisSize.min,
-                  //     children: [
-                  //       Icon(
-                  //         Icons.cake_rounded,
-                  //         color: cakeColor,
-                  //         size: 35 *0.8,
-                  //       ),
-                  //       Text(
-                  //         countdown != 0 ? '-$countdown' : '오늘',
-                  //         style: textTheme.titleLarge?.copyWith(
-                  //           color: cakeColor,
-                  //           fontWeight: FontWeight.bold,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
+                  ProspectItemIcon(customer: customer!,size: 37,),
+                  width(5),
+                  BirthdayBadge(
+                    birth: customer?.birth,
+                    iconSize: 24,
+                    textSize: 20,
+                  ),
                 ],
               )
               : Column(
-                children: [CustomerItemIcon(customer: customer!), height(15)],
+                children: [InsuredMembersIcon(customer: customer!), height(15)],
               ),
 
       actions: [
