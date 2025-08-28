@@ -98,7 +98,7 @@ class CustomerItem extends StatelessWidget {
         width(5),
         // 이름 (아이콘과 바로 붙음)
         Text(
-          shortenedNameText(customer.name, length: 6),
+          shortenedNameText(customer.name, length: 4),
           style: theme.textTheme.bodyLarge?.copyWith(
             color: colorScheme.onSurface,
           ),

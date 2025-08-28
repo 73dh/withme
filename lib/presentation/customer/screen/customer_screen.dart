@@ -74,7 +74,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              height(8),
+                  height(8),
                   CustomerInfo(
                     customer: widget.customer,
                     viewModel: viewModel,
@@ -82,7 +82,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     difference: difference,
                     insuranceChangeDate: insuranceChangeDate,
                   ),
-                height(20),
+                  height(20),
                   Text(
                     '보험계약 정보',
                     style: textTheme.titleMedium?.copyWith(
@@ -90,7 +90,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                height(12),
+                  height(12),
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

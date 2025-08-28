@@ -55,7 +55,7 @@ class CustomerInfo extends StatelessWidget {
                               : IconsPath.womanIcon,
                       size: 24,
                     ),
-                    width(6),
+                    width(4),
                     Text(
                       shortenedNameText(customer.name),
                       style: TextStyle(
@@ -64,7 +64,7 @@ class CustomerInfo extends StatelessWidget {
                         color: colorScheme.onSurface, // 다크/라이트 대응
                       ),
                     ),
-                    width(6),
+                    width(4),
                     BirthdayBadge(birth: customer.birth,iconSize: 18,textSize: 14,),
                   ],
                 ),
@@ -94,23 +94,20 @@ class CustomerInfo extends StatelessWidget {
                 ),
                 height(4),
 
-                /// 상령일 (D-xxx)
-                if (birthDate != null &&
-                    difference != null &&
-                    difference! >= 0 &&
-                    insuranceChangeDate != null)
-                  InsuranceAgeWidget(
-                    difference: difference!,
-                    isUrgent: isUrgent,
-                    insuranceChangeDate: insuranceChangeDate!,
-                    colorScheme: colorScheme,
-                  ),
+                /// 상령일 (D-xxx) → 조건 제거, 항상 표시
+                InsuranceAgeWidget(
+                  difference: difference!, // 무조건 값 있음
+                  isUrgent: isUrgent,
+                  insuranceChangeDate: insuranceChangeDate!, // 무조건 값 있음
+                  colorScheme: colorScheme,
+                ),
+
 
                 /// 소개자
                 if (customer.recommended.isNotEmpty) ...[
                   height(4),
                   Text(
-                    '소개자: ${customer.recommended}',
+                    '[소개자] ${customer.recommended}',
                     style: TextStyle(
                       fontSize: 12,
                       color: colorScheme.onSurfaceVariant,

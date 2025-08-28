@@ -26,7 +26,7 @@ class InsuranceAgeWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Flexible(
-          child: Text(
+          child:Text(
             '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',
             style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
             overflow: TextOverflow.ellipsis,

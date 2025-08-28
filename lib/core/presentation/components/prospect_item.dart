@@ -102,6 +102,8 @@ class ProspectItem extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   width(5),
+                                  if(customer.memo.isNotEmpty)
+                                    Icon(Icons.feed_outlined,color: colorScheme.primary,size: 16,),
                                   BirthdayBadge(birth: customer.birth,iconSize: 16,textSize: 14,),
                                 ],
                               ),
