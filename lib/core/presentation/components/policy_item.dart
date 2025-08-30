@@ -73,7 +73,9 @@ class PolicyItem extends StatelessWidget {
     children: [
       _personDetail(
         textTheme,
-        sexIcon: SexIcon(
+        sexIcon:
+
+        SexIcon(
           sex: policy.policyHolderSex,
           backgroundImagePath:
               policy.policyHolderSex == '남'

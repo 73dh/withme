@@ -131,6 +131,21 @@ class FBase {
     });
   }
 
+  Future<CustomerModel?> getCustomerInfo({
+    required String userKey,
+    required String customerKey,
+  }) async {
+    final doc = await _customerDoc(userKey, customerKey).get();
+
+    if (!doc.exists) return null;
+
+    return CustomerModel.fromMap(
+      doc.data()!,
+      doc.id,
+      documentReference: doc.reference,
+    );
+  }
+
   Future<void> updateCustomer({
     required String userKey,
     required Map<String, dynamic> customerData,
@@ -235,7 +250,6 @@ class FBase {
     await ref.set(todoData);
   }
 
-
   Future<void> updateTodo({
     required String userKey,
     required String customerKey,
@@ -245,6 +259,7 @@ class FBase {
     final ref = _subCol(userKey, customerKey, collectionTodos).doc(todoDocId);
     await ref.update(todoData);
   }
+
   Future<void> deleteTodo({
     required String userKey,
     required String customerKey,
@@ -259,8 +274,9 @@ class FBase {
     required String todoId,
     required HistoryModel newHistory,
   }) async {
-    final String uid = FirebaseAuth.instance.currentUser?.uid
-        ?? (throw Exception("User not authenticated"));
+    final String uid =
+        FirebaseAuth.instance.currentUser?.uid ??
+        (throw Exception("User not authenticated"));
 
     final todoRef = _subCol(uid, customerKey, collectionTodos).doc(todoId);
     final historyRef = _subCol(uid, customerKey, collectionHistories).doc();

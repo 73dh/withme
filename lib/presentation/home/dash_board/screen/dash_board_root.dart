@@ -60,7 +60,7 @@ class _DashBoardRootState extends State<DashBoardRoot>
                 children: [
                   AnimatedText(
                     text: '통계 작성중',
-                    style: textTheme.titleMedium?.copyWith(
+                    style: textTheme.titleSmall?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),

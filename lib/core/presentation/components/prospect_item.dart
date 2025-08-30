@@ -1,6 +1,6 @@
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/birthday_badge.dart';
-import 'package:withme/core/presentation/components/prospect_item_icon.dart';
+import 'package:withme/core/presentation/components/first_name_icon.dart';
 import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/history_model.dart';
@@ -8,7 +8,6 @@ import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
 
 import '../../../domain/model/customer_model.dart';
 import '../../di/setup.dart';
-import '../../utils/is_birthday_within_7days.dart';
 import '../core_presentation_import.dart';
 import '../todo/todo_view_model.dart';
 
@@ -75,7 +74,12 @@ class ProspectItem extends StatelessWidget {
                         ),
                       ),
                       height(4),
-                      ProspectItemIcon(customer: customer),
+                      FirstNameIcon(
+                        customer: customer,
+                        size: 40,
+                        todoCount: todos.length, // ✅ Todo 개수 전달
+                      ),
+                      // ProspectItemIcon(customer: customer),
                     ],
                   ),
 
@@ -102,62 +106,84 @@ class ProspectItem extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   width(5),
-                                  if(customer.memo.isNotEmpty)
-                                    Icon(Icons.feed_outlined,color: colorScheme.primary,size: 16,),
-                                  BirthdayBadge(birth: customer.birth,iconSize: 16,textSize: 14,),
+                                  if (customer.memo.isNotEmpty)
+                                    Icon(
+                                      Icons.feed_outlined,
+                                      color: colorScheme.primary,
+                                      size: 16,
+                                    ),
+                                  BirthdayBadge(
+                                    birth: customer.birth,
+                                    iconSize: 16,
+                                    textSize: 14,
+                                  ),
                                 ],
                               ),
                             ),
 
-                            if (todos.isNotEmpty) ...[
-                              width(6),
-                              // ✅ 고정폭 Container로 텍스트 위치 고정
-                              StreamTodoText(
-                                todoList: todos.map((t) => t.content).toList(),
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.copyWith(
-                                  color: getSexIconColor(
-                                    customer.sex,
-                                    colorScheme,
-                                  ),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              width(4),
-                              // TodoCountIcon 위치 고정
-                              SizedBox(
-                                width: 18,
-                                child: TodoCountIcon(
-                                  todos: todos,
-                                  sex: customer.sex,
-                                  iconSize: 18,
-                                ),
-                              ),
-                            ],
+                            /// 할일목록 표시
+                            // if (todos.isNotEmpty) ...[
+                            //   width(6),
+                            //   // ✅ 고정폭 Container로 텍스트 위치 고정
+                            //   StreamTodoText(
+                            //     todoList: todos.map((t) => t.content).toList(),
+                            //     style: Theme.of(
+                            //       context,
+                            //     ).textTheme.bodySmall?.copyWith(
+                            //       color: getSexIconColor(
+                            //         customer.sex,
+                            //         colorScheme,
+                            //       ),
+                            //       fontWeight: FontWeight.bold,
+                            //     ),
+                            //   ),
+                            //   width(4),
+                            //   // TodoCountIcon 위치 고정
+                            //   SizedBox(
+                            //     width: 18,
+                            //     child: TodoCountIcon(
+                            //       todos: todos,
+                            //       sex: customer.sex,
+                            //       iconSize: 18,
+                            //     ),
+                            //   ),
+                            // ],
                           ],
                         ),
 
                         height(2),
 
-                        // 생년월일
-                        if (customer.birth != null)
+                        Row(
+                          children: [
+                            // 생년월일
+                            if (customer.birth != null)
+                              Text(
+                                '${customer.birth!.formattedBirth} (${calculateAge(customer.birth!)}세)',
+                                style: textTheme.labelMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            width(5),
+                            // 상령일
+                            if (info.difference != null &&
+                                info.insuranceChangeDate != null)
+                              InsuranceAgeWidget(
+                                difference: info.difference!,
+                                isUrgent: info.isUrgent,
+                                insuranceChangeDate: info.insuranceChangeDate!,
+                                colorScheme: colorScheme,
+                              ),
+                          ],
+                        ),
+                        height(2),
+                        // 소개자
+                        if (customer.recommended.isNotEmpty)
                           Text(
-                            '${customer.birth!.formattedBirth} (${calculateAge(customer.birth!)}세)',
-                            style: textTheme.labelMedium?.copyWith(
+                            '[소개자] ${customer.recommended}',
+                            style: textTheme.labelSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                        // 상령일
-                        if (info.difference != null &&
-                            info.insuranceChangeDate != null)
-                          InsuranceAgeWidget(
-                            difference: info.difference!,
-                            isUrgent: info.isUrgent,
-                            insuranceChangeDate: info.insuranceChangeDate!,
-                            colorScheme: colorScheme,
                           ),
                       ],
                     ),

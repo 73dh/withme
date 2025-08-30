@@ -2,8 +2,7 @@ import 'dart:developer';
 
 import 'package:withme/core/domain/enum/policy_state.dart';
 import 'package:withme/core/presentation/components/birthday_badge.dart';
-import 'package:withme/core/presentation/components/todo_count_icon.dart';
-import 'package:withme/core/ui/core_ui_import.dart';
+import 'package:withme/core/presentation/components/first_name_icon.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/core/utils/extension/number_format.dart';
 
@@ -45,6 +44,7 @@ class CustomerItem extends StatelessWidget {
         return ItemContainer(
           backgroundColor:
               isUrgent ? colorScheme.tertiaryContainer : colorScheme.surface,
+          height: 82,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -88,13 +88,15 @@ class CustomerItem extends StatelessWidget {
     ThemeData theme,
     ColorScheme colorScheme,
   ) {
-    final iconPath =
-        customer.sex == '남' ? IconsPath.manIcon : IconsPath.womanIcon;
-
     return Row(
       children: [
         // 성별 + 생일 아이콘
-        SexIcon(sex: customer.sex, backgroundImagePath: iconPath, size: 23),
+        FirstNameIcon(
+          customer: customer,
+          size: 23,
+          badgeSize: 10,
+          todoCount: customer.todos.length,
+        ),
         width(5),
         // 이름 (아이콘과 바로 붙음)
         Text(
@@ -116,6 +118,8 @@ class CustomerItem extends StatelessWidget {
                 ),
               ),
               width(3),
+              if (customer.memo.isNotEmpty)
+                Icon(Icons.feed_outlined, color: colorScheme.primary, size: 16),
               BirthdayBadge(birth: customer.birth, iconSize: 14, textSize: 13),
             ],
           ),
@@ -130,18 +134,6 @@ class CustomerItem extends StatelessWidget {
             isCustomerItem: true,
           ),
         const Spacer(),
-        // 할일
-        if (customer.todos.isNotEmpty) ...[
-          StreamTodoText(
-            todoList: customer.todos.map((t) => t.content).toList(),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: getSexIconColor(customer.sex, colorScheme),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          width(2),
-          TodoCountIcon(todos: customer.todos, sex: customer.sex, iconSize: 18),
-        ],
         width(10),
       ],
     );

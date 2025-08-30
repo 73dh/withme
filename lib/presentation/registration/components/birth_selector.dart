@@ -25,9 +25,11 @@ class BirthSelector extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final urgentThresholdDays = SharedPrefValue.urgentThresholdDays;
-    final daysLeft =
-    birth != null ? daysUntilInsuranceAgeChange(birth!) : null;
-    final isUrgent = daysLeft != null && daysLeft <= urgentThresholdDays;
+    final daysLeft = birth != null ? daysUntilInsuranceAgeChange(birth!) : null;
+    final isUrgent = daysLeft != null && daysLeft > 0 && daysLeft <= urgentThresholdDays;
+    final isPassed = daysLeft != null && daysLeft < 0;
+    final passedDays = isPassed ? daysLeft!.abs() : null;
+
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,20 +96,31 @@ class BirthSelector extends StatelessWidget {
                     children: [
                       TextSpan(
                         text:
-                        '${calculateAge(birth!)}세 (보험나이: ${calculateInsuranceAge(birth!)}세), 상령일까지 ',
+                        '${calculateAge(birth!)}세 (보험나이: ${calculateInsuranceAge(birth!)}세), ',
                       ),
-                      TextSpan(
-                        text: '$daysLeft일',
-                        style: isUrgent
-                            ? TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.error,
+                      if (isPassed)
+                        TextSpan(
+                          text: '상령일 ${passedDays}일 경과',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.error,
+                          ),
                         )
-                            : null,
-                      ),
+                      else
+                        TextSpan(
+                          text: '상령일까지 $daysLeft일',
+                          style: isUrgent
+                              ? TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.error,
+                          )
+                              : null,
+                        ),
                     ],
                   ),
                 ),
+
+
                 if (isUrgent) ...[
                   const SizedBox(width: 6),
                   SizedBox(

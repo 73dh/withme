@@ -31,11 +31,11 @@ class InsuredMembersIcon extends StatelessWidget {
 
     switch (displayCount) {
       case 1:
-        circleSize = size; // 1개일 땐 기본 크기
+        circleSize = size;
         positions = [const Offset(0, 0)];
         break;
       case 2:
-        circleSize = size * 0.7; // 2개 이상부터 조금 키움
+        circleSize = size * 0.7;
         positions = [Offset(0, size * 0.15), Offset(size * 0.3, 0)];
         break;
       case 3:
@@ -71,7 +71,7 @@ class InsuredMembersIcon extends StatelessWidget {
           for (int i = 0; i < displayCount; i++)
             Positioned(
               left: positions[i].dx,
-              top: positions[i].dy + (circleSize / 2), // 세로 중앙
+              top: positions[i].dy + (circleSize / 2),
               child: _buildCircle(
                 policies[i].insured.characters.firstOrNull ?? '?',
                 circleSize,
@@ -84,41 +84,19 @@ class InsuredMembersIcon extends StatelessWidget {
             Positioned(
               top: -4,
               right: -4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      offset: const Offset(1, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                child: Text(
-                  '$totalCount',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+              child: _buildBadge(totalCount.toString(), Colors.purple),
             ),
-          // ✅ 생일 배지 (우측 하단)
+
+          // ✅ 생일 배지 (좌측 하단)
           if (hasUpcomingBirthday)
             Positioned(
-              top: 4,
+              top: 2,
               left: -2,
               child: BirthdayBadge(
                 iconSize: 18,
                 isShowDate: false,
                 birth: getEarliestUpcomingBirthday(policies),
-              ), // size는 원하는 값으로 조정
+              ),
             ),
         ],
       ),
@@ -143,11 +121,34 @@ class InsuredMembersIcon extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         letter,
-        style: TextStyle(
-          fontSize: circleSize * 0.7,
-          // fontWeight: FontWeight.bold,
+        style: TextStyle(fontSize: circleSize * 0.7, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            offset: const Offset(1, 1),
+            blurRadius: 2,
+          ),
+        ],
+      ),
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+      child: Text(
+        text,
+        style: const TextStyle(
           color: Colors.white,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
         ),
+        textAlign: TextAlign.center,
       ),
     );
   }

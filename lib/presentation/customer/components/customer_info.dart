@@ -65,6 +65,8 @@ class CustomerInfo extends StatelessWidget {
                       ),
                     ),
                     width(4),
+                    if(customer.memo.isNotEmpty)
+                      Icon(Icons.feed_outlined,color: colorScheme.primary,size: 16,),
                     BirthdayBadge(birth: customer.birth,iconSize: 18,textSize: 14,),
                   ],
                 ),

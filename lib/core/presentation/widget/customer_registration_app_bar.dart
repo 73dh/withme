@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/insured_members_icon.dart';
-import 'package:withme/core/presentation/components/prospect_item_icon.dart';
+import 'package:withme/core/presentation/components/first_name_icon.dart';
 import 'package:withme/core/presentation/todo/todo_view_model.dart';
 import 'package:withme/core/presentation/widget/show_add_todo_dialog.dart';
 
@@ -77,7 +77,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
           registrationViewModel != null
               ? Row(
                 children: [
-                  ProspectItemIcon(customer: customer!,size: 37,),
+                  FirstNameIcon(customer: customer!, size: 37),
                   width(5),
                   BirthdayBadge(
                     birth: customer?.birth,
@@ -87,7 +87,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
                 ],
               )
               : Column(
-                children: [InsuredMembersIcon(customer: customer!), height(15)],
+                children: [InsuredMembersIcon(customer: customer!), height(20)],
               ),
 
       actions: [

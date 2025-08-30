@@ -90,7 +90,7 @@ class _ProspectListPageState extends State<ProspectListPage>
       userKey: UserSession.userId,
       customerKey:
           customer?.customerKey ??
-          'new_${DateTime.now().millisecondsSinceEpoch}',
+          '${DateTime.now().millisecondsSinceEpoch}',
     );
     await showBottomSheetWithDraggable(
       context: context,

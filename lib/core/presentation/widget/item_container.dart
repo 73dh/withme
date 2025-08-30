@@ -10,7 +10,7 @@ class ItemContainer extends StatelessWidget {
   const ItemContainer({
     super.key,
     required this.child,
-    this.height = 86,
+    this.height = 80,
     this.backgroundColor,
   });
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:withme/core/ui/core_ui_import.dart';
 
 class AddPolicyWidget extends StatefulWidget {
   final void Function() onTap;
@@ -48,11 +49,11 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
       end: colorScheme.primaryContainer,
     ).animate(_animationController);
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.1).animate(
+    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    return Row(
+    return  Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         GestureDetector(
@@ -76,10 +77,11 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
                 ),
                 child: Transform.scale(
                   scale: _scaleAnimation.value,
-                  child: Icon(
-                    Icons.description,
-                    color: iconColor, // 전달받은 색상 사용
-                    size: 24,
+                  child: Image.asset(
+                    IconsPath.newFolder,
+                    color: iconColor,
+                    width: widget.size ,
+                    height: widget.size ,
                   ),
                 ),
               );
@@ -88,5 +90,6 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
         ),
       ],
     );
+
   }
 }

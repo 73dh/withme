@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:withme/core/presentation/components/policy_item.dart';
 import 'package:withme/core/presentation/widget/customer_registration_app_bar.dart';
+import 'package:withme/core/presentation/widget/show_update_memo_dialog.dart';
 import 'package:withme/domain/model/policy_model.dart';
 import 'package:withme/presentation/customer/customer_view_model.dart';
 
@@ -25,16 +26,34 @@ class CustomerScreen extends StatefulWidget {
 class _CustomerScreenState extends State<CustomerScreen> {
   final viewModel = getIt<CustomerViewModel>();
   late final TodoViewModel todoViewModel;
+  late CustomerModel _customer; // 내부 상태로 관리
 
   @override
   void initState() {
     super.initState();
+
+    // widget.customer를 내부 상태에 복사
+    _customer = widget.customer;
+
     todoViewModel = TodoViewModel(
       userKey: UserSession.userId,
-      customerKey: widget.customer.customerKey,
+      customerKey: _customer.customerKey,
     );
 
-    todoViewModel.loadTodos(widget.customer.todos);
+    todoViewModel.loadTodos(_customer.todos);
+  }
+
+  Future<void> _updateMemo(String newMemo) async {
+    await viewModel.updateMemo(
+      userKey: UserSession.userId,
+      customerKey: _customer.customerKey,
+      memo: newMemo,
+    );
+
+    // DB 반영 후, 상태도 즉시 업데이트
+    setState(() {
+      _customer = _customer.copyWith(memo: newMemo);
+    });
   }
 
   @override
@@ -43,7 +62,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final info = widget.customer.insuranceInfo;
+    final info = _customer.insuranceInfo;
     final difference = info.difference;
     final isUrgent = info.isUrgent;
     final insuranceChangeDate = info.insuranceChangeDate;
@@ -53,11 +72,11 @@ class _CustomerScreenState extends State<CustomerScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         resizeToAvoidBottomInset: true,
         appBar: CustomerRegistrationAppBar(
-          customer: widget.customer,
+          customer: _customer,
           todoViewModel: todoViewModel,
         ),
         body: StreamBuilder<List<PolicyModel>>(
-          stream: viewModel.getPolicies(widget.customer.customerKey),
+          stream: viewModel.getPolicies(_customer.customerKey),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               log(snapshot.error.toString());
@@ -75,12 +94,24 @@ class _CustomerScreenState extends State<CustomerScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   height(8),
-                  CustomerInfo(
-                    customer: widget.customer,
-                    viewModel: viewModel,
-                    isUrgent: isUrgent,
-                    difference: difference,
-                    insuranceChangeDate: insuranceChangeDate,
+                  GestureDetector(
+                    onTap: () async {
+                      final newMemo = await showUpdateMemoDialog(
+                        context,
+                        title: _customer.name,
+                        initMemo: _customer.memo,
+                      );
+                      if (newMemo != null && newMemo.isNotEmpty) {
+                        await _updateMemo(newMemo);
+                      }
+                    },
+                    child: CustomerInfo(
+                      customer: _customer,
+                      viewModel: viewModel,
+                      isUrgent: isUrgent,
+                      difference: difference,
+                      insuranceChangeDate: insuranceChangeDate,
+                    ),
                   ),
                   height(20),
                   Text(

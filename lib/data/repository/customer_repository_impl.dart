@@ -31,9 +31,7 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
     required String userKey,
     required Map<String, dynamic> customerData,
   }) async {
-    await fBase.updateCustomer(
-        userKey: userKey,
-        customerData: customerData);
+    await fBase.updateCustomer(userKey: userKey, customerData: customerData);
   }
 
   // @override
@@ -43,7 +41,7 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
 
   @override
   Future<List<CustomerModel>> getAllCustomers({required String userKey}) {
-    return fBase. getAllCustomers( userKey);
+    return fBase.getAllCustomers(userKey);
   }
 
   @override
@@ -60,5 +58,16 @@ class CustomerRepositoryImpl with Transformers implements CustomerRepository {
   @override
   Future<List<CustomerModel>> getEditedAll({required String userKey}) async {
     return await fBase.getEditedAll(userKey: userKey);
+  }
+
+  @override
+  Future<CustomerModel?> getCustomerInfo({
+    required String userKey,
+    required String customerKey,
+  }) async {
+    return await fBase.getCustomerInfo(
+      userKey: userKey,
+      customerKey: customerKey,
+    );
   }
 }
