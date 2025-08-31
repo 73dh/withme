@@ -13,6 +13,7 @@ class SearchPage extends StatefulWidget {
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
+
 class _SearchPageState extends State<SearchPage> {
   late final viewModel = getIt<SearchPageViewModel>();
   final userKey = FirebaseAuth.instance.currentUser?.uid;
@@ -36,9 +37,7 @@ class _SearchPageState extends State<SearchPage> {
       return Center(
         child: Text(
           '로그인 정보가 없습니다.',
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-          ),
+          style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
         ),
       );
     }
@@ -49,11 +48,11 @@ class _SearchPageState extends State<SearchPage> {
         return Scaffold(
           backgroundColor: colorScheme.surface, // Scaffold 배경 통일
           appBar:
-          viewModel.state.currentSearchOption == SearchOption.filterPolicy
-              ? PolicyListAppBar(
-            count: viewModel.state.filteredPolicies.length,
-          )
-              : CustomerListAppBar(viewModel: viewModel),
+              viewModel.state.currentSearchOption == SearchOption.filterPolicy
+                  ? PolicyListAppBar(
+                    count: viewModel.state.filteredPolicies.length,
+                  )
+                  : CustomerListAppBar(viewModel: viewModel),
           body: Stack(
             children: [
               AnimatedSwitcher(
@@ -64,36 +63,38 @@ class _SearchPageState extends State<SearchPage> {
               ),
               AnimatedSwitcher(
                 duration: AppDurations.duration300,
-                child: viewModel.state.currentSearchOption == null
-                    ? Stack(
-                  key: ValueKey(
-                    'search_option-${viewModel.state.currentSearchOption}',
-                  ),
-                  children: [
-                    Positioned(
-                      top: 200,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: colorScheme.primary, // 검색 아이콘에 theme 반영
+                child:
+                    viewModel.state.currentSearchOption == null
+                        ? Stack(
+                          key: ValueKey(
+                            'search_option-${viewModel.state.currentSearchOption}',
                           ),
-                          width(20),
-                          AnimatedText(
-                            text: '아래 조건을 선택하세요.',
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                          children: [
+                            Positioned(
+                              top: 200,
+                              left: 0,
+                              right: 0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search,
+                                    color:
+                                        colorScheme.primary, // 검색 아이콘에 theme 반영
+                                  ),
+                                  width(20),
+                                  AnimatedText(
+                                    text: '아래 조건을 선택하세요.',
+                                    style: textTheme.bodyLarge?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-                    : const SizedBox.shrink(key: ValueKey('empty')),
+                          ],
+                        )
+                        : const SizedBox.shrink(key: ValueKey('empty')),
               ),
               DraggableFilterSheet(
                 isLoadingAllData: viewModel.state.isLoadingAllData,
@@ -101,21 +102,22 @@ class _SearchPageState extends State<SearchPage> {
                   viewModel.resetSearchOption();
                   viewModel.getAllData();
                 },
-                buildFilterOptions: (scrollController) => FilterBox(
-                  controller: scrollController,
-                  viewModel: viewModel,
-                  isSearchingByName: _isSearchingByName,
-                  searchFocusNode: _searchFocusNode,
-                  onToggleSearch: () {
-                    setState(() {
-                      _isSearchingByName = !_isSearchingByName;
-                      viewModel.toggleNameSearch(_isSearchingByName);
-                    });
-                    if (!_isSearchingByName) {
-                      viewModel.resetSearchOption();
-                    }
-                  },
-                ),
+                buildFilterOptions:
+                    (scrollController) => FilterBox(
+                      controller: scrollController,
+                      viewModel: viewModel,
+                      isSearchingByName: _isSearchingByName,
+                      searchFocusNode: _searchFocusNode,
+                      onToggleSearch: () {
+                        setState(() {
+                          _isSearchingByName = !_isSearchingByName;
+                          viewModel.toggleNameSearch(_isSearchingByName);
+                        });
+                        if (!_isSearchingByName) {
+                          viewModel.resetSearchOption();
+                        }
+                      },
+                    ),
               ),
             ],
           ),

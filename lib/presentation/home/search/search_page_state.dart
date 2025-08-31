@@ -1,4 +1,5 @@
 import 'package:withme/core/domain/enum/insurance_company.dart';
+import 'package:withme/core/domain/enum/payment_status.dart';
 import 'package:withme/core/domain/enum/product_category.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/domain/model/policy_model.dart';
@@ -25,6 +26,7 @@ class SearchPageState {
   final List<String> insuranceCompanies;
   final String selectedContractMonth;
   final bool isSearchingByName;
+  final PaymentStatus paymentStatus;
 
   SearchPageState({
     this.isLoadingAllData = false,
@@ -44,6 +46,7 @@ class SearchPageState {
     this.insuranceCompanies = const [],
     this.selectedContractMonth = '전계약월',
     this.isSearchingByName = false,
+    this.paymentStatus=PaymentStatus.all,
   });
 
   SearchPageState copyWith({
@@ -65,6 +68,7 @@ class SearchPageState {
     List<String>? insuranceCompanies,
     String? selectedContractMonth,
     bool? isSearchingByName,
+    PaymentStatus? paymentStatus,
   }) {
     return SearchPageState(
       isLoadingAllData: isLoadingAllData ?? this.isLoadingAllData,
@@ -86,6 +90,7 @@ class SearchPageState {
       selectedContractMonth:
           selectedContractMonth ?? this.selectedContractMonth,
       isSearchingByName: isSearchingByName ?? this.isSearchingByName,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
     );
   }
 }

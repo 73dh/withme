@@ -93,7 +93,6 @@ class _CustomerScreenState extends State<CustomerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  height(8),
                   GestureDetector(
                     onTap: () async {
                       final newMemo = await showUpdateMemoDialog(

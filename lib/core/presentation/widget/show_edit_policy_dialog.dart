@@ -17,6 +17,10 @@ Future<void> showEditPolicyDialog({
   final holderController = TextEditingController(text: policy.policyHolder);
   final premiumController = TextEditingController(text: policy.premium);
 
+  String paymentMethod = policy.paymentMethod ?? '월납'; // 월납/일시납
+  final periodController = TextEditingController(
+    text: policy.paymentPeriod.toString() ?? '',
+  );
   DateTime? holderBirth = policy.policyHolderBirth;
   final holderBirthController = TextEditingController(
     text:
@@ -153,6 +157,53 @@ Future<void> showEditPolicyDialog({
                         ),
                         height(16),
 
+                        // 납입기간
+                        Row(
+                          children: [
+                            // 납입방식
+                            Expanded(
+                              flex: 2,
+                              child: DropdownButtonFormField<String>(
+                                value: paymentMethod,
+                                decoration: inputDecoration('납입방식'),
+                                items: ['월납', '일시납'].map(
+                                      (method) => DropdownMenuItem(
+                                    value: method,
+                                    child: Text(
+                                      method,
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() => paymentMethod = value);
+                                  }
+                                },
+                              ),
+                            ),
+
+                            width(10),
+
+                            // 납입기간 (월납일 때만 활성, 일시납은 비활성)
+                            Expanded(
+                              flex: 2,
+                              child: TextFormField(
+                                controller: periodController,
+                                keyboardType: TextInputType.number,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface,
+                                ),
+                                decoration: inputDecoration('납입기간(개월)'),
+                                enabled: paymentMethod == '월납', // ✅ 월납만 수정 가능
+                              ),
+                            ),
+                          ],
+                        )
+,
+                        height(16),
                         // 보험 상태
                         DropdownButtonFormField<PolicyStatus>(
                           value: selectedState,
@@ -242,6 +293,7 @@ Future<void> showEditPolicyDialog({
                                     policyHolderSex: holderSex,
                                     policyHolderBirth: holderBirth,
                                     premium: premium.toString(),
+                                    paymentPeriod:int.parse( periodController.text),
                                     policyState: selectedState.label,
                                   );
 

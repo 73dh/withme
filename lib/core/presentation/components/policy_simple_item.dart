@@ -1,10 +1,14 @@
 import 'package:withme/core/presentation/components/birthday_badge.dart';
+import 'package:withme/core/presentation/components/payment_status_icon.dart';
 
 import '../../../domain/model/policy_model.dart';
+import '../../ui/const/remaining_payment_period.dart';
 import '../../ui/icon/const.dart';
+import '../../utils/check_payment_status.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
 import '../../utils/policy_status_helper.dart';
+import '../../utils/remaining_payment_period.dart';
 import '../core_presentation_import.dart';
 
 class PolicySimpleItem extends StatelessWidget {
@@ -17,6 +21,14 @@ class PolicySimpleItem extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final remainingMonths = monthsUntilEnd(policy);
+    final showMaturityIcon =
+        policy.paymentMethod == '월납' &&
+        remainingMonths <= remainingPaymentMonth;
+
+    // 상태 계산
+    final status = checkPaymentStatus(policy);
+
 
     // 보험료 텍스트 스타일
     final premiumStyle = PolicyStatusHelper.premiumTextStyle(
@@ -66,8 +78,14 @@ class PolicySimpleItem extends StatelessWidget {
                           color: colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
-                      ),  width(3),
-                      BirthdayBadge(birth: policy.policyHolderBirth,iconSize: 14,textSize: 14,),
+                      ),
+                      width(3),
+                      BirthdayBadge(
+                        birth: policy.policyHolderBirth,
+                        iconSize: 14,
+                        textSize: 14,
+                      ),
+                      PaymentStatusIcon(status: status, size: 16), // ✅ 상태별 아이콘 자동 처리
                     ],
                   ),
                 ),
@@ -93,7 +111,11 @@ class PolicySimpleItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       width(3),
-                      BirthdayBadge(birth: policy.insuredBirth,iconSize: 14,textSize: 14,),
+                      BirthdayBadge(
+                        birth: policy.insuredBirth,
+                        iconSize: 14,
+                        textSize: 14,
+                      ),
                     ],
                   ),
                 ),
@@ -127,10 +149,41 @@ class PolicySimpleItem extends StatelessWidget {
                               '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
                           style: premiumStyle,
                         ),
+                        // 납입방법
                         TextSpan(
-                          text: ' (${policy.paymentMethod})',
-                          style: textTheme.labelLarge?.copyWith(
+                          text: ' (${policy.paymentMethod}',
+                          style: textTheme.labelMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        // 납입기간 (월납일 때만 표시)
+                        if (policy.paymentMethod == '월납')
+                          TextSpan(
+                            text: ', ${policy.paymentPeriod}년',
+                            style: textTheme.labelMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        TextSpan(
+                          text: ')',
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              policy.paymentMethod == '월납'
+                                  ? calculateRemainingPaymentMonth(policy)
+                                  : '',
+                          style: textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color:
+                                policy.startDate != null &&
+                                        monthsUntilEnd(policy) <
+                                            remainingPaymentMonth // 3개월 미만 체크
+                                    ? colorScheme
+                                        .error // 빨간색 등 강조
+                                    : colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

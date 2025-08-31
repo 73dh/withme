@@ -19,10 +19,10 @@ class InsuredMembersIcon extends StatelessWidget {
     final int displayCount = totalCount >= 5 ? 4 : totalCount;
 
     final List<Color> circleColors = [
-      Colors.blueAccent,
-      Colors.green,
-      Colors.orangeAccent,
-      Colors.purpleAccent,
+      Colors.blue.shade300, // 부드러운 블루
+      Colors.green.shade300, // 부드러운 그린
+      Colors.orange.shade300, // 부드러운 오렌지
+      Colors.purple.shade300, // 부드러운 퍼플
     ];
 
     // 원 크기 및 위치 정의

@@ -1,4 +1,5 @@
 import '../../../core/domain/core_domain_import.dart';
+import '../../../core/domain/enum/payment_status.dart';
 import '../home_grand_import.dart';
 
 sealed class SearchPageEvent {
@@ -25,10 +26,15 @@ sealed class SearchPageEvent {
     required InsuranceCompany insuranceCompany,
   }) = SelectInsuranceCompany;
 
+  factory SearchPageEvent.selectPaymentStatus({
+    required PaymentStatus paymentStatus,
+  }) = SelectPaymentStatus;
+
   factory SearchPageEvent.filterPolicy({
     required ProductCategory productCategory,
     required InsuranceCompany insuranceCompany,
     required String selectedContractMonth,
+    required PaymentStatus paymentStatus,
   }) = FilterPolicy;
 }
 
@@ -68,14 +74,22 @@ class SelectInsuranceCompany implements SearchPageEvent {
   SelectInsuranceCompany({required this.insuranceCompany});
 }
 
+class SelectPaymentStatus implements SearchPageEvent {
+  final PaymentStatus paymentStatus;
+
+  SelectPaymentStatus({required this.paymentStatus});
+}
+
 class FilterPolicy implements SearchPageEvent {
   final ProductCategory productCategory;
   final InsuranceCompany insuranceCompany;
   final String selectedContractMonth;
+  final PaymentStatus paymentStatus;
 
   FilterPolicy({
     required this.productCategory,
     required this.insuranceCompany,
     required this.selectedContractMonth,
+    required this.paymentStatus,
   });
 }

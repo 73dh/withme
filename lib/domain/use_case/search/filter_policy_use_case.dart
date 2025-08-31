@@ -1,4 +1,6 @@
 import '../../../core/domain/core_domain_import.dart';
+import '../../../core/domain/enum/payment_status.dart';
+import '../../../core/utils/check_payment_status.dart';
 import '../../model/policy_model.dart';
 
 class FilterPolicyUseCase {
@@ -7,6 +9,7 @@ class FilterPolicyUseCase {
     required ProductCategory productCategory,
     required InsuranceCompany insuranceCompany,
     required List<PolicyModel> policies,
+    required PaymentStatus paymentStatus,
   }) async {
     final filtered =
         policies.where((policy) {
@@ -23,7 +26,12 @@ class FilterPolicyUseCase {
           final matchCompany =
               policy.insuranceCompany == insuranceCompany.toString() ||
               insuranceCompany == InsuranceCompany.all;
-          return matchContractMonth && matchProduct && matchCompany;
+
+          // 납입 상태 필터
+          final matchPaymentStatus = paymentStatus == PaymentStatus.all ||
+              checkPaymentStatus(policy) == paymentStatus;
+
+          return matchContractMonth && matchProduct && matchCompany&& matchPaymentStatus;
         }).toList();
 
     return filtered;

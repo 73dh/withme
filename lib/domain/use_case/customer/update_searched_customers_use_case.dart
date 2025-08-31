@@ -26,6 +26,7 @@ class UpdateSearchedCustomersUseCase {
         productCategory: state.productCategory,
         insuranceCompany: state.insuranceCompany,
         selectedContractMonth: state.selectedContractMonth,
+        paymentStatus: state.paymentStatus,
       ),
       _ => null,
     };

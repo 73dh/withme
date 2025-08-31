@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../core_presentation_import.dart';
-
 class RenderPopUpMenu extends StatelessWidget {
   final String label;
   final List<dynamic> items;
@@ -26,52 +24,51 @@ class RenderPopUpMenu extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Flexible(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PopupMenuButton<dynamic>(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: Icon(
+    return PopupMenuButton<dynamic>(
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+      onSelected: onSelect,
+      itemBuilder: (context) {
+        return items
+            .map(
+              (e) => PopupMenuItem<dynamic>(
+            value: e,
+            child: Text(
+              e.toString(),
+              style: textTheme.bodyMedium?.copyWith(
+                color: textColor ?? colorScheme.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        )
+            .toList();
+      },
+      child: Container(
+        // ✅ 부모 Expanded에서 받은 폭을 모두 사용
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // 아이콘 + 텍스트 가운데 정렬
+          children: [
+            Icon(
               icon ?? Icons.more_vert,
               size: 18,
               color: iconColor ?? colorScheme.primary,
             ),
-            itemBuilder: (context) {
-              return items
-                  .map(
-                    (e) => PopupMenuItem<dynamic>(
-                      child: GestureDetector(
-                        onTap: () {
-                          onSelect(e);
-                          context.pop();
-                        },
-                        child: Text(
-                          e.toString(),
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: textColor ?? colorScheme.onSurface,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList();
-            },
-          ),
-          // const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              label,
-              style: textTheme.bodySmall?.copyWith(
-                color: textColor ?? colorScheme.onSurfaceVariant,
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                label,
+                style: textTheme.bodySmall?.copyWith(
+                  color: textColor ?? colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

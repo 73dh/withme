@@ -142,7 +142,6 @@ class PolicyPart extends StatelessWidget {
               height(10),
 
               // 하단: 납입방식, 보험료, 납입기간
-              // 하단: 납입방식, 보험료, 납입기간
               Row(
                 children: [
                   // 납입방식 Toggle
@@ -194,9 +193,9 @@ class PolicyPart extends StatelessWidget {
                         hintText:
                             paymentMethod == '월납' ? '납입기간 입력(예: 5)' : '일시납',
                         suffixText: paymentMethod == '월납' ? ' 년' : null,
-                        // 오른쪽 단위
-                        suffixStyle: TextStyle(color: Colors.black),
-                        // 색상 조정
+                        suffixStyle: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
                         filled: true,
                         fillColor: colorScheme.surfaceContainerHighest,
                         contentPadding: const EdgeInsets.symmetric(
@@ -208,11 +207,12 @@ class PolicyPart extends StatelessWidget {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
                       enabled: paymentMethod == '월납',
                       onChanged: onInputPaymentPeriodTap,
                     ),
-
                   ),
 
                   // 보험료 입력
@@ -226,8 +226,9 @@ class PolicyPart extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: '보험료',
                         suffixText: ' 원',
-                        // 오른쪽 단위
-                        suffixStyle: TextStyle(color: Colors.black),
+                        suffixStyle: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
                         filled: true,
                         fillColor: colorScheme.surfaceContainerHighest,
                         contentPadding: const EdgeInsets.symmetric(
@@ -239,72 +240,15 @@ class PolicyPart extends StatelessWidget {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
                       onChanged: onInputPremiumTap,
                     ),
                   ),
                 ],
               ),
 
-              // Row(
-              //   children: [
-              //     ToggleButtons(
-              //       isSelected: [paymentMethod == '월납', paymentMethod == '일시납'],
-              //       constraints: BoxConstraints(
-              //         minWidth: AppSizes.toggleMinWidth,
-              //         minHeight: 38,
-              //       ),
-              //       borderRadius: BorderRadius.circular(8),
-              //       onPressed: (index) {
-              //         if (index == 0) {
-              //           onPremiumMonthTap('월납');
-              //         } else {
-              //           onPremiumSingleTap('일시납');
-              //         }
-              //       },
-              //       selectedColor: colorScheme.onPrimary,
-              //       fillColor: colorScheme.primary,
-              //       color: colorScheme.onSurface,
-              //       children: const [
-              //         Padding(
-              //           padding: EdgeInsets.symmetric(horizontal: 4),
-              //           child: Text('월납'),
-              //         ),
-              //         Padding(
-              //           padding: EdgeInsets.symmetric(horizontal: 4),
-              //           child: Text('일시납'),
-              //         ),
-              //       ],
-              //     ),
-              //     width(12),
-              //     SizedBox(
-              //       width: 250,
-              //       child: TextFormField(
-              //         controller: premiumController,
-              //         textAlign: TextAlign.center,
-              //         keyboardType: TextInputType.number,
-              //         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              //         decoration: InputDecoration(
-              //           hintText: '보험료 (예: 100,000)',
-              //           filled: true,
-              //           fillColor: colorScheme.surfaceContainerHighest,
-              //           contentPadding: const EdgeInsets.symmetric(
-              //             vertical: 12,
-              //             horizontal: 10,
-              //           ),
-              //           border: OutlineInputBorder(
-              //             borderRadius: BorderRadius.circular(8),
-              //             borderSide: BorderSide.none,
-              //           ),
-              //         ),
-              //         style: textTheme.bodyMedium?.copyWith(
-              //           color: colorScheme.onSurface,
-              //         ),
-              //         onChanged: onInputPremiumTap,
-              //       ),
-              //     ),
-              //   ],
-              // ),
               height(20),
 
               // 계약일 / 만기일
@@ -369,64 +313,6 @@ class PolicyPart extends StatelessWidget {
                   ),
                 ],
               ),
-
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: RenderFilledButton(
-              //         borderRadius: 5,
-              //         backgroundColor:
-              //             startDate != null
-              //                 ? colorScheme.primary
-              //                 : colorScheme.surfaceContainerHigh,
-              //         foregroundColor:
-              //             startDate != null
-              //                 ? colorScheme.onPrimary
-              //                 : colorScheme.onSurfaceVariant,
-              //         onPressed: () async {
-              //           DateTime? selected = await selectDate(
-              //             context,
-              //             initial: startDate,
-              //           );
-              //           if (selected != null) {
-              //             onStartDateChanged(selected);
-              //           }
-              //         },
-              //         text:
-              //             startDate == null
-              //                 ? '계약일'
-              //                 : '개시일: ${startDate!.toLocal().toIso8601String().split('T')[0]}',
-              //       ),
-              //     ),
-              //     width(16),
-              //     Expanded(
-              //       child: RenderFilledButton(
-              //         borderRadius: 5,
-              //         backgroundColor:
-              //             endDate != null
-              //                 ? colorScheme.primary
-              //                 : colorScheme.surfaceContainerHigh,
-              //         foregroundColor:
-              //             endDate != null
-              //                 ? colorScheme.onPrimary
-              //                 : colorScheme.onSurfaceVariant,
-              //         onPressed: () async {
-              //           DateTime? selected = await selectDate(
-              //             context,
-              //             initial: endDate,
-              //           );
-              //           if (selected != null) {
-              //             onEndDateChanged(selected);
-              //           }
-              //         },
-              //         text:
-              //             endDate == null
-              //                 ? '만기일'
-              //                 : '만기일: ${endDate!.toLocal().toIso8601String().split('T')[0]}',
-              //       ),
-              //     ),
-              //   ],
-              // ),
             ],
           ),
         ),

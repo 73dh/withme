@@ -12,6 +12,8 @@ import 'package:withme/presentation/home/search/search_page_state.dart';
 
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
+import '../../../core/domain/enum/payment_status.dart';
+import '../../../core/utils/check_payment_status.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
@@ -38,10 +40,11 @@ class SearchPageViewModel with ChangeNotifier {
       _selectProductCategory(productCategory: event.productCategory);
     } else if (event is SelectInsuranceCompany) {
       _selectInsuranceCompany(insuranceCompany: event.insuranceCompany);
-    } else if (event is FilterPolicy) {
+    }
+    else if (event is SelectPaymentStatus) {
+      _selectPaymentStatus(paymentStatus: event.paymentStatus);
+    }else if (event is FilterPolicy) {
       await _filterPolicy(
-        productCategory: event.productCategory,
-        insuranceCompany: event.insuranceCompany,
       );
     } else if (event is SelectContractMonth) {
       _selectContractMonth(selectedContractMonth: event.selectedContractMonth);
@@ -149,35 +152,59 @@ class SearchPageViewModel with ChangeNotifier {
   void _selectContractMonth({required String selectedContractMonth}) {
     _state = state.copyWith(selectedContractMonth: selectedContractMonth);
     notifyListeners();
+    _filterPolicy(); // ✅ 자동 필터 실행
   }
 
   /// 상품 카테고리 선택
   void _selectProductCategory({required ProductCategory productCategory}) {
     _state = state.copyWith(productCategory: productCategory);
     notifyListeners();
+    _filterPolicy(); // ✅ 자동 필터 실행
   }
 
   /// 보험사 선택
   void _selectInsuranceCompany({required InsuranceCompany insuranceCompany}) {
     _state = state.copyWith(insuranceCompany: insuranceCompany);
     notifyListeners();
+    _filterPolicy(); // ✅ 자동 필터 실행
   }
 
+  /// 납입 상태
+  void _selectPaymentStatus({ required PaymentStatus paymentStatus}) {
+
+
+    _state = state.copyWith(paymentStatus: paymentStatus);
+    notifyListeners();
+    _filterPolicy(); // ✅ 자동 필터 실행
+  }
+
+
+
   /// 정책 필터
-  Future<void> _filterPolicy({
-    required ProductCategory productCategory,
-    required InsuranceCompany insuranceCompany,
-  }) async {
+  Future<void> _filterPolicy(
+  ) async {
     final filtered = await FilterPolicyUseCase.call(
       contractMonth: state.selectedContractMonth,
       policies: state.policies,
-      productCategory: productCategory,
-      insuranceCompany: insuranceCompany,
+      productCategory: state.productCategory,
+      insuranceCompany:state.insuranceCompany,
+      paymentStatus: state.paymentStatus,
     );
     _state = state.copyWith(
       filteredPolicies: filtered,
       currentSearchOption: SearchOption.filterPolicy,
     );
+    notifyListeners();
+  }
+  /// 필터 초기화
+  void resetFilters() {
+    _state = _state.copyWith(
+      productCategory: ProductCategory.all,
+      insuranceCompany: InsuranceCompany.all,
+      selectedContractMonth: '전계약월',
+      paymentStatus: PaymentStatus.all,
+    );
+    _filterPolicy();
     notifyListeners();
   }
 

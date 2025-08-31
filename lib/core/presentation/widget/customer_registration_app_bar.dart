@@ -1,9 +1,8 @@
 import 'package:go_router/go_router.dart';
-import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/insured_members_icon.dart';
-import 'package:withme/core/presentation/components/first_name_icon.dart';
 import 'package:withme/core/presentation/todo/todo_view_model.dart';
 import 'package:withme/core/presentation/widget/show_add_todo_dialog.dart';
+import 'package:withme/core/utils/calculate_total_premium.dart';
 
 import '../../../domain/domain_import.dart';
 import '../../../presentation/home/customer_list/customer_list_view_model.dart';
@@ -14,6 +13,8 @@ import '../../../presentation/registration/registration_event.dart';
 import '../../../presentation/registration/registration_view_model.dart';
 import '../../data/fire_base/user_session.dart';
 import '../../di/setup.dart';
+import '../../domain/enum/policy_state.dart';
+import '../../ui/const/app_bar_height.dart';
 import '../../ui/core_ui_import.dart';
 import '../components/blinking_calendar_icon.dart';
 import '../core_presentation_import.dart';
@@ -45,7 +46,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(customScreenAppbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -73,22 +74,61 @@ class CustomerRegistrationAppBar extends StatelessWidget
       elevation: 0,
       backgroundColor: bgColor,
       foregroundColor: fgColor,
-      title:
-          registrationViewModel != null
-              ? Row(
-                children: [
-                  FirstNameIcon(customer: customer!, size: 37),
-                  width(5),
-                  BirthdayBadge(
-                    birth: customer?.birth,
-                    iconSize: 24,
-                    textSize: 20,
-                  ),
-                ],
-              )
-              : Column(
-                children: [InsuredMembersIcon(customer: customer!), height(20)],
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InsuredMembersIcon(customer: customer!),
+          width(10),
+
+          /// 👉 총 계약 건수 & 총 보험료
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              height(5),
+              // 계약 건수
+              Text(
+                '계약 ${customer!.policies.length}건 (정상 ${customer!.policies.where((p) => p.policyState == PolicyStatus.keep.label).length}건)',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: fgColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
+
+              // 보험료
+              Builder(
+                builder: (_) {
+                  final monthlyTotal = calculateTotalPremium(
+                    customer!.policies
+                        .where(
+                          (p) =>
+                              p.policyState == PolicyStatus.keep.label &&
+                              p.paymentMethod == '월납',
+                        )
+                        .toList(),
+                  );
+
+                  final singleTotal = calculateTotalPremium(
+                    customer!.policies
+                        .where(
+                          (p) =>
+                              p.policyState == PolicyStatus.keep.label &&
+                              p.paymentMethod == '일시납',
+                        )
+                        .toList(),
+                  );
+
+                  return Text(
+                    '월납(납입중) $monthlyTotal원\n일시납 $singleTotal원',
+                    style: theme.textTheme.bodySmall?.copyWith(color: fgColor),
+                  );
+                },
+              ),
+              height(5),
+            ],
+          ),
+        ],
+      ),
 
       actions: [
         Padding(
@@ -105,8 +145,8 @@ class CustomerRegistrationAppBar extends StatelessWidget
             },
           ),
         ),
-        width(8),
-        if (onHistoryTap != null)
+        if (onHistoryTap != null) ...[
+          width(8),
           GestureDetector(
             onTap: onHistoryTap,
             child: Column(
@@ -123,6 +163,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
               ],
             ),
           ),
+        ],
         if (onEditToggle != null) ...[
           width(10),
           EditToggleIcon(
@@ -131,8 +172,8 @@ class CustomerRegistrationAppBar extends StatelessWidget
             color: fgColor,
           ),
         ],
-        width(5),
-        if (registrationViewModel != null)
+        if (registrationViewModel != null) ...[
+          width(5),
           GestureDetector(
             onTap: () async {
               final confirmed = await showConfirmDialog(
@@ -154,6 +195,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
             },
             child: Image.asset(IconsPath.deleteIcon, width: 22, color: fgColor),
           ),
+        ],
         width(10),
         AddPolicyButton(
           customerModel: customer!,

@@ -60,7 +60,7 @@ class ProspectItem extends StatelessWidget {
                       ? colorScheme.tertiaryContainer
                       : colorScheme.surface,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center, // ✅ 변경
                 children: [
                   // 등록일 + 성별 아이콘
                   Column(
@@ -76,7 +76,7 @@ class ProspectItem extends StatelessWidget {
                       height(4),
                       FirstNameIcon(
                         customer: customer,
-                        size: 40,
+                        size: 38,
                         todoCount: todos.length, // ✅ Todo 개수 전달
                       ),
                       // ProspectItemIcon(customer: customer),

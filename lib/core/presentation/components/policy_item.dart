@@ -1,11 +1,15 @@
 import 'package:withme/core/presentation/components/birthday_badge.dart';
+import 'package:withme/core/presentation/components/payment_status_icon.dart';
 
 import '../../../domain/model/policy_model.dart';
 import '../../domain/enum/policy_state.dart';
+import '../../ui/const/remaining_payment_period.dart';
 import '../../ui/core_ui_import.dart';
+import '../../utils/check_payment_status.dart';
 import '../../utils/core_utils_import.dart';
 import '../../utils/extension/number_format.dart';
 import '../../utils/policy_status_helper.dart';
+import '../../utils/remaining_payment_period.dart';
 import '../core_presentation_import.dart';
 
 class PolicyItem extends StatelessWidget {
@@ -60,22 +64,31 @@ class PolicyItem extends StatelessWidget {
     );
   }
 
-  Widget _titleRow(TextTheme textTheme, ColorScheme colorScheme) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      _labelValue('계약자', '', textTheme, colorScheme),
-      _labelValue('피보험자', '', textTheme, colorScheme),
-    ],
-  );
+  Widget _titleRow(TextTheme textTheme, ColorScheme colorScheme) {
+    // 상태 계산
+    final status = checkPaymentStatus(policy);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            _labelValue('계약자', '', textTheme, colorScheme),
+            PaymentStatusIcon(status: status, size: 16),
+            // ✅ 상태별 아이콘 자동 처리  ],
+          ],
+        ),
+        _labelValue('피보험자', '', textTheme, colorScheme),
+      ],
+    );
+  }
 
   Widget _personInfoRow(TextTheme textTheme, ColorScheme colorScheme) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       _personDetail(
         textTheme,
-        sexIcon:
-
-        SexIcon(
+        sexIcon: SexIcon(
           sex: policy.policyHolderSex,
           backgroundImagePath:
               policy.policyHolderSex == '남'
@@ -161,7 +174,7 @@ class PolicyItem extends StatelessWidget {
               color: statusColor(colorScheme),
               fontWeight: FontWeight.w600,
               decoration:
-              (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
+                  (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
             ),
           ),
           // 납입방법
@@ -185,10 +198,25 @@ class PolicyItem extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
             ),
           ),
+          TextSpan(
+            text:
+                policy.paymentMethod == '월납'
+                    ? calculateRemainingPaymentMonth(policy)
+                    : '',
+            style: textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color:
+                  policy.startDate != null &&
+                          monthsUntilEnd(policy) <
+                              remainingPaymentMonth // 3개월 미만 체크
+                      ? colorScheme
+                          .error // 빨간색 등 강조
+                      : colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
-
   }
 
   _statusBadge(TextTheme textTheme, ColorScheme colorScheme) => Container(
@@ -231,32 +259,32 @@ class PolicyItem extends StatelessWidget {
   );
 
   Widget _personDetail(
-      TextTheme textTheme, {
-        required String name,
-        required Widget sexIcon,
-        required int age,
-        required DateTime? birth, // <-- nullable DateTime으로
-        required ColorScheme colorScheme,
-      }) =>
-      Row(
-        children: [
-          sexIcon,
-          width(4),
-          Text(
-            name,
-            style: textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ) ,width(3), BirthdayBadge(birth: birth,iconSize: 10,textSize: 10,),
-          width(3),
-          Text(
-            '${birth?.formattedBirth ?? '-'} ($age세)', // 여기서 변환
-            style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      );
-
+    TextTheme textTheme, {
+    required String name,
+    required Widget sexIcon,
+    required int age,
+    required DateTime? birth, // <-- nullable DateTime으로
+    required ColorScheme colorScheme,
+  }) => Row(
+    children: [
+      sexIcon,
+      width(4),
+      Text(
+        name,
+        style: textTheme.labelMedium?.copyWith(
+          color: colorScheme.onSurface,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      width(3),
+      BirthdayBadge(birth: birth, iconSize: 10, textSize: 10),
+      width(3),
+      Text(
+        '${birth?.formattedBirth ?? '-'} ($age세)', // 여기서 변환
+        style: textTheme.labelSmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+    ],
+  );
 }

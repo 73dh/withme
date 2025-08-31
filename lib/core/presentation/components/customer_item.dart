@@ -49,7 +49,7 @@ class CustomerItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InsuredMembersIcon(customer: customer),
-              width(6),
+              width(8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,6 +63,7 @@ class CustomerItem extends StatelessWidget {
                       theme,
                       colorScheme,
                     ),
+                    height(3),
                     _buildPolicyList(policies, theme, colorScheme),
                   ],
                 ),
@@ -140,43 +141,31 @@ class CustomerItem extends StatelessWidget {
   }
 
   Widget _buildPolicyList(
-    List<PolicyModel> policies,
-    ThemeData theme,
-    ColorScheme colorScheme,
-  ) {
-    final showPrev = policies.length > 1;
-    final recentPolicies =
-        showPrev
-            ? policies.reversed.take(1).toList().reversed.toList()
-            : policies;
+      List<PolicyModel> policies,
+      ThemeData theme,
+      ColorScheme colorScheme,
+      ) {
+    final showMore = policies.length > 2;
+    // 오래된 것부터 2개 추출
+    final displayedPolicies = showMore
+        ? policies.take(2).toList()
+        : policies;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (showPrev)
-          Row(
-            children: [
-              width(5),
-              Text(
-                '...prev',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-        height(2),
-        ...recentPolicies.map((policy) {
+        ...displayedPolicies.asMap().entries.map((entry) {
+          final index = entry.key;
+          final policy = entry.value;
+
           final isCancelled =
               policy.policyState == PolicyStatus.cancelled.label ||
-              policy.policyState == PolicyStatus.lapsed.label;
+                  policy.policyState == PolicyStatus.lapsed.label;
           final premiumText = numFormatter.format(
             int.tryParse(policy.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
           );
 
           return Row(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               width(5),
@@ -201,13 +190,11 @@ class CustomerItem extends StatelessWidget {
               Text(
                 premiumText,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color:
-                      isCancelled ? colorScheme.error : colorScheme.onSurface,
+                  color: isCancelled ? colorScheme.error : colorScheme.onSurface,
                   fontWeight: isCancelled ? FontWeight.bold : FontWeight.normal,
-                  decoration:
-                      isCancelled
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
+                  decoration: isCancelled
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
                   decorationColor: isCancelled ? colorScheme.error : null,
                   decorationThickness: isCancelled ? 2 : null,
                 ),
@@ -223,10 +210,116 @@ class CustomerItem extends StatelessWidget {
                   ),
                 ),
               ),
+
+              // 👉 첫 번째(과거) 계약에만 ...more 표시
+              if (showMore && index == 0) ...[
+                width(5),
+                Text(
+                  '...more',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ],
           );
+
         }),
+
       ],
     );
   }
+
+
+// Widget _buildPolicyList(
+  //   List<PolicyModel> policies,
+  //   ThemeData theme,
+  //   ColorScheme colorScheme,
+  // ) {
+  //   final showPrev = policies.length > 1;
+  //   final recentPolicies =
+  //       showPrev
+  //           ? policies.reversed.take(1).toList().reversed.toList()
+  //           : policies;
+  //
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       if (showPrev)
+  //         Row(
+  //           children: [
+  //             width(5),
+  //             Text(
+  //               '...prev',
+  //               style: theme.textTheme.bodyMedium?.copyWith(
+  //                 color: colorScheme.onSurfaceVariant,
+  //                 fontStyle: FontStyle.italic,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       height(2),
+  //       ...recentPolicies.map((policy) {
+  //         final isCancelled =
+  //             policy.policyState == PolicyStatus.cancelled.label ||
+  //             policy.policyState == PolicyStatus.lapsed.label;
+  //         final premiumText = numFormatter.format(
+  //           int.tryParse(policy.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
+  //         );
+  //
+  //         return Row(
+  //           mainAxisSize: MainAxisSize.min,
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             width(5),
+  //             Text(
+  //               policy.startDate?.formattedBirth ?? '',
+  //               style: theme.textTheme.bodySmall?.copyWith(
+  //                 color: colorScheme.onSurface,
+  //               ),
+  //             ),
+  //             width(5),
+  //             Flexible(
+  //               fit: FlexFit.loose,
+  //               child: Text(
+  //                 policy.productCategory,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: theme.textTheme.bodySmall?.copyWith(
+  //                   color: colorScheme.onSurface,
+  //                 ),
+  //               ),
+  //             ),
+  //             width(5),
+  //             Text(
+  //               premiumText,
+  //               style: theme.textTheme.bodySmall?.copyWith(
+  //                 color:
+  //                     isCancelled ? colorScheme.error : colorScheme.onSurface,
+  //                 fontWeight: isCancelled ? FontWeight.bold : FontWeight.normal,
+  //                 decoration:
+  //                     isCancelled
+  //                         ? TextDecoration.lineThrough
+  //                         : TextDecoration.none,
+  //                 decorationColor: isCancelled ? colorScheme.error : null,
+  //                 decorationThickness: isCancelled ? 2 : null,
+  //               ),
+  //             ),
+  //             width(5),
+  //             Flexible(
+  //               fit: FlexFit.loose,
+  //               child: Text(
+  //                 ' (${policy.paymentMethod})',
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: theme.textTheme.bodySmall?.copyWith(
+  //                   color: colorScheme.onSurface,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         );
+  //       }),
+  //     ],
+  //   );
+  // }
 }
