@@ -28,6 +28,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
   final _insuredNameController = TextEditingController();
   final _productNameController = TextEditingController();
   final _premiumController = TextEditingController();
+  final _paymentPeriodController = TextEditingController();
   final _formatter = NumberFormat.decimalPattern();
 
   String _policyHolderName = '';
@@ -40,6 +41,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
   String _insuranceCompany = '보험사';
 
   String _paymentMethod = '';
+  int _paymentPeriod = 0; // 연 단위 납입기간
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -78,6 +80,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
     _insuredNameController.dispose();
     _productNameController.dispose();
     _premiumController.dispose();
+    _paymentPeriodController.dispose();
     super.dispose();
   }
 
@@ -172,6 +175,10 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     onInputPremiumTap:
                         (value) =>
                             setState(() => _premiumController.text = value),
+                    onInputPaymentPeriodTap: (value) => setState(() {
+                      _paymentPeriodController.text = value;
+                    }),
+                    paymentPeriodController: _paymentPeriodController, // ✅ 추가
                     startDate: _startDate,
                     endDate: _endDate,
                     onStartDateChanged:
@@ -238,6 +245,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
     if (_insuranceCompany == '보험사') return '보험사를 선택하세요.';
     if (_productNameController.text.trim().isEmpty) return '상품명을 입력하세요.';
     if (_paymentMethod.isEmpty) return '납입방법을 선택하세요.';
+    if (_paymentPeriodController.text.isEmpty) return '납입기간을 입력하세요.';
     if (_premiumController.text.trim().isEmpty) return '보험료를 입력하세요.';
     if (_startDate == null) return '계약일을 확인하세요';
     if (_endDate == null) return '보장 종료일을 확인하세요.';
@@ -276,6 +284,9 @@ class _PolicyScreenState extends State<PolicyScreen> {
       insuranceCompany: _insuranceCompany,
       productName: _productNameController.text,
       paymentMethod: _paymentMethod,
+      paymentPeriod: _paymentMethod == '월납'
+          ? int.tryParse(_paymentPeriodController.text) ?? 0
+          : 0,
       premium: _premiumController.text,
       startDate: _startDate!,
       endDate: _endDate!,

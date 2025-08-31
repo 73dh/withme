@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:withme/presentation/auth/sign_up/agreement_text.dart';
 
 import '../../../core/data/fire_base/firestore_keys.dart';
 import '../../../core/domain/core_domain_import.dart';
@@ -60,6 +61,7 @@ class FBase {
         membershipStatus: MembershipStatus.free,
         paidAt: DateTime(2020),
         agreedDate: DateTime.now(),
+        agreementText: agreementText,
       );
 
       await docRef.set(user.toMap());

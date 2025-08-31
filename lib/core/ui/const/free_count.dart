@@ -1,1 +1,1 @@
-const int freeCount=15;
+const int freeCount=20;

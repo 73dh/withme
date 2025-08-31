@@ -161,11 +161,26 @@ class PolicyItem extends StatelessWidget {
               color: statusColor(colorScheme),
               fontWeight: FontWeight.w600,
               decoration:
-                  (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
+              (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
             ),
           ),
+          // 납입방법
           TextSpan(
-            text: ' (${policy.paymentMethod})',
+            text: ' (${policy.paymentMethod}',
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          // 납입기간 (월납일 때만 표시)
+          if (policy.paymentMethod == '월납')
+            TextSpan(
+              text: ', ${policy.paymentPeriod}년',
+              style: textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          TextSpan(
+            text: ')',
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -173,6 +188,7 @@ class PolicyItem extends StatelessWidget {
         ],
       ),
     );
+
   }
 
   _statusBadge(TextTheme textTheme, ColorScheme colorScheme) => Container(

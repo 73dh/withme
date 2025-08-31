@@ -6,18 +6,18 @@ class UserModel {
   final String userKey;
   final String email;
   final DateTime agreedDate;
+  final String agreementText; // ← 약관 전문 저장
   final MembershipStatus membershipStatus;
   final DateTime? paidAt; // 유료 결제일
-  // final int prospectCycleDays; // ✅ 가망고객 관리주기
   final DocumentReference? documentReference;
 
   UserModel({
     required this.userKey,
     required this.email,
     required this.agreedDate,
+    required this.agreementText,
     required this.membershipStatus,
     this.paidAt,
-    // this.prospectCycleDays = 60, // ✅ 기본값 60
     this.documentReference,
   });
 
@@ -26,12 +26,12 @@ class UserModel {
       userKey: json[keyUserKey] as String,
       email: json[keyEmail] as String,
       agreedDate: (json[keyAgreedDate] as Timestamp).toDate(),
+     agreementText: json[keyAgreementText] as String,
       membershipStatus:
       MembershipStatusExtension.fromString(json[keyMembershipStatus] ?? 'free'),
       paidAt: json[keyPaidAt] != null
           ? (json[keyPaidAt] as Timestamp).toDate()
           : null,
-      // prospectCycleDays: (json['prospectCycleDays'] as int?) ?? 60, // ✅
       documentReference: json['documentReference'] as DocumentReference?,
     );
   }
@@ -45,12 +45,12 @@ class UserModel {
       userKey: userKey,
       email: map[keyEmail] ?? '',
       agreedDate: (map[keyAgreedDate] as Timestamp).toDate(),
+    agreementText: map[keyAgreementText]??'',
       membershipStatus:
       MembershipStatusExtension.fromString(map[keyMembershipStatus] ?? 'free'),
       paidAt: map[keyPaidAt] != null
           ? (map[keyPaidAt] as Timestamp).toDate()
           : null,
-      // prospectCycleDays: (map['prospectCycleDays'] as int?) ?? 60, // ✅
       documentReference: documentReference,
     );
   }
@@ -65,6 +65,7 @@ class UserModel {
       keyUserKey: userKey,
       keyEmail: email,
       keyAgreedDate: Timestamp.fromDate(agreedDate),
+      keyAgreementText: agreementText,
       keyMembershipStatus: membershipStatus.name,
       if (paidAt != null) keyPaidAt: Timestamp.fromDate(paidAt!),
     };
@@ -98,18 +99,18 @@ class UserModel {
     String? userKey,
     String? email,
     DateTime? agreedDate,
+    String? agreementText,
     MembershipStatus? membershipStatus,
     DateTime? paidAt,
-    // int? prospectCycleDays,
     DocumentReference? documentReference,
   }) {
     return UserModel(
       userKey: userKey ?? this.userKey,
       email: email ?? this.email,
       agreedDate: agreedDate ?? this.agreedDate,
+     agreementText: agreementText?? this.agreementText,
       membershipStatus: membershipStatus ?? this.membershipStatus,
       paidAt: paidAt ?? this.paidAt,
-      // prospectCycleDays: prospectCycleDays ?? this.prospectCycleDays,
       documentReference: documentReference ?? this.documentReference,
     );
   }

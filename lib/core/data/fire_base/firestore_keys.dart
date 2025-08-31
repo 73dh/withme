@@ -33,6 +33,7 @@ const String keyInsuranceCompany='insuranceCompany';
 const String keyProductName='productName';
 const String keyPremium='premium';
 const String keyPaymentMethod='paymentMethod';
+const String keyPaymentPeriod='paymentPeriod';
 const String keyPayPeriod='payPeriod';
 const String keyPolicyState='policyState';
 
@@ -50,6 +51,7 @@ const String keyTodoContent='todo_content';
 const String keyUserKey='userKey';
 const String keyEmail='email';
 const String keyAgreedDate='agreedDate';
+const String keyAgreementText='agreementText';
 const String keyMembershipStatus='memberShipStatus';
 const String keyPaidAt='paidDate';
 const String keyProspectCycleDays='prospectCycleDays';
