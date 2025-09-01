@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../const/duration.dart';
 import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
 

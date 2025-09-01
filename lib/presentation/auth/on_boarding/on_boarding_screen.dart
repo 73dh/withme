@@ -6,6 +6,7 @@ import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/core/ui/core_ui_import.dart';
 
+import '../../../core/const/info_text.dart';
 import '../../../core/di/di_setup_import.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/router/router.dart';

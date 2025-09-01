@@ -55,7 +55,7 @@ class HistoryPartWidget extends StatelessWidget {
               colorScheme: colorScheme,
             ),
           if (showReminderAnimation) ...[
-            height(3),
+            height(2),
             BlinkingCalendarIcon(sex: sex, size: 25),
           ],
         ],
@@ -125,12 +125,16 @@ class HistoryPartWidget extends StatelessWidget {
             Text(history.contactDate.formattedBirth, style: dateStyle),
           ],
         ),
-        height(2),
+        height(1),
         Text(
           history.content,
           style: contentStyle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          textHeightBehavior: const TextHeightBehavior(
+            applyHeightToFirstAscent: false,
+            applyHeightToLastDescent: false,
+          ),
         ),
       ],
     );

@@ -1,6 +1,6 @@
-import 'package:withme/core/ui/const/size.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 
+import '../../../core/const/size.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 
 class InsuredHolderPart extends StatelessWidget {

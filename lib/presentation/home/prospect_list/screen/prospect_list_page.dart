@@ -28,7 +28,7 @@ class _ProspectListPageState extends State<ProspectListPage>
         SingleTickerProviderStateMixin,
         FilterBarAnimationMixin {
   final RouteObserver<PageRoute> _routeObserver =
-      getIt<RouteObserver<PageRoute>>();
+  getIt<RouteObserver<PageRoute>>();
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
@@ -89,13 +89,16 @@ class _ProspectListPageState extends State<ProspectListPage>
     final todoViewModel = TodoViewModel(
       userKey: UserSession.userId,
       customerKey:
-          customer?.customerKey ??
-          '${DateTime.now().millisecondsSinceEpoch}',
+      customer?.customerKey ??
+          '${DateTime
+              .now()
+              .millisecondsSinceEpoch}',
     );
     await showBottomSheetWithDraggable(
       context: context,
       builder:
-          (scrollController) => RegistrationScreen(
+          (scrollController) =>
+          RegistrationScreen(
             customer: customer,
             scrollController: scrollController,
             todoViewModel: todoViewModel,
@@ -148,7 +151,7 @@ class _ProspectListPageState extends State<ProspectListPage>
               body: Column(
                 children: [
                   _buildFilterBar(),
-                height(5),
+                  height(5),
                   Expanded(child: _buildProspectList(customers)),
                 ],
               ),
@@ -161,7 +164,9 @@ class _ProspectListPageState extends State<ProspectListPage>
 
   PreferredSizeWidget _buildAppBar(List<CustomerModel> customers) {
     return ProspectListAppBar(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme
+          .of(context)
+          .scaffoldBackgroundColor,
       viewModel: viewModel,
       customers: customers,
       onToggleFilterBar: _toggleFilterBar,

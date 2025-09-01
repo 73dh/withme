@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/shared_pref_value.dart';
-
-import '../../presentation/core_presentation_import.dart';
+import 'package:withme/core/const/shared_pref_value.dart';
 import 'free_count.dart';
 
 const String adminEmail = 'kdaehee@gmail.com';

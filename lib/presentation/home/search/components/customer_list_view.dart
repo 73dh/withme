@@ -1,9 +1,9 @@
 import 'package:withme/core/domain/core_domain_import.dart';
 import 'package:withme/core/presentation/components/customer_item.dart';
-import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/domain/model/customer_model.dart';
 import 'package:withme/presentation/customer/screen/customer_screen.dart';
 
+import '../../../../core/const/duration.dart';
 import '../../../../core/data/fire_base/firestore_keys.dart';
 import '../../../../core/data/fire_base/user_session.dart';
 import '../../../../core/di/setup.dart';

@@ -6,6 +6,7 @@ import 'package:withme/presentation/home/dash_board/part/custom_summery_table.da
 import 'package:withme/presentation/home/dash_board/part/insurance_company_summery_table.dart';
 import 'package:withme/presentation/home/dash_board/part/product_category_summery_table.dart';
 
+import '../../../../core/const/duration.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/ui/core_ui_import.dart';
 

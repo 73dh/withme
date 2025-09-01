@@ -1,3 +1,4 @@
+import '../../const/duration.dart';
 import '../core_presentation_import.dart';
 import '../../ui/core_ui_import.dart';
 

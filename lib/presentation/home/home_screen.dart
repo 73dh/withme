@@ -1,6 +1,6 @@
-import 'package:withme/core/ui/const/duration.dart';
-import 'package:withme/core/ui/const/size.dart';
 
+import '../../core/const/duration.dart';
+import '../../core/const/size.dart';
 import '../../core/domain/enum/home_menu.dart';
 import '../../core/presentation/core_presentation_import.dart';
 

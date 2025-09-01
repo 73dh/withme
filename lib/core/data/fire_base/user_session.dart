@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:withme/core/ui/const/shared_pref_value.dart';
 
 import '../../../domain/model/user_model.dart';
+import '../../const/shared_pref_value.dart';
 
 class UserSession extends ChangeNotifier {
   // 싱글톤 인스턴스
@@ -17,17 +17,20 @@ class UserSession extends ChangeNotifier {
   }
 
   // SharedPreferences 키 상수
-  static const String _agreementSeenKey = 'hasAgreed'; //최초 동의여부
+  static const String _agreementSeenKey = 'hasAgreed'; // 최초 동의 여부
   static const String _managePeriodKey = 'managePeriodDays'; // 관리주기
-  static const String _urgentThresholdKey = 'urgentThresholdDays'; //상령일
+  static const String _urgentThresholdKey = 'urgentThresholdDays'; // 상령일
   static const String _targetProspectCountKey = 'targetProspectCount'; // 목표고객수
+  static const String _remainPaymentMonthKey =
+      'remainPaymentMonth'; // 납입기간 종료 관리
 
   /// 초기화 메서드
   Future<void> _init() async {
     await loadManagePeriodFromPrefs();
     await loadUrgentThresholdFromPrefs();
-    await loadAgreementCheckFromPrefs();
     await loadTargetProspectCountFromPrefs();
+    await loadRemainPaymentMonthFromPrefs(); // 납입기간 종료 관리 추가
+    await loadAgreementCheckFromPrefs();
   }
 
   // 현재 Firebase 로그인 유저 UID
@@ -48,17 +51,6 @@ class UserSession extends ChangeNotifier {
 
   int get managePeriodDays => _managePeriodDays;
 
-  // 상령일 도래일
-  int _urgentThresholdDays = SharedPrefValue.urgentThresholdDays;
-
-  int get urgentThresholdDays => _urgentThresholdDays;
-
-  // 목표고객수
-  int _targetProspectCount = SharedPrefValue.targetProspectCount;
-
-  int get targetProspectCount => _targetProspectCount;
-
-  // 관리주기
   void updateManagePeriod(int days) {
     _managePeriodDays = days;
     _saveManagePeriodToPrefs(days);
@@ -76,6 +68,11 @@ class UserSession extends ChangeNotifier {
         prefs.getInt(_managePeriodKey) ?? SharedPrefValue.managePeriodDays;
     notifyListeners();
   }
+
+  // 상령일 도래일
+  int _urgentThresholdDays = SharedPrefValue.urgentThresholdDays;
+
+  int get urgentThresholdDays => _urgentThresholdDays;
 
   void updateUrgentThresholdDays(int days) {
     _urgentThresholdDays = days;
@@ -97,6 +94,10 @@ class UserSession extends ChangeNotifier {
   }
 
   // 목표고객수 관리
+  int _targetProspectCount = SharedPrefValue.targetProspectCount;
+
+  int get targetProspectCount => _targetProspectCount;
+
   void updateTargetProspectCount(int count) {
     _targetProspectCount = count;
     _saveTargetProspectCountToPrefs(count);
@@ -113,6 +114,30 @@ class UserSession extends ChangeNotifier {
     _targetProspectCount =
         prefs.getInt(_targetProspectCountKey) ??
         SharedPrefValue.targetProspectCount;
+    notifyListeners();
+  }
+
+  // 납입기간 종료 관리
+  int _remainPaymentMonth = SharedPrefValue.remainPaymentMonth;
+
+  int get remainPaymentMonth => _remainPaymentMonth;
+
+  void updateRemainPaymentMonth(int months) {
+    _remainPaymentMonth = months;
+    _saveRemainPaymentMonthToPrefs(months);
+    notifyListeners();
+  }
+
+  Future<void> _saveRemainPaymentMonthToPrefs(int months) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_remainPaymentMonthKey, months);
+  }
+
+  Future<void> loadRemainPaymentMonthFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _remainPaymentMonth =
+        prefs.getInt(_remainPaymentMonthKey) ??
+        SharedPrefValue.remainPaymentMonth;
     notifyListeners();
   }
 

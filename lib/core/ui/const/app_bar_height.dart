@@ -1,1 +1,0 @@
-const double customScreenAppbarHeight=64;

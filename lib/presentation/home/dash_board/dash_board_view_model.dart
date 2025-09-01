@@ -6,14 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
-import 'package:withme/core/ui/const/info_text.dart';
 import 'package:withme/domain/domain_import.dart';
 import 'package:withme/presentation/home/dash_board/dash_board_state.dart';
 
+import '../../../core/const/info_text.dart';
+import '../../../core/const/size.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/router/router.dart';
 import '../../../core/router/router_path.dart';
-import '../../../core/ui/const/size.dart';
 import '../../../data/data_source/remote/fbase.dart';
 import '../../../domain/model/user_model.dart';
 import 'enum/menu_status.dart';

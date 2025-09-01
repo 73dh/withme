@@ -6,6 +6,8 @@ import 'package:withme/presentation/home/dash_board/enum/menu_status.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_page.dart';
 import 'package:withme/presentation/home/dash_board/screen/dash_board_side_menu.dart';
 
+import '../../../../core/const/duration.dart';
+import '../../../../core/const/info_text.dart';
 import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_reauth_dialog.dart';

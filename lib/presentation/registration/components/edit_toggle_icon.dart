@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/duration.dart';
+
+import '../../../core/const/duration.dart';
 
 class EditToggleIcon extends StatelessWidget {
   final bool isReadOnly;

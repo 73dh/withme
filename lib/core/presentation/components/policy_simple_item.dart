@@ -2,7 +2,7 @@ import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/payment_status_icon.dart';
 
 import '../../../domain/model/policy_model.dart';
-import '../../ui/const/remaining_payment_period.dart';
+import '../../data/fire_base/user_session.dart';
 import '../../ui/icon/const.dart';
 import '../../utils/check_payment_status.dart';
 import '../../utils/core_utils_import.dart';
@@ -24,7 +24,7 @@ class PolicySimpleItem extends StatelessWidget {
     final remainingMonths = monthsUntilEnd(policy);
     final showMaturityIcon =
         policy.paymentMethod == '월납' &&
-        remainingMonths <= remainingPaymentMonth;
+        remainingMonths <= UserSession().remainPaymentMonth;
 
     // 상태 계산
     final status = checkPaymentStatus(policy);
@@ -180,7 +180,7 @@ class PolicySimpleItem extends StatelessWidget {
                             color:
                                 policy.startDate != null &&
                                         monthsUntilEnd(policy) <
-                                            remainingPaymentMonth // 3개월 미만 체크
+                                            UserSession().remainPaymentMonth // 3개월 미만 체크
                                     ? colorScheme
                                         .error // 빨간색 등 강조
                                     : colorScheme.onSurfaceVariant,

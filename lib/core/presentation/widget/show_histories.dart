@@ -5,10 +5,10 @@ import 'package:withme/core/presentation/components/width_height.dart';
 import 'package:withme/core/presentation/widget/history_button.dart';
 import 'package:withme/core/presentation/widget/select_history_menu.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
-import 'package:withme/core/ui/const/duration.dart';
 import 'package:withme/core/utils/extension/date_time.dart';
 import 'package:withme/domain/model/history_model.dart';
 
+import '../../const/duration.dart';
 import '../../domain/core_domain_import.dart';
 
 class CommonDialog {

@@ -3,6 +3,7 @@ import 'package:withme/core/presentation/widget/reset_password.dart';
 import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/theme/theme.dart';
 
+import '../../../core/const/info_text.dart';
 import '../../../core/di/di_setup_import.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';

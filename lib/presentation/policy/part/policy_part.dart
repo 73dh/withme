@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 
+import '../../../core/const/size.dart';
 import '../../../core/domain/core_domain_import.dart';
 import '../../../core/presentation/core_presentation_import.dart';
-import '../../../core/ui/const/size.dart';
 
 class PolicyPart extends StatelessWidget {
   final String productCategory;

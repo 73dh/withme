@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/presentation/components/width_height.dart';
 
-import '../../../core/ui/const/size.dart';
+import '../../../core/const/size.dart';
+
 
 class SexSelector extends StatelessWidget {
   final String? sex;

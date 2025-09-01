@@ -1,7 +1,6 @@
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/first_name_icon.dart';
-import 'package:withme/core/presentation/components/todo_count_icon.dart';
 import 'package:withme/core/utils/core_utils_import.dart';
 import 'package:withme/domain/model/history_model.dart';
 import 'package:withme/domain/use_case/history/get_histories_use_case.dart';
@@ -27,171 +26,40 @@ class ProspectItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
     final info = customer.insuranceInfo;
 
-    // TodoViewModel을 고객별로 생성 (Provider로 관리 추천)
+    // TodoViewModel 초기화
     final todoViewModel = TodoViewModel(
       userKey: userKey,
       customerKey: customer.customerKey,
-    );
+    )..loadTodos(customer.todos);
 
-    // 초기 Firestore todos 넣어주기 (없으면 빈 리스트)
-    todoViewModel.loadTodos(customer.todos);
+    return StreamBuilder<List<HistoryModel>>(
+      stream: getIt<HistoryUseCase>().call(
+        usecase: GetHistoriesUseCase(
+          userKey: userKey,
+          customerKey: customer.customerKey,
+        ),
+      ),
+      builder: (context, snapshot) {
+        final histories = snapshot.data ?? [];
 
-    return AnimatedBuilder(
-      animation: todoViewModel,
-      builder: (context, _) {
-        final todos = todoViewModel.todoList;
-
-        return StreamBuilder<List<HistoryModel>>(
-          stream: getIt<HistoryUseCase>().call(
-            usecase: GetHistoriesUseCase(
-              userKey: userKey,
-              customerKey: customer.customerKey,
-            ),
-          ),
-          builder: (context, historySnapshot) {
-            final histories = historySnapshot.data ?? [];
+        return AnimatedBuilder(
+          animation: todoViewModel,
+          builder: (context, _) {
+            final todos = todoViewModel.todoList;
 
             return ItemContainer(
-              backgroundColor:
-                  info.isUrgent
-                      ? colorScheme.tertiaryContainer
-                      : colorScheme.surface,
+              backgroundColor: info.isUrgent
+                  ? colorScheme.tertiaryContainer
+                  : colorScheme.surface,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center, // ✅ 변경
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // 등록일 + 성별 아이콘
-                  Column(
-                    mainAxisSize: MainAxisSize.min, // ✅ 높이 자식만큼만
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        customer.registeredDate.formattedYearAndMonth,
-                        style: textTheme.labelMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      height(4),
-                      FirstNameIcon(
-                        customer: customer,
-                        size: 38,
-                        todoCount: todos.length, // ✅ Todo 개수 전달
-                      ),
-                      // ProspectItemIcon(customer: customer),
-                    ],
-                  ),
-
-                  width(12),
-
-                  // 이름, 생년월일, 상령일, 할일
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min, // ✅ Column 높이 최소화
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 이름 + 할일 Row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    shortenedNameText(customer.name, length: 6),
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onSurface,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  width(5),
-                                  if (customer.memo.isNotEmpty)
-                                    Icon(
-                                      Icons.feed_outlined,
-                                      color: colorScheme.primary,
-                                      size: 16,
-                                    ),
-                                  BirthdayBadge(
-                                    birth: customer.birth,
-                                    iconSize: 16,
-                                    textSize: 14,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            /// 할일목록 표시
-                            // if (todos.isNotEmpty) ...[
-                            //   width(6),
-                            //   // ✅ 고정폭 Container로 텍스트 위치 고정
-                            //   StreamTodoText(
-                            //     todoList: todos.map((t) => t.content).toList(),
-                            //     style: Theme.of(
-                            //       context,
-                            //     ).textTheme.bodySmall?.copyWith(
-                            //       color: getSexIconColor(
-                            //         customer.sex,
-                            //         colorScheme,
-                            //       ),
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            //   width(4),
-                            //   // TodoCountIcon 위치 고정
-                            //   SizedBox(
-                            //     width: 18,
-                            //     child: TodoCountIcon(
-                            //       todos: todos,
-                            //       sex: customer.sex,
-                            //       iconSize: 18,
-                            //     ),
-                            //   ),
-                            // ],
-                          ],
-                        ),
-
-                        height(2),
-
-                        Row(
-                          children: [
-                            // 생년월일
-                            if (customer.birth != null)
-                              Text(
-                                '${customer.birth!.formattedBirth} (${calculateAge(customer.birth!)}세)',
-                                style: textTheme.labelMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            width(5),
-                            // 상령일
-                            if (info.difference != null &&
-                                info.insuranceChangeDate != null)
-                              InsuranceAgeWidget(
-                                difference: info.difference!,
-                                isUrgent: info.isUrgent,
-                                insuranceChangeDate: info.insuranceChangeDate!,
-                                colorScheme: colorScheme,
-                              ),
-                          ],
-                        ),
-                        height(2),
-                        // 소개자
-                        if (customer.recommended.isNotEmpty)
-                          Text(
-                            '[소개자] ${customer.recommended}',
-                            style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-
-                  width(8),
-
-                  // HistoryPartWidget은 남는 공간 차지
+                  _buildIconColumn(theme, todos),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildInfoColumn(theme, colorScheme)),
+                  const SizedBox(width: 8),
                   SizedBox(
                     width: 80,
                     child: HistoryPartWidget(
@@ -206,6 +74,99 @@ class ProspectItem extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  Widget _buildIconColumn(ThemeData theme, List todos) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          customer.registeredDate.formattedYearAndMonth,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 4),
+        FirstNameIcon(
+          customer: customer,
+          size: 38,
+          todoCount: todos.length,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoColumn(ThemeData theme, ColorScheme colorScheme) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 이름 + Memo + Birthday
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    shortenedNameText(customer.name, length: 6),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(width: 5),
+                  if (customer.memo.isNotEmpty)
+                    Icon(
+                      Icons.feed_outlined,
+                      color: colorScheme.primary,
+                      size: 16,
+                    ),
+                  BirthdayBadge(
+                    birth: customer.birth,
+                    iconSize: 16,
+                    textSize: 14,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        // 생년월일 + 상령일
+        Row(
+          children: [
+            if (customer.birth != null)
+              Text(
+                '${customer.birth!.formattedBirth} (${calculateAge(customer.birth!)}세)',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            const SizedBox(width: 5),
+            if (customer.insuranceInfo.difference != null &&
+                customer.insuranceInfo.insuranceChangeDate != null)
+              InsuranceAgeWidget(
+                difference: customer.insuranceInfo.difference!,
+                isUrgent: customer.insuranceInfo.isUrgent,
+                insuranceChangeDate:
+                customer.insuranceInfo.insuranceChangeDate!,
+                colorScheme: colorScheme,
+              ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        // 소개자
+        if (customer.recommended.isNotEmpty)
+          Text(
+            '[소개자] ${customer.recommended}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart'; // 필수 import 확인
 
+import '../../const/duration.dart';
 import '../../domain/enum/sort_status.dart';
 import '../../domain/enum/sort_type.dart';
 import '../../ui/core_ui_import.dart';

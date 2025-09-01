@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../ui/const/duration.dart';
+import '../../const/duration.dart';
+
 
 class AnimatedProgressBar extends StatefulWidget {
   final double progress; // 0.0 ~ 1.0

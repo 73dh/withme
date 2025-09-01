@@ -2,8 +2,8 @@ import 'package:withme/core/presentation/components/birthday_badge.dart';
 import 'package:withme/core/presentation/components/payment_status_icon.dart';
 
 import '../../../domain/model/policy_model.dart';
+import '../../data/fire_base/user_session.dart';
 import '../../domain/enum/policy_state.dart';
-import '../../ui/const/remaining_payment_period.dart';
 import '../../ui/core_ui_import.dart';
 import '../../utils/check_payment_status.dart';
 import '../../utils/core_utils_import.dart';
@@ -208,7 +208,7 @@ class PolicyItem extends StatelessWidget {
               color:
                   policy.startDate != null &&
                           monthsUntilEnd(policy) <
-                              remainingPaymentMonth // 3개월 미만 체크
+                              UserSession().remainPaymentMonth // 3개월 미만 체크
                       ? colorScheme
                           .error // 빨간색 등 강조
                       : colorScheme.onSurfaceVariant,

@@ -7,4 +7,7 @@ abstract class SharedPrefValue {
 
   // 목표고객수
   static const int targetProspectCount = 20;
+
+  // 납입기간 종료 관리
+  static const int remainPaymentMonth = 3;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:withme/core/ui/const/duration.dart';
+
+import '../../const/duration.dart';
 
 class AppBarSearchWidget extends StatefulWidget {
   final void Function(String) onSubmitted;

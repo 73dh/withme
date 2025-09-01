@@ -6,8 +6,8 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/presentation/fab/animated_fab_container.dart';
 import 'package:withme/core/presentation/fab/main_fab.dart';
 import 'package:withme/core/presentation/fab/small_fab.dart';
-import 'package:withme/core/ui/const/fab_position.dart';
 
+import '../../const/fab_position.dart';
 import 'fab_view_model_interface.dart';
 
 mixin FabOverlayManagerMixin<

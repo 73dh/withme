@@ -1,8 +1,8 @@
 import 'package:withme/core/di/di_setup_import.dart';
 import 'package:withme/core/presentation/core_presentation_import.dart';
-import 'package:withme/core/ui/const/free_count.dart';
 import 'package:withme/domain/model/user_model.dart';
 
+import '../../const/free_count.dart';
 import '../../di/setup.dart';
 import '../../domain/core_domain_import.dart';
 
