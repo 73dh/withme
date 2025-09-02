@@ -30,7 +30,7 @@ Future<void> showEditPolicyDialog({
   );
 
   PolicyStatus selectedState = PolicyStatus.values.firstWhere(
-    (e) => e.name == policy.policyState,
+    (e) => e.label == policy.policyState,
     orElse: () => PolicyStatus.keep,
   );
 
@@ -160,13 +160,14 @@ Future<void> showEditPolicyDialog({
                         // 납입기간
                         Row(
                           children: [
-                            // 납입방식
+                            // 납입방법 (항상 수정 불가)
                             Expanded(
                               flex: 2,
                               child: DropdownButtonFormField<String>(
                                 value: paymentMethod,
-                                decoration: inputDecoration('납입방식'),
-                                items: ['월납', '일시납'].map(
+                                decoration: inputDecoration('납입방법'),
+                                items: ['월납', '일시납']
+                                    .map(
                                       (method) => DropdownMenuItem(
                                     value: method,
                                     child: Text(
@@ -176,14 +177,12 @@ Future<void> showEditPolicyDialog({
                                       ),
                                     ),
                                   ),
-                                ).toList(),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() => paymentMethod = value);
-                                  }
-                                },
+                                )
+                                    .toList(),
+                                onChanged: null, // null이면 비활성화
                               ),
                             ),
+
 
                             width(10),
 
@@ -201,34 +200,35 @@ Future<void> showEditPolicyDialog({
                               ),
                             ),
                           ],
-                        )
-,
-                        height(16),
-                        // 보험 상태
-                        DropdownButtonFormField<PolicyStatus>(
-                          value: selectedState,
-                          decoration: inputDecoration('보험 상태'),
-                          items:
-                              PolicyStatus.values
-                                  .map(
-                                    (state) => DropdownMenuItem(
-                                      value: state,
-                                      child: Text(
-                                        state.label,
-                                        style: textTheme.bodyMedium?.copyWith(
-                                          color: colorScheme.onSurface,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => selectedState = value);
-                            }
-                          },
                         ),
-                        height(24),
+                        height(16),
+                      // 계약 상태
+                      DropdownButtonFormField<PolicyStatus>(
+                        value: selectedState,
+                        decoration: inputDecoration('계약 상태'),
+                        items: PolicyStatus.values
+                            .map(
+                              (state) => DropdownMenuItem(
+                            value: state,
+                            child: Text(
+                              state.label,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                        )
+                            .toList(),
+                        onChanged: paymentMethod == '월납'
+                            ? (value) {
+                          if (value != null) {
+                            setState(() => selectedState = value);
+                          }
+                        }
+                            : null, // 일시납이면 수정 불가
+                      ),
+
+                      height(24),
 
                         // 버튼
                         Row(
@@ -293,7 +293,9 @@ Future<void> showEditPolicyDialog({
                                     policyHolderSex: holderSex,
                                     policyHolderBirth: holderBirth,
                                     premium: premium.toString(),
-                                    paymentPeriod:int.parse( periodController.text),
+                                    paymentPeriod: int.parse(
+                                      periodController.text,
+                                    ),
                                     policyState: selectedState.label,
                                   );
 

@@ -10,6 +10,18 @@ import '../../utils/extension/number_format.dart';
 import '../../utils/policy_status_helper.dart';
 import '../../utils/remaining_payment_period.dart';
 import '../core_presentation_import.dart';
+import 'package:withme/core/presentation/components/birthday_badge.dart';
+import 'package:withme/core/presentation/components/payment_status_icon.dart';
+
+import '../../../domain/model/policy_model.dart';
+import '../../data/fire_base/user_session.dart';
+import '../../ui/icon/const.dart';
+import '../../utils/check_payment_status.dart';
+import '../../utils/core_utils_import.dart';
+import '../../utils/extension/number_format.dart';
+import '../../utils/policy_status_helper.dart';
+import '../../utils/remaining_payment_period.dart';
+import '../core_presentation_import.dart';
 
 class PolicySimpleItem extends StatelessWidget {
   final PolicyModel policy;
@@ -21,21 +33,19 @@ class PolicySimpleItem extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final remainingMonths = monthsUntilEnd(policy);
-    final showMaturityIcon =
-        policy.paymentMethod == '월납' &&
-        remainingMonths <= UserSession().remainPaymentMonth;
 
     // 상태 계산
     final status = checkPaymentStatus(policy);
 
-
-    // 보험료 텍스트 스타일
-    final premiumStyle = PolicyStatusHelper.premiumTextStyle(
-      policy,
-      textTheme,
-      colorScheme,
+    // 보험료 텍스트 스타일 (여기서 중간선 직접 적용)
+    final premiumStyle = textTheme.labelMedium?.copyWith(
+      color: PolicyStatusHelper.statusTextColor(policy, colorScheme),
+      fontWeight: FontWeight.w600,
+      decoration: (policy.policyState != 'keep')
+          ? TextDecoration.lineThrough
+          : null,
     );
+
     // 상태 배경 색상
     final stateBgColor = PolicyStatusHelper.statusBackgroundColor(
       policy,
@@ -47,6 +57,7 @@ class PolicySimpleItem extends StatelessWidget {
       policy,
       colorScheme,
     );
+
     return ItemContainer(
       height: 120,
       backgroundColor: colorScheme.surface,
@@ -58,17 +69,15 @@ class PolicySimpleItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Row(
                     children: [
                       SexIcon(
                         sex: policy.policyHolderSex,
-                        backgroundImagePath:
-                            policy.policyHolderSex == '남'
-                                ? IconsPath.manIcon
-                                : IconsPath.womanIcon,
+                        backgroundImagePath: policy.policyHolderSex == '남'
+                            ? IconsPath.manIcon
+                            : IconsPath.womanIcon,
                         size: 20,
                       ),
                       width(5),
@@ -85,21 +94,23 @@ class PolicySimpleItem extends StatelessWidget {
                         iconSize: 14,
                         textSize: 14,
                       ),
-                      PaymentStatusIcon(status: status, size: 14), // ✅ 상태별 아이콘 자동 처리
+                      PaymentStatusIcon(
+                        status: status,
+                        size: 14,
+                      ), // ✅ 상태별 아이콘 자동 처리
                     ],
                   ),
                 ),
-                width(8), // 약간의 간격
+                width(8),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       SexIcon(
                         sex: policy.insuredSex,
-                        backgroundImagePath:
-                            policy.insuredSex == '남'
-                                ? IconsPath.manIcon
-                                : IconsPath.womanIcon,
+                        backgroundImagePath: policy.insuredSex == '남'
+                            ? IconsPath.manIcon
+                            : IconsPath.womanIcon,
                         size: 20,
                       ),
                       width(5),
@@ -121,7 +132,7 @@ class PolicySimpleItem extends StatelessWidget {
                 ),
               ],
             ),
-            height(4),
+            height(5),
             Text(
               '상품명: ${policy.productName}',
               style: textTheme.labelLarge?.copyWith(
@@ -130,7 +141,6 @@ class PolicySimpleItem extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            height(6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -146,8 +156,14 @@ class PolicySimpleItem extends StatelessWidget {
                         ),
                         TextSpan(
                           text:
-                              '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
-                          style: premiumStyle,
+                          '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
+                          style: (premiumStyle ?? const TextStyle()).copyWith(
+                            decoration: policy.policyState != '정상'
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                            decorationColor: colorScheme.error,
+                            decorationThickness: 2,
+                          ),
                         ),
                         // 납입방법
                         TextSpan(
@@ -171,19 +187,16 @@ class PolicySimpleItem extends StatelessWidget {
                           ),
                         ),
                         TextSpan(
-                          text:
-                              policy.paymentMethod == '월납'
-                                  ? calculateRemainingPaymentMonth(policy)
-                                  : '',
+                          text: policy.paymentMethod == '월납'
+                              ? calculateRemainingPaymentMonth(policy)
+                              : '',
                           style: textTheme.labelMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color:
-                                policy.startDate != null &&
-                                        monthsUntilEnd(policy) <
-                                            UserSession().remainPaymentMonth // 3개월 미만 체크
-                                    ? colorScheme
-                                        .error // 빨간색 등 강조
-                                    : colorScheme.onSurfaceVariant,
+                            color: policy.startDate != null &&
+                                monthsUntilEnd(policy) <
+                                    UserSession().remainPaymentMonth
+                                ? colorScheme.error
+                                : colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

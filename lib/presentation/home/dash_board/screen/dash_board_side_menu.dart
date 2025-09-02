@@ -100,6 +100,7 @@ class DashBoardSideMenu extends StatelessWidget {
         final managePeriodDays = getIt<UserSession>().managePeriodDays;
         final urgentThresholdDays = getIt<UserSession>().urgentThresholdDays;
         final targetProspectCount = getIt<UserSession>().targetProspectCount;
+        final remainPaymentMonth=getIt<UserSession>().remainPaymentMonth;
 
         if (currentUser == null) {
           return Text('로그인 정보 없음', style: textTheme.bodyMedium);
@@ -230,6 +231,20 @@ class DashBoardSideMenu extends StatelessWidget {
                         (newCount) => getIt<UserSession>()
                             .updateTargetProspectCount(newCount),
                   ),
+            ),
+            height(15),
+            BuildMenuItem(
+              icon: Icons.payment_outlined,
+              text: '납입기간 종료 관리: $remainPaymentMonth개월',
+              onTap:
+                  () => showCycleEditDialog(
+                context,
+                title: '납입기간 종료 관리',
+                initNumber: remainPaymentMonth,
+                onUpdate:
+                    (newMonth) => getIt<UserSession>()
+                    .updateRemainPaymentMonth(newMonth),
+              ),
             ),
             height(15),
           ],

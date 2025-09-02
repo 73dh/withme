@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/payment_status.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/payment_status.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/domain/enum/payment_status.dart';
 
 class PaymentStatusIcon extends StatefulWidget {
   const PaymentStatusIcon({super.key, required this.status, this.size = 18});
@@ -24,7 +22,7 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     )..repeat(reverse: true);
 
@@ -51,16 +49,16 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
               opacity: _opacityAnim.value,
               child: Container(
                 height: widget.size + 6,
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: colorScheme.error,
-                  borderRadius: BorderRadius.circular((widget.size + 6) / 2),
+                  color: colorScheme.error, // theme error 컬러
+                  borderRadius: BorderRadius.circular(widget.size / 2),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '완료임박',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colorScheme.onError, // error 위의 텍스트 색
                     fontSize: widget.size * 0.6,
                     fontWeight: FontWeight.bold,
                   ),
@@ -71,19 +69,19 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
         );
 
       case PaymentStatus.paid:
-      // 납입완료 → 점멸 없이 고정
+      // 납입완료 → theme success 계열
         return Container(
           height: widget.size + 6,
-          padding: const EdgeInsets.symmetric(horizontal: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular((widget.size + 6) / 2),
+            color: colorScheme.primary, // primary 컬러 사용
+            borderRadius: BorderRadius.circular(widget.size / 2),
           ),
           alignment: Alignment.center,
           child: Text(
             '납입완료',
             style: TextStyle(
-              color: Colors.white,
+              color: colorScheme.onPrimary, // primary 위 텍스트 색
               fontSize: widget.size * 0.6,
               fontWeight: FontWeight.bold,
             ),
@@ -91,8 +89,10 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
         );
 
       case PaymentStatus.paying:
+        return const SizedBox.shrink();
+
       case PaymentStatus.all:
-        return const SizedBox.shrink(); // 아이콘 없음
+        return const SizedBox.shrink();
     }
   }
 }

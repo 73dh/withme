@@ -4,6 +4,7 @@ import 'package:withme/presentation/home/dash_board/part/custom_bar_chart.dart';
 import 'package:withme/presentation/home/dash_board/part/custom_monthly_table.dart';
 import 'package:withme/presentation/home/dash_board/part/custom_summery_table.dart';
 import 'package:withme/presentation/home/dash_board/part/insurance_company_summery_table.dart';
+import 'package:withme/presentation/home/dash_board/part/payment_summery_table.dart';
 import 'package:withme/presentation/home/dash_board/part/product_category_summery_table.dart';
 
 import '../../../../core/const/duration.dart';
@@ -96,6 +97,16 @@ class DashBoardPage extends StatelessWidget {
                           cellColor: colorScheme.surfaceContainerHighest,
                         ),
                         height(5),
+                        PartTitle(text: '보험료 (정상)', color: colorScheme.onSurface),
+                        PaymentSummaryTable(
+                          cellWidth: cellWidth,
+                          customers: customers,
+                          textStyle: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                          cellColor: colorScheme.surfaceContainerHighest,
+                        ),
+                        height(5),
                         PartTitle(text: '판매상품', color: colorScheme.onSurface),
                         ProductCategorySummaryTable(
                           cellWidth: cellWidth,
@@ -107,7 +118,7 @@ class DashBoardPage extends StatelessWidget {
                         ),
                         height(5),
                         PartTitle(
-                          text: '월별 고객 및 건수',
+                          text: '월별 가망고객 및 계약건수',
                           color: colorScheme.onSurface,
                         ),
                         CustomMonthlyTable(

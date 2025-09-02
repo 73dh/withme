@@ -56,14 +56,14 @@ class CustomMonthlyTable extends StatelessWidget {
       ),
       // 가망고객 행
       renderTableRow(
-        cells: ['가망고객', ...prospectData],
+        cells: ['가망고객(명)', ...prospectData],
         textStyle: prospectTextStyle,
         backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
         isBarProspect: true,
       ),
       // 총 계약건수 행
       renderTableRow(
-        cells: ['총 계약건수', ...contractData],
+        cells: ['계약(건)', ...contractData],
         textStyle: contractTextStyle,
         backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
         isBarContract: true,

@@ -159,8 +159,7 @@ class CustomerItem extends StatelessWidget {
           final policy = entry.value;
 
           final isCancelled =
-              policy.policyState == PolicyStatus.cancelled.label ||
-                  policy.policyState == PolicyStatus.lapsed.label;
+              policy.policyState != PolicyStatus.keep.label;
           final premiumText = numFormatter.format(
             int.tryParse(policy.premium.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
           );
