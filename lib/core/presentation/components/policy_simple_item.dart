@@ -85,7 +85,7 @@ class PolicySimpleItem extends StatelessWidget {
                         iconSize: 14,
                         textSize: 14,
                       ),
-                      PaymentStatusIcon(status: status, size: 16), // ✅ 상태별 아이콘 자동 처리
+                      PaymentStatusIcon(status: status, size: 14), // ✅ 상태별 아이콘 자동 처리
                     ],
                   ),
                 ),

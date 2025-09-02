@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/payment_status.dart';
 import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/payment_status.dart';
+import 'package:flutter/material.dart';
+import 'package:withme/core/domain/enum/payment_status.dart';
 
 class PaymentStatusIcon extends StatefulWidget {
   const PaymentStatusIcon({super.key, required this.status, this.size = 18});
@@ -41,7 +43,7 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
 
     switch (widget.status) {
       case PaymentStatus.soonPaid:
-      // 완료임박 → 동그란 배경 + "임박" 텍스트 + 점멸
+      // 완료임박 → 점멸 + 텍스트
         return AnimatedBuilder(
           animation: _opacityAnim,
           builder: (context, child) {
@@ -56,7 +58,7 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  '임박',
+                  '완료임박',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: widget.size * 0.6,
@@ -69,11 +71,23 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
         );
 
       case PaymentStatus.paid:
-      // 납입완료 → 체크 아이콘
-        return Icon(
-          Icons.check_circle,
-          size: widget.size,
-          color: Colors.green,
+      // 납입완료 → 점멸 없이 고정
+        return Container(
+          height: widget.size + 6,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular((widget.size + 6) / 2),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            '납입완료',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: widget.size * 0.6,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         );
 
       case PaymentStatus.paying:

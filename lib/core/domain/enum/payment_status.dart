@@ -1,7 +1,7 @@
 enum PaymentStatus {
   all,   // 전체
   paying, // 납입중
-  soonPaid, //완료임박
+  soonPaid, //완료예정
   paid,   // 납입완료
 }
 

@@ -74,7 +74,8 @@ class PolicyItem extends StatelessWidget {
         Row(
           children: [
             _labelValue('계약자', '', textTheme, colorScheme),
-            PaymentStatusIcon(status: status, size: 16),
+            width(5),
+            PaymentStatusIcon(status: status, size: 14),
             // ✅ 상태별 아이콘 자동 처리  ],
           ],
         ),
