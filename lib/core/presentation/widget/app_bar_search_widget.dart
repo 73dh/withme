@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../const/duration.dart';
+import 'package:flutter/material.dart';
+
+import '../../const/duration.dart';
 
 class AppBarSearchWidget extends StatefulWidget {
   final void Function(String) onSubmitted;
@@ -17,24 +20,25 @@ class _AppBarSearchWidgetState extends State<AppBarSearchWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         if (_isSearching)
           ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 50),
+            constraints: const BoxConstraints(maxWidth: 60),
             child: TextField(
               controller: _searchController,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '이름',
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
               ),
-              style: const TextStyle(color: Colors.black87),
-              onSubmitted: (value) {
-                widget.onSubmitted(value);
-              },
+              style: TextStyle(color: colorScheme.onSurface),
+              onSubmitted: (value) => widget.onSubmitted(value),
               textAlign: TextAlign.right,
             ),
           ),
@@ -46,7 +50,10 @@ class _AppBarSearchWidgetState extends State<AppBarSearchWidget> {
           },
           child: IconButton(
             key: ValueKey<bool>(_isSearching),
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            icon: Icon(
+              _isSearching ? Icons.close : Icons.search,
+              color: colorScheme.onSurface,
+            ),
             onPressed: () {
               setState(() {
                 if (_isSearching) {
