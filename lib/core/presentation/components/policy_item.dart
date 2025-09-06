@@ -174,10 +174,10 @@ class PolicyItem extends StatelessWidget {
             style: textTheme.labelMedium?.copyWith(
               color: statusColor(colorScheme),
               fontWeight: FontWeight.w600,
-              decoration: (isCancelled || isLapsed)
-                  ? TextDecoration.lineThrough
-                  : null,
-              decorationColor: statusColor(colorScheme), // ✅ 줄 색상 고정
+              decoration:
+                  (isCancelled || isLapsed) ? TextDecoration.lineThrough : null,
+              decorationColor: statusColor(colorScheme),
+              // ✅ 줄 색상 고정
               decorationThickness: 2, // ✅ 줄 두께
             ),
           ),
@@ -202,15 +202,18 @@ class PolicyItem extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: policy.paymentMethod == '월납'
-                ? calculateRemainingPaymentMonth(policy)
-                : '',
+            text:
+                policy.paymentMethod == '월납'
+                    ? calculateRemainingPaymentMonth(policy)
+                    : '',
             style: textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: policy.startDate != null &&
-                  monthsUntilEnd(policy) < UserSession().remainPaymentMonth
-                  ? colorScheme.error
-                  : colorScheme.onSurfaceVariant,
+              color:
+                  policy.startDate != null &&
+                          monthsUntilEnd(policy) <
+                              UserSession().remainPaymentMonth
+                      ? colorScheme.error
+                      : colorScheme.onSurfaceVariant,
             ),
           ),
         ],

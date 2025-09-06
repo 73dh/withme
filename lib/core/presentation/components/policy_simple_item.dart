@@ -59,7 +59,7 @@ class PolicySimpleItem extends StatelessWidget {
     );
 
     return ItemContainer(
-      height: 120,
+      height: 100,
       backgroundColor: colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -83,7 +83,7 @@ class PolicySimpleItem extends StatelessWidget {
                       width(5),
                       Text(
                         '계약자: ${shortenedNameText(policy.policyHolder)}',
-                        style: textTheme.labelLarge?.copyWith(
+                        style: textTheme.labelMedium?.copyWith(
                           color: colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -116,7 +116,7 @@ class PolicySimpleItem extends StatelessWidget {
                       width(5),
                       Text(
                         '피보험자: ${shortenedNameText(policy.insured)}',
-                        style: textTheme.labelLarge?.copyWith(
+                        style: textTheme.labelMedium?.copyWith(
                           color: colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -125,7 +125,7 @@ class PolicySimpleItem extends StatelessWidget {
                       BirthdayBadge(
                         birth: policy.insuredBirth,
                         iconSize: 14,
-                        textSize: 14,
+                        textSize: 12,
                       ),
                     ],
                   ),

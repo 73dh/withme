@@ -71,25 +71,28 @@ class _PolicyListViewState extends State<PolicyListView> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 8,
+                    vertical: 3,
                   ),
                   child: GestureDetector(
-                    onTap: () => toggleExpansion(index),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child:
-                          isExpanded
-                              ? PolicyItem(
-                                key: ValueKey('expanded_$index'),
-                                policy: policy,
-                              )
-                              : PolicySimpleItem(
-                                key: ValueKey('simple_$index'),
-                                policy: policy,
-                              ),
-                    ),
-                  ),
-                );
+                      onTap: () => toggleExpansion(index),
+                      child: Card(
+                        elevation: 3,
+                        margin: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 300),
+                          crossFadeState: isExpanded
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                          firstChild: PolicyItem(policy: policy),
+                          secondChild: PolicySimpleItem(policy: policy),
+                        ),
+                      ),
+                    )
+                    ,
+                  );
               },
             ),
           ),
