@@ -7,11 +7,20 @@ import 'app.dart';
 import 'core/data/fire_base/firebase_options.dart';
 import 'core/router/router.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  diSetup();
-  initializeAuthState(); // ✅ 온보딩 상태 초기화
+
+  // 중복 초기화 방지
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } else {
+    Firebase.app(); // 이미 초기화된 앱 재사용
+  }
+
+  await diSetup();
+  await initializeAuthState();
   runApp(const App());
 }
 

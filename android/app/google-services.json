@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "58346949612",
-    "project_id": "withme-b3e85",
-    "storage_bucket": "withme-b3e85.appspot.com"
+    "project_number": "267038943888",
+    "project_id": "withme-25f8e",
+    "storage_bucket": "withme-25f8e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:58346949612:android:c8a3a900bae9f9eb34cec9",
+        "mobilesdk_app_id": "1:267038943888:android:c818e17dec5bb50f760615",
         "android_client_info": {
           "package_name": "com.example.dh.withme"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBIoSEurOQJizo35PIgULn8nhtracqwmmY"
+          "current_key": "AIzaSyDYADE60ZADqfGLls2klIP7PwPYHsWe15o"
         }
       ],
       "services": {

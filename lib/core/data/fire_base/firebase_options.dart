@@ -26,7 +26,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -50,19 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBIoSEurOQJizo35PIgULn8nhtracqwmmY',
-    appId: '1:58346949612:android:c8a3a900bae9f9eb34cec9',
-    messagingSenderId: '58346949612',
-    projectId: 'withme-b3e85',
-    storageBucket: 'withme-b3e85.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBc86CgKXDKEa1QZwqlzuiqgbV4TPyqRyk',
-    appId: '1:58346949612:ios:b807d0b41f4b8b1334cec9',
-    messagingSenderId: '58346949612',
-    projectId: 'withme-b3e85',
-    storageBucket: 'withme-b3e85.appspot.com',
-    iosBundleId: 'com.example.dh.withme',
+    apiKey: 'AIzaSyDYADE60ZADqfGLls2klIP7PwPYHsWe15o',
+    appId: '1:267038943888:android:3f631a060e96f0bb760615',
+    messagingSenderId: '267038943888',
+    projectId: 'withme-25f8e',
+    storageBucket: 'withme-25f8e.firebasestorage.app',
   );
 }

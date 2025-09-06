@@ -6,8 +6,6 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.0.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0") // 버전에 따라 다를 수 있음
-        // firebase analytics사용하기 위한 설정
-//        classpath("com.google.gms:google-services:4.4.1") // 최신 버전 확인
     }
 }
 
