@@ -65,11 +65,11 @@ class CustomerInfoPart extends StatelessWidget {
         );
 
     return ItemContainer(
-      height: 352, // ← 이거 없애고 Column이 자연스럽게 크기 잡게 두는 걸 추천
+      height: 355, // ← 이거 없애고 Column이 자연스럽게 크기 잡게 두는 걸 추천
 
       backgroundColor: backgroundColor ?? colorScheme.surface,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,8 +129,10 @@ class CustomerInfoPart extends StatelessWidget {
                   child: TextFormField(
                     controller: memoController,
 
-                    readOnly: isReadOnly, // ✅ 스크롤 허용 + 입력만 막기
-                    enabled: true,        // ✅ 항상 활성 상태 유지
+                    readOnly: isReadOnly,
+                    // ✅ 스크롤 허용 + 입력만 막기
+                    enabled: true,
+                    // ✅ 항상 활성 상태 유지
                     style: effectiveSubtitleStyle,
                     minLines: 2,
                     // 기본 2줄 보이기

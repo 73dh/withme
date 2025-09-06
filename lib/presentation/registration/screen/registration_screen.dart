@@ -98,6 +98,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         child: Container(
           color: colorScheme.surface,
           child: Column(
+            mainAxisSize: MainAxisSize.min, // 내용 크기만큼만
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               CustomerRegistrationAppBar(
                 customer: widget.customer,
@@ -157,14 +159,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget _buildSubmitButton(BuildContext context, ColorScheme colorScheme) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
