@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/const/shared_pref_value.dart';
 import 'free_count.dart';
 
-const String adminEmail = 'kdaehee@gmail.com';
+const String adminEmail = 'withme.appservice@gmail.com';
 
 Widget styledInfoText(BuildContext context) {
   final theme = Theme.of(context);
