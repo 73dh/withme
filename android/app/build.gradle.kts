@@ -55,9 +55,18 @@ android {
     }
 }
 
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    // 다른 Firebase 라이브러리도 동일하게 추가
+}
 //dependencies {
-//    implementation("com.google.firebase:firebase-analytics-ktx")
-//    // 다른 Firebase SDK 추가 가능 (예: Crashlytics, Auth 등)
+//    // Firebase BoM (버전 통합 관리)
+//    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+//
+//    // Firebase Analytics 라이브러리
+//    implementation 'com.google.firebase:firebase-analytics'
 //}
 
 flutter {

@@ -26,9 +26,9 @@ class _ProspectListPageState extends State<ProspectListPage>
         RouteAware,
         FabOverlayManagerMixin<ProspectListPage, ProspectListViewModel>,
         SingleTickerProviderStateMixin,
-        FilterBarAnimationMixin {
-  final RouteObserver<PageRoute> _routeObserver =
-  getIt<RouteObserver<PageRoute>>();
+        FilterBarAnimationMixin
+         {
+
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
@@ -36,6 +36,7 @@ class _ProspectListPageState extends State<ProspectListPage>
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
   bool _firstEnter = true;
+
 
   @override
   void initState() {
@@ -47,12 +48,10 @@ class _ProspectListPageState extends State<ProspectListPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final modalRoute = ModalRoute.of(context);
-    if (modalRoute is PageRoute) _routeObserver.subscribe(this, modalRoute);
   }
 
   @override
   void dispose() {
-    _routeObserver.unsubscribe(this);
     disposeFilterBarAnimation();
     super.dispose();
   }
@@ -89,16 +88,12 @@ class _ProspectListPageState extends State<ProspectListPage>
     final todoViewModel = TodoViewModel(
       userKey: UserSession.userId,
       customerKey:
-      customer?.customerKey ??
-          '${DateTime
-              .now()
-              .millisecondsSinceEpoch}',
+          customer?.customerKey ?? '${DateTime.now().millisecondsSinceEpoch}',
     );
     await showBottomSheetWithDraggable(
       context: context,
       builder:
-          (scrollController) =>
-          RegistrationScreen(
+          (scrollController) => RegistrationScreen(
             customer: customer,
             scrollController: scrollController,
             todoViewModel: todoViewModel,
@@ -164,9 +159,7 @@ class _ProspectListPageState extends State<ProspectListPage>
 
   PreferredSizeWidget _buildAppBar(List<CustomerModel> customers) {
     return ProspectListAppBar(
-      backgroundColor: Theme
-          .of(context)
-          .scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       viewModel: viewModel,
       customers: customers,
       onToggleFilterBar: _toggleFilterBar,

@@ -38,7 +38,6 @@ class _AppState extends State<App> {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: router,
-
         theme: applyCustomTheme(materialTheme.light()),
         darkTheme: applyCustomTheme(materialTheme.dark()),
         themeMode: ThemeMode.system,

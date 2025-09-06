@@ -1,3 +1,4 @@
+import 'package:withme/analytics/ayalytics_page_view_observer.dart';
 
 import '../../core/const/duration.dart';
 import '../../core/const/size.dart';
@@ -11,17 +12,32 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with AnalyticsPageViewObserver {
   int _currentIndex = 0;
   final _pageController = PageController();
 
+  @override
+  void initState() {
+    super.initState();
+    final menu = HomeMenu.values[_currentIndex];
+    logTabChange(menu.toString(), 'HomeScreen'); // 첫 화면도 기록
+  }
+
   void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index % 4;
-    });
+    final newIndex = index % HomeMenu.values.length;
+    if (newIndex == _currentIndex) return;
+
+    setState(() => _currentIndex = newIndex);
+
+    final menu = HomeMenu.values[_currentIndex];
+
+    // ✅ Firebase Analytics 조회수 기록
+    logTabChange(menu.name, 'HomeScreen');
   }
 
   void _onItemTapped(int index) {
+    if(index==_currentIndex) return;
     _pageController.animateToPage(
       index,
       duration: AppDurations.duration100,

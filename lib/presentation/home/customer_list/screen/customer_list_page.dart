@@ -1,4 +1,5 @@
 // customer_list_page.dart
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
 import 'package:withme/domain/model/customer_model.dart';
@@ -29,8 +30,8 @@ class _CustomerListPageState extends State<CustomerListPage>
         FabOverlayManagerMixin<CustomerListPage, CustomerListViewModel>,
         SingleTickerProviderStateMixin,
         FilterBarAnimationMixin {
-  final RouteObserver<PageRoute> _routeObserver =
-      getIt<RouteObserver<PageRoute>>();
+
+
   @override
   final CustomerListViewModel viewModel = getIt<CustomerListViewModel>();
 
@@ -50,12 +51,10 @@ class _CustomerListPageState extends State<CustomerListPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final route = ModalRoute.of(context);
-    if (route is PageRoute) _routeObserver.subscribe(this, route);
   }
 
   @override
   void dispose() {
-    _routeObserver.unsubscribe(this);
     disposeFilterBarAnimation();
     super.dispose();
   }

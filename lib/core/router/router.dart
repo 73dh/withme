@@ -1,6 +1,8 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:withme/analytics/analytics_route_observer.dart';
 import 'package:withme/core/router/router_path.dart';
 import 'package:withme/presentation/auth/log_in/log_in_screen.dart';
 import 'package:withme/presentation/customer/screen/customer_screen.dart';
@@ -18,10 +20,14 @@ import '../di/setup.dart';
 import '../presentation/todo/todo_view_model.dart';
 
 final authChangeNotifier = AuthChangeNotifier();
+final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
 final router = GoRouter(
   initialLocation: RoutePath.splash,
-  observers: [getIt<RouteObserver<PageRoute>>()],
+  observers: [
+    getIt<RouteObserver<PageRoute>>(),
+    AnalyticsRouteObserver(analytics),
+  ],
   refreshListenable: authChangeNotifier,
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
@@ -69,20 +75,19 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: RoutePath.splash,
-      pageBuilder:
-          (context, state) =>
-          _fadePage(child: const SplashScreen(), state: state),
+      pageBuilder: (context, state) {
+        return _fadePage(child: SplashScreen(), state: state,name: 'SplashScreen');
+      },
     ),
     GoRoute(
       path: RoutePath.home,
       pageBuilder:
           (context, state) =>
-          _fadePage(child: const HomeScreen(), state: state),
+              _fadePage(child: const HomeScreen(), state: state,name: 'HomeScreen'),
     ),
     GoRoute(
       path: RoutePath.registration,
-      pageBuilder:
-          (context, state) {
+      pageBuilder: (context, state) {
         final customer = state.extra as CustomerModel?;
         final todoViewModel = getIt<TodoViewModel>(); // ⚡ 반드시 주입
         return _fadePage(
@@ -93,6 +98,7 @@ final router = GoRouter(
             todoViewModel: todoViewModel,
           ),
           state: state,
+          name: 'RegistrationScreen'
         );
       },
     ),
@@ -100,42 +106,41 @@ final router = GoRouter(
       path: RoutePath.signUp,
       pageBuilder:
           (context, state) =>
-          _fadePage(child: const SignUpScreen(), state: state),
+              _fadePage(child: const SignUpScreen(), state: state,name: 'SignupScreen'),
     ),
     GoRoute(
       path: RoutePath.login,
       pageBuilder:
           (context, state) =>
-          _fadePage(child: const LoginScreen(), state: state),
+              _fadePage(child: const LoginScreen(), state: state,name: 'LoginScreen'),
     ),
     GoRoute(
       path: RoutePath.verifyEmail,
       pageBuilder:
           (context, state) =>
-          _fadePage(child: const VerifyEmailScreen(), state: state),
+              _fadePage(child: const VerifyEmailScreen(), state: state,name: 'VerifyEmail'),
     ),
     GoRoute(
       path: RoutePath.onboarding,
       pageBuilder:
           (context, state) =>
-          _fadePage(child: const OnboardingScreen(), state: state),
+              _fadePage(child: const OnboardingScreen(), state: state,name: 'Onboarding'),
     ),
     GoRoute(
       path: RoutePath.policy,
       pageBuilder:
-          (context, state) =>
-          _fadePage(
+          (context, state) => _fadePage(
             child: PolicyScreen(customer: state.extra as CustomerModel),
             state: state,
+            name: 'PolicyScreen'
           ),
     ),
     GoRoute(
       path: RoutePath.customer,
       pageBuilder:
-          (context, state) =>
-          _fadePage(
+          (context, state) => _fadePage(
             child: CustomerScreen(customer: state.extra as CustomerModel),
-            state: state,
+            state: state,name: 'CustomerScreen'
           ),
     ),
   ],
@@ -144,9 +149,11 @@ final router = GoRouter(
 CustomTransitionPage _fadePage({
   required Widget child,
   required GoRouterState state,
+  required String name, // route 추적 위해 추가
 }) {
   return CustomTransitionPage(
     key: state.pageKey,
+    name: name, // ✅ RouteSettings.name 으로 들어감
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return FadeTransition(opacity: animation, child: child);
