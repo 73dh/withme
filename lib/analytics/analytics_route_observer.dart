@@ -5,10 +5,8 @@ class AnalyticsRouteObserver extends NavigatorObserver {
   AnalyticsRouteObserver(this.analytics);
 
   void _sendScreenView(Route<dynamic>? route) {
-    if (route is PageRoute) {
-      final settings = route.settings;
-      final name = settings.name ?? route.runtimeType.toString();
-
+    if (route?.settings.name != null) {  // ✅ PageRoute 제한 없앰
+      final name = route!.settings.name!;
       debugPrint('📊 Route change → $name');
 
       analytics.logScreenView(
@@ -34,5 +32,12 @@ class AnalyticsRouteObserver extends NavigatorObserver {
   void didReplace({Route? newRoute, Route? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     _sendScreenView(newRoute);
+  }
+
+
+  @override
+  void didRemove(Route route, Route? previousRoute) {
+    super.didRemove(route, previousRoute);
+    _sendScreenView(previousRoute);
   }
 }

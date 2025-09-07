@@ -76,14 +76,21 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.splash,
       pageBuilder: (context, state) {
-        return _fadePage(child: SplashScreen(), state: state,name: 'SplashScreen');
+        return _fadePage(
+          child: SplashScreen(),
+          state: state,
+          name: 'SplashScreen',
+        );
       },
     ),
     GoRoute(
       path: RoutePath.home,
       pageBuilder:
-          (context, state) =>
-              _fadePage(child: const HomeScreen(), state: state,name: 'HomeScreen'),
+          (context, state) => _fadePage(
+            child: const HomeScreen(),
+            state: state,
+            name: 'HomeScreen',
+          ),
     ),
     GoRoute(
       path: RoutePath.registration,
@@ -98,33 +105,45 @@ final router = GoRouter(
             todoViewModel: todoViewModel,
           ),
           state: state,
-          name: 'RegistrationScreen'
+          name: 'RegistrationScreen',
         );
       },
     ),
     GoRoute(
       path: RoutePath.signUp,
       pageBuilder:
-          (context, state) =>
-              _fadePage(child: const SignUpScreen(), state: state,name: 'SignupScreen'),
+          (context, state) => _fadePage(
+            child: const SignUpScreen(),
+            state: state,
+            name: 'SignupScreen',
+          ),
     ),
     GoRoute(
       path: RoutePath.login,
       pageBuilder:
-          (context, state) =>
-              _fadePage(child: const LoginScreen(), state: state,name: 'LoginScreen'),
+          (context, state) => _fadePage(
+            child: const LoginScreen(),
+            state: state,
+            name: 'LoginScreen',
+          ),
     ),
     GoRoute(
       path: RoutePath.verifyEmail,
       pageBuilder:
-          (context, state) =>
-              _fadePage(child: const VerifyEmailScreen(), state: state,name: 'VerifyEmail'),
+          (context, state) => _fadePage(
+            child: const VerifyEmailScreen(),
+            state: state,
+            name: 'VerifyEmail',
+          ),
     ),
     GoRoute(
       path: RoutePath.onboarding,
       pageBuilder:
-          (context, state) =>
-              _fadePage(child: const OnboardingScreen(), state: state,name: 'Onboarding'),
+          (context, state) => _fadePage(
+            child: const OnboardingScreen(),
+            state: state,
+            name: 'Onboarding',
+          ),
     ),
     GoRoute(
       path: RoutePath.policy,
@@ -132,7 +151,7 @@ final router = GoRouter(
           (context, state) => _fadePage(
             child: PolicyScreen(customer: state.extra as CustomerModel),
             state: state,
-            name: 'PolicyScreen'
+            name: 'PolicyScreen',
           ),
     ),
     GoRoute(
@@ -140,7 +159,8 @@ final router = GoRouter(
       pageBuilder:
           (context, state) => _fadePage(
             child: CustomerScreen(customer: state.extra as CustomerModel),
-            state: state,name: 'CustomerScreen'
+            state: state,
+            name: 'CustomerScreen',
           ),
     ),
   ],
@@ -153,7 +173,8 @@ CustomTransitionPage _fadePage({
 }) {
   return CustomTransitionPage(
     key: state.pageKey,
-    name: name, // ✅ RouteSettings.name 으로 들어감
+    name: name,
+    // ✅ RouteSettings.name 으로 들어감
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return FadeTransition(opacity: animation, child: child);

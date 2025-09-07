@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:withme/core/domain/enum/insurance_company.dart';
 import 'package:withme/core/domain/enum/product_category.dart';
@@ -13,7 +14,6 @@ import 'package:withme/presentation/home/search/search_page_state.dart';
 import '../../../core/data/fire_base/user_session.dart';
 import '../../../core/di/setup.dart';
 import '../../../core/domain/enum/payment_status.dart';
-import '../../../core/utils/check_payment_status.dart';
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/history_model.dart';
 import '../../../domain/model/policy_model.dart';
@@ -40,12 +40,10 @@ class SearchPageViewModel with ChangeNotifier {
       _selectProductCategory(productCategory: event.productCategory);
     } else if (event is SelectInsuranceCompany) {
       _selectInsuranceCompany(insuranceCompany: event.insuranceCompany);
-    }
-    else if (event is SelectPaymentStatus) {
+    } else if (event is SelectPaymentStatus) {
       _selectPaymentStatus(paymentStatus: event.paymentStatus);
-    }else if (event is FilterPolicy) {
-      await _filterPolicy(
-      );
+    } else if (event is FilterPolicy) {
+      await _filterPolicy();
     } else if (event is SelectContractMonth) {
       _selectContractMonth(selectedContractMonth: event.selectedContractMonth);
     }
@@ -170,24 +168,19 @@ class SearchPageViewModel with ChangeNotifier {
   }
 
   /// 납입 상태
-  void _selectPaymentStatus({ required PaymentStatus paymentStatus}) {
-
-
+  void _selectPaymentStatus({required PaymentStatus paymentStatus}) {
     _state = state.copyWith(paymentStatus: paymentStatus);
     notifyListeners();
     _filterPolicy(); // ✅ 자동 필터 실행
   }
 
-
-
-  /// 정책 필터
-  Future<void> _filterPolicy(
-  ) async {
+  /// 보험계약 필터
+  Future<void> _filterPolicy() async {
     final filtered = await FilterPolicyUseCase.call(
       contractMonth: state.selectedContractMonth,
       policies: state.policies,
       productCategory: state.productCategory,
-      insuranceCompany:state.insuranceCompany,
+      insuranceCompany: state.insuranceCompany,
       paymentStatus: state.paymentStatus,
     );
     _state = state.copyWith(
@@ -195,7 +188,18 @@ class SearchPageViewModel with ChangeNotifier {
       currentSearchOption: SearchOption.filterPolicy,
     );
     notifyListeners();
+    // ✅ Analytics 이벤트 추가
+    await FirebaseAnalytics.instance.logEvent(
+      name: "filter_policy",
+      parameters: {
+        "contractMonth": state.selectedContractMonth,
+        "productCategory": state.productCategory.toString(),
+        "insuranceCompany": state.insuranceCompany.toString(),
+        "paymentStatus": state.paymentStatus.toString(),
+      },
+    );
   }
+
   /// 필터 초기화
   void resetFilters() {
     _state = _state.copyWith(

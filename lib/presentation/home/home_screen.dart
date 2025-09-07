@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen>
     logTabChange(menu.toString(), 'HomeScreen'); // 첫 화면도 기록
   }
 
-  void _onPageChanged(int index) {
+  void _onPageChanged(int index)async {
     final newIndex = index % HomeMenu.values.length;
     if (newIndex == _currentIndex) return;
 
@@ -32,8 +32,17 @@ class _HomeScreenState extends State<HomeScreen>
 
     final menu = HomeMenu.values[_currentIndex];
 
-    // ✅ Firebase Analytics 조회수 기록
-    logTabChange(menu.name, 'HomeScreen');
+    // 기존: 화면 전환 이벤트
+    await logTabChange(menu.name, 'HomeScreen');
+
+    // 추가: 탭 선택 이벤트
+    await analytics.logEvent(
+      name: 'home_button',
+      parameters: {
+        'home_name': menu.name,
+        'home_index': _currentIndex,
+      },
+    );
   }
 
   void _onItemTapped(int index) {

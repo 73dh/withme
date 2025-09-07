@@ -8,8 +8,8 @@ mixin AnalyticsPageViewObserver<T extends StatefulWidget> on State<T> {
     print('📊 [Analytics] Tab change → $tabName');
 
     await analytics.logScreenView(
-      screenName: tabName, // ✅ 탭 이름을 화면 이름으로 기록
-      screenClass: screenClass, // "HomeScreen" 같이 상위 클래스명
+      screenName: tabName,
+      screenClass: "${screenClass}_$tabName", // ✅ 탭별로 구분
     );
   }
 }
