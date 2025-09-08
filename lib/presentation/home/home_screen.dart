@@ -4,6 +4,12 @@ import '../../core/const/duration.dart';
 import '../../core/const/size.dart';
 import '../../core/domain/enum/home_menu.dart';
 import '../../core/presentation/core_presentation_import.dart';
+import 'package:withme/analytics/ayalytics_page_view_observer.dart';
+
+import '../../core/const/duration.dart';
+import '../../core/const/size.dart';
+import '../../core/domain/enum/home_menu.dart';
+import '../../core/presentation/core_presentation_import.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,10 +27,11 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     final menu = HomeMenu.values[_currentIndex];
-    logTabChange(menu.toString(), 'HomeScreen'); // 첫 화면도 기록
+    // ✅ 첫 화면도 한글 라벨로 기록
+    logTabChange(menu.label, screenClass: 'HomeScreen');
   }
 
-  void _onPageChanged(int index)async {
+  void _onPageChanged(int index) async {
     final newIndex = index % HomeMenu.values.length;
     if (newIndex == _currentIndex) return;
 
@@ -32,21 +39,21 @@ class _HomeScreenState extends State<HomeScreen>
 
     final menu = HomeMenu.values[_currentIndex];
 
-    // 기존: 화면 전환 이벤트
-    await logTabChange(menu.name, 'HomeScreen');
+    // ✅ 화면 전환 이벤트 (한글 라벨)
+    await logTabChange(menu.label, screenClass: 'HomeScreen');
 
-    // 추가: 탭 선택 이벤트
+    // ✅ 탭 선택 이벤트 (한글 라벨)
     await analytics.logEvent(
       name: 'home_button',
       parameters: {
-        'home_name': menu.name,
+        'home_label': menu.label, // "고객관리", "잠재고객" 등
         'home_index': _currentIndex,
       },
     );
   }
 
   void _onItemTapped(int index) {
-    if(index==_currentIndex) return;
+    if (index == _currentIndex) return;
     _pageController.animateToPage(
       index,
       duration: AppDurations.duration100,
@@ -63,13 +70,12 @@ class _HomeScreenState extends State<HomeScreen>
         onPageChanged: _onPageChanged,
         itemCount: HomeMenu.values.length,
         itemBuilder: (context, index) {
-          final pageIndex = index % 4;
+          final pageIndex = index % HomeMenu.values.length;
           return HomeMenu.values
               .firstWhere((e) => e.index == pageIndex)
               .toWidget;
         },
       ),
-
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -89,27 +95,23 @@ class _HomeScreenState extends State<HomeScreen>
             onTap: _onItemTapped,
             selectedFontSize: 0,
             unselectedFontSize: 0,
-            items:
-                HomeMenu.values.map((menu) {
-                  return BottomNavigationBarItem(
-                    icon: Image.asset(
-                      menu.iconPath,
-                      width: AppSizes.bottomNavIconSize,
-                      height: AppSizes.bottomNavIconSize,
-                      color:
-                          menu.index == _currentIndex
-                              ? (Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? Colors.black87
-                                  : Colors.white)
-                              : (Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? Colors.black38
-                                  : Colors.white54),
-                    ),
-                    label: '',
-                  );
-                }).toList(),
+            items: HomeMenu.values.map((menu) {
+              return BottomNavigationBarItem(
+                icon: Image.asset(
+                  menu.iconPath,
+                  width: AppSizes.bottomNavIconSize,
+                  height: AppSizes.bottomNavIconSize,
+                  color: menu.index == _currentIndex
+                      ? (Theme.of(context).brightness == Brightness.light
+                      ? Colors.black87
+                      : Colors.white)
+                      : (Theme.of(context).brightness == Brightness.light
+                      ? Colors.black38
+                      : Colors.white54),
+                ),
+                label: '',
+              );
+            }).toList(),
           ),
         ),
       ),

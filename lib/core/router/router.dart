@@ -76,7 +76,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.splash,
       pageBuilder: (context, state) {
-        return _fadePage(
+        return fadePage(
           child: SplashScreen(),
           state: state,
           name: 'SplashScreen',
@@ -86,7 +86,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.home,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: const HomeScreen(),
             state: state,
             name: 'HomeScreen',
@@ -97,7 +97,7 @@ final router = GoRouter(
       pageBuilder: (context, state) {
         final customer = state.extra as CustomerModel?;
         final todoViewModel = getIt<TodoViewModel>(); // ⚡ 반드시 주입
-        return _fadePage(
+        return fadePage(
           child: RegistrationScreen(
             customer: customer,
             scrollController: ScrollController(), // 필요 시 기본 ScrollController
@@ -112,7 +112,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.signUp,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: const SignUpScreen(),
             state: state,
             name: 'SignupScreen',
@@ -121,7 +121,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.login,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: const LoginScreen(),
             state: state,
             name: 'LoginScreen',
@@ -130,7 +130,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.verifyEmail,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: const VerifyEmailScreen(),
             state: state,
             name: 'VerifyEmail',
@@ -139,7 +139,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.onboarding,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: const OnboardingScreen(),
             state: state,
             name: 'Onboarding',
@@ -148,7 +148,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.policy,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: PolicyScreen(customer: state.extra as CustomerModel),
             state: state,
             name: 'PolicyScreen',
@@ -157,7 +157,7 @@ final router = GoRouter(
     GoRoute(
       path: RoutePath.customer,
       pageBuilder:
-          (context, state) => _fadePage(
+          (context, state) => fadePage(
             child: CustomerScreen(customer: state.extra as CustomerModel),
             state: state,
             name: 'CustomerScreen',
@@ -166,22 +166,70 @@ final router = GoRouter(
   ],
 );
 
-CustomTransitionPage _fadePage({
+Page<T> fadePage<T>({
   required Widget child,
   required GoRouterState state,
-  required String name, // route 추적 위해 추가
+  required String name,
 }) {
-  return CustomTransitionPage(
+  return MaterialPage<T>(
     key: state.pageKey,
-    name: name,
-    // ✅ RouteSettings.name 으로 들어감
-    child: child,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(opacity: animation, child: child);
-    },
-    transitionDuration: AppDurations.duration300,
+    name: name, // ✅ RouteSettings.name 으로 Analytics에 기록됨
+    child: _FadeTransitionWrapper(child: child),
   );
 }
+
+class _FadeTransitionWrapper extends StatefulWidget {
+  final Widget child;
+  const _FadeTransitionWrapper({ required this.child});
+
+  @override
+  State<_FadeTransitionWrapper> createState() => _FadeTransitionWrapperState();
+}
+
+class _FadeTransitionWrapperState extends State<_FadeTransitionWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(opacity: _animation, child: widget.child);
+  }
+}
+
+// CustomTransitionPage _fadePage({
+//   required Widget child,
+//   required GoRouterState state,
+//   required String name, // route 추적 위해 추가
+// }) {
+//   return CustomTransitionPage(
+//     key: state.pageKey,
+//     name: name,
+//     // ✅ RouteSettings.name 으로 들어감
+//     child: child,
+//     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+//       return FadeTransition(opacity: animation, child: child);
+//     },
+//     transitionDuration: AppDurations.duration300,
+//   );
+// }
 
 class AuthChangeNotifier extends ChangeNotifier {
   bool _needsOnboarding = false;

@@ -29,18 +29,23 @@ class ApplyCurrentSortUseCase {
         break;
 
       case SortType.birth:
-        // 1차: 생일순 / 2차: 이름순
+      // 1차: 생일 (월/일 기준) / 2차: 이름순
         sortedList.sort((a, b) {
-          final aBirth = a.birth ?? DateTime(1900);
-          final bBirth = b.birth ?? DateTime(1900);
+          final aBirth = a.birth != null
+              ? DateTime(1900, a.birth!.month, a.birth!.day) // 연도 무시
+              : DateTime(1900);
+          final bBirth = b.birth != null
+              ? DateTime(1900, b.birth!.month, b.birth!.day)
+              : DateTime(1900);
 
           final birthCompare =
-              isAscending ? aBirth.compareTo(bBirth) : bBirth.compareTo(aBirth);
+          isAscending ? aBirth.compareTo(bBirth) : bBirth.compareTo(aBirth);
           if (birthCompare != 0) return birthCompare;
 
           return a.name.compareTo(b.name); // 항상 오름차순
         });
         break;
+
 
       case SortType.insuredDate:
         // 1차: 상령일순 / 2차: 이름순

@@ -1,15 +1,17 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/material.dart';
+
 mixin AnalyticsPageViewObserver<T extends StatefulWidget> on State<T> {
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
-  Future<void> logTabChange(String tabName, String screenClass) async {
-    print('📊 [Analytics] Tab change → $tabName');
-
+  Future<void> logTabChange(String tabLabel, {required String screenClass}) async {
+    debugPrint('📊 [Analytics] Tab change → $tabLabel');
     await analytics.logScreenView(
-      screenName: tabName,
-      screenClass: "${screenClass}_$tabName", // ✅ 탭별로 구분
+      screenName: tabLabel, // ✅ 한글 라벨을 직접 기록
+      screenClass: screenClass,
     );
   }
 }

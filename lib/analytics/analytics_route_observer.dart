@@ -1,13 +1,20 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/material.dart';
+
 class AnalyticsRouteObserver extends NavigatorObserver {
   final FirebaseAnalytics analytics;
   AnalyticsRouteObserver(this.analytics);
 
   void _sendScreenView(Route<dynamic>? route) {
-    if (route?.settings.name != null) {  // ✅ PageRoute 제한 없앰
+    if (route?.settings.name != null) {
       final name = route!.settings.name!;
-      debugPrint('📊 Route change → $name');
+      if (name == 'HomeScreen') {
+        // 🚫 HomeScreen은 제외 → 내부 탭에서만 기록
+        return;
+      }
 
       analytics.logScreenView(
         screenName: name,
@@ -33,7 +40,6 @@ class AnalyticsRouteObserver extends NavigatorObserver {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     _sendScreenView(newRoute);
   }
-
 
   @override
   void didRemove(Route route, Route? previousRoute) {

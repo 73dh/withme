@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../core/data/fire_base/firestore_keys.dart';
 import '../../core/domain/enum/membership_status.dart';
 
@@ -6,7 +7,7 @@ class UserModel {
   final String userKey;
   final String email;
   final DateTime agreedDate;
-  final String agreementText; // ← 약관 전문 저장
+  final String policyText; // ← 약관 전문 저장
   final MembershipStatus membershipStatus;
   final DateTime? paidAt; // 유료 결제일
   final DocumentReference? documentReference;
@@ -15,7 +16,7 @@ class UserModel {
     required this.userKey,
     required this.email,
     required this.agreedDate,
-    required this.agreementText,
+    required this.policyText,
     required this.membershipStatus,
     this.paidAt,
     this.documentReference,
@@ -26,38 +27,46 @@ class UserModel {
       userKey: json[keyUserKey] as String,
       email: json[keyEmail] as String,
       agreedDate: (json[keyAgreedDate] as Timestamp).toDate(),
-     agreementText: json[keyAgreementText] as String,
-      membershipStatus:
-      MembershipStatusExtension.fromString(json[keyMembershipStatus] ?? 'free'),
-      paidAt: json[keyPaidAt] != null
-          ? (json[keyPaidAt] as Timestamp).toDate()
-          : null,
+      policyText: json[keyPolicyText] as String,
+      membershipStatus: MembershipStatusExtension.fromString(
+        json[keyMembershipStatus] ?? 'free',
+      ),
+      paidAt:
+          json[keyPaidAt] != null
+              ? (json[keyPaidAt] as Timestamp).toDate()
+              : null,
       documentReference: json['documentReference'] as DocumentReference?,
     );
   }
 
   factory UserModel.fromMap(
-      Map<String, dynamic> map,
-      String userKey, {
-        DocumentReference? documentReference,
-      }) {
+    Map<String, dynamic> map,
+    String userKey, {
+    DocumentReference? documentReference,
+  }) {
     return UserModel(
       userKey: userKey,
       email: map[keyEmail] ?? '',
       agreedDate: (map[keyAgreedDate] as Timestamp).toDate(),
-    agreementText: map[keyAgreementText]??'',
-      membershipStatus:
-      MembershipStatusExtension.fromString(map[keyMembershipStatus] ?? 'free'),
-      paidAt: map[keyPaidAt] != null
-          ? (map[keyPaidAt] as Timestamp).toDate()
-          : null,
+      policyText: map[keyPolicyText] ?? '',
+      membershipStatus: MembershipStatusExtension.fromString(
+        map[keyMembershipStatus] ?? 'free',
+      ),
+      paidAt:
+          map[keyPaidAt] != null
+              ? (map[keyPaidAt] as Timestamp).toDate()
+              : null,
       documentReference: documentReference,
     );
   }
 
   factory UserModel.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
-    return UserModel.fromMap(data, snapshot.id, documentReference: snapshot.reference);
+    return UserModel.fromMap(
+      data,
+      snapshot.id,
+      documentReference: snapshot.reference,
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -65,7 +74,7 @@ class UserModel {
       keyUserKey: userKey,
       keyEmail: email,
       keyAgreedDate: Timestamp.fromDate(agreedDate),
-      keyAgreementText: agreementText,
+      keyPolicyText: policyText,
       keyMembershipStatus: membershipStatus.name,
       if (paidAt != null) keyPaidAt: Timestamp.fromDate(paidAt!),
     };
@@ -99,7 +108,7 @@ class UserModel {
     String? userKey,
     String? email,
     DateTime? agreedDate,
-    String? agreementText,
+    String? policyText,
     MembershipStatus? membershipStatus,
     DateTime? paidAt,
     DocumentReference? documentReference,
@@ -108,11 +117,10 @@ class UserModel {
       userKey: userKey ?? this.userKey,
       email: email ?? this.email,
       agreedDate: agreedDate ?? this.agreedDate,
-     agreementText: agreementText?? this.agreementText,
+      policyText: policyText ?? this.policyText,
       membershipStatus: membershipStatus ?? this.membershipStatus,
       paidAt: paidAt ?? this.paidAt,
       documentReference: documentReference ?? this.documentReference,
     );
   }
-
 }

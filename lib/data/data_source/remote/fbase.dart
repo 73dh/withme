@@ -61,7 +61,7 @@ class FBase {
         membershipStatus: MembershipStatus.free,
         paidAt: DateTime(2020),
         agreedDate: DateTime.now(),
-        agreementText: agreementText,
+        policyText: agreementText,
       );
 
       await docRef.set(user.toMap());
