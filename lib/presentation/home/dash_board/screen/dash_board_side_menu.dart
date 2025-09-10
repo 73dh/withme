@@ -12,6 +12,7 @@ import '../../../../core/domain/core_domain_import.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_cycle_edit_dialog.dart';
 import '../../../../core/ui/core_ui_import.dart';
+import '../../../../core/ui/theme/theme_controller.dart';
 import '../../../../domain/model/user_model.dart';
 import '../components/build_menu_item.dart';
 
@@ -69,6 +70,31 @@ class DashBoardSideMenu extends StatelessWidget {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        AnimatedBuilder(
+                          animation: themeController,
+                          builder: (context, _) {
+                            return BuildMenuItem(
+                              icon: themeController.themeMode == AppThemeMode.system
+                                  ? Icons.brightness_6 // 시스템
+                                  : themeController.themeMode == AppThemeMode.light
+                                  ? Icons.wb_sunny // 라이트
+                                  : Icons.nightlight_round, // 다크
+                              text: themeController.themeMode == AppThemeMode.system
+                                  ? '시스템 적용중'
+                                  : themeController.themeMode == AppThemeMode.light
+                                  ? '라이트 모드'
+                                  : '다크 모드',
+                              onTap: () {
+                                final nextMode = AppThemeMode
+                                    .values[(themeController.themeMode.index + 1) %
+                                    AppThemeMode.values.length];
+                                themeController.setTheme(nextMode);
+                              },
+                            );
+                          },
+                        )
+,
+                        height(15),
                         BuildMenuItem(
                           icon: Icons.info_outline,
                           text: 'App소개',

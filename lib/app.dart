@@ -6,6 +6,15 @@ import 'package:withme/core/router/router.dart';
 import 'core/system/auto_exit_wrapper.dart';
 import 'core/ui/theme/theme.dart';
 import 'core/ui/theme/theme_components.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:withme/core/router/router.dart';
+
+import 'core/system/auto_exit_wrapper.dart';
+import 'core/ui/theme/theme.dart';
+import 'core/ui/theme/theme_components.dart';
+import 'core/ui/theme/theme_controller.dart'; // ✅ ThemeController import
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -19,6 +28,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     final baseTextTheme = ThemeData().textTheme;
     final materialTheme = MaterialTheme(baseTextTheme);
+
     ThemeData applyCustomTheme(ThemeData base) {
       final colors = base.colorScheme;
       return base.copyWith(
@@ -32,24 +42,29 @@ class _AppState extends State<App> {
     return AutoExitWrapper(
       duration: const Duration(seconds: 10),
       onTimeout: () {
-        // 2) 앱을 홈으로 보내고 백그라운드에 두기 (권장)
+        // 앱을 홈으로 보내고 백그라운드에 두기
         SystemNavigator.pop();
       },
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        routerConfig: router,
-        theme: applyCustomTheme(materialTheme.light()),
-        darkTheme: applyCustomTheme(materialTheme.dark()),
-        themeMode: ThemeMode.system,
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('ko'), // 한국어 지원
-        ],
-        locale: const Locale('ko'), // 앱 전체 로케일을 한국어로 강제
+      child: AnimatedBuilder(
+        animation: themeController, // ✅ ThemeController 변화 감지
+        builder: (context, _) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            routerConfig: router,
+            theme: applyCustomTheme(materialTheme.light()),
+            darkTheme: applyCustomTheme(materialTheme.dark()),
+            themeMode: themeController.flutterThemeMode, // ✅ 반영
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('ko'), // 한국어 지원
+            ],
+            locale: const Locale('ko'), // 앱 전체 로케일을 한국어로 강제
+          );
+        },
       ),
     );
   }
