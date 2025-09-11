@@ -1,4 +1,5 @@
 abstract class IconsPath {
+  static const String timeLine = 'assets/icons/time_line.png';
   static const String prospectPerson = 'assets/icons/pool_person.png';
   static const String folderIcon = 'assets/icons/folder.png';
   static const String searchPerson = 'assets/icons/search_person.png';

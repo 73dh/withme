@@ -4,9 +4,11 @@ import 'package:withme/presentation/home/dash_board/screen/dash_board_root.dart'
 import '../../../presentation/home/customer_list/screen/customer_list_page.dart';
 import '../../../presentation/home/prospect_list/screen/prospect_list_page.dart';
 import '../../../presentation/home/search/screen/search_page.dart';
+import '../../../presentation/home/time_line/screen/time_line_page.dart';
 import '../../ui/icon/const.dart';
 
 enum HomeMenu {
+  timeLine(label: '할일목록', iconPath: IconsPath.timeLine),
   prospect(label: '가망고객', iconPath: IconsPath.prospectPerson),
   customer(label: '계약고객', iconPath: IconsPath.folderIcon),
   search(label: '검색', iconPath: IconsPath.searchPerson),
@@ -18,6 +20,7 @@ enum HomeMenu {
   const HomeMenu({required this.label, required this.iconPath});
 
   Widget get toWidget => switch (this) {
+    HomeMenu.timeLine =>  TimelinePage(),
     HomeMenu.prospect => const ProspectListPage(),
     HomeMenu.customer => const CustomerListPage(),
     HomeMenu.search => const SearchPage(),

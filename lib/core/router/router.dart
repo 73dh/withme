@@ -214,23 +214,6 @@ class _FadeTransitionWrapperState extends State<_FadeTransitionWrapper>
   }
 }
 
-// CustomTransitionPage _fadePage({
-//   required Widget child,
-//   required GoRouterState state,
-//   required String name, // route 추적 위해 추가
-// }) {
-//   return CustomTransitionPage(
-//     key: state.pageKey,
-//     name: name,
-//     // ✅ RouteSettings.name 으로 들어감
-//     child: child,
-//     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-//       return FadeTransition(opacity: animation, child: child);
-//     },
-//     transitionDuration: AppDurations.duration300,
-//   );
-// }
-
 class AuthChangeNotifier extends ChangeNotifier {
   bool _needsOnboarding = false;
   bool _isDataLoaded = false;
