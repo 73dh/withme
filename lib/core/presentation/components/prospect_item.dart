@@ -54,7 +54,7 @@ class ProspectItem extends StatelessWidget {
                   ? colorScheme.tertiaryContainer
                   : colorScheme.surface,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start, // ✅ 위쪽 정렬
                 children: [
                   _buildIconColumn(theme, todos),
                   const SizedBox(width: 12),
@@ -98,26 +98,6 @@ class ProspectItem extends StatelessWidget {
       ],
     );
   }
-
-  // Widget _buildIconColumn(ThemeData theme, List todos) {
-  //   return Column(
-  //     mainAxisSize: MainAxisSize.min,
-  //     children: [
-  //       Text(
-  //         customer.registeredDate.formattedYearAndMonth,
-  //         style: theme.textTheme.labelMedium?.copyWith(
-  //           color: theme.colorScheme.onSurfaceVariant,
-  //         ),
-  //       ),
-  //       const SizedBox(height: 4),
-  //       FirstNameIcon(
-  //         customer: customer,
-  //         size: 38,
-  //         todoCount: todos.length,
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget _buildInfoColumn(ThemeData theme, ColorScheme colorScheme) {
     return Column(

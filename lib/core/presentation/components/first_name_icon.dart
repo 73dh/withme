@@ -14,7 +14,7 @@ class FirstNameIcon extends StatefulWidget {
     super.key,
     required this.customer,
     this.size = 38,
-    this.badgeSize = 12,
+    this.badgeSize = 14,
     this.todoCount = 0,
     this.hasOverdueTodo = false,
   });
@@ -77,22 +77,49 @@ class _FirstNameIconState extends State<FirstNameIcon>
   }
 
   Widget _buildBadge(ColorScheme colorScheme, Widget circle) {
-    if (!widget.hasOverdueTodo) {
-      // 🔹 일반 배지 (애니메이션 없음)
-      return Badge(
-        alignment: Alignment.topRight,
-        offset: const Offset(4, -4),
-        padding: const EdgeInsets.all(2),
-        backgroundColor: colorScheme.error,
-        label: Text(
+    final badgeFontSize = 7.0;
+    final badgeSize = widget.badgeSize; // 기본 12
+
+    // 공통 뱃지 빌더
+    Widget buildBadge({required Color bgColor, required Color textColor}) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+        decoration: BoxDecoration(
+          color: bgColor,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 0.8), // ✅ 얇은 테두리
+        ),
+        constraints: BoxConstraints(
+          minWidth: badgeSize,
+          minHeight: badgeSize,
+        ),
+        alignment: Alignment.center,
+        child: Text(
           '${widget.todoCount}',
           style: TextStyle(
-            color: colorScheme.onError,
-            fontSize: 7,
+            color: textColor,
+            fontSize: badgeFontSize,
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: circle,
+      );
+    }
+
+    if (!widget.hasOverdueTodo) {
+      // 🔹 일반 뱃지 (테두리만 있음)
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          circle,
+          Positioned(
+            right: -2,
+            top: -2,
+            child: buildBadge(
+              bgColor: colorScheme.error,
+              textColor: colorScheme.onError,
+            ),
+          ),
+        ],
       );
     }
 
@@ -101,27 +128,24 @@ class _FirstNameIconState extends State<FirstNameIcon>
       animation: _controller,
       builder: (context, child) {
         final t = _controller.value;
-
         final backgroundColor =
-            Color.lerp(colorScheme.error, colorScheme.onError, t)!;
-
+        Color.lerp(colorScheme.error, colorScheme.onError, t)!;
         final textColor =
-            Color.lerp(colorScheme.onError, colorScheme.error, t)!;
+        Color.lerp(colorScheme.onError, colorScheme.error, t)!;
 
-        return Badge(
-          alignment: Alignment.topRight,
-          offset: const Offset(4, -4),
-          padding: const EdgeInsets.all(2),
-          backgroundColor: backgroundColor,
-          label: Text(
-            '${widget.todoCount}',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 7,
-              fontWeight: FontWeight.bold,
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            circle,
+            Positioned(
+              right: -2,
+              top: -2,
+              child: buildBadge(
+                bgColor: backgroundColor,
+                textColor: textColor,
+              ),
             ),
-          ),
-          child: circle,
+          ],
         );
       },
     );
