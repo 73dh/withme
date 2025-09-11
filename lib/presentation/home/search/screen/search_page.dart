@@ -3,7 +3,6 @@ import 'package:withme/core/di/setup.dart';
 
 import '../../../../core/const/duration.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
-import '../../../../core/ui/core_ui_import.dart';
 import '../../home_grand_import.dart';
 import '../components/policy_list_app_bar.dart';
 import '../filter/filter_box.dart';

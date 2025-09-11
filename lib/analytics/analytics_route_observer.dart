@@ -1,11 +1,9 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/material.dart';
-
 class AnalyticsRouteObserver extends NavigatorObserver {
   final FirebaseAnalytics analytics;
+
   AnalyticsRouteObserver(this.analytics);
 
   void _sendScreenView(Route<dynamic>? route) {

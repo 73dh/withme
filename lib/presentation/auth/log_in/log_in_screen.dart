@@ -4,11 +4,8 @@ import 'package:withme/core/presentation/widget/show_overlay_snack_bar.dart';
 import 'package:withme/core/ui/theme/theme.dart';
 
 import '../../../core/const/info_text.dart';
-import '../../../core/di/di_setup_import.dart';
-import '../../../core/di/setup.dart';
 import '../../../core/presentation/core_presentation_import.dart';
 import '../../../core/router/router_import.dart';
-import '../../../core/ui/core_ui_import.dart';
 import '../../../domain/domain_import.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -190,12 +187,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 RenderFilledButton(
                   text: _isLoading ? '로그인 중...' : '로그인',
-                  foregroundColor: _isFormValid
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurface38,
-                  backgroundColor: _isFormValid
-                      ? colorScheme.primary
-                      : colorScheme.onSurface12,
+                  foregroundColor:
+                      _isFormValid
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurface38,
+                  backgroundColor:
+                      _isFormValid
+                          ? colorScheme.primary
+                          : colorScheme.onSurface12,
                   onPressed: _isFormValid && !_isLoading ? _login : null,
                 ),
                 height(20),

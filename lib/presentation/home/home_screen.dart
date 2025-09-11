@@ -4,12 +4,6 @@ import '../../core/const/duration.dart';
 import '../../core/const/size.dart';
 import '../../core/domain/enum/home_menu.dart';
 import '../../core/presentation/core_presentation_import.dart';
-import 'package:withme/analytics/ayalytics_page_view_observer.dart';
-
-import '../../core/const/duration.dart';
-import '../../core/const/size.dart';
-import '../../core/domain/enum/home_menu.dart';
-import '../../core/presentation/core_presentation_import.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -95,23 +89,27 @@ class _HomeScreenState extends State<HomeScreen>
             onTap: _onItemTapped,
             selectedFontSize: 0,
             unselectedFontSize: 0,
-            items: HomeMenu.values.map((menu) {
-              return BottomNavigationBarItem(
-                icon: Image.asset(
-                  menu.iconPath,
-                  width: AppSizes.bottomNavIconSize,
-                  height: AppSizes.bottomNavIconSize,
-                  color: menu.index == _currentIndex
-                      ? (Theme.of(context).brightness == Brightness.light
-                      ? Colors.black87
-                      : Colors.white)
-                      : (Theme.of(context).brightness == Brightness.light
-                      ? Colors.black38
-                      : Colors.white54),
-                ),
-                label: '',
-              );
-            }).toList(),
+            items:
+                HomeMenu.values.map((menu) {
+                  return BottomNavigationBarItem(
+                    icon: Image.asset(
+                      menu.iconPath,
+                      width: AppSizes.bottomNavIconSize,
+                      height: AppSizes.bottomNavIconSize,
+                      color:
+                          menu.index == _currentIndex
+                              ? (Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Colors.black87
+                                  : Colors.white)
+                              : (Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Colors.black38
+                                  : Colors.white54),
+                    ),
+                    label: '',
+                  );
+                }).toList(),
           ),
         ),
       ),

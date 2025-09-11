@@ -9,7 +9,6 @@ import '../../core/const/duration.dart';
 import '../../core/di/setup.dart';
 import '../../core/router/router.dart';
 import '../../core/router/router_path.dart';
-import '../../core/ui/core_ui_import.dart';
 import '../home/customer_list/customer_list_view_model.dart';
 import '../home/prospect_list/prospect_list_view_model.dart';
 

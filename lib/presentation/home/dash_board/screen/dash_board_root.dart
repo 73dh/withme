@@ -11,7 +11,6 @@ import '../../../../core/const/info_text.dart';
 import '../../../../core/di/setup.dart';
 import '../../../../core/presentation/core_presentation_import.dart';
 import '../../../../core/presentation/widget/show_reauth_dialog.dart';
-import '../../../../core/ui/core_ui_import.dart';
 import '../dash_board_view_model.dart';
 
 class DashBoardRoot extends StatefulWidget {

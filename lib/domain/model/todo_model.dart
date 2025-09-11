@@ -60,4 +60,6 @@ class TodoModel {
 
   // 문서 ID 추출
   String get docId => reference?.id ?? '';
+
+  bool get isOverdue => dueDate.isBefore(DateTime.now());
 }

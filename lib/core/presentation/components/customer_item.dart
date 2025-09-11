@@ -92,12 +92,13 @@ class CustomerItem extends StatelessWidget {
     return Row(
       children: [
         // 성별 + 생일 아이콘
-        FirstNameIcon(
-          customer: customer,
-          size: 23,
-          badgeSize: 10,
-          todoCount: customer.todos.length,
-        ),
+      FirstNameIcon(
+      customer: customer,
+      size: 23,
+      badgeSize: 10,
+      todoCount: customer.todos.length,
+      hasOverdueTodo: customer.todos.any((t) => t.isOverdue),
+    ),
         width(5),
         // 이름 (아이콘과 바로 붙음)
         Text(

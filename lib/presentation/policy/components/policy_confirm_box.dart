@@ -55,7 +55,7 @@ class PolicyConfirmBox extends StatelessWidget {
     String displayPaymentPeriod = '';
     if (paymentMethod == '월납') {
       displayPaymentPeriod =
-          paymentPeriodRaw.isNotEmpty ? '${paymentPeriodRaw}년' : '';
+          paymentPeriodRaw.isNotEmpty ? '$paymentPeriodRaw년' : '';
     } else if (paymentMethod == '일시납') {
       displayPaymentPeriod = '일시납';
     }
@@ -131,8 +131,9 @@ class PolicyConfirmBox extends StatelessWidget {
           RenderFilledButton(
             onPressed: () {
               onChecked();
-              if (context.mounted)
+              if (context.mounted) {
                 Navigator.of(context, rootNavigator: true).pop();
+              }
             },
             text: '계약 저장',
             borderRadius: 10,

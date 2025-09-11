@@ -77,7 +77,8 @@ class ProspectItem extends StatelessWidget {
     );
   }
 
-  Widget _buildIconColumn(ThemeData theme, List todos) {
+  Widget _buildIconColumn(ThemeData theme, List todos, ) {
+    final hasOverdue = todos.any((t) => t.isOverdue); // ✅ 여기서 계산
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -92,10 +93,31 @@ class ProspectItem extends StatelessWidget {
           customer: customer,
           size: 38,
           todoCount: todos.length,
+          hasOverdueTodo: hasOverdue, // ✅ 전달
         ),
       ],
     );
   }
+
+  // Widget _buildIconColumn(ThemeData theme, List todos) {
+  //   return Column(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       Text(
+  //         customer.registeredDate.formattedYearAndMonth,
+  //         style: theme.textTheme.labelMedium?.copyWith(
+  //           color: theme.colorScheme.onSurfaceVariant,
+  //         ),
+  //       ),
+  //       const SizedBox(height: 4),
+  //       FirstNameIcon(
+  //         customer: customer,
+  //         size: 38,
+  //         todoCount: todos.length,
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildInfoColumn(ThemeData theme, ColorScheme colorScheme) {
     return Column(

@@ -18,7 +18,7 @@ String calculateTotalPremium(List<PolicyModel> policies) {
     } else {
       // ✅ 월납 등 반복납입 → 이번 달에 해당하는지만 체크
       final start = policy.startDate;
-      final periodMonths = policy.paymentPeriod ?? 0;
+      final periodMonths = policy.paymentPeriod;
       if (start == null || periodMonths <= 0) continue;
 
       final now = DateTime.now();

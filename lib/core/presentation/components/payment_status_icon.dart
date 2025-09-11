@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:withme/core/domain/enum/payment_status.dart';
-import 'package:flutter/material.dart';
-import 'package:withme/core/domain/enum/payment_status.dart';
 
 class PaymentStatusIcon extends StatefulWidget {
   const PaymentStatusIcon({super.key, required this.status, this.size = 18});
@@ -41,7 +39,7 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
 
     switch (widget.status) {
       case PaymentStatus.soonPaid:
-      // 완료임박 → 점멸 + 텍스트
+        // 완료임박 → 점멸 + 텍스트
         return AnimatedBuilder(
           animation: _opacityAnim,
           builder: (context, child) {
@@ -69,7 +67,7 @@ class _PaymentStatusIconState extends State<PaymentStatusIcon>
         );
 
       case PaymentStatus.paid:
-      // 납입완료 → theme success 계열
+        // 납입완료 → theme success 계열
         return Container(
           height: widget.size + 6,
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

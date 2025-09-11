@@ -66,24 +66,6 @@ class CustomerListViewModel
     notifyListeners();
   }
 
-  void setFilterBarToggledManually(bool value) {
-    _isFilterBarToggledManually = value;
-    notifyListeners();
-  }
-
-  bool shouldAutoExpandFilterBar() {
-    if (_isFilterBarToggledManually) return false;
-    if (!_autoHandledOnce) {
-      _autoHandledOnce = true;
-      return !_allCountsZero;
-    }
-    return false;
-  }
-
-  /// 상령일까지 체크?
-  // bool get _allCountsZero =>
-  //     todoCount == 0 && managePeriodCount == 0 && insuranceAgeUrgentCount == 0;
-
   bool get _allCountsZero => todoCount == 0 && managePeriodCount == 0;
 
   // ================= 필터 상태 =================
@@ -91,6 +73,14 @@ class CustomerListViewModel
   bool _showInactiveOnly = false;
   bool _showUrgentOnly = false;
   bool _showInsuranceAgeUrgentOnly = false;
+
+  bool get showTodoOnly => _showTodoOnly;
+
+  bool get showInactiveOnly => _showInactiveOnly;
+
+  bool get showUrgentOnly => _showUrgentOnly;
+
+  bool get showInsuranceAgeUrgentOnly => _showInsuranceAgeUrgentOnly;
 
   void updateFilter({
     bool? todoOnly,
@@ -104,11 +94,6 @@ class CustomerListViewModel
     if (insuranceAgeUrgentOnly != null) {
       _showInsuranceAgeUrgentOnly = insuranceAgeUrgentOnly;
     }
-    _applyFilterAndSort();
-  }
-
-  void updateShowTodoOnly(bool value) {
-    _showTodoOnly = value;
     _applyFilterAndSort();
   }
 
@@ -205,13 +190,10 @@ class CustomerListViewModel
     ).call(filtered);
 
     // ================= filterBar 상태 처리 =================
-
     if (_allCountsZero) {
-      // count가 0이면 무조건 닫기
       _isFilterBarExpanded = false;
       _isFilterBarToggledManually = false;
     } else {
-      // 최초 진입 & count 있음 → 자동 열기
       if (!_autoHandledOnce) {
         _isFilterBarExpanded = true;
         _autoHandledOnce = true;

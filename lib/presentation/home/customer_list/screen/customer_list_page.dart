@@ -1,5 +1,4 @@
 // customer_list_page.dart
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:withme/core/presentation/mixin/filter_bar_animation_mixin.dart';
 import 'package:withme/domain/model/customer_model.dart';
@@ -30,27 +29,16 @@ class _CustomerListPageState extends State<CustomerListPage>
         FabOverlayManagerMixin<CustomerListPage, CustomerListViewModel>,
         SingleTickerProviderStateMixin,
         FilterBarAnimationMixin {
-
-
   @override
   final CustomerListViewModel viewModel = getIt<CustomerListViewModel>();
 
   String _searchText = '';
-  bool _showTodoOnly = false;
-  bool _showInactiveOnly = false;
-  bool _showUrgentOnly = false;
 
   @override
   void initState() {
     super.initState();
     initFilterBarAnimation(vsync: this);
     viewModel.fetchData(force: true);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final route = ModalRoute.of(context);
   }
 
   @override
@@ -71,7 +59,6 @@ class _CustomerListPageState extends State<CustomerListPage>
     } else {
       filterBarController.reverse();
     }
-
     viewModel.setFilterBarExpanded(expanded, manual: manual);
   }
 
@@ -151,24 +138,21 @@ class _CustomerListPageState extends State<CustomerListPage>
       sizeFactor: heightFactor,
       axisAlignment: -1.0,
       child: InactiveAndUrgentFilterBar(
-        showInactiveOnly: _showInactiveOnly,
-        showTodoOnly: _showTodoOnly,
-        showUrgentOnly: _showUrgentOnly,
+        showInactiveOnly: viewModel.showInactiveOnly,
+        showTodoOnly: viewModel.showTodoOnly,
+        showUrgentOnly: viewModel.showUrgentOnly,
         inactiveCount: viewModel.managePeriodCount,
         todoCount: viewModel.todoCount,
         urgentCount: viewModel.insuranceAgeUrgentCount,
         onInactiveToggle: (val) {
-          setState(() => _showInactiveOnly = val);
           viewModel.updateFilter(inactiveOnly: val);
           setFilterBarExpanded(true, manual: true);
         },
         onTodoToggle: (val) {
-          setState(() => _showTodoOnly = val);
-          viewModel.updateShowTodoOnly(val);
+          viewModel.updateFilter(todoOnly: val);
           setFilterBarExpanded(true, manual: true);
         },
         onUrgentToggle: (val) {
-          setState(() => _showUrgentOnly = val);
           viewModel.updateFilter(insuranceAgeUrgentOnly: val);
           setFilterBarExpanded(true, manual: true);
         },

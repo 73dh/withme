@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart'; // 필수 import 확인
-
 import '../../const/duration.dart';
 import '../../domain/enum/sort_status.dart';
 import '../../domain/enum/sort_type.dart';
-import '../../ui/core_ui_import.dart';
 import '../core_presentation_import.dart';
 
 class SmallFab extends StatefulWidget {
@@ -253,7 +250,7 @@ class _SmallFabState extends State<SmallFab> with TickerProviderStateMixin {
             ),
           ),
           if (icon != null) ...[
-          width(4),
+            width(4),
             Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
           ],
         ],

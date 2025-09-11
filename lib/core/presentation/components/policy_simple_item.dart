@@ -10,18 +10,6 @@ import '../../utils/extension/number_format.dart';
 import '../../utils/policy_status_helper.dart';
 import '../../utils/remaining_payment_period.dart';
 import '../core_presentation_import.dart';
-import 'package:withme/core/presentation/components/birthday_badge.dart';
-import 'package:withme/core/presentation/components/payment_status_icon.dart';
-
-import '../../../domain/model/policy_model.dart';
-import '../../data/fire_base/user_session.dart';
-import '../../ui/icon/const.dart';
-import '../../utils/check_payment_status.dart';
-import '../../utils/core_utils_import.dart';
-import '../../utils/extension/number_format.dart';
-import '../../utils/policy_status_helper.dart';
-import '../../utils/remaining_payment_period.dart';
-import '../core_presentation_import.dart';
 
 class PolicySimpleItem extends StatelessWidget {
   final PolicyModel policy;
@@ -41,9 +29,8 @@ class PolicySimpleItem extends StatelessWidget {
     final premiumStyle = textTheme.labelMedium?.copyWith(
       color: PolicyStatusHelper.statusTextColor(policy, colorScheme),
       fontWeight: FontWeight.w600,
-      decoration: (policy.policyState != 'keep')
-          ? TextDecoration.lineThrough
-          : null,
+      decoration:
+          (policy.policyState != 'keep') ? TextDecoration.lineThrough : null,
     );
 
     // 상태 배경 색상
@@ -75,9 +62,10 @@ class PolicySimpleItem extends StatelessWidget {
                     children: [
                       SexIcon(
                         sex: policy.policyHolderSex,
-                        backgroundImagePath: policy.policyHolderSex == '남'
-                            ? IconsPath.manIcon
-                            : IconsPath.womanIcon,
+                        backgroundImagePath:
+                            policy.policyHolderSex == '남'
+                                ? IconsPath.manIcon
+                                : IconsPath.womanIcon,
                         size: 20,
                       ),
                       width(5),
@@ -108,9 +96,10 @@ class PolicySimpleItem extends StatelessWidget {
                     children: [
                       SexIcon(
                         sex: policy.insuredSex,
-                        backgroundImagePath: policy.insuredSex == '남'
-                            ? IconsPath.manIcon
-                            : IconsPath.womanIcon,
+                        backgroundImagePath:
+                            policy.insuredSex == '남'
+                                ? IconsPath.manIcon
+                                : IconsPath.womanIcon,
                         size: 20,
                       ),
                       width(5),
@@ -156,11 +145,12 @@ class PolicySimpleItem extends StatelessWidget {
                         ),
                         TextSpan(
                           text:
-                          '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
+                              '${numFormatter.format(int.parse(policy.premium.replaceAll(',', '')))}원',
                           style: (premiumStyle ?? const TextStyle()).copyWith(
-                            decoration: policy.policyState != '정상'
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
+                            decoration:
+                                policy.policyState != '정상'
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none,
                             decorationColor: colorScheme.error,
                             decorationThickness: 2,
                           ),
@@ -187,16 +177,18 @@ class PolicySimpleItem extends StatelessWidget {
                           ),
                         ),
                         TextSpan(
-                          text: policy.paymentMethod == '월납'
-                              ? calculateRemainingPaymentMonth(policy)
-                              : '',
+                          text:
+                              policy.paymentMethod == '월납'
+                                  ? calculateRemainingPaymentMonth(policy)
+                                  : '',
                           style: textTheme.labelMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: policy.startDate != null &&
-                                monthsUntilEnd(policy) <
-                                    UserSession().remainPaymentMonth
-                                ? colorScheme.error
-                                : colorScheme.onSurfaceVariant,
+                            color:
+                                policy.startDate != null &&
+                                        monthsUntilEnd(policy) <
+                                            UserSession().remainPaymentMonth
+                                    ? colorScheme.error
+                                    : colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

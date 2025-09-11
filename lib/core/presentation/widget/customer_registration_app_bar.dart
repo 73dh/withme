@@ -76,21 +76,25 @@ class CustomerRegistrationAppBar extends StatelessWidget
       backgroundColor: bgColor,
       foregroundColor: fgColor,
 
-      leading:
-          registrationViewModel == null
-              ? Padding(
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  top: 8,
-                  bottom: 8,
-                  right: 8.0,
-                ),
-                child: InsuredMembersIcon(customer: customer!),
-              )
-              : Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FirstNameIcon(customer: customer!),
-              ),
+        leading: registrationViewModel == null
+            ? Padding(
+          padding: const EdgeInsets.only(
+            left: 16,
+            top: 8,
+            bottom: 8,
+            right: 8.0,
+          ),
+          child: InsuredMembersIcon(customer: customer!),
+        )
+            : Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FirstNameIcon(
+            customer: customer!,
+            todoCount: todoViewModel.todoList.length,
+            hasOverdueTodo: todoViewModel.todoList.any((t) => t.isOverdue),
+          ),
+        ),
+
       // ✅ leading과 title 사이 여백 조절
       title:
           registrationViewModel == null
@@ -139,7 +143,7 @@ class CustomerRegistrationAppBar extends StatelessWidget
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '월납(납입중) ${monthlyPremium}원',
+                              '월납(납입중) $monthlyPremium원',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: fgColor,
                               ),
@@ -244,125 +248,5 @@ class CustomerRegistrationAppBar extends StatelessWidget
       ],
     );
 
-    // return AppBar(
-    //   automaticallyImplyLeading: false,
-    //   elevation: 0,
-    //   backgroundColor: bgColor,
-    //   foregroundColor: fgColor,
-    //
-    //   // ✅ 아이콘을 leading에 배치
-    //   leading: Padding(
-    //     padding: const EdgeInsets.only(left: 12.0),
-    //     child: InsuredMembersIcon(customer: customer!),
-    //   ),
-    //
-    //   // ✅ 텍스트 묶음을 title에 배치 (수직 중앙 정렬됨)
-    //   title: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     mainAxisSize: MainAxisSize.min,
-    //     children: [
-    //       Text(
-    //         '계약 ${customer!.policies.length}건 '
-    //         '(정상 ${customer!.policies.where((p) => p.policyState == PolicyStatus.keep.label).length}건)',
-    //         style: theme.textTheme.bodySmall?.copyWith(
-    //           color: fgColor,
-    //           fontWeight: FontWeight.w600,
-    //         ),
-    //       ),
-    //       Text(
-    //         '월납(납입중) ${calculateTotalPremium(customer!.policies.where((p) => p.policyState == PolicyStatus.keep.label && p.paymentMethod == "월납").toList())}원',
-    //         style: theme.textTheme.bodySmall?.copyWith(color: fgColor),
-    //       ),
-    //       Text(
-    //         '일시납 ${calculateTotalPremium(customer!.policies.where((p) => p.policyState == PolicyStatus.keep.label && p.paymentMethod == "일시납").toList())}원',
-    //         style: theme.textTheme.bodySmall?.copyWith(color: fgColor),
-    //       ),
-    //     ],
-    //   ),
-    //
-    //   // ✅ 나머지 버튼/아이콘은 actions로 정리
-    //   actions: [
-    //     Padding(
-    //       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    //       child: ManageTodoList(
-    //         viewModel: todoViewModel,
-    //         customerSex: customer!.sex,
-    //         textColor: fgColor,
-    //         onAddPressed: () async {
-    //           final newTodo = await showAddOrEditTodoDialog(context);
-    //           if (newTodo != null) {
-    //             await todoViewModel.addOrUpdateTodo(newTodo: newTodo);
-    //           }
-    //         },
-    //       ),
-    //     ),
-    //     if (onHistoryTap != null)
-    //       GestureDetector(
-    //         onTap: onHistoryTap,
-    //         child: Padding(
-    //           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    //           child:
-    //               isNeedNewHistory
-    //                   ? BlinkingCalendarIcon(
-    //                     key: ValueKey(isNeedNewHistory),
-    //                     sex: customer!.sex,
-    //                     size: 30,
-    //                   )
-    //                   : Icon(Icons.menu, color: fgColor),
-    //         ),
-    //       ),
-    //     if (onEditToggle != null)
-    //       Padding(
-    //         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    //         child: EditToggleIcon(
-    //           isReadOnly: isReadOnly,
-    //           onPressed: onEditToggle!,
-    //           color: fgColor,
-    //         ),
-    //       ),
-    //     if (registrationViewModel != null)
-    //       Padding(
-    //         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    //         child: GestureDetector(
-    //           onTap: () async {
-    //             final confirmed = await showConfirmDialog(
-    //               context,
-    //               text: '가망고객을 삭제하시겠습니까?',
-    //               onConfirm: () async {
-    //                 await registrationViewModel?.onEvent(
-    //                   RegistrationEvent.deleteCustomer(
-    //                     userKey: UserSession.userId,
-    //                     customerKey: customer!.customerKey,
-    //                   ),
-    //                 );
-    //                 final prospectViewModel = getIt<ProspectListViewModel>();
-    //                 prospectViewModel.clearCache();
-    //                 await prospectViewModel.fetchData(force: true);
-    //               },
-    //             );
-    //             if (context.mounted && confirmed == true) context.pop();
-    //           },
-    //           child: Image.asset(
-    //             IconsPath.deleteIcon,
-    //             width: 22,
-    //             color: fgColor,
-    //           ),
-    //         ),
-    //       ),
-    //     Padding(
-    //       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    //       child: AddPolicyButton(
-    //         customerModel: customer!,
-    //         onRegistered: (bool result) async {
-    //           if (result) {
-    //             await getIt<CustomerListViewModel>().refresh();
-    //             await getIt<CustomerListViewModel>().fetchData();
-    //           }
-    //         },
-    //         iconColor: fgColor,
-    //       ),
-    //     ),
-    //   ],
-    // );
   }
 }

@@ -175,10 +175,12 @@ class _PolicyScreenState extends State<PolicyScreen> {
                     onInputPremiumTap:
                         (value) =>
                             setState(() => _premiumController.text = value),
-                    onInputPaymentPeriodTap: (value) => setState(() {
-                      _paymentPeriodController.text = value;
-                    }),
-                    paymentPeriodController: _paymentPeriodController, // ✅ 추가
+                    onInputPaymentPeriodTap:
+                        (value) => setState(() {
+                          _paymentPeriodController.text = value;
+                        }),
+                    paymentPeriodController: _paymentPeriodController,
+                    // ✅ 추가
                     startDate: _startDate,
                     endDate: _endDate,
                     onStartDateChanged:
@@ -284,9 +286,10 @@ class _PolicyScreenState extends State<PolicyScreen> {
       insuranceCompany: _insuranceCompany,
       productName: _productNameController.text,
       paymentMethod: _paymentMethod,
-      paymentPeriod: _paymentMethod == '월납'
-          ? int.tryParse(_paymentPeriodController.text) ?? 0
-          : 0,
+      paymentPeriod:
+          _paymentMethod == '월납'
+              ? int.tryParse(_paymentPeriodController.text) ?? 0
+              : 0,
       premium: _premiumController.text,
       startDate: _startDate!,
       endDate: _endDate!,

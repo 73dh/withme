@@ -26,28 +26,16 @@ class _ProspectListPageState extends State<ProspectListPage>
         RouteAware,
         FabOverlayManagerMixin<ProspectListPage, ProspectListViewModel>,
         SingleTickerProviderStateMixin,
-        FilterBarAnimationMixin
-         {
-
+        FilterBarAnimationMixin {
   @override
   final viewModel = getIt<ProspectListViewModel>();
 
-  bool _showTodoOnly = false;
-  bool _showInactiveOnly = false;
-  bool _showUrgentOnly = false;
   bool _firstEnter = true;
-
 
   @override
   void initState() {
     super.initState();
     initFilterBarAnimation(vsync: this);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final modalRoute = ModalRoute.of(context);
   }
 
   @override
@@ -88,16 +76,15 @@ class _ProspectListPageState extends State<ProspectListPage>
     final todoViewModel = TodoViewModel(
       userKey: UserSession.userId,
       customerKey:
-          customer?.customerKey ?? '${DateTime.now().millisecondsSinceEpoch}',
+      customer?.customerKey ?? '${DateTime.now().millisecondsSinceEpoch}',
     );
     await showBottomSheetWithDraggable(
       context: context,
-      builder:
-          (scrollController) => RegistrationScreen(
-            customer: customer,
-            scrollController: scrollController,
-            todoViewModel: todoViewModel,
-          ),
+      builder: (scrollController) => RegistrationScreen(
+        customer: customer,
+        scrollController: scrollController,
+        todoViewModel: todoViewModel,
+      ),
       onClosed: () async {
         setIsProcessActive(false);
         await viewModel.fetchData(force: true);
@@ -120,7 +107,6 @@ class _ProspectListPageState extends State<ProspectListPage>
           builder: (context, snapshot) {
             final customers = snapshot.data ?? [];
 
-            // 최초 진입 시 자동 필터 적용
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
 
@@ -132,7 +118,7 @@ class _ProspectListPageState extends State<ProspectListPage>
                 return;
               }
 
-              // 이후 rebuild 시 AnimationController 동기화
+              // AnimationController 동기화
               if (viewModel.isFilterBarExpanded) {
                 filterBarController.forward();
               } else {
@@ -167,31 +153,28 @@ class _ProspectListPageState extends State<ProspectListPage>
   }
 
   Widget _buildFilterBar() {
-    return StreamBuilder<List<CustomerModel>>(
-      stream: viewModel.cachedProspects,
-      builder: (context, snapshot) {
+    return AnimatedBuilder(
+      animation: viewModel,
+      builder: (context, _) {
         return SizeTransition(
           sizeFactor: heightFactor,
           axisAlignment: -1.0,
           child: InactiveAndUrgentFilterBar(
-            showInactiveOnly: _showInactiveOnly,
-            showUrgentOnly: _showUrgentOnly,
-            showTodoOnly: _showTodoOnly,
+            showInactiveOnly: viewModel.inactiveOnly,
+            showUrgentOnly: viewModel.urgentOnly,
+            showTodoOnly: viewModel.todoOnly,
             inactiveCount: viewModel.managePeriodCount,
             urgentCount: viewModel.urgentCount,
             todoCount: viewModel.todoCount,
             onInactiveToggle: (val) {
-              setState(() => _showInactiveOnly = val);
               viewModel.updateFilter(inactiveOnly: val);
               setFilterBarExpanded(true, manual: true);
             },
             onUrgentToggle: (val) {
-              setState(() => _showUrgentOnly = val);
               viewModel.updateFilter(urgentOnly: val);
               setFilterBarExpanded(true, manual: true);
             },
             onTodoToggle: (val) {
-              setState(() => _showTodoOnly = val);
               viewModel.updateFilter(todoOnly: val);
               setFilterBarExpanded(true, manual: true);
             },

@@ -6,14 +6,6 @@ import 'package:withme/core/router/router.dart';
 import 'core/system/auto_exit_wrapper.dart';
 import 'core/ui/theme/theme.dart';
 import 'core/ui/theme/theme_components.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:withme/core/router/router.dart';
-
-import 'core/system/auto_exit_wrapper.dart';
-import 'core/ui/theme/theme.dart';
-import 'core/ui/theme/theme_components.dart';
 import 'core/ui/theme/theme_controller.dart'; // ✅ ThemeController import
 
 class App extends StatefulWidget {
@@ -53,7 +45,8 @@ class _AppState extends State<App> {
             routerConfig: router,
             theme: applyCustomTheme(materialTheme.light()),
             darkTheme: applyCustomTheme(materialTheme.dark()),
-            themeMode: themeController.flutterThemeMode, // ✅ 반영
+            themeMode: themeController.flutterThemeMode,
+            // ✅ 반영
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,

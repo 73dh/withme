@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../const/duration.dart';
-import 'package:flutter/material.dart';
-
-import '../../const/duration.dart';
 
 class AppBarSearchWidget extends StatefulWidget {
   final void Function(String) onSubmitted;
@@ -35,7 +32,9 @@ class _AppBarSearchWidgetState extends State<AppBarSearchWidget> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
               ),
               style: TextStyle(color: colorScheme.onSurface),
               onSubmitted: (value) => widget.onSubmitted(value),

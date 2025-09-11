@@ -15,7 +15,6 @@ import '../../presentation/auth/sign_up/sign_up_screen.dart';
 import '../../presentation/auth/verity_email/verify_email_screen.dart';
 import '../../presentation/policy/screen/policy_screen.dart';
 import '../../presentation/registration/screen/registration_screen.dart';
-import '../const/duration.dart';
 import '../di/setup.dart';
 import '../presentation/todo/todo_view_model.dart';
 
@@ -77,7 +76,7 @@ final router = GoRouter(
       path: RoutePath.splash,
       pageBuilder: (context, state) {
         return fadePage(
-          child: SplashScreen(),
+          child: const SplashScreen(),
           state: state,
           name: 'SplashScreen',
         );
@@ -180,7 +179,8 @@ Page<T> fadePage<T>({
 
 class _FadeTransitionWrapper extends StatefulWidget {
   final Widget child;
-  const _FadeTransitionWrapper({ required this.child});
+
+  const _FadeTransitionWrapper({required this.child});
 
   @override
   State<_FadeTransitionWrapper> createState() => _FadeTransitionWrapperState();

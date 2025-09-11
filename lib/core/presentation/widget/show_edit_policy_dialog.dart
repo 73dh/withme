@@ -17,9 +17,9 @@ Future<void> showEditPolicyDialog({
   final holderController = TextEditingController(text: policy.policyHolder);
   final premiumController = TextEditingController(text: policy.premium);
 
-  String paymentMethod = policy.paymentMethod ?? '월납'; // 월납/일시납
+  String paymentMethod = policy.paymentMethod;
   final periodController = TextEditingController(
-    text: policy.paymentPeriod.toString() ?? '',
+    text: policy.paymentPeriod.toString() ,
   );
   DateTime? holderBirth = policy.policyHolderBirth;
   final holderBirthController = TextEditingController(
@@ -166,23 +166,25 @@ Future<void> showEditPolicyDialog({
                               child: DropdownButtonFormField<String>(
                                 value: paymentMethod,
                                 decoration: inputDecoration('납입방법'),
-                                items: ['월납', '일시납']
-                                    .map(
-                                      (method) => DropdownMenuItem(
-                                    value: method,
-                                    child: Text(
-                                      method,
-                                      style: textTheme.bodyMedium?.copyWith(
-                                        color: colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                    .toList(),
+                                items:
+                                    ['월납', '일시납']
+                                        .map(
+                                          (method) => DropdownMenuItem(
+                                            value: method,
+                                            child: Text(
+                                              method,
+                                              style: textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                    color:
+                                                        colorScheme.onSurface,
+                                                  ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: null, // null이면 비활성화
                               ),
                             ),
-
 
                             width(10),
 
@@ -202,33 +204,35 @@ Future<void> showEditPolicyDialog({
                           ],
                         ),
                         height(16),
-                      // 계약 상태
-                      DropdownButtonFormField<PolicyStatus>(
-                        value: selectedState,
-                        decoration: inputDecoration('계약 상태'),
-                        items: PolicyStatus.values
-                            .map(
-                              (state) => DropdownMenuItem(
-                            value: state,
-                            child: Text(
-                              state.label,
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                        )
-                            .toList(),
-                        onChanged: paymentMethod == '월납'
-                            ? (value) {
-                          if (value != null) {
-                            setState(() => selectedState = value);
-                          }
-                        }
-                            : null, // 일시납이면 수정 불가
-                      ),
+                        // 계약 상태
+                        DropdownButtonFormField<PolicyStatus>(
+                          value: selectedState,
+                          decoration: inputDecoration('계약 상태'),
+                          items:
+                              PolicyStatus.values
+                                  .map(
+                                    (state) => DropdownMenuItem(
+                                      value: state,
+                                      child: Text(
+                                        state.label,
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged:
+                              paymentMethod == '월납'
+                                  ? (value) {
+                                    if (value != null) {
+                                      setState(() => selectedState = value);
+                                    }
+                                  }
+                                  : null, // 일시납이면 수정 불가
+                        ),
 
-                      height(24),
+                        height(24),
 
                         // 버튼
                         Row(

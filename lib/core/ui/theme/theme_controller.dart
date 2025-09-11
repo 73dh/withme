@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum AppThemeMode { system, light, dark }
 
@@ -19,7 +17,7 @@ class ThemeController extends ChangeNotifier {
       case AppThemeMode.dark:
         return ThemeMode.dark;
       case AppThemeMode.system:
-      return ThemeMode.system;
+        return ThemeMode.system;
     }
   }
 
@@ -47,6 +45,7 @@ class ThemeController extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_themePrefKey, _themeMode.index);
   }
+
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     final modeIndex = prefs.getInt(_themePrefKey);
@@ -57,6 +56,5 @@ class ThemeController extends ChangeNotifier {
     }
   }
 }
-
 
 final ThemeController themeController = ThemeController();

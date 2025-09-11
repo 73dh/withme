@@ -6,17 +6,7 @@ import 'package:withme/core/di/setup.dart';
 import 'app.dart';
 import 'core/data/fire_base/firebase_options.dart';
 import 'core/router/router.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:withme/core/di/setup.dart';
-
-import 'app.dart';
-import 'core/data/fire_base/firebase_options.dart';
-import 'core/router/router.dart';
 import 'core/ui/theme/theme_controller.dart'; // ✅ 추가
-import 'core/ui/theme/theme_controller.dart'; // ✅ 추가
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

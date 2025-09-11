@@ -23,16 +23,19 @@ class ProspectListViewModel
   Stream<List<CustomerModel>> get cachedProspects => _cachedProspects.stream;
 
   List<CustomerModel> allCustomers = [];
+
+  /// Fab
   bool _isFabVisible = true;
 
   @override
   bool get isFabVisible => _isFabVisible;
 
+  /// 필터바 확장 상태
   bool _isFilterBarExpanded = false;
 
   bool get isFilterBarExpanded => _isFilterBarExpanded;
 
-  /// 수동 필터 토글 상태
+  /// 수동 토글 여부
   bool _isFilterBarToggledManually = false;
 
   bool get isFilterBarToggledManually => _isFilterBarToggledManually;
@@ -40,25 +43,22 @@ class ProspectListViewModel
   /// 최초 자동 처리 여부
   bool _autoHandledOnce = false;
 
-  /// 상령일까지 체크?
-  // bool get _allCountsZero =>
-  //     todoCount == 0 && urgentCount == 0 && managePeriodCount == 0;
-  bool get _allCountsZero =>
-      todoCount == 0 && urgentCount == 0;
+  /// counts=0 체크 (todo, urgent만 기준)
+  bool get _allCountsZero => todoCount == 0 && urgentCount == 0;
 
   void setFilterBarExpanded(bool expanded, {bool manual = false}) {
     _isFilterBarExpanded = expanded;
     if (manual) {
-      _isFilterBarToggledManually = true; // ✅ 수동 토글 기록
+      _isFilterBarToggledManually = true;
     }
     notifyListeners();
   }
 
-  /// counts=0일 때는 무조건 닫기
+  /// counts=0일 때 수동 토글 해제
   void resetManualFilterIfEmpty() {
     if (_allCountsZero && _isFilterBarToggledManually) {
       _isFilterBarExpanded = false;
-      _isFilterBarToggledManually = false; // 수동 상태 해제
+      _isFilterBarToggledManually = false;
       notifyListeners();
     }
   }
@@ -66,22 +66,19 @@ class ProspectListViewModel
   /// 자동 확장 조건
   bool shouldAutoExpandFilterBar() {
     if (_isFilterBarToggledManually) {
-      // ✅ 수동 상태여도 아이템이 전부 0이면 자동으로 닫힘
       if (_allCountsZero) {
         _isFilterBarExpanded = false;
-        _isFilterBarToggledManually = false; // 수동 상태 해제
+        _isFilterBarToggledManually = false;
         notifyListeners();
       }
       return false;
     }
 
-    // ✅ 최초 실행일 때만 자동 적용
     if (!_autoHandledOnce) {
       _autoHandledOnce = true;
       return !_allCountsZero;
     }
-
-    return false; // 이후에는 자동 동작 안 함
+    return false;
   }
 
   @override
@@ -100,16 +97,25 @@ class ProspectListViewModel
     }
   }
 
+  /// 정렬 상태
   SortStatus _sortStatus = SortStatus(type: SortType.name, isAscending: true);
 
   @override
   SortStatus get sortStatus => _sortStatus;
 
-  // 필터 조건
+  /// 필터 조건
   bool _todoOnly = false;
   bool _inactiveOnly = false;
   bool _urgentOnly = false;
   String _searchText = '';
+
+  bool get todoOnly => _todoOnly;
+
+  bool get inactiveOnly => _inactiveOnly;
+
+  bool get urgentOnly => _urgentOnly;
+
+  String get searchText => _searchText;
 
   void clearCache() {
     _cachedProspects.add([]);
@@ -183,7 +189,6 @@ class ProspectListViewModel
       currentSortType: _sortStatus.type,
     ).call(filtered);
 
-    // 수동 상태에서 아이템 모두 0이면 자동으로 닫힘
     resetManualFilterIfEmpty();
     _cachedProspects.add(List.from(sorted));
     notifyListeners();
@@ -264,5 +269,5 @@ class ProspectListViewModel
   bool get hasMainFab => true;
 
   @override
-  bool get hasSmallFab =>true;
+  bool get hasSmallFab => true;
 }

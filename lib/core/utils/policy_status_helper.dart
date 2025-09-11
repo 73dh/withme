@@ -26,8 +26,8 @@ class PolicyStatusHelper {
       PolicyModel policy, ColorScheme colorScheme) {
     final notKeep = isNotKeepPolicy(policy);
     return notKeep
-        ? colorScheme.errorContainer.withOpacity(0.3)
-        : colorScheme.tertiaryContainer.withOpacity(0.2);
+        ? colorScheme.errorContainer.withValues(alpha: 0.3)
+        : colorScheme.tertiaryContainer.withValues(alpha: 0.2);
   }
 
   /// 상태 텍스트 색상

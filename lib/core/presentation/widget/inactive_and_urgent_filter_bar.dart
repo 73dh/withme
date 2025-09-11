@@ -109,7 +109,7 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? activeColor.withOpacity(0.1) : bgColor, // 여기서 배경색 적용
+          color: isActive ? activeColor.withValues(alpha: 0.1) : bgColor, // 여기서 배경색 적용
           border: Border.all(
             color: isActive ? activeColor : Colors.grey[400]!,
             width: 1.2,
