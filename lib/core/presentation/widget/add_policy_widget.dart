@@ -53,7 +53,7 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    return  Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         GestureDetector(
@@ -80,8 +80,8 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
                   child: Image.asset(
                     IconsPath.newFolder,
                     color: iconColor,
-                    width: widget.size ,
-                    height: widget.size ,
+                    width: widget.size,
+                    height: widget.size,
                   ),
                 ),
               );
@@ -90,6 +90,5 @@ class _AddPolicyWidgetState extends State<AddPolicyWidget>
         ),
       ],
     );
-
   }
 }

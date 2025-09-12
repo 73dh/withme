@@ -7,6 +7,19 @@ import '../../../../core/presentation/components/birthday_badge.dart';
 import '../../../../core/presentation/components/payment_status_icon.dart';
 import '../../../../core/utils/check_payment_status.dart';
 import '../time_line_view_model.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/presentation/components/animated_text.dart';
+import '../../../../core/presentation/components/birthday_badge.dart';
+import '../time_line_view_model.dart';
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/presentation/components/animated_text.dart';
+import '../../../../core/presentation/components/birthday_badge.dart';
+import '../time_line_view_model.dart';
 
 class TimelinePage extends StatefulWidget {
   const TimelinePage({super.key});
@@ -19,23 +32,15 @@ class _TimelinePageState extends State<TimelinePage>
     with TickerProviderStateMixin {
   late final TimeLineViewModel viewModel;
 
-  late Color prospectColor; // ✅ 가망고객 배경색
-
   @override
   void initState() {
     super.initState();
     viewModel = TimeLineViewModel();
-    viewModel.fetchData(force: false);
+    viewModel.fetchData();
+
     viewModel.addListener(() {
       if (mounted) setState(() {});
     });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // ✅ 계약자는 primary, 가망고객은 deepOrange 톤
-    prospectColor = Colors.deepOrange.shade400;
   }
 
   @override
@@ -47,7 +52,6 @@ class _TimelinePageState extends State<TimelinePage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
     final brightness = theme.brightness;
 
@@ -57,6 +61,14 @@ class _TimelinePageState extends State<TimelinePage>
 
     final todos = viewModel.allTodos;
     final totalTodos = viewModel.totalTodos;
+
+    // ✅ 가망고객/계약자 색상
+    final prospectColor = brightness == Brightness.light
+        ? Colors.deepOrange.shade400
+        : Colors.deepOrange.shade200;
+    final customerColor = brightness == Brightness.light
+        ? Colors.blue.shade500
+        : Colors.blue.shade200;
 
     return Scaffold(
       appBar: AppBar(
@@ -73,13 +85,14 @@ class _TimelinePageState extends State<TimelinePage>
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
+          // ✅ 범례(legend)
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 12),
             child: Row(
               children: [
                 _buildLegendDot(prospectColor, "가망고객"),
                 const SizedBox(width: 8),
-                _buildLegendDot(colorScheme.primary, "계약자"),
+                _buildLegendDot(customerColor, "계약자"),
               ],
             ),
           ),
@@ -115,28 +128,24 @@ class _TimelinePageState extends State<TimelinePage>
             child: Builder(
               builder: (context) {
                 if (viewModel.isLoading) {
-                  // ⏳ 로딩 중
                   return Center(
                     child: AnimatedText(
                       text: '할일 확인중',
-                      style: textTheme.bodyLarge?.copyWith(
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   );
-                  // Center(child: Text("확인중"));
                 } else if (viewModel.allTodos.isEmpty) {
-                  // ✅ 로딩 끝났는데 데이터 없음
                   return Center(
                     child: AnimatedText(
                       text: '등록된 할일이 없습니다.',
-                      style: textTheme.bodyLarge?.copyWith(
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   );
                 } else {
-                  // 📌 할 일 리스트 출력
                   return ListView.builder(
                     padding: const EdgeInsets.only(top: 15),
                     itemCount: todos.length,
@@ -146,31 +155,14 @@ class _TimelinePageState extends State<TimelinePage>
 
                       final date = item.todo.dueDate;
                       final dateText = DateFormat("MM/dd").format(date);
-
-                      final isContracted = item.customer.policies.isNotEmpty;
-                      final isOverdue = item.todo.dueDate.isBefore(
-                        DateTime.now(),
-                      );
-
-                      final bool showDate =
-                          index == 0 ||
+                      final isOverdue = item.todo.dueDate.isBefore(DateTime.now());
+                      final bool showDate = index == 0 ||
                           !isSameDay(date, todos[index - 1].todo.dueDate);
-                      // 고객의 모든 계약의 상태 체크
-                      PaymentStatus? paymentStatus;
-                      if (item.customer.policies.isNotEmpty) {
-                        final statuses =
-                            item.customer.policies
-                                .map(checkPaymentStatus)
-                                .toList();
 
-                        if (statuses.contains(PaymentStatus.soonPaid)) {
-                          paymentStatus = PaymentStatus.soonPaid;
-                        } else if (statuses.contains(PaymentStatus.paid)) {
-                          paymentStatus = PaymentStatus.paid;
-                        } else {
-                          paymentStatus = PaymentStatus.paying;
-                        }
-                      }
+                      // ✅ 고객 분류에 따른 색상
+                      final isProspect = item.customer.policies.isEmpty;
+                      final iconColor =
+                      isProspect ? prospectColor : customerColor;
 
                       return TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0, end: 1),
@@ -193,25 +185,23 @@ class _TimelinePageState extends State<TimelinePage>
                                 // ✅ 날짜 최초 1번만 표시
                                 SizedBox(
                                   width: 90,
-                                  child:
-                                      showDate
-                                          ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                dateText,
-                                                style: TextStyle(
-                                                  color:
-                                                      colorScheme
-                                                          .onSurfaceVariant,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 2),
-                                              _buildWeekdayChip(context, date),
-                                            ],
-                                          )
-                                          : const SizedBox.shrink(),
+                                  child: showDate
+                                      ? Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        dateText,
+                                        style: TextStyle(
+                                          color: colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      _buildWeekdayChip(context, date),
+                                    ],
+                                  )
+                                      : const SizedBox.shrink(),
                                 ),
 
                                 // Dot + 세로선
@@ -222,19 +212,14 @@ class _TimelinePageState extends State<TimelinePage>
                                       _BlinkingDot(
                                         isOverdue: isOverdue,
                                         radius: dotRadius * 1.6,
-                                        backgroundColor:
-                                            isContracted
-                                                ? colorScheme.primary
-                                                : prospectColor,
-                                        label:
-                                            item.customer.name.isNotEmpty
-                                                ? item.customer.name[0]
-                                                : "?",
-                                        // ✅ 라이트 모드 → 검정, 다크 모드 → 흰색
-                                        labelColor:
-                                            brightness == Brightness.light
-                                                ? Colors.black
-                                                : Colors.white,
+                                        backgroundColor: iconColor,
+                                        label: item.customer.name.isNotEmpty
+                                            ? item.customer.name[0]
+                                            : "?",
+                                        labelColor: brightness ==
+                                            Brightness.light
+                                            ? Colors.black
+                                            : Colors.white,
                                       ),
                                       if (!isLast)
                                         Container(
@@ -248,29 +233,24 @@ class _TimelinePageState extends State<TimelinePage>
 
                                 const SizedBox(width: 8),
 
-                                // 고객명 + 할 일 내용
+                                // 고객명 + 생일뱃지 + 할 일 내용
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          // 고객명
+                                          // ✅ 아이콘 옆에 이름 표시
                                           Text(
                                             item.customer.name,
                                             style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.bold,
-                                              color:
-                                                  isContracted
-                                                      ? colorScheme.primary
-                                                      : prospectColor,
+                                              color: iconColor,
                                             ),
                                           ),
                                           const SizedBox(width: 4),
-
-                                          // 🎂 생일 뱃지
                                           BirthdayBadge(
                                             birth: item.customer.birth,
                                             cakeColor: Colors.pinkAccent,
@@ -278,115 +258,8 @@ class _TimelinePageState extends State<TimelinePage>
                                             textSize: 12,
                                             isShowDate: true,
                                           ),
-                                          const SizedBox(width: 6),
-
-                                          // 💰 계약자일 경우 계약건수 + 상태별 건수
-                                          if (isContracted) ...[
-                                            // 총 계약 건수
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 6,
-                                                    vertical: 2,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    colorScheme.surfaceVariant,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Text(
-                                                "${item.customer.policies.length}건",
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w600,
-                                                  color:
-                                                      colorScheme
-                                                          .onSurfaceVariant,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-
-                                            // 상태별 계약 건수 (완료임박 + 납입완료)
-                                            Builder(
-                                              builder: (context) {
-                                                final statuses =
-                                                    item.customer.policies
-                                                        .map(checkPaymentStatus)
-                                                        .toList();
-                                                final soonPaidCount =
-                                                    statuses
-                                                        .where(
-                                                          (s) =>
-                                                              s ==
-                                                              PaymentStatus
-                                                                  .soonPaid,
-                                                        )
-                                                        .length;
-                                                final paidCount =
-                                                    statuses
-                                                        .where(
-                                                          (s) =>
-                                                              s ==
-                                                              PaymentStatus
-                                                                  .paid,
-                                                        )
-                                                        .length;
-
-                                                return Row(
-                                                  children: [
-                                                    // ⏳ 완료임박 건수
-                                                    if (soonPaidCount > 0) ...[
-                                                      const PaymentStatusIcon(
-                                                        status:
-                                                            PaymentStatus
-                                                                .soonPaid,
-                                                        size: 14,
-                                                      ),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        "$soonPaidCount건",
-                                                        style: TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              colorScheme
-                                                                  .onSurfaceVariant,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 6),
-                                                    ],
-
-                                                    // ✅ 납입완료 건수
-                                                    if (paidCount > 0) ...[
-                                                      const PaymentStatusIcon(
-                                                        status:
-                                                            PaymentStatus.paid,
-                                                        size: 14,
-                                                      ),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        "$paidCount건",
-                                                        style: TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              colorScheme
-                                                                  .onSurfaceVariant,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          ],
                                         ],
                                       ),
-
                                       Text(
                                         item.todo.content,
                                         style: TextStyle(
@@ -418,24 +291,6 @@ class _TimelinePageState extends State<TimelinePage>
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Widget _buildLegendDot(Color color, String label) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black.withOpacity(0.4), width: 1),
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-
   Widget _buildWeekdayChip(BuildContext context, DateTime date) {
     final theme = Theme.of(context);
     final isLight = theme.brightness == Brightness.light;
@@ -465,6 +320,16 @@ class _TimelinePageState extends State<TimelinePage>
           color: textColor,
         ),
       ),
+    );
+  }
+
+  Widget _buildLegendDot(Color color, String label) {
+    return Row(
+      children: [
+        CircleAvatar(radius: 6, backgroundColor: color),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 12)),
+      ],
     );
   }
 }
@@ -516,8 +381,11 @@ class _BlinkingDotState extends State<_BlinkingDot>
       height: widget.radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: widget.backgroundColor.withOpacity(opacity),
-        border: Border.all(color: theme.colorScheme.outline, width: 1.5),
+        color:widget.backgroundColor.withValues(alpha: opacity * 0.6),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.8),
+          width: 1.5,
+        ),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -526,6 +394,13 @@ class _BlinkingDotState extends State<_BlinkingDot>
           fontSize: 9,
           fontWeight: FontWeight.bold,
           color: widget.labelColor,
+          shadows: [
+            Shadow(
+              offset: const Offset(0.5, 0.5),
+              blurRadius: 1,
+              color: Colors.black.withValues(alpha: 0.3),
+            ),
+          ],
         ),
       ),
     );

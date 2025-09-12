@@ -76,24 +76,27 @@ class CustomerRegistrationAppBar extends StatelessWidget
       backgroundColor: bgColor,
       foregroundColor: fgColor,
 
-        leading: registrationViewModel == null
-            ? Padding(
-          padding: const EdgeInsets.only(
-            left: 16,
-            top: 8,
-            bottom: 8,
-            right: 8.0,
-          ),
-          child: InsuredMembersIcon(customer: customer!),
-        )
-            : Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FirstNameIcon(
-            customer: customer!,
-            todoCount: todoViewModel.todoList.length,
-            hasOverdueTodo: todoViewModel.todoList.any((t) => t.isOverdue),
-          ),
-        ),
+      leading:
+          registrationViewModel == null
+              ? Padding(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  top: 8,
+                  bottom: 8,
+                  right: 8.0,
+                ),
+                child: InsuredMembersIcon(customer: customer!),
+              )
+              : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FirstNameIcon(
+                  customer: customer!,
+                  todoCount: todoViewModel.todoList.length,
+                  hasOverdueTodo: todoViewModel.todoList.any(
+                    (t) => t.isOverdue,
+                  ),
+                ),
+              ),
 
       // ✅ leading과 title 사이 여백 조절
       title:
@@ -247,6 +250,5 @@ class CustomerRegistrationAppBar extends StatelessWidget
         ),
       ],
     );
-
   }
 }

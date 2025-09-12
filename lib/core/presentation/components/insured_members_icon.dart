@@ -1,28 +1,54 @@
+import 'package:flutter/material.dart';
 import 'package:withme/core/utils/get_earliest_upcoming_birthday.dart';
 
 import '../../../domain/domain_import.dart';
 import '../../../domain/model/policy_model.dart';
+import '../../domain/enum/payment_status.dart';
+import '../../utils/check_payment_status.dart'; // ✅ checkPaymentStatus, PaymentStatus import
 import '../../utils/is_birthday_within_7days.dart';
 import '../core_presentation_import.dart';
 import 'birthday_badge.dart';
 
-class InsuredMembersIcon extends StatelessWidget {
+class InsuredMembersIcon extends StatefulWidget {
   final CustomerModel customer;
   final double size;
 
   const InsuredMembersIcon({super.key, required this.customer, this.size = 32});
 
   @override
+  State<InsuredMembersIcon> createState() => _InsuredMembersIconState();
+}
+
+class _InsuredMembersIconState extends State<InsuredMembersIcon>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _blinkController;
+
+  @override
+  void initState() {
+    super.initState();
+    _blinkController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true); // 깜빡임
+  }
+
+  @override
+  void dispose() {
+    _blinkController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<PolicyModel> policies = customer.policies;
+    final List<PolicyModel> policies = widget.customer.policies;
     final int totalCount = policies.length;
     final int displayCount = totalCount >= 5 ? 4 : totalCount;
 
     final List<Color> circleColors = [
-      Colors.blue.shade300, // 부드러운 블루
-      Colors.green.shade300, // 부드러운 그린
-      Colors.orange.shade300, // 부드러운 오렌지
-      Colors.purple.shade300, // 부드러운 퍼플
+      Colors.purple.shade400,
+      Colors.green.shade400,
+      Colors.orange.shade400,
+      Colors.blue.shade400,
     ];
 
     // 원 크기 및 위치 정의
@@ -31,28 +57,31 @@ class InsuredMembersIcon extends StatelessWidget {
 
     switch (displayCount) {
       case 1:
-        circleSize = size;
+        circleSize = widget.size;
         positions = [const Offset(0, 0)];
         break;
       case 2:
-        circleSize = size * 0.7;
-        positions = [Offset(0, size * 0.15), Offset(size * 0.3, 0)];
+        circleSize = widget.size * 0.7;
+        positions = [
+          Offset(0, widget.size * 0.15),
+          Offset(widget.size * 0.3, 0),
+        ];
         break;
       case 3:
-        circleSize = size * 0.7;
+        circleSize = widget.size * 0.7;
         positions = [
-          Offset(0, size * 0.2),
-          Offset(size * 0.35, 0),
-          Offset(size * 0.5, size * 0.4),
+          Offset(0, widget.size * 0.2),
+          Offset(widget.size * 0.35, 0),
+          Offset(widget.size * 0.5, widget.size * 0.4),
         ];
         break;
       default:
-        circleSize = size * 0.6;
+        circleSize = widget.size * 0.6;
         positions = [
           const Offset(0, 0),
-          Offset(size * 0.5, 0),
-          Offset(0, size * 0.5),
-          Offset(size * 0.5, size * 0.5),
+          Offset(widget.size * 0.5, 0),
+          Offset(0, widget.size * 0.5),
+          Offset(widget.size * 0.5, widget.size * 0.5),
         ];
     }
 
@@ -61,9 +90,17 @@ class InsuredMembersIcon extends StatelessWidget {
       (p) => p.insuredBirth != null && isBirthdayWithin7Days(p.insuredBirth!),
     );
 
+    // ✅ 납입 상태 체크
+    final bool hasSoonPaid = policies.any(
+      (p) => checkPaymentStatus(p) == PaymentStatus.soonPaid,
+    );
+    final bool hasPaid = policies.any(
+      (p) => checkPaymentStatus(p) == PaymentStatus.paid,
+    );
+
     return SizedBox(
-      width: size,
-      height: size,
+      width: widget.size,
+      height: widget.size,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -97,6 +134,24 @@ class InsuredMembersIcon extends StatelessWidget {
                 isShowDate: false,
                 birth: getEarliestUpcomingBirthday(policies),
               ),
+            ),
+
+          // ✅ 납입완료건 or 완료임박건 표시 (우측 하단)
+          if (hasSoonPaid || hasPaid)
+            Positioned(
+              left: -1,
+              bottom: -20,
+              child:
+                  hasSoonPaid
+                      ? FadeTransition(
+                        opacity: _blinkController,
+                        child: _buildDot(
+                          Theme.of(context).colorScheme.error,
+                        ), // ✅ 완료임박 = error
+                      )
+                      : _buildDot(
+                        Theme.of(context).colorScheme.primary,
+                      ), // ✅ 납입완료 = primary
             ),
         ],
       ),
@@ -149,6 +204,23 @@ class InsuredMembersIcon extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildDot(Color color) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        border: Border.all(
+          color: colorScheme.surface, // ✅ 배경색과 자연스럽게 맞춤
+          width: 2,
+        ),
       ),
     );
   }

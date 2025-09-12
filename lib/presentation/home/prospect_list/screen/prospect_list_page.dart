@@ -31,6 +31,7 @@ class _ProspectListPageState extends State<ProspectListPage>
   final viewModel = getIt<ProspectListViewModel>();
 
   bool _firstEnter = true;
+  bool _isRouteSubscribed = false; // ✅ 중복 구독 방지
 
   @override
   void initState() {
@@ -39,10 +40,23 @@ class _ProspectListPageState extends State<ProspectListPage>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getIt<RouteObserver<PageRoute>>().subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  @override
   void dispose() {
-    disposeFilterBarAnimation();
+    getIt<RouteObserver<PageRoute>>().unsubscribe(this);
     super.dispose();
   }
+
+
+  // @override
+  // void dispose() {
+  //   disposeFilterBarAnimation();
+  //   super.dispose();
+  // }
 
   void _toggleFilterBar() {
     setFilterBarExpanded(!viewModel.isFilterBarExpanded, manual: true);

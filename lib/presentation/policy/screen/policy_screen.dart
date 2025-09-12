@@ -310,6 +310,7 @@ class _PolicyScreenState extends State<PolicyScreen> {
           customerKey: customerKey,
           policyData: policyMap,
         );
+        await getIt<ProspectListViewModel>().fetchData(force: true);
         await getIt<CustomerListViewModel>().refresh();
 
         if (mounted) Navigator.pop(context, true);
