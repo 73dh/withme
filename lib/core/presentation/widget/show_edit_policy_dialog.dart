@@ -197,7 +197,7 @@ Future<void> showEditPolicyDialog({
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: colorScheme.onSurface,
                                 ),
-                                decoration: inputDecoration('납입기간(개월)'),
+                                decoration: inputDecoration('납입기간(연)'),
                                 enabled: paymentMethod == '월납', // ✅ 월납만 수정 가능
                               ),
                             ),

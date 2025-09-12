@@ -23,9 +23,12 @@ import '../../../domain/model/todo_model.dart';
 
 /// 고객 이름 + Todo 묶음
 class TodoWithCustomer {
-  final String customerName;
+  final CustomerModel customer; // ✅ 고객 전체 모델 보관
   final TodoModel todo;
-  TodoWithCustomer(this.customerName, this.todo);
+
+  TodoWithCustomer(this.customer, this.todo);
+
+  String get customerName => customer.name; // ✅ 기존처럼 이름 꺼내기 편하게
 }
 
 class TimeLineViewModel with ChangeNotifier {
@@ -37,12 +40,16 @@ class TimeLineViewModel with ChangeNotifier {
 
   List<CustomerModel> allCustomers = [];
 
+  /// ✅ 로딩 상태 관리
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   /// ✅ 전체 todos (flatten)
   List<TodoWithCustomer> get allTodos {
     return allCustomers.expand((c) {
-      return c.todos.map((t) => TodoWithCustomer(c.name, t));
+      return c.todos.map((t) => TodoWithCustomer(c, t));
     }).toList()
-      ..sort((a, b) => a.todo.dueDate.compareTo(b.todo.dueDate)); // 날짜순 정렬
+      ..sort((a, b) => a.todo.dueDate.compareTo(b.todo.dueDate));
   }
 
   /// ✅ 전체 todo 개수
@@ -50,15 +57,23 @@ class TimeLineViewModel with ChangeNotifier {
       allCustomers.fold<int>(0, (sum, c) => sum + c.todos.length);
 
   Future<void> fetchData({bool force = false}) async {
-    final usecase =
-    force
-        ? GetEditedAllUseCase(userKey: UserSession.userId)
-        : GetAllDataUseCase(userKey: UserSession.userId);
-
-    final result = await getIt<CustomerUseCase>().execute(usecase: usecase);
-    allCustomers = result;
-    _cachedCustomers.add(List.from(allCustomers));
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      final usecase = force
+          ? GetEditedAllUseCase(userKey: UserSession.userId)
+          : GetAllDataUseCase(userKey: UserSession.userId);
+
+      final result =
+      await getIt<CustomerUseCase>().execute(usecase: usecase);
+
+      allCustomers = result;
+      _cachedCustomers.add(List.from(allCustomers));
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void clearCache() {
