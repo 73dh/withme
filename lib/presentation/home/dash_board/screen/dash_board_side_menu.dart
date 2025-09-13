@@ -270,11 +270,11 @@ class DashBoardSideMenu extends StatelessWidget {
             height(15),
             BuildMenuItem(
               icon: Icons.payment_outlined,
-              text: '납입기간 종료 관리: $remainPaymentMonth개월',
+              text: '납입기간 종료 알림: $remainPaymentMonth개월 전',
               onTap:
                   () => showCycleEditDialog(
                     context,
-                    title: '납입기간 종료 관리',
+                    title: '납입기간 종료 알림 관리',
                     initNumber: remainPaymentMonth,
                     onUpdate:
                         (newMonth) => getIt<UserSession>()

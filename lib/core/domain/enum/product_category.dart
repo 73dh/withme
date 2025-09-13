@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-
 enum ProductCategory {
   all,
   wholeLife,
   termLife,
+  child,
   variableWholeLife,
   variableAnnuity,
   variableSavings,
@@ -19,9 +18,10 @@ enum ProductCategory {
 
   @override
   String toString() => switch (this) {
-    ProductCategory.all=>'전상품',
+    ProductCategory.all => '전상품',
     ProductCategory.wholeLife => '종신보험',
     ProductCategory.termLife => '정기보험',
+    ProductCategory.child => '어린이보험',
     ProductCategory.variableWholeLife => '변액종신보험',
     ProductCategory.variableAnnuity => '변액연금보험',
     ProductCategory.variableSavings => '변액저축보험',
@@ -35,24 +35,4 @@ enum ProductCategory {
     ProductCategory.homeInsurance => '주택화재보험',
     ProductCategory.etc => '기타',
   };
-
-  IconData getCategoryIcon() {
-    return switch (this) {
-      ProductCategory.all=>Icons.info,
-      ProductCategory.wholeLife => Icons.favorite,
-      ProductCategory.termLife => Icons.access_time,
-      ProductCategory.variableWholeLife => Icons.swap_vert,
-      ProductCategory.variableAnnuity => Icons.trending_up,
-      ProductCategory.variableSavings => Icons.savings,
-      ProductCategory.annuity => Icons.account_balance_wallet,
-      ProductCategory.savings => Icons.savings,
-      ProductCategory.health => Icons.health_and_safety,
-      ProductCategory.cancer => Icons.biotech,
-      ProductCategory.criticalInsurance => Icons.warning_amber,
-      ProductCategory.accidentInsurance => Icons.healing,
-      ProductCategory.autoInsurance => Icons.directions_car,
-      ProductCategory.homeInsurance => Icons.home,
-      ProductCategory.etc => Icons.more_horiz,
-    };
-  }
 }

@@ -7,6 +7,7 @@ class InsuranceAgeWidget extends StatelessWidget {
   final DateTime insuranceChangeDate;
   final ColorScheme colorScheme;
   final bool isCustomerItem;
+  final bool isShowText;
 
   const InsuranceAgeWidget({
     super.key,
@@ -15,6 +16,7 @@ class InsuranceAgeWidget extends StatelessWidget {
     required this.insuranceChangeDate,
     required this.colorScheme,
     this.isCustomerItem = true,
+    this.isShowText=true,
   });
 
   @override
@@ -25,6 +27,7 @@ class InsuranceAgeWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min, // Row 최소 폭만 차지
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        if(isShowText)
         Flexible(
           child:Text(
             '[상령일] ${insuranceChangeDate.formattedMonthAndDate}',

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:withme/core/data/fire_base/user_session.dart';
 import 'package:withme/core/di/setup.dart';
 
-import '../components/info_icon_with_popup.dart';
-
 class InactiveAndUrgentFilterBar extends StatelessWidget {
   final bool showTodoOnly;
   final bool showInactiveOnly;
@@ -51,7 +49,8 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
         child: Wrap(
           spacing: 6,
           runSpacing: 6,
-          alignment: WrapAlignment.center, // ← 중앙 정렬 추가
+          alignment: WrapAlignment.center,
+          // ← 중앙 정렬 추가
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             _buildFilterButton(
@@ -81,14 +80,6 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
                 txtColor: txtColor,
                 activeColor: icColor,
               ),
-            InfoIconWithPopup(
-              message: '''
-        관리기간: $manageDays일
-        상령일 임박: $urgentDays일
-        (설정에서 변경 가능)
-        ''',
-              color: txtColor,
-            ),
           ],
         ),
       ),
@@ -109,7 +100,8 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? activeColor.withValues(alpha: 0.1) : bgColor, // 여기서 배경색 적용
+          color: isActive ? activeColor.withValues(alpha: 0.1) : bgColor,
+          // 여기서 배경색 적용
           border: Border.all(
             color: isActive ? activeColor : Colors.grey[400]!,
             width: 1.2,
@@ -127,4 +119,3 @@ class InactiveAndUrgentFilterBar extends StatelessWidget {
     );
   }
 }
-
